@@ -1,0 +1,1 @@
+export { BankingPage } from './BankingPage';

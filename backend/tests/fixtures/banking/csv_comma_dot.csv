@@ -1,0 +1,3 @@
+date,payee,memo,debit,credit,ref
+2026-03-11,Acme Builders GmbH,"INV-000001, thanks",,"1,190.00",TX-1
+2026-03-12,Office Supply Store,Order 7781,45.90,,TX-2

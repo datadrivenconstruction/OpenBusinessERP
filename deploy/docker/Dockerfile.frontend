@@ -1,0 +1,56 @@
+# Pinned to the same node minor as Dockerfile.unified, and pinned rather than
+# floating for the reason given there. The locked rollup-plugin-visualizer 7.0.1
+# declares engines node >=22, so node:20 built this image against a dependency
+# that says it does not run there (BUG-B04).
+FROM node:24.20-alpine AS build
+
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json ./
+# Default heap on purpose: the ceiling below is for the Vite build and should
+# not reach the install. The install itself is hardened the same way as in
+# Dockerfile.unified, which carries the full note on issue #404; keep the two
+# invocations identical so a fix to one is not silently missing from the other.
+RUN npm config set fetch-retries 5 \
+ && npm config set fetch-retry-maxtimeout 120000 \
+ && npm config set fetch-timeout 600000 \
+ && { npm ci --ignore-scripts --no-audit --no-fund \
+      || { echo "npm ci failed, retrying once with a clean cache"; \
+           tail -n 60 /root/.npm/_logs/*-debug-0.log 2>/dev/null || true; \
+           npm cache clean --force; \
+           npm ci --ignore-scripts --no-audit --no-fund \
+             || { echo "npm ci failed twice, npm debug log follows"; \
+                  tail -n 60 /root/.npm/_logs/*-debug-0.log 2>/dev/null || true; \
+                  exit 1; }; }; }
+
+COPY frontend/ .
+# The Vite/Rollup build exceeds Node's default ~4 GB heap and aborts with exit
+# 134 ("JavaScript heap out of memory"). This image had no ceiling at all, so
+# the two-container production layout in docker-compose.prod.yml could not
+# build its frontend. Scoped to this one command, not the stage.
+# The ceiling that applies is the explicit --max-old-space-size=12288 in the
+# frontend/package.json build script, which beats NODE_OPTIONS; the value
+# here only mirrors it. The type check alone peaks at about 9.2 GB, so the
+# Docker host needs about 14 GB of memory to build this stage.
+RUN NODE_OPTIONS=--max-old-space-size=12288 npm run build
+
+FROM nginx:alpine
+
+RUN rm /etc/nginx/conf.d/default.conf
+
+COPY deploy/docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+RUN chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/log/nginx \
+    && touch /var/run/nginx.pid \
+    && chown -R nginx:nginx /var/run/nginx.pid
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget -qO /dev/null http://localhost:80/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

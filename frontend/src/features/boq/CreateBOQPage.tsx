@@ -1,0 +1,495 @@
+// DDC-CWICR-OE: DataDrivenConstruction · OpenBusinessERP
+// Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
+import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChevronDown, X, FileSpreadsheet, FilePlus2, Upload, FileUp } from 'lucide-react';
+import { Button, Input } from '@/shared/ui';
+import { useToastStore } from '@/stores/useToastStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useProjectContextStore } from '@/stores/useProjectContextStore';
+import { fetchProjectList } from '@/shared/lib/projectList';
+import { boqApi } from './api';
+import { importFailureFromBody } from './importFailureText';
+
+interface Project {
+  id: string;
+  name: string;
+}
+
+interface CreateBOQModalProps {
+  open: boolean;
+  onClose: () => void;
+  defaultProjectId?: string;
+}
+
+type StartMode = 'empty' | 'import';
+
+/**
+ * Accepted import containers in the New BOQ window, grouped by the standard /
+ * country they come from. Everything here is dispatched to the backend
+ * `/import/auto/` endpoint, which sniffs the file and routes it to the matching
+ * native parser (GAEB / FIEBDC-3 / Excel) or, for drawings and scans, to the
+ * AI takeoff path. The `accept` string is derived from this list so the two can
+ * never drift.
+ */
+const IMPORT_STANDARDS: { region: string; standard: string; exts: string[] }[] = [
+  { region: 'Germany / Austria / Switzerland', standard: 'GAEB DA XML 3.3 (X81 / X83 / X84 / X86)', exts: ['.x81', '.x83', '.x84', '.x86', '.xml'] },
+  { region: 'Spain / Latin America', standard: 'FIEBDC-3 (BC3)', exts: ['.bc3'] },
+  { region: 'United Kingdom / United States / universal', standard: 'Excel or CSV (NRM / MasterFormat / custom columns)', exts: ['.xlsx', '.xls', '.csv'] },
+  { region: 'Drawings and scans (AI takeoff)', standard: 'PDF, IFC, DWG, RVT, DGN, images', exts: ['.pdf', '.ifc', '.dwg', '.rvt', '.dgn', '.jpg', '.jpeg', '.png', '.tiff'] },
+];
+
+const IMPORT_ACCEPT = Array.from(new Set(IMPORT_STANDARDS.flatMap((s) => s.exts))).join(',');
+
+/**
+ * The shapes the server reads a price base or a tax date in: a day, a month, a
+ * quarter or a year (`app.modules.boq.base_date`). Mirrored here only so the
+ * form can say what is wrong before the round trip; the server stays the judge.
+ */
+const DATE_SHAPE = /^\d{4}(-\d{2}(-\d{2})?|-[Qq][1-4])?$/;
+
+const isReadableDate = (value: string): boolean => {
+  if (value === '') return true;
+  if (!DATE_SHAPE.test(value)) return false;
+  const year = Number(value.slice(0, 4));
+  if (year < 1) return false;
+  if (value.length === 4 || /-[Qq]/.test(value)) return true;
+  const month = Number(value.slice(5, 7));
+  if (month < 1 || month > 12) return false;
+  if (value.length === 7) return true;
+  const day = Number(value.slice(8, 10));
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day >= 1 && day <= days[month - 1]!;
+};
+
+export function CreateBOQModal({ open, onClose, defaultProjectId }: CreateBOQModalProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const addToast = useToastStore((s) => s.addToast);
+
+  // A caller that names no project gets the one in the top-bar switcher, the
+  // project the reader is working in, rather than an empty picker.
+  const activeProjectId = useProjectContextStore((s) => s.activeProjectId);
+  const initialProjectId = defaultProjectId || activeProjectId || '';
+  const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  // Blank tax date means "same as the price base": the server stores null
+  // and taxes the bill on its base date, so a later change to the base date
+  // still moves the tax date of a bill that never chose its own.
+  const [baseDate, setBaseDate] = useState('');
+  const [taxDate, setTaxDate] = useState('');
+  const [startMode, setStartMode] = useState<StartMode>('empty');
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => fetchProjectList<Project[]>(),
+    staleTime: 5 * 60_000,
+  });
+
+  // Sync default project when modal opens or defaultProjectId changes
+  useEffect(() => {
+    if (open) {
+      setSelectedProjectId(initialProjectId);
+      setName('');
+      setDescription('');
+      setBaseDate('');
+      setTaxDate('');
+      setStartMode('empty');
+      setFile(null);
+      setBusy(false);
+      setError(null);
+      setTouched(false);
+    }
+  }, [open, initialProjectId]);
+
+  const stripExt = (filename: string): string => filename.replace(/\.[^./\\]+$/, '');
+
+  // When importing, a missing name defaults to the file name so the user
+  // does not have to type one just to get going.
+  const effectiveName =
+    name.trim() || (startMode === 'import' && file ? stripExt(file.name) : '');
+
+  const projectError =
+    touched && !selectedProjectId
+      ? t('validation.required', { defaultValue: 'This field is required' })
+      : undefined;
+  const nameError =
+    touched && !effectiveName
+      ? t('validation.required', { defaultValue: 'This field is required' })
+      : undefined;
+  const fileError =
+    touched && startMode === 'import' && !file
+      ? t('boq.import_needs_file', { defaultValue: 'Choose a file to import, or switch to an empty BOQ.' })
+      : undefined;
+  const dateShapeError = t('boq.date_shape_error', {
+    defaultValue: 'Use a day, a month, a quarter or a year: 2026-03-15, 2026-03, 2026-Q1 or 2026',
+  });
+  const baseDateError = isReadableDate(baseDate.trim()) ? undefined : dateShapeError;
+  const taxDateError = isReadableDate(taxDate.trim()) ? undefined : dateShapeError;
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (busy) return;
+    setError(null);
+    setTouched(true);
+
+    if (!selectedProjectId || !effectiveName) return;
+    if (startMode === 'import' && !file) return;
+    if (baseDateError || taxDateError) return;
+
+    setBusy(true);
+    try {
+      const boq = await boqApi.create({
+        project_id: selectedProjectId,
+        name: effectiveName,
+        description,
+        base_date: baseDate.trim() || null,
+        tax_date: taxDate.trim() || null,
+      });
+
+      if (startMode === 'import' && file) {
+        addToast({
+          type: 'info',
+          title: t('boq.import_started', { defaultValue: 'Importing {{name}}…', name: file.name }),
+          message: t('boq.import_started_hint', {
+            defaultValue: 'Large files (PDF / CAD / 1000+ rows) may take up to 60 seconds.',
+          }),
+        });
+
+        const token = useAuthStore.getState().accessToken;
+        const form = new FormData();
+        form.append('file', file);
+
+        // The auto dispatcher sniffs the file and routes it to the native
+        // GAEB / FIEBDC-3 / Excel parser, or to the AI path for drawings, so
+        // every supported country standard lands on a real parser rather than
+        // a generic guess. 90s ceiling so a hung upload cannot freeze the UI.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90_000);
+        try {
+          const res = await fetch(`/api/v1/boq/boqs/${boq.id}/import/auto/`, {
+            method: 'POST',
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            body: form,
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+          if (!res.ok) {
+            const body = (await res.json().catch(() => ({}))) as { detail?: unknown };
+            const failed = t('boq.import_failed', { defaultValue: 'Import failed' });
+            throw new Error(
+              importFailureFromBody(body, t, failed) ?? (typeof body.detail === 'string' ? body.detail : failed),
+            );
+          }
+          const result = (await res.json()) as {
+            imported: number;
+            skipped?: number;
+            total_items?: number;
+            errors?: unknown[];
+            source_format?: string;
+            format_id?: string;
+            currency?: string;
+          };
+          const denominator = result.total_items ?? result.imported + (result.skipped ?? 0);
+          const fmtLabel = result.source_format ? ` (${result.source_format}${result.currency ? `, ${result.currency}` : ''})` : '';
+          const errCount = Array.isArray(result.errors) ? result.errors.length : 0;
+          addToast({
+            type: result.imported > 0 ? 'success' : 'warning',
+            title: t('boq.import_done', {
+              defaultValue: 'Imported {{n}} of {{total}} positions{{label}}',
+              n: result.imported,
+              total: denominator,
+              label: fmtLabel,
+            }),
+            message: errCount > 0 ? t('boq.import_errors', { defaultValue: '{{n}} row(s) could not be read', n: errCount }) : undefined,
+          });
+        } catch (importErr) {
+          clearTimeout(timeoutId);
+          const isTimeout = importErr instanceof DOMException && importErr.name === 'AbortError';
+          // The BOQ was created; only the import failed. Surface that clearly
+          // and still navigate into the (empty) BOQ so the user can retry.
+          addToast({
+            type: 'error',
+            title: t('boq.import_failed', { defaultValue: 'Import failed' }),
+            message: isTimeout
+              ? t('boq.import_timeout', { defaultValue: 'Server did not respond within 90 seconds. Try a smaller file.' })
+              : importErr instanceof Error ? importErr.message : String(importErr),
+          });
+        }
+      } else {
+        addToast({ type: 'success', title: t('toasts.boq_created', { defaultValue: 'Bill of Quantities created successfully' }) });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['boqs', selectedProjectId] });
+      queryClient.invalidateQueries({ queryKey: ['all-boqs'] });
+      onClose();
+      navigate(`/boq/${boq.id}`);
+    } catch (createErr) {
+      setError(createErr instanceof Error ? createErr.message : t('toasts.boq_create_failed', { defaultValue: 'Failed to create Bill of Quantities' }));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!open) return null;
+
+  const submitLabel =
+    startMode === 'import'
+      ? t('boq.create_and_import', { defaultValue: 'Create and import' })
+      : t('boq.create_boq', { defaultValue: 'Create BOQ' });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-lg animate-fade-in" onClick={busy ? undefined : onClose} />
+
+      {/* Modal */}
+      <div className="relative w-full max-w-lg mx-4 rounded-2xl bg-surface-elevated border border-border-light shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-oe-blue/10">
+              <FileSpreadsheet size={20} className="text-oe-blue" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-content-primary">
+                {t('projects.new_boq', { defaultValue: 'New BOQ' })}
+              </h2>
+              <p className="text-xs text-content-tertiary">
+                {t('boq.create_subtitle', { defaultValue: 'Create a new bill of quantities' })}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            disabled={busy}
+            aria-label={t('common.close', { defaultValue: 'Close' })}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-secondary transition-colors disabled:opacity-50"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
+          {/* Project selector */}
+          <div>
+            <label className="text-sm font-medium text-content-primary block mb-1.5">
+              {t('common.project')}
+              <span aria-hidden="true" className="ml-1 text-semantic-error">*</span>
+            </label>
+            <div className="relative">
+              <select
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                className={`w-full h-10 appearance-none rounded-lg border px-3 pr-9 text-sm text-content-primary bg-surface-primary focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-fast ease-oe ${
+                  projectError
+                    ? 'border-semantic-error focus:ring-semantic-error/30'
+                    : 'border-border focus:ring-oe-blue hover:border-content-tertiary'
+                }`}
+                required aria-required="true"
+                aria-invalid={Boolean(projectError)}
+              >
+                <option value="" disabled>
+                  {t('boq.select_project', { defaultValue: 'Select Project' })}
+                </option>
+                {projects?.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-content-tertiary" />
+            </div>
+            {projectError && (
+              <p className="mt-1 text-xs text-semantic-error" role="alert">{projectError}</p>
+            )}
+          </div>
+
+          {/* Start mode: empty vs import */}
+          <div>
+            <label className="text-sm font-medium text-content-primary block mb-1.5">
+              {t('boq.start_from', { defaultValue: 'Start from' })}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setStartMode('empty')}
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+                  startMode === 'empty'
+                    ? 'border-oe-blue bg-oe-blue/5 text-content-primary'
+                    : 'border-border text-content-secondary hover:border-content-tertiary'
+                }`}
+                aria-pressed={startMode === 'empty'}
+              >
+                <FilePlus2 size={16} className={startMode === 'empty' ? 'text-oe-blue' : 'text-content-tertiary'} />
+                {t('boq.start_empty', { defaultValue: 'Empty BOQ' })}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStartMode('import')}
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+                  startMode === 'import'
+                    ? 'border-oe-blue bg-oe-blue/5 text-content-primary'
+                    : 'border-border text-content-secondary hover:border-content-tertiary'
+                }`}
+                aria-pressed={startMode === 'import'}
+                data-testid="create-boq-import-mode"
+              >
+                <Upload size={16} className={startMode === 'import' ? 'text-oe-blue' : 'text-content-tertiary'} />
+                {t('boq.start_import', { defaultValue: 'Import a file' })}
+              </button>
+            </div>
+          </div>
+
+          {/* Import file picker + supported standards */}
+          {startMode === 'import' && (
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex w-full items-center gap-3 rounded-lg border border-dashed px-3 py-3 text-left text-sm transition-colors ${
+                  fileError
+                    ? 'border-semantic-error'
+                    : 'border-border hover:border-oe-blue hover:bg-oe-blue/5'
+                }`}
+                data-testid="create-boq-file-picker"
+              >
+                <FileUp size={18} className="shrink-0 text-content-tertiary" />
+                {file ? (
+                  <span className="truncate text-content-primary">{file.name}</span>
+                ) : (
+                  <span className="text-content-tertiary">
+                    {t('boq.import_choose_file', { defaultValue: 'Choose a file to import' })}
+                  </span>
+                )}
+              </button>
+              {fileError && (
+                <p className="text-xs text-semantic-error" role="alert">{fileError}</p>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={IMPORT_ACCEPT}
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  setFile(f);
+                  if (f && !name.trim()) setName(stripExt(f.name));
+                  e.target.value = '';
+                }}
+                aria-label={t('boq.import_choose_file', { defaultValue: 'Choose a file to import' })}
+              />
+
+              <div className="rounded-lg bg-surface-secondary/60 px-3 py-2.5">
+                <p className="text-xs font-medium text-content-secondary mb-1.5">
+                  {t('boq.import_supported', { defaultValue: 'Supported standards' })}
+                </p>
+                <ul className="space-y-1">
+                  {IMPORT_STANDARDS.map((s) => (
+                    <li key={s.standard} className="flex flex-col text-xs leading-tight">
+                      <span className="text-content-primary">{s.standard}</span>
+                      <span className="text-content-tertiary">{s.region}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Name */}
+          <Input
+            label={t('boq.name_label', { defaultValue: 'BOQ Name' })}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t('boq.name_placeholder', {
+              defaultValue: 'e.g. Main Building - Structural Works',
+            })}
+            required={startMode === 'empty'}
+            aria-required={startMode === 'empty'}
+            error={nameError}
+            autoFocus
+          />
+
+          {/* Description */}
+          <div>
+            <label className="text-sm font-medium text-content-primary block mb-1.5">
+              {t('common.description')}
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t('boq.scope_placeholder', { defaultValue: 'Scope of this BOQ...' })}
+              rows={2}
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-content-primary placeholder:text-content-tertiary bg-surface-primary focus:outline-none focus:ring-2 focus:ring-oe-blue focus:border-transparent transition-all duration-fast ease-oe hover:border-content-tertiary resize-none"
+            />
+          </div>
+
+          {/* Price base date and tax date. Two days, not one: a bill priced at
+              last year's rates for works carried out this year is taxed at
+              this year's rate. Blank tax date follows the price base. */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start">
+            <Input
+              label={t('boq.base_date_label', { defaultValue: 'Price base date' })}
+              value={baseDate}
+              onChange={(e) => setBaseDate(e.target.value)}
+              placeholder="2026-Q1"
+              maxLength={20}
+              error={baseDateError}
+              data-testid="create-boq-base-date"
+            />
+            <Input
+              label={t('boq.tax_date_label', { defaultValue: 'Tax date' })}
+              value={taxDate}
+              onChange={(e) => setTaxDate(e.target.value)}
+              placeholder={baseDate.trim() || t('boq.tax_date_placeholder', { defaultValue: 'Same as price base date' })}
+              maxLength={20}
+              error={taxDateError}
+              hint={t('boq.tax_date_hint', {
+                defaultValue: 'VAT is charged at the rate in force on this date. Leave it empty to use the price base date.',
+              })}
+              data-testid="create-boq-tax-date"
+            />
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="rounded-lg bg-semantic-error-bg px-3 py-2 text-sm text-semantic-error">
+              {error}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button variant="secondary" type="button" onClick={onClose} disabled={busy}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="primary" type="submit" loading={busy}>
+              {submitLabel}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Route compat — redirects to /boq and opens modal
+export function CreateBOQPage() {
+  const navigate = useNavigate();
+  const { projectId } = useParams<{ projectId: string }>();
+
+  useEffect(() => {
+    navigate('/boq', { state: { openCreateModal: true, projectId }, replace: true });
+  }, [navigate, projectId]);
+
+  return null;
+}

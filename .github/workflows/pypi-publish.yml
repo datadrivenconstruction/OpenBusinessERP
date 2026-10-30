@@ -1,0 +1,481 @@
+# OpenBusinessERP — PyPI publish
+#
+# Triggered on version tag push (e.g., v5.0.0). Builds the frontend
+# bundle, vendors it into the wheel layout, builds the wheel, and
+# publishes to PyPI via Trusted Publishing (OIDC).
+#
+# No secrets required — the OIDC token is short-lived and minted at
+# job-start time. To enable on the PyPI side (one-time, 2 minutes):
+#   1. Sign in at https://pypi.org/manage/account/publishing/
+#   2. "Add a new pending publisher" with:
+#        PyPI Project Name: openbusinesserp
+#        Owner: DataDrivenConstruction
+#        Repository name: OpenBusinessERP
+#        Workflow name: pypi-publish.yml
+#        Environment name: pypi
+#   3. Save. Next tag push to this repo publishes automatically.
+#
+# Manual fallback (no Trusted Publisher set up): see
+#   the internal publish guide
+# for the local twine upload procedure.
+
+name: PyPI Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to build (e.g., v5.0.0). Required for workflow_dispatch.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  # id-token: write is the OIDC permission Trusted Publishing requires.
+  id-token: write
+
+jobs:
+  publish:
+    name: Build + Publish to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/openbusinesserp
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.version || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Repo hygiene - no internal-only files in the tree
+        run: python scripts/check_repo_hygiene.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          # The line the Docker image and the rest of CI build on. Cesium
+          # 1.137+ needs Node 22 or newer, so this can never drop below 22;
+          # tsc-on-prebuild needs the full devDeps set.
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend bundle into wheel layout
+        # The heap ceiling for this build is NOT set here. frontend/package.json
+        # runs both tsc and vite through node --max-old-space-size=12288 on the
+        # command line, and an explicit flag beats NODE_OPTIONS in both
+        # directions: measured, an environment asking for 9999 alongside a flag
+        # of 1024 gives a 1216 MB heap. The value below therefore reaches only
+        # npm's own process during npm ci, never the build, and editing it
+        # cannot fix or cause an out of memory in Vite or tsc. Change
+        # package.json for that.
+        env:
+          NODE_OPTIONS: --max-old-space-size=12288
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+          # NOTE: do NOT copy dist into backend/app/_frontend_dist here.
+          # backend/pyproject.toml already declares
+          #   [tool.hatch.build.targets.wheel.force-include]
+          #   "../frontend/dist" = "app/_frontend_dist"
+          # so hatchling vendors the bundle into the wheel itself. A manual
+          # pre-copy makes the same files visible to both the packages=["app"]
+          # walker AND the force-include map, producing duplicate ZIP entries
+          # that PyPI rejects with 400 "Duplicate filename in local headers".
+
+      - name: Install build tooling
+        run: python -m pip install --upgrade build
+
+      - name: Build wheel
+        run: |
+          cd backend
+          python -m build --wheel --outdir ../dist/
+
+      - name: Check the wheel fits, per file and against the project total
+        shell: bash
+        run: |
+          python - <<'PY'
+          import glob, json, os, sys, urllib.error, urllib.request
+          from datetime import datetime, timezone
+
+          # PyPI rejects any single file over 100 MiB, and it rejects it at
+          # upload, which here is after the tag is already public. Nothing
+          # asserted the size before, so the first release to cross the line
+          # would have found out the expensive way. This step runs immediately
+          # after the build and before anything is published.
+          #
+          # The number: the hard cap is 100 MiB = 104857600 bytes. A wheel built
+          # from a clean tree at 16.8.1 is about 85.8 MiB, and the trend across
+          # 16.1.0 to 16.8.0 was 85.4 MB to 88.2 MB in eight days, roughly
+          # 0.35 MB a day, driven by the bundled frontend and the regional packs.
+          # 95 MiB sits about 9 MiB above today's wheel and 5 MiB below the cap:
+          # at the observed rate that is roughly a month of warning, which is
+          # enough time to shrink something deliberately rather than in a panic
+          # on a tag that cannot be taken back.
+          #
+          # If this fails, do not just raise the number. Look at what grew first:
+          # `python -c "import zipfile,collections;..."` over the wheel usually
+          # shows one directory that doubled. Raising the limit past 100 MiB
+          # cannot work at all, so the headroom is the whole point of it.
+          LIMIT_MIB = 95
+          HARD_CAP_MIB = 100
+
+          whl = sorted(glob.glob("dist/*.whl"))
+          assert len(whl) == 1, f"expected exactly one wheel in dist/, found {whl}"
+          size = os.path.getsize(whl[0])
+          mib = size / 1048576
+          print(f"wheel {whl[0]} is {size:,} bytes ({mib:.1f} MiB)")
+          if mib > LIMIT_MIB:
+              sys.exit(
+                  f"ERROR: wheel is {mib:.1f} MiB, over the {LIMIT_MIB} MiB budget. "
+                  f"PyPI's hard limit is {HARD_CAP_MIB} MiB per file and it is enforced "
+                  f"at upload, after this tag is public. Find what grew and drop it; "
+                  f"raising the budget only moves the wall closer."
+              )
+          print(f"OK: {LIMIT_MIB - mib:.1f} MiB of headroom under the {LIMIT_MIB} MiB budget")
+
+          # Second wall, and the one that actually stopped a release. PyPI caps
+          # the TOTAL stored size of a project as well as each file, and the two
+          # limits share the phrase "size limit" while meaning different things.
+          # Everything above this line measures one wheel. 17.0.1 passed all of
+          # it, built cleanly, and was refused at upload with
+          #   400 Project size too large. Limit for project
+          #   'openbusinesserp' total size is 10 GB.
+          # after 336 versions had accumulated 10164 MiB. The step was green and
+          # honest; the defect was simply not inside what it measured. So this
+          # widens the existing check rather than adding a second one beside it.
+          #
+          # The limit is 10 GiB, not a decimal 10 GB, and that is measured rather
+          # than assumed: 16.9.0's 85.49 MiB upload SUCCEEDED at a stored total of
+          # 10164 MiB, which a 9537 MiB decimal cap would have refused, and
+          # 17.0.1's 85.9 MiB was refused, putting the wall under 10250 MiB.
+          #
+          # Failing here still leaves a public tag with no wheel, which is why the
+          # real fix is to run this before tagging. It is much better than a 400:
+          # it names both numbers and says how much has to come off.
+          PROJECT = "openbusinesserp"
+          LIMIT_BYTES = 10 * 1024**3
+
+          try:
+              with urllib.request.urlopen(
+                  f"https://pypi.org/pypi/{PROJECT}/json", timeout=60
+              ) as r:
+                  meta = json.load(r)
+          except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+              # Do not fail the release because PyPI was unreachable for a moment.
+              # An unmeasured total is reported as unmeasured, never as fine.
+              print(f"::warning::could not read the PyPI project total ({exc}); "
+                    f"the project-size wall was NOT checked for this release")
+          else:
+              stored = sum(f["size"] for fs in meta["releases"].values() for f in fs)
+              versions = len(meta["releases"])
+              after = stored + size
+              print(
+                  f"PyPI project total: {stored/1048576:,.0f} MiB across {versions} "
+                  f"versions; limit {LIMIT_BYTES/1048576:,.0f} MiB; "
+                  f"headroom {(LIMIT_BYTES - stored)/1048576:,.1f} MiB"
+              )
+              if after > LIMIT_BYTES:
+                  sys.exit(
+                      f"ERROR: this {mib:.1f} MiB wheel does not fit. The project "
+                      f"holds {stored/1048576:,.0f} MiB of a {LIMIT_BYTES/1048576:,.0f} "
+                      f"MiB limit, leaving {(LIMIT_BYTES - stored)/1048576:,.1f} MiB, so "
+                      f"{(after - LIMIT_BYTES)/1048576:,.1f} MiB has to come off the wheel "
+                      f"or space has to be freed on PyPI. Shrinking the wheel is the half "
+                      f"that does not need a PyPI account; raising the project limit or "
+                      f"removing old releases is the half that does."
+                  )
+              left = LIMIT_BYTES - after
+              print(f"OK: fits, with {left/1048576:,.1f} MiB left after this upload")
+
+              # How much warning that headroom is worth depends entirely on how
+              # fast we release, so measure the cadence instead of assuming it.
+              #
+              # This used to warn only when less than one more wheel fit. That is
+              # a true statement but it arrives too late to act on. Freeing space
+              # means deleting old releases, which breaks anyone pinned to them,
+              # or asking PyPI to raise the project limit, which is a support
+              # request answered by a person on their own schedule. Neither is
+              # something to start on the release that fails.
+              #
+              # The threshold is therefore stated in days rather than wheels,
+              # because days are what the remedy needs and wheels only stand in
+              # for them. Fourteen days is the number, and it is chosen against
+              # the slower of the two remedies: a support request is answered by
+              # a volunteer on their own schedule, so a week is optimistic.
+              #
+              # Counting wheels instead would set the lead time by accident. At
+              # 17.8.3 the project had room for 5.8 of them, which is a month if
+              # releases are monthly and under four days at the rate they were
+              # actually going out that week. A wheel count cannot tell those
+              # apart; that is the whole reason the cadence is measured below.
+              #
+              # There is no second threshold on the wheel count, and there was
+              # one until it was checked. It read "under two wheels, warn
+              # whatever the arithmetic says", to cover a quiet spell driving
+              # the measured rate toward zero and the day estimate toward
+              # infinity. That cannot happen. The rate below adds one for the
+              # release being published right now, in every window including
+              # the three day one, so it can never come out below a third of a
+              # release a day. Days are therefore never more than three times
+              # the wheel count, under two wheels is always under six days, and
+              # the day threshold has already fired. A guard that cannot fire,
+              # justified by a paragraph that is false, is worse than no guard.
+              #
+              # Take the fastest rate sustained over any recent window rather
+              # than one average, because the averaging window decides the
+              # answer and a single long one hides exactly the burst that
+              # empties the quota. Measured against the index as it stood when
+              # 17.8.3 published: the last fourteen wheels average 0.6 a day and
+              # put the runway at nine days, while the three day window gives
+              # 1.33 a day and just under four. Understating the rate is the
+              # dangerous direction for a warning about running out, so the
+              # windows disagreeing means take the worst and name which it was.
+              now = datetime.now(timezone.utc)
+              ages = sorted(
+                  (now - datetime.fromisoformat(f["upload_time_iso_8601"].replace("Z", "+00:00"))).total_seconds() / 86400
+                  for fs in meta["releases"].values()
+                  for f in fs
+                  if f["filename"].endswith(".whl")
+              )
+              WARN_DAYS = 14
+
+              fits = left / size
+              runway = f"{fits:.1f} more wheels this size"
+              rates = [
+                  # The +1 is the release being published right now, which is not
+                  # on the index yet when this runs on a tag. Re-running this
+                  # script by hand after a release counts that wheel twice and
+                  # reads high; subtract it if you are checking between tags.
+                  ((sum(1 for a in ages if a <= w) + 1) / w, w)
+                  for w in (3, 7, 14, 30)
+              ]
+              per_day, window = max(rates)
+              days = fits / per_day if per_day > 0 else float("inf")
+              if per_day > 0:
+                  runway += (
+                      f", about {days:.0f} days at {per_day:.2f} releases a "
+                      f"day, the fastest of the last 3, 7, 14 and 30 day windows "
+                      f"(the {window} day one)"
+                  )
+              print(f"room for {runway}")
+              if days < WARN_DAYS:
+                  print(
+                      f"::warning::PyPI project storage is running out: room for {runway}. "
+                      f"The wheel cannot shrink enough to matter here, so this needs "
+                      f"either old releases deleted, which breaks anyone pinned to them, "
+                      f"or a support request to raise the project limit. Both want a "
+                      f"human and neither is instant."
+                  )
+          PY
+
+      - name: Sanity check wheel
+        shell: bash
+        run: |
+          ls -lh dist/
+          python - <<'PY'
+          import json, os, re, zipfile
+
+          # This check used to ask whether any member's name contained the
+          # string "_frontend_dist". It could not fail. The build hook creates
+          # frontend/dist/.placeholder whenever that file is missing, precisely
+          # so the force-include map always resolves, so a wheel whose entire
+          # user interface is one 123-byte placeholder satisfied it and printed
+          # "wheel OK". The substring also matched _frontend_dist_prev, so a
+          # wheel carrying nothing but a stale bundle passed too.
+          #
+          # Ask instead for the thing the check exists to prove: that the page
+          # the server serves is in the wheel, and that everything that page
+          # asks for is in the wheel with it.
+          whl = next(f for f in os.listdir('dist') if f.endswith('.whl'))
+          path = os.path.join('dist', whl)
+          with zipfile.ZipFile(path) as z:
+              files = set(z.namelist())
+              index = 'app/_frontend_dist/index.html'
+              assert index in files, f'wheel {whl} has no {index}; the built frontend did not reach it'
+              html = z.read(index).decode('utf-8')
+
+          refs = re.findall(r'(?:src|href)="([^"]+)"', html)
+          local = [r for r in refs if not r.startswith(('http://', 'https://', 'data:', '//', '#'))]
+          assert local, f'{index} asks for nothing; it is not a built page'
+          missing = [r for r in local if 'app/_frontend_dist/' + r.lstrip('/').split('?')[0] not in files]
+          assert not missing, f'wheel {whl} is missing {len(missing)} asset(s) index.html asks for: {missing[:5]}'
+
+          # The migration tree and the translations are the other two payloads a
+          # pip install cannot work without, and neither had a check at all.
+          revisions = [f for f in files if f.startswith('alembic/versions/') and f.endswith('.py')]
+          assert 'alembic.ini' in files, f'wheel {whl} has no alembic.ini, so alembic cannot run after install'
+          assert len(revisions) > 100, f'wheel {whl} carries only {len(revisions)} migration revisions'
+          locales = [f for f in files if f.startswith('locales/') and f.endswith('.json')]
+          assert len(locales) >= 20, f'wheel {whl} carries only {len(locales)} locale files'
+
+          # The PDF.js decoders, which this step is structurally unable to see by
+          # the mechanism above. Everything before this line is reached by
+          # scraping src= and href= out of index.html, and these files are never
+          # named in markup: the viewer builds their URLs at runtime from
+          # PDFJS_ASSET_ROOT (frontend/src/shared/lib/pdfjs.ts:53) and passes
+          # them as wasmUrl and iccUrl parameters. So a wheel carrying none of
+          # them passes every assertion above and then draws a blank page for
+          # exactly the scanned drawings a takeoff receives most often.
+          #
+          # The emitting side is frontend/vite.config.ts:102-159, and its two
+          # silent skips are the failure to guard against. It reads the version
+          # from node_modules/pdfjs-dist/package.json and returns doing nothing
+          # if that is missing, and it does `if (!existsSync(dir)) continue` over
+          # the wasm and iccs directories. Both are correct for 6.2.108, where
+          # those directories sit at the package root. A future pdfjs that moves
+          # them under build/ or legacy/ trips the second guard, emits zero
+          # files, logs nothing and fails no test, because pdfjs.test.ts mocks
+          # the library and fabricates the version rather than reading it.
+          #
+          # This asks the same source of truth the plugin asks, so the two cannot
+          # disagree about which version directory to expect.
+          with open('frontend/node_modules/pdfjs-dist/package.json', encoding='utf-8') as fh:
+              pdfjs_version = json.load(fh)['version']
+          root = f'app/_frontend_dist/assets/pdfjs/{pdfjs_version}/'
+          wasm = [f for f in files if f.startswith(root + 'wasm/')]
+          iccs = [f for f in files if f.startswith(root + 'iccs/')]
+          assert wasm, (
+              f'wheel {whl} carries no PDF.js wasm decoders under {root}wasm/. The viewer builds '
+              f'that path at runtime from the installed pdfjs version, so nothing in index.html '
+              f'names it and no other check here can see it missing. Scanned drawings using JBIG2 '
+              f'or JPEG 2000 would render blank. Check the wasm/iccs directory layout of '
+              f'pdfjs-dist {pdfjs_version} against the plugin in frontend/vite.config.ts.'
+          )
+          assert iccs, (
+              f'wheel {whl} carries no PDF.js ICC profile under {root}iccs/, so CMYK colour in '
+              f'scanned drawings has no profile to resolve against. Same cause as the wasm case.'
+          )
+          print(f'OK: {len(wasm)} wasm and {len(iccs)} icc file(s) at pdfjs {pdfjs_version}')
+
+          # The community packs, which for the whole life of the project reached
+          # no user at all: the tree was never packaged, and discovery resolved
+          # its location by counting parent directories, which lands inside the
+          # virtualenv's Lib after an install. Every pip and desktop user was
+          # told there were no packs available. Config that reads correctly can
+          # still build an archive without them, so ask the archive.
+          # backend/tests/unit/test_community_packs_ship.py decides WHICH packs
+          # belong here; this only insists that what was decided arrived.
+          manifests = [f for f in files if f.startswith('packs/') and f.endswith('/manifest.py')]
+          pack_slugs = sorted({f.split('/')[1] for f in files if f.startswith('packs/')})
+          assert len(pack_slugs) >= 15, (
+              f'wheel {whl} carries {len(pack_slugs)} community packs, and the tree ships at least '
+              f'15. A wheel short of them installs to a UI that reports no packs available: '
+              f'{pack_slugs}'
+          )
+          without_manifest = [s for s in pack_slugs if not any(m.startswith(f'packs/{s}/') for m in manifests)]
+          assert not without_manifest, (
+              f'wheel {whl} carries pack directories with no manifest.py, which discovery cannot '
+              f'load and which therefore ship as dead bytes: {without_manifest}'
+          )
+
+          # The same question asked of the packs, because a manifest does not
+          # only configure: it NAMES files. One JSON per additional_locales
+          # entry, a logo, a favicon, an onboarding script, one reference
+          # document per validation_rule_packs id. Nothing anywhere resolved one
+          # of those names against a file, and four of them pointed at nothing.
+          #
+          # backend/tests/unit/test_community_packs_ship.py asks this of the
+          # tree on every run, which is where it can still stop a commit. This
+          # asks it of the artefact, which is the only place that can say the
+          # bytes actually arrived - force-include copies from the working tree,
+          # and a build machine's tree is not a clean checkout.
+          #
+          # This reader skips a declaration it cannot evaluate statically rather
+          # than failing on it. The tree-side gate refuses those outright, and
+          # runs first, so an unreadable declaration is caught before a tag is
+          # ever cut; duplicating that machinery into YAML would cost more than
+          # it buys.
+          import ast
+
+          _SCALAR = ('logo_path', 'favicon_path', 'onboarding_script_path')
+          _CALLS = ('PartnerPackManifest', 'PartnerBranding')
+          declared = []
+          with zipfile.ZipFile(path) as zp:
+              for member in sorted(manifests):
+                  pkg = member.rsplit('/', 1)[0]
+                  for node in ast.walk(ast.parse(zp.read(member).decode('utf-8'), member)):
+                      if not isinstance(node, ast.Call):
+                          continue
+                      called = getattr(node.func, 'id', None) or getattr(node.func, 'attr', '')
+                      if called not in _CALLS:
+                          continue
+                      for kw in node.keywords:
+                          value = kw.value
+                          if kw.arg in _SCALAR:
+                              if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                                  declared.append(f'{pkg}/{value.value}')
+                          elif kw.arg == 'additional_locales' and isinstance(value, ast.Dict):
+                              declared += [
+                                  f'{pkg}/{p.value}' for p in value.values
+                                  if isinstance(p, ast.Constant) and isinstance(p.value, str)
+                              ]
+                          elif kw.arg == 'validation_rule_packs' and isinstance(value, ast.List):
+                              declared += [
+                                  f'{pkg}/rule_packs/{e.value}.json' for e in value.elts
+                                  if isinstance(e, ast.Constant) and isinstance(e.value, str)
+                              ]
+
+          # Guard the instrument before the comparison that leans on it. The
+          # assertion below sweeps clean over an empty list, so a reader that
+          # quietly stopped matching would report every pack perfect. The floor
+          # sits far under the real count, which is well over a hundred, because
+          # it is a check on this reader and not a target for the packs.
+          assert len(declared) >= 50, (
+              f'read only {len(declared)} declared asset path(s) from {len(manifests)} pack manifests '
+              f'in wheel {whl}. They declare far more than that, so this reader has stopped seeing '
+              f'them and the check below would pass over nothing.'
+          )
+          absent_assets = sorted(set(declared) - files)
+          assert not absent_assets, (
+              f'wheel {whl} carries pack manifests naming {len(absent_assets)} file(s) the wheel does '
+              f'not contain: {absent_assets[:5]}. Nothing raises on a user machine and the UI falls '
+              f'back, so this surfaces nowhere: the pack simply delivers less than it promised.'
+          )
+
+          print(
+              f'wheel OK: {whl} - {len(files)} files, index.html plus all {len(local)} assets it asks for, '
+              f'{len(revisions)} migrations, {len(locales)} locales, {len(pack_slugs)} packs carrying all '
+              f'{len(declared)} files their manifests name'
+          )
+          PY
+
+      - name: Repo hygiene - no internal-only files in the wheel
+        run: python scripts/check_repo_hygiene.py --zip "$(ls dist/*.whl | head -n1)"
+
+      - name: Detect publish mode
+        id: pubmode
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          if [ -n "${PYPI_API_TOKEN:-}" ]; then
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+            echo "Publishing via API token (PYPI_API_TOKEN secret present)."
+          else
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+            echo "Publishing via Trusted Publishing (OIDC)."
+          fi
+
+      - name: Publish to PyPI (Trusted Publishing)
+        if: steps.pubmode.outputs.has_token == 'false'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          verbose: true
+
+      - name: Publish to PyPI (API token fallback)
+        if: steps.pubmode.outputs.has_token == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          verbose: true
+          attestations: false

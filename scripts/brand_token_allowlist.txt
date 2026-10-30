@@ -1,0 +1,45 @@
+# Reviewed functional-interop exceptions for check_no_brand_tokens.py.
+# Founder-approved 2026-06-08: functional interop names stay (they tell a user
+# what they can actually import or connect to); everything else is scrubbed.
+#
+# Format: <path-substr>||<line-substr>
+# A brand token is allowed ONLY on a line whose file path contains <path-substr>
+# (empty = any file) AND whose text contains <line-substr>. This stays precise:
+# a new brand on any other line is still caught, because it will not carry the
+# reviewed context substring. Keep this list as small as the genuine interop set.
+
+# Schedule importer: the named tab-delimited exchange format is functional interop
+# (the import endpoint parses real files of this format).
+backend/app/modules/schedule/router.py||XER
+
+# Integration-targets description: lists the external systems the platform can
+# connect to via API, so a user knows what actually integrates.
+locales/||community_type_integration_desc
+
+# Functional schedule import-format parsers named in design docs (same case as the
+# XER allowlist above: the code actually parses these exchange formats).
+docs/MASTER_PLAN_v2.7.md||XER
+docs/rfc/35-eac-v2-platform.md||PMXML
+
+# Portuguese-language demo content: the facade-paint line in the Sao Paulo demo
+# pack uses the ordinary Portuguese word for "textured", not a brand.
+# The context used to be the unaccented spelling of the word beside it, which
+# stopped matching the moment the demo packs were given their accents, and the
+# check went red on a line nobody had touched. It is pinned to the accent-free
+# opening of the description now, which no spelling pass will move. As with the
+# Czech entries below, the context deliberately stops short of the flagged token:
+# this file is scanned like any other.
+demo_packs/residential-saopaulo||Pintura de fachada
+
+# Czech case content: the five letters flagged on these two lines are the ordinary
+# Czech past-tense verb "flowed", which happens to spell one of the denied product
+# names. The sentences are about labour flowing into a unit rate and about survey
+# quantities flowing into cost. Same situation as the Portuguese line above, and the
+# reason the denylist header warns to keep tokens to unambiguous coined words.
+# Rewriting correct Czech to satisfy a substring match would be the worse trade.
+# The context words below deliberately stop short of the flagged token. They have
+# to: this file is scanned like any other, so an entry quoting the token would put
+# a literal hit in the allowlist and fail the check on itself. Pinning to the words
+# either side keeps the exception narrow without that.
+frontend/src/app/locales/cs.ts||aby práce
+frontend/src/app/locales/cs.ts||na zaměření

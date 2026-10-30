@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <BkToCstmrStmt>
+    <GrpHdr><MsgId>TESTSTMT-1</MsgId><CreDtTm>2026-03-12T08:00:00</CreDtTm></GrpHdr>
+    <Stmt>
+      <Id>STMT-2026-03-11</Id>
+      <Acct><Id><IBAN>DE89370400440532013000</IBAN></Id><Ccy>EUR</Ccy></Acct>
+      <Ntry>
+        <Amt Ccy="EUR">1190.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-03-11</Dt></BookgDt>
+        <ValDt><Dt>2026-03-11</Dt></ValDt>
+        <AcctSvcrRef>BANKREF-0001</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <Refs><EndToEndId>E2E-ACME-1</EndToEndId></Refs>
+          <RltdPties>
+            <Dbtr><Pty><Nm>Acme Builders GmbH</Nm></Pty></Dbtr>
+            <DbtrAcct><Id><IBAN>DE02120300000000202051</IBAN></Id></DbtrAcct>
+          </RltdPties>
+          <RmtInf><Ustrd>Payment INV-000001 thank you</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">45.90</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <BookgDt><DtTm>2026-03-11T10:15:00</DtTm></BookgDt>
+        <AcctSvcrRef>BANKREF-0002</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Cdtr><Nm>Office Supply Store</Nm></Cdtr></RltdPties>
+          <RmtInf><Ustrd>Order 7781</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">300.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <BookgDt><Dt>2026-03-11</Dt></BookgDt>
+        <AcctSvcrRef>BATCH-9</AcctSvcrRef>
+        <NtryDtls>
+          <TxDtls><Amt Ccy="EUR">100.00</Amt><RltdPties><Dbtr><Nm>Alpha</Nm></Dbtr></RltdPties><RmtInf><Ustrd>A1</Ustrd></RmtInf></TxDtls>
+          <TxDtls><Amt Ccy="EUR">200.00</Amt><RltdPties><Dbtr><Nm>Beta</Nm></Dbtr></RltdPties><RmtInf><Ustrd>B1</Ustrd></RmtInf></TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

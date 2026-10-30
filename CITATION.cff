@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use OpenBusinessERP in your work, please cite it as below."
+title: "OpenBusinessERP"
+type: software
+authors:
+  - given-names: "Artem"
+    family-names: "Boiko"
+    email: "info@datadrivenconstruction.io"
+    affiliation: "DataDrivenConstruction"
+repository-code: "https://github.com/datadrivenconstruction/OpenBusinessERP"
+url: "https://datadrivenconstruction.io"
+license: "AGPL-3.0-or-later"
+version: "18.4.0"
+keywords:
+  - erp
+  - small-business
+  - invoicing
+  - accounting
+  - e-invoicing
+  - crm
+  - inventory
+  - open-source
+abstract: >-
+  Open-source, self-hostable ERP for small and mid-sized businesses:
+  invoicing, accounting, VAT and e-invoicing, banking and reconciliation,
+  CRM, sales, inventory, procurement, HR, appointments and online booking,
+  with country and industry packs and optional AI assistance.
