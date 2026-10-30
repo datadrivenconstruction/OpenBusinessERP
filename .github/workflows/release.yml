@@ -126,7 +126,7 @@ jobs:
           echo "Extracted $(printf '%s\n' "$CONTENT" | grep -c . || true) non-empty lines of notes for $VERSION."
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: "OpenBusinessERP ${{ github.ref_name }}"
