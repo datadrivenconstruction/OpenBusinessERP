@@ -78,8 +78,6 @@ from app.modules.contracts.service import ContractsService
 # an assumed shape.
 
 
-
-
 def _shipped_packs() -> list[object]:
     from app.core.partner_pack import discovery
 
@@ -121,15 +119,9 @@ NON_JURISDICTION_RULE_SETS: dict[str, str] = {
 }
 
 
-
-
 def _pack_reachable_rule_sets() -> set[str]:
     """Every rule set some compliance pack can put in front of the engine."""
     return {rs for pack in RULE_PACKS.values() for rs in pack.get("rule_sets", [])}
-
-
-
-
 
 
 def test_every_rule_set_a_pack_names_is_registered_in_the_engine() -> None:
@@ -201,13 +193,9 @@ NO_NATIONAL_RULES_REGISTERED: dict[str, str] = {
 }
 
 
-
-
 def _resolved_pack_for_tag(column: str, tag: str) -> str:
     """Resolve a tag through the same column the product reads it from."""
     return resolve_pack(tag, None) if column == "country" else resolve_pack(None, tag)
-
-
 
 
 # ── Gate 3: no country is measured against somebody else's standards ───────

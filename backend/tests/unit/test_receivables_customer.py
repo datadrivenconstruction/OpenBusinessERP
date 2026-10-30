@@ -48,14 +48,21 @@ async def _setup(session, tenant="default"):
 
 
 async def _invoice(sales, name, net, due=DUE):
-    inv = await sales.create("invoice", lines=[LineData("Work", "", D(1), D(net), D(0), D(0))],
-                             doc_date=DAY, due_date=due, customer_name=name)
+    inv = await sales.create(
+        "invoice",
+        lines=[LineData("Work", "", D(1), D(net), D(0), D(0))],
+        doc_date=DAY,
+        due_date=due,
+        customer_name=name,
+    )
     return await sales.issue_invoice(inv.id)
 
 
 def test_payment_stats_weighted_by_amount():
-    pays = [{"amount": D("100"), "days_to_pay": 10, "days_late": 0},
-            {"amount": D("300"), "days_to_pay": 30, "days_late": 20}]
+    pays = [
+        {"amount": D("100"), "days_to_pay": 10, "days_late": 0},
+        {"amount": D("300"), "days_to_pay": 30, "days_late": 20},
+    ]
     s = payment_stats(pays)
     assert (s["avg_days_to_pay"], s["avg_days_late"], s["on_time_share"]) == (25.0, 15.0, 25)
     assert payment_stats([])["avg_days_to_pay"] is None
@@ -78,9 +85,17 @@ async def test_customer_detail_payments_promises_and_preview(session):
     assert [p["level"] for p in detail["next_dunning"]] == [1]
     assert await ReceivablesService(session).list_runs() == []
 
-    promise = await cust.add({"partner_key": ACME, "customer_name": "Acme", "kind": "promise",
-                              "invoice_id": open_inv.id, "promised_date": as_of - timedelta(days=1),
-                              "promised_amount": D("200"), "text": "Phoned, pays Friday"})
+    promise = await cust.add(
+        {
+            "partner_key": ACME,
+            "customer_name": "Acme",
+            "kind": "promise",
+            "invoice_id": open_inv.id,
+            "promised_date": as_of - timedelta(days=1),
+            "promised_amount": D("200"),
+            "text": "Phoned, pays Friday",
+        }
+    )
     await cust.add({"partner_key": ACME, "kind": "note", "text": "Prefers email"})
     assert promise.invoice_number == open_inv.number and promise.status == "open"
     assert followup_out(promise, as_of)["overdue"] is True

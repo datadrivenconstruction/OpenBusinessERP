@@ -143,7 +143,9 @@ def score_item(line: BankLine, item: OpenItem, tolerance: Decimal, window_days: 
         s *= 0.5
         reasons.append("currency differs")
     alloc = min(bank, item.open_amount)
-    return Suggestion(round(min(s, 1.0), 3), [Allocation(item.kind, item.id, item.number, alloc)], reasons, bank - alloc)
+    return Suggestion(
+        round(min(s, 1.0), 3), [Allocation(item.kind, item.id, item.number, alloc)], reasons, bank - alloc
+    )
 
 
 def suggest(

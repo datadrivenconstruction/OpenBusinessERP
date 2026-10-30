@@ -37,14 +37,40 @@ D = Decimal
 # GL codes the demo posts costs to, per chart template the sales module knows.
 EXPENSE_ACCOUNTS: dict[str, dict[str, str]] = {
     "de_skr03": {
-        "bank": "1200", "equity": "0800", "input_vat": "1576", "goods": "3400", "services": "3100",
-        "rent": "4210", "wages": "4120", "marketing": "4600", "software": "4806", "other": "4900",
-        "revenue": "8400", "payables": "1600", "inventory": "3980", "cogs": "3400", "loan": "0630", "interest": "2100",
+        "bank": "1200",
+        "equity": "0800",
+        "input_vat": "1576",
+        "goods": "3400",
+        "services": "3100",
+        "rent": "4210",
+        "wages": "4120",
+        "marketing": "4600",
+        "software": "4806",
+        "other": "4900",
+        "revenue": "8400",
+        "payables": "1600",
+        "inventory": "3980",
+        "cogs": "3400",
+        "loan": "0630",
+        "interest": "2100",
     },
     "ifrs_generic": {
-        "bank": "1710", "equity": "3000", "input_vat": "1450", "goods": "5000", "services": "5100",
-        "rent": "5400", "wages": "5200", "marketing": "5500", "software": "5500", "other": "5500",
-        "revenue": "4000", "payables": "2200", "inventory": "1300", "cogs": "5000", "loan": "2000", "interest": "5600",
+        "bank": "1710",
+        "equity": "3000",
+        "input_vat": "1450",
+        "goods": "5000",
+        "services": "5100",
+        "rent": "5400",
+        "wages": "5200",
+        "marketing": "5510",
+        "software": "5520",
+        "other": "5500",
+        "revenue": "4000",
+        "payables": "2200",
+        "inventory": "1300",
+        "cogs": "5000",
+        "loan": "2000",
+        "interest": "5600",
     },
 }
 NO_VAT_CATEGORIES = {"wages"}
@@ -92,30 +118,51 @@ CASES: dict[str, Case] = {
             industry="Wholesale",
             summary="B2B wholesaler of industrial consumables and packaging, Hamburg.",
             customers=[
-                ("Kestner Maschinenbau GmbH", "DE"), ("Varnholt Logistik AG", "DE"), ("Dornquist Metallwaren KG", "DE"),
-                ("Zellbrook Verpackung GmbH", "DE"), ("Veldmoor Industrie B.V.", "NL"), ("Tallvik Produktion AB", "SE"),
-                ("Brodavka Strojírny s.r.o.", "CZ"), ("Atelier Corvelle SARL", "FR"), ("Felsgrat Werkzeuge GmbH", "AT"),
-                ("Valtorne Componenti S.r.l.", "IT"), ("Brzozel Przemysł Sp. z o.o.", "PL"), ("Wendt & Söhne OHG", "DE"),
-                ("Quellhain Lebensmitteltechnik GmbH", "DE"), ("Ironhollow Fasteners Inc.", "US"),
+                ("Kestner Maschinenbau GmbH", "DE"),
+                ("Varnholt Logistik AG", "DE"),
+                ("Dornquist Metallwaren KG", "DE"),
+                ("Zellbrook Verpackung GmbH", "DE"),
+                ("Veldmoor Industrie B.V.", "NL"),
+                ("Tallvik Produktion AB", "SE"),
+                ("Brodavka Strojírny s.r.o.", "CZ"),
+                ("Atelier Corvelle SARL", "FR"),
+                ("Felsgrat Werkzeuge GmbH", "AT"),
+                ("Valtorne Componenti S.r.l.", "IT"),
+                ("Brzozel Przemysł Sp. z o.o.", "PL"),
+                ("Wendt & Söhne OHG", "DE"),
+                ("Quellhain Lebensmitteltechnik GmbH", "DE"),
+                ("Ironhollow Fasteners Inc.", "US"),
             ],
             suppliers=[
-                ("Morvenau Industriebedarf GmbH", "DE", "goods"), ("Kuusela Packaging Oy", "FI", "goods"),
-                ("Stalwen Steel Components S.A.", "PL", "goods"), ("Spedition Ravensold GmbH", "DE", "services"),
+                ("Morvenau Industriebedarf GmbH", "DE", "goods"),
+                ("Kuusela Packaging Oy", "FI", "goods"),
+                ("Stalwen Steel Components S.A.", "PL", "goods"),
+                ("Spedition Ravensold GmbH", "DE", "services"),
                 ("Kaiwerk Lagerflächen GmbH", "DE", "rent"),
             ],
             expenses=[
-                ("Warehouse rent Hamburg", "rent", 6800), ("Salaries", "wages", 30000),
-                ("Freight forwarding", "services", 4200), ("ERP and EDI subscriptions", "software", 890),
+                ("Warehouse rent Hamburg", "rent", 6800),
+                ("Salaries", "wages", 30000),
+                ("Freight forwarding", "services", 4200),
+                ("ERP and EDI subscriptions", "software", 890),
                 ("Trade fair and catalogue", "marketing", 1500),
             ],
             deals=[
-                "Framework agreement packaging 2027", "Quarterly glove supply", "Fastener vendor-managed inventory",
-                "New warehouse consumables bundle", "Export programme Scandinavia", "Cleaning supplies annual contract",
-                "Pallet equipment refresh", "Annual label contract",
+                "Framework agreement packaging 2027",
+                "Quarterly glove supply",
+                "Fastener vendor-managed inventory",
+                "New warehouse consumables bundle",
+                "Export programme Scandinavia",
+                "Cleaning supplies annual contract",
+                "Pallet equipment refresh",
+                "Annual label contract",
             ],
             tasks=[
-                "Renegotiate freight rates with Spedition Ravensold", "Chase overdue invoices over 30 days",
-                "Stock count main warehouse", "Update price list for Q1", "Onboard new customer Veldmoor Industrie",
+                "Renegotiate freight rates with Spedition Ravensold",
+                "Chase overdue invoices over 30 days",
+                "Stock count main warehouse",
+                "Update price list for Q1",
+                "Onboard new customer Veldmoor Industrie",
             ],
             quotes=42,
         ),
@@ -126,28 +173,48 @@ CASES: dict[str, Case] = {
             industry="Management consulting",
             summary="Management and finance consulting boutique, Amsterdam.",
             customers=[
-                ("Duinhaven Foods B.V.", "NL"), ("Lindewaard Housing Cooperative", "NL"), ("Stroomvaart Energy Services N.V.", "NL"),
-                ("Kaaiwerk Port Services NV", "BE"), ("Hellmark Privatbank AG", "DE"), ("Vermelin Santé Groupe", "FR"),
-                ("Corrigan Fintech Labs Ltd", "IE"), ("Skovlund Design Retail ApS", "DK"), ("Strehlau Mobility GmbH", "AT"),
-                ("Arrietza Renewables S.L.", "ES"), ("Kestridge Insurance Group plc", "GB"), ("Ambercove Capital LLC", "US"),
+                ("Duinhaven Foods B.V.", "NL"),
+                ("Lindewaard Housing Cooperative", "NL"),
+                ("Stroomvaart Energy Services N.V.", "NL"),
+                ("Kaaiwerk Port Services NV", "BE"),
+                ("Hellmark Privatbank AG", "DE"),
+                ("Vermelin Santé Groupe", "FR"),
+                ("Corrigan Fintech Labs Ltd", "IE"),
+                ("Skovlund Design Retail ApS", "DK"),
+                ("Strehlau Mobility GmbH", "AT"),
+                ("Arrietza Renewables S.L.", "ES"),
+                ("Kestridge Insurance Group plc", "GB"),
+                ("Ambercove Capital LLC", "US"),
             ],
             suppliers=[
-                ("Grachtzijde Offices B.V.", "NL", "rent"), ("Freelance Analytics Collective", "NL", "services"),
-                ("Quorvane Research Ltd", "GB", "software"), ("Vliegwiel Travel Desk B.V.", "NL", "other"),
+                ("Grachtzijde Offices B.V.", "NL", "rent"),
+                ("Freelance Analytics Collective", "NL", "services"),
+                ("Quorvane Research Ltd", "GB", "software"),
+                ("Vliegwiel Travel Desk B.V.", "NL", "other"),
             ],
             expenses=[
-                ("Office rent Amsterdam", "rent", 5200), ("Salaries", "wages", 46000),
-                ("Associate consultants", "services", 6500), ("Research databases", "software", 1400),
+                ("Office rent Amsterdam", "rent", 5200),
+                ("Salaries", "wages", 46000),
+                ("Associate consultants", "services", 6500),
+                ("Research databases", "software", 1400),
                 ("Travel", "other", 1800),
             ],
             deals=[
-                "Operating model redesign", "Post-merger integration support", "Pricing strategy review",
-                "Finance function benchmarking", "Vendor due diligence", "Board advisory retainer 2027",
-                "Cost reduction programme", "ESG reporting readiness",
+                "Operating model redesign",
+                "Post-merger integration support",
+                "Pricing strategy review",
+                "Finance function benchmarking",
+                "Vendor due diligence",
+                "Board advisory retainer 2027",
+                "Cost reduction programme",
+                "ESG reporting readiness",
             ],
             tasks=[
-                "Prepare steering committee deck for Stroomvaart Energy", "Staff plan for Q1 engagements",
-                "Send timesheet reminders", "Renew professional indemnity insurance", "Write case study Duinhaven Foods",
+                "Prepare steering committee deck for Stroomvaart Energy",
+                "Staff plan for Q1 engagements",
+                "Send timesheet reminders",
+                "Renew professional indemnity insurance",
+                "Write case study Duinhaven Foods",
             ],
             quotes=30,
             lines_per_doc=(1, 3),
@@ -159,28 +226,48 @@ CASES: dict[str, Case] = {
             industry="Furniture manufacturing",
             summary="Solid-wood furniture maker supplying retailers and hotels, Cork.",
             customers=[
-                ("Ardmorrow Home Interiors Ltd", "IE"), ("Clonfern Hotels Group", "IE"), ("Brackenlee Office Interiors Ltd", "IE"),
-                ("Tullagh Design Store", "IE"), ("Saltmere Living Ltd", "GB"), ("Glenvarrow Boutique Hotels Ltd", "GB"),
-                ("Möbelhaus Wendrich GmbH", "DE"), ("Maison & Bois SARL", "FR"), ("Fjällrum Interiör AB", "SE"),
-                ("Casa Ombrella Arredamenti S.r.l.", "IT"), ("Copperline Loft Furnishings Inc.", "US"), ("Quayhouse Co-Working Hub", "IE"),
+                ("Ardmorrow Home Interiors Ltd", "IE"),
+                ("Clonfern Hotels Group", "IE"),
+                ("Brackenlee Office Interiors Ltd", "IE"),
+                ("Tullagh Design Store", "IE"),
+                ("Saltmere Living Ltd", "GB"),
+                ("Glenvarrow Boutique Hotels Ltd", "GB"),
+                ("Möbelhaus Wendrich GmbH", "DE"),
+                ("Maison & Bois SARL", "FR"),
+                ("Fjällrum Interiör AB", "SE"),
+                ("Casa Ombrella Arredamenti S.r.l.", "IT"),
+                ("Copperline Loft Furnishings Inc.", "US"),
+                ("Quayhouse Co-Working Hub", "IE"),
             ],
             suppliers=[
-                ("Ozolkalns Timber SIA", "LV", "goods"), ("Ballyrook Hardware Supplies Ltd", "IE", "goods"),
-                ("Glanswerk Finishing Oils B.V.", "NL", "goods"), ("Rathgowan Industrial Estates Ltd", "IE", "rent"),
+                ("Ozolkalns Timber SIA", "LV", "goods"),
+                ("Ballyrook Hardware Supplies Ltd", "IE", "goods"),
+                ("Glanswerk Finishing Oils B.V.", "NL", "goods"),
+                ("Rathgowan Industrial Estates Ltd", "IE", "rent"),
                 ("Wavecrest Freight Ltd", "IE", "services"),
             ],
             expenses=[
-                ("Factory rent", "rent", 7500), ("Salaries and wages", "wages", 52000),
-                ("Outbound freight", "services", 3100), ("Machine maintenance", "other", 1600),
+                ("Factory rent", "rent", 7500),
+                ("Salaries and wages", "wages", 52000),
+                ("Outbound freight", "services", 3100),
+                ("Machine maintenance", "other", 1600),
             ],
             deals=[
-                "Hotel refurbishment 120 rooms", "Retail collection autumn line", "Co-working desks rollout",
-                "Restaurant seating package", "Export distributor Germany", "Bespoke boardroom table",
-                "Student housing furniture", "Showroom display set",
+                "Hotel refurbishment 120 rooms",
+                "Retail collection autumn line",
+                "Co-working desks rollout",
+                "Restaurant seating package",
+                "Export distributor Germany",
+                "Bespoke boardroom table",
+                "Student housing furniture",
+                "Showroom display set",
             ],
             tasks=[
-                "Order kiln-dried oak for December batch", "Quality check finish on chair series C01",
-                "Plan production week 48", "Service the CNC router", "Photograph new walnut collection",
+                "Order kiln-dried oak for December batch",
+                "Quality check finish on chair series C01",
+                "Plan production week 48",
+                "Service the CNC router",
+                "Photograph new walnut collection",
             ],
             quotes=34,
         ),
@@ -195,27 +282,49 @@ CASES: dict[str, Case] = {
             quotes=48,
             lines_per_doc=(1, 3),
             customers=[
-                ("Camille Durand", "FR"), ("Julien Lefèvre", "FR"), ("Sophie Martin", "FR"), ("Lucas Bernard", "FR"),
-                ("Emma Petit", "FR"), ("Hugo Laurent", "FR"), ("Léa Moreau", "FR"), ("Nicolas Girard", "FR"),
-                ("Anna Schmidt", "DE"), ("Marco Bianchi", "IT"), ("Laura García", "ES"), ("Pieter de Vries", "NL"),
-                ("Boutique Écolo Verdelune", "FR"), ("Concept Store Mirabelle SARL", "FR"), ("Café Botanique Fleurac", "FR"),
+                ("Camille Durand", "FR"),
+                ("Julien Lefèvre", "FR"),
+                ("Sophie Martin", "FR"),
+                ("Lucas Bernard", "FR"),
+                ("Emma Petit", "FR"),
+                ("Hugo Laurent", "FR"),
+                ("Léa Moreau", "FR"),
+                ("Nicolas Girard", "FR"),
+                ("Anna Schmidt", "DE"),
+                ("Marco Bianchi", "IT"),
+                ("Laura García", "ES"),
+                ("Pieter de Vries", "NL"),
+                ("Boutique Écolo Verdelune", "FR"),
+                ("Concept Store Mirabelle SARL", "FR"),
+                ("Café Botanique Fleurac", "FR"),
             ],
             suppliers=[
-                ("Verre & Céramique Atelier SAS", "FR", "goods"), ("Bamboo Goods Wholesale Ltd", "GB", "goods"),
-                ("Colivra Business Services", "FR", "services"), ("Vitrinéo Platform SAS", "FR", "software"),
+                ("Verre & Céramique Atelier SAS", "FR", "goods"),
+                ("Bamboo Goods Wholesale Ltd", "GB", "goods"),
+                ("Colivra Business Services", "FR", "services"),
+                ("Vitrinéo Platform SAS", "FR", "software"),
                 ("Social Ads Agency Pixane", "FR", "marketing"),
             ],
             expenses=[
-                ("Parcel shipping", "services", 1900), ("Shop platform and payments", "software", 420),
-                ("Online advertising", "marketing", 2200), ("Salaries", "wages", 9800),
+                ("Parcel shipping", "services", 1900),
+                ("Shop platform and payments", "software", 420),
+                ("Online advertising", "marketing", 2200),
+                ("Salaries", "wages", 9800),
             ],
             deals=[
-                "Wholesale order concept stores", "Corporate gifts year-end", "Café merchandise partnership",
-                "Marketplace listing expansion", "Subscription box pilot", "Wedding list partnership",
+                "Wholesale order concept stores",
+                "Corporate gifts year-end",
+                "Café merchandise partnership",
+                "Marketplace listing expansion",
+                "Subscription box pilot",
+                "Wedding list partnership",
             ],
             tasks=[
-                "Prepare Black Friday campaign", "Reorder bestselling glass bottles", "Answer open customer returns",
-                "Photograph spring collection", "Review shipping tariffs",
+                "Prepare Black Friday campaign",
+                "Reorder bestselling glass bottles",
+                "Answer open customer returns",
+                "Photograph spring collection",
+                "Review shipping tariffs",
             ],
         ),
         Case(
@@ -225,28 +334,46 @@ CASES: dict[str, Case] = {
             industry="HVAC service",
             summary="Heating, ventilation and air-conditioning maintenance and repair, Vienna.",
             customers=[
-                ("Hotel Auwinkel GmbH", "AT"), ("Bürozentrum Lindgrund KG", "AT"), ("Gesundheitszentrum Talwies Betriebs GmbH", "AT"),
-                ("Supermarkt Hollerer & Co", "AT"), ("Privatschule Sonnhalde", "AT"), ("Wohnhausverwaltung Grabner", "AT"),
-                ("Bäckerei Mairhofer", "AT"), ("Datenhalle Ostbrück GmbH", "AT"), ("Fitnessstudio Vitalwerk", "AT"),
-                ("Autohaus Steinwender", "AT"), ("Restaurant Zum Silbernen Kranich", "AT"), ("Pharmalog Vendura GmbH", "AT"),
+                ("Hotel Auwinkel GmbH", "AT"),
+                ("Bürozentrum Lindgrund KG", "AT"),
+                ("Gesundheitszentrum Talwies Betriebs GmbH", "AT"),
+                ("Supermarkt Hollerer & Co", "AT"),
+                ("Privatschule Sonnhalde", "AT"),
+                ("Wohnhausverwaltung Grabner", "AT"),
+                ("Bäckerei Mairhofer", "AT"),
+                ("Datenhalle Ostbrück GmbH", "AT"),
+                ("Fitnessstudio Vitalwerk", "AT"),
+                ("Autohaus Steinwender", "AT"),
+                ("Restaurant Zum Silbernen Kranich", "AT"),
+                ("Pharmalog Vendura GmbH", "AT"),
                 ("Dunavec Office Park s.r.o.", "SK"),
             ],
             suppliers=[
-                ("Frostlinde Kältetechnik Großhandel GmbH", "AT", "goods"), ("Filter & Luft Vertriebs GmbH", "DE", "goods"),
-                ("Fuhrpark Leasing Rovena", "AT", "other"), ("Gewerbehof Kranzbach", "AT", "rent"),
+                ("Frostlinde Kältetechnik Großhandel GmbH", "AT", "goods"),
+                ("Filter & Luft Vertriebs GmbH", "DE", "goods"),
+                ("Fuhrpark Leasing Rovena", "AT", "other"),
+                ("Gewerbehof Kranzbach", "AT", "rent"),
             ],
             expenses=[
                 ("Salaries technicians", "wages", 41000),
-                ("Van leasing and fuel", "other", 3900), ("Workshop rent", "rent", 2800),
+                ("Van leasing and fuel", "other", 3900),
+                ("Workshop rent", "rent", 2800),
                 ("Field service app", "software", 520),
             ],
             deals=[
-                "Hospital ventilation service contract", "Hotel AC replacement 40 rooms", "Data centre cooling audit",
-                "Supermarket chain maintenance 6 sites", "Office park heat pump retrofit", "School ventilation upgrade",
+                "Hospital ventilation service contract",
+                "Hotel AC replacement 40 rooms",
+                "Data centre cooling audit",
+                "Supermarket chain maintenance 6 sites",
+                "Office park heat pump retrofit",
+                "School ventilation upgrade",
             ],
             tasks=[
-                "Schedule winter boiler checks", "Renew F-gas certificates for two technicians",
-                "Restock vans with filters", "Follow up quote Datenhalle Ostbrück", "Plan route for Monday call-outs",
+                "Schedule winter boiler checks",
+                "Renew F-gas certificates for two technicians",
+                "Restock vans with filters",
+                "Follow up quote Datenhalle Ostbrück",
+                "Plan route for Monday call-outs",
             ],
             quotes=40,
             payment_days=14,
@@ -258,30 +385,50 @@ CASES: dict[str, Case] = {
             industry="Freight forwarding",
             summary="Road and sea freight forwarder between Central Europe and the Nordics, Gdańsk.",
             customers=[
-                ("Sosnowa Meble S.A.", "PL"), ("Morwen Seafood Export Sp. z o.o.", "PL"), ("Wiślan Electronics Sp. z o.o.", "PL"),
-                ("Papiernia Jodłowa S.A.", "PL"), ("Hemvind Retail AB", "SE"), ("Fjordheim Home Supplies AS", "NO"),
-                ("Kaskmäe Trade OÜ", "EE"), ("Travenhof Spedition Partner GmbH", "DE"), ("Veenhoek Fresh Produce B.V.", "NL"),
-                ("Ąžuolis Auto Parts UAB", "LT"), ("Koivuranta Wholesale Oy", "FI"), ("Prairiecrest Machinery Imports LLC", "US"),
+                ("Sosnowa Meble S.A.", "PL"),
+                ("Morwen Seafood Export Sp. z o.o.", "PL"),
+                ("Wiślan Electronics Sp. z o.o.", "PL"),
+                ("Papiernia Jodłowa S.A.", "PL"),
+                ("Hemvind Retail AB", "SE"),
+                ("Fjordheim Home Supplies AS", "NO"),
+                ("Kaskmäe Trade OÜ", "EE"),
+                ("Travenhof Spedition Partner GmbH", "DE"),
+                ("Veenhoek Fresh Produce B.V.", "NL"),
+                ("Ąžuolis Auto Parts UAB", "LT"),
+                ("Koivuranta Wholesale Oy", "FI"),
+                ("Prairiecrest Machinery Imports LLC", "US"),
                 ("Lyngholt Garden Products A/S", "DK"),
             ],
             suppliers=[
-                ("Drogwen Carriers Sp. z o.o.", "PL", "services"), ("Vågsund Ferry Lines AB", "SE", "services"),
-                ("Paliwex Fuel Card Sp. z o.o.", "PL", "other"), ("Nabrzeże Warehousing", "PL", "rent"),
+                ("Drogwen Carriers Sp. z o.o.", "PL", "services"),
+                ("Vågsund Ferry Lines AB", "SE", "services"),
+                ("Paliwex Fuel Card Sp. z o.o.", "PL", "other"),
+                ("Nabrzeże Warehousing", "PL", "rent"),
                 ("Spurlicht Telematics GmbH", "DE", "software"),
             ],
             expenses=[
-                ("Partner carriers", "services", 58000), ("Ferry bookings", "services", 9500),
-                ("Fuel", "other", 7200), ("Warehouse lease", "rent", 6100), ("Salaries dispatch and office", "wages", 24000),
+                ("Partner carriers", "services", 58000),
+                ("Ferry bookings", "services", 9500),
+                ("Fuel", "other", 7200),
+                ("Warehouse lease", "rent", 6100),
+                ("Salaries dispatch and office", "wages", 24000),
                 ("Telematics", "software", 650),
             ],
             deals=[
-                "Weekly FTL lane Gdańsk to Oslo", "Seafood reefer programme", "Furniture export consolidation",
-                "Contract logistics 1,200 pallets", "Customs brokerage outsourcing", "US import consolidation",
+                "Weekly FTL lane Gdańsk to Oslo",
+                "Seafood reefer programme",
+                "Furniture export consolidation",
+                "Contract logistics 1,200 pallets",
+                "Customs brokerage outsourcing",
+                "US import consolidation",
                 "Peak season capacity agreement",
             ],
             tasks=[
-                "Confirm ferry slots for next week", "Audit carrier insurance certificates", "Update fuel surcharge table",
-                "Resolve damaged pallet claim Hemvind Retail", "Plan driver rest schedules",
+                "Confirm ferry slots for next week",
+                "Audit carrier insurance certificates",
+                "Update fuel surcharge table",
+                "Resolve damaged pallet claim Hemvind Retail",
+                "Plan driver rest schedules",
             ],
             quotes=44,
             lines_per_doc=(1, 3),
@@ -293,28 +440,48 @@ CASES: dict[str, Case] = {
             industry="Digital agency",
             summary="Web, app and digital-marketing agency for mid-sized brands, Manchester.",
             customers=[
-                ("Ironvale Rail Heritage Trust", "GB"), ("Highcairn Outdoor Ltd", "GB"), ("Tollbridge Craft Brewery", "GB"),
-                ("Ravensby Legal LLP", "GB"), ("Spokewell Bike Co.", "GB"), ("Thistlegate Fashion House Ltd", "GB"),
-                ("Brynmor Dental Group", "GB"), ("Flinkrad Mobility GmbH", "DE"), ("Feestpoort Event Tickets B.V.", "NL"),
-                ("Emberline Coffee Roasters Inc.", "US"), ("Marésia Surf Schools Lda", "PT"), ("Dalesbury Tea Rooms Ltd", "GB"),
+                ("Ironvale Rail Heritage Trust", "GB"),
+                ("Highcairn Outdoor Ltd", "GB"),
+                ("Tollbridge Craft Brewery", "GB"),
+                ("Ravensby Legal LLP", "GB"),
+                ("Spokewell Bike Co.", "GB"),
+                ("Thistlegate Fashion House Ltd", "GB"),
+                ("Brynmor Dental Group", "GB"),
+                ("Flinkrad Mobility GmbH", "DE"),
+                ("Feestpoort Event Tickets B.V.", "NL"),
+                ("Emberline Coffee Roasters Inc.", "US"),
+                ("Marésia Surf Schools Lda", "PT"),
+                ("Dalesbury Tea Rooms Ltd", "GB"),
                 ("Linwick Language Courses Ltd", "GB"),
             ],
             suppliers=[
-                ("Nimbusworth Hosting Ltd", "GB", "software"), ("Freelance Dev Network", "GB", "services"),
-                ("Millrace Studios Workspace", "GB", "rent"), ("Framewell Media Library Ltd", "GB", "software"),
+                ("Nimbusworth Hosting Ltd", "GB", "software"),
+                ("Freelance Dev Network", "GB", "services"),
+                ("Millrace Studios Workspace", "GB", "rent"),
+                ("Framewell Media Library Ltd", "GB", "software"),
             ],
             expenses=[
-                ("Salaries", "wages", 52000), ("Freelance developers", "services", 8800),
-                ("Studio rent", "rent", 4600), ("Hosting and SaaS tools", "software", 2100),
+                ("Salaries", "wages", 52000),
+                ("Freelance developers", "services", 8800),
+                ("Studio rent", "rent", 4600),
+                ("Hosting and SaaS tools", "software", 2100),
                 ("Conferences and marketing", "marketing", 900),
             ],
             deals=[
-                "E-commerce replatforming", "Mobile booking app", "Brand refresh and website", "Headless CMS migration",
-                "Annual SEO retainer", "Accessibility audit and fixes", "Customer portal MVP",
+                "E-commerce replatforming",
+                "Mobile booking app",
+                "Brand refresh and website",
+                "Headless CMS migration",
+                "Annual SEO retainer",
+                "Accessibility audit and fixes",
+                "Customer portal MVP",
             ],
             tasks=[
-                "Sprint review with Spokewell Bike Co.", "Renew SSL certificates for hosted clients",
-                "Update rate card for 2027", "Security patching on managed hosting", "Draft proposal for Ravensby Legal LLP",
+                "Sprint review with Spokewell Bike Co.",
+                "Renew SSL certificates for hosted clients",
+                "Update rate card for 2027",
+                "Security patching on managed hosting",
+                "Draft proposal for Ravensby Legal LLP",
             ],
             quotes=32,
             lines_per_doc=(1, 3),
@@ -326,28 +493,45 @@ CASES: dict[str, Case] = {
             industry="Non-profit",
             summary="Environmental education association running courses, events and member programmes, Leipzig.",
             customers=[
-                ("Umweltamt Kreisstadt Auenried", "DE"), ("Stiftung Naturerbe Wiesental", "DE"), ("Grundschule am Erlenbruch", "DE"),
-                ("Volkshochschule Auenried", "DE"), ("BioMarkt Kornblume eG", "DE"), ("Energiewerke Talgrund AG", "DE"),
-                ("Hochschule Auenried Fachbereich Biologie", "DE"), ("Familienzentrum Weidenhof", "DE"),
-                ("Horizon Youth Network", "BE"), ("Klimabündnis Elbtalwiesen e.V.", "DE"), ("Gartenfreunde Sonnenwinkel", "DE"),
+                ("Umweltamt Kreisstadt Auenried", "DE"),
+                ("Stiftung Naturerbe Wiesental", "DE"),
+                ("Grundschule am Erlenbruch", "DE"),
+                ("Volkshochschule Auenried", "DE"),
+                ("BioMarkt Kornblume eG", "DE"),
+                ("Energiewerke Talgrund AG", "DE"),
+                ("Hochschule Auenried Fachbereich Biologie", "DE"),
+                ("Familienzentrum Weidenhof", "DE"),
+                ("Horizon Youth Network", "BE"),
+                ("Klimabündnis Elbtalwiesen e.V.", "DE"),
+                ("Gartenfreunde Sonnenwinkel", "DE"),
             ],
             suppliers=[
-                ("Druckerei Papierkranich GmbH", "DE", "marketing"), ("Seminarhaus Schilfufer", "DE", "rent"),
-                ("Bio-Catering Löwenzahn", "DE", "services"), ("Vereinswerk Online GmbH", "DE", "software"),
+                ("Druckerei Papierkranich GmbH", "DE", "marketing"),
+                ("Seminarhaus Schilfufer", "DE", "rent"),
+                ("Bio-Catering Löwenzahn", "DE", "services"),
+                ("Vereinswerk Online GmbH", "DE", "software"),
             ],
             expenses=[
-                ("Staff salaries", "wages", 21000), ("Office and seminar rooms", "rent", 1900),
-                ("Catering for events", "services", 1100), ("Printing and outreach", "marketing", 700),
+                ("Staff salaries", "wages", 21000),
+                ("Office and seminar rooms", "rent", 1900),
+                ("Catering for events", "services", 1100),
+                ("Printing and outreach", "marketing", 700),
                 ("Membership software", "software", 140),
             ],
             deals=[
-                "Municipal environmental education grant", "Foundation programme funding 2027",
-                "Corporate volunteering day Energiewerke", "School partnership network", "EU youth exchange project",
+                "Municipal environmental education grant",
+                "Foundation programme funding 2027",
+                "Corporate volunteering day Energiewerke",
+                "School partnership network",
+                "EU youth exchange project",
                 "Annual sponsorship BioMarkt",
             ],
             tasks=[
-                "Submit grant report to Stiftung Naturerbe", "Prepare general assembly invitations",
-                "Collect member fees for 2027", "Book seminar house for spring camp", "Recruit volunteers for tree planting",
+                "Submit grant report to Stiftung Naturerbe",
+                "Prepare general assembly invitations",
+                "Collect member fees for 2027",
+                "Book seminar house for spring camp",
+                "Recruit volunteers for tree planting",
             ],
             quotes=26,
             lines_per_doc=(1, 2),
@@ -359,30 +543,48 @@ CASES: dict[str, Case] = {
             industry="Electrical trade",
             summary="Electrical installation, testing and e-mobility business with eight electricians, Stuttgart.",
             customers=[
-                ("Hausverwaltung Kesselbach GmbH", "DE"), ("Wohnbau Talblick eG", "DE"), ("Bäckerei Wolfsried KG", "DE"),
-                ("Autohaus Brennwald GmbH", "DE"), ("Hotel Rosenhain Betriebs GmbH", "DE"),
-                ("Praxisgemeinschaft am Lindenring", "DE"), ("Kita Pusteblume e.V.", "DE"),
-                ("Weinstube Rebstöckle", "DE"), ("Schreinerei Voglreiter", "DE"), ("Familie Maier", "DE"),
-                ("WEG Birkenweg 12", "DE"), ("Druckerei Lämmerhof GmbH", "DE"),
+                ("Hausverwaltung Kesselbach GmbH", "DE"),
+                ("Wohnbau Talblick eG", "DE"),
+                ("Bäckerei Wolfsried KG", "DE"),
+                ("Autohaus Brennwald GmbH", "DE"),
+                ("Hotel Rosenhain Betriebs GmbH", "DE"),
+                ("Praxisgemeinschaft am Lindenring", "DE"),
+                ("Kita Pusteblume e.V.", "DE"),
+                ("Weinstube Rebstöckle", "DE"),
+                ("Schreinerei Voglreiter", "DE"),
+                ("Familie Maier", "DE"),
+                ("WEG Birkenweg 12", "DE"),
+                ("Druckerei Lämmerhof GmbH", "DE"),
             ],
             suppliers=[
-                ("Elektrogroßhandel Voltaris GmbH", "DE", "goods"), ("Kabelwerk Drahtquell GmbH", "DE", "goods"),
-                ("Flottenservice Radwerk GmbH", "DE", "services"), ("Gewerbehof Funkenried GmbH", "DE", "rent"),
+                ("Elektrogroßhandel Voltaris GmbH", "DE", "goods"),
+                ("Kabelwerk Drahtquell GmbH", "DE", "goods"),
+                ("Flottenservice Radwerk GmbH", "DE", "services"),
+                ("Gewerbehof Funkenried GmbH", "DE", "rent"),
             ],
             expenses=[
-                ("Workshop and storage rent", "rent", 2400), ("Salaries", "wages", 38000),
-                ("Van leasing and fuel", "services", 2600), ("Job and time-capture software", "software", 290),
+                ("Workshop and storage rent", "rent", 2400),
+                ("Salaries", "wages", 38000),
+                ("Van leasing and fuel", "services", 2600),
+                ("Job and time-capture software", "software", 290),
                 ("Online listings and vehicle lettering", "marketing", 450),
             ],
             deals=[
-                "Wallbox rollout Autohaus Brennwald", "Annual DGUV V3 testing contract", "LED retrofit for bakery branches",
-                "Rewiring of 12 flats Wohnbau Talblick", "Smart home upgrade Familie Maier",
-                "Emergency service agreement Hausverwaltung Kesselbach", "Kita electrical safety check",
+                "Wallbox rollout Autohaus Brennwald",
+                "Annual DGUV V3 testing contract",
+                "LED retrofit for bakery branches",
+                "Rewiring of 12 flats Wohnbau Talblick",
+                "Smart home upgrade Familie Maier",
+                "Emergency service agreement Hausverwaltung Kesselbach",
+                "Kita electrical safety check",
                 "PV maintenance for Druckerei Lämmerhof",
             ],
             tasks=[
-                "Order materials for the Maier kitchen rewiring", "DGUV V3 testing round at Hotel Rosenhain",
-                "Renew van leases", "Chase final invoice WEG Birkenweg", "Plan apprentice exam preparation",
+                "Order materials for the Maier kitchen rewiring",
+                "DGUV V3 testing round at Hotel Rosenhain",
+                "Renew van leases",
+                "Chase final invoice WEG Birkenweg",
+                "Plan apprentice exam preparation",
             ],
             payment_days=14,
             quotes=40,
@@ -394,29 +596,48 @@ CASES: dict[str, Case] = {
             industry="Food production",
             summary="Farm dairy making mountain cheese, butter and yoghurt from local hay milk, Allgäu.",
             customers=[
-                ("Feinkost Gamsgrat KG", "DE"), ("Biomarkt Wiesengrund eG", "DE"), ("Gasthof Zum Hirschsprung", "DE"),
-                ("Käsehandel Lindhuber GmbH", "DE"), ("Hotel Gipfelruh", "DE"), ("Metzgerei Hubmann Partyservice", "DE"),
-                ("Hofladen-Kooperative Almwiese eG", "DE"), ("Betriebskantine Energiewerke Talgrund", "DE"),
-                ("Fromagerie Dubrelle", "FR"), ("Feinkost Seewinkel AG", "CH"), ("Delikatessen Rovelli", "IT"),
+                ("Feinkost Gamsgrat KG", "DE"),
+                ("Biomarkt Wiesengrund eG", "DE"),
+                ("Gasthof Zum Hirschsprung", "DE"),
+                ("Käsehandel Lindhuber GmbH", "DE"),
+                ("Hotel Gipfelruh", "DE"),
+                ("Metzgerei Hubmann Partyservice", "DE"),
+                ("Hofladen-Kooperative Almwiese eG", "DE"),
+                ("Betriebskantine Energiewerke Talgrund", "DE"),
+                ("Fromagerie Dubrelle", "FR"),
+                ("Feinkost Seewinkel AG", "CH"),
+                ("Delikatessen Rovelli", "IT"),
             ],
             suppliers=[
-                ("Milchhof Weberling GbR", "DE", "goods"), ("Molkereibedarf Kannwerk GmbH", "DE", "goods"),
-                ("Kühltransporte Frostfalke GmbH", "DE", "services"), ("Hofgut Hubmann Verpachtung", "DE", "rent"),
+                ("Milchhof Weberling GbR", "DE", "goods"),
+                ("Molkereibedarf Kannwerk GmbH", "DE", "goods"),
+                ("Kühltransporte Frostfalke GmbH", "DE", "services"),
+                ("Hofgut Hubmann Verpachtung", "DE", "rent"),
             ],
             expenses=[
-                ("Dairy and ripening cellar lease", "rent", 2900), ("Salaries", "wages", 22000),
-                ("Refrigerated transport", "services", 2100), ("Energy for cooling and boiler", "other", 3200),
-                ("Hygiene lab testing", "other", 450), ("Markets and tastings", "marketing", 600),
+                ("Dairy and ripening cellar lease", "rent", 2900),
+                ("Salaries", "wages", 22000),
+                ("Refrigerated transport", "services", 2100),
+                ("Energy for cooling and boiler", "other", 3200),
+                ("Hygiene lab testing", "other", 450),
+                ("Markets and tastings", "marketing", 600),
                 ("Batch tracking software", "software", 180),
             ],
             deals=[
-                "Cheese counter listing Biomarkt Wiesengrund", "Hotel breakfast supply 2027", "Christmas gift boxes for Energiewerke Talgrund",
-                "Export trial Fromagerie Dubrelle", "Canteen dairy supply contract", "Wedding season platters Hubmann",
+                "Cheese counter listing Biomarkt Wiesengrund",
+                "Hotel breakfast supply 2027",
+                "Christmas gift boxes for Energiewerke Talgrund",
+                "Export trial Fromagerie Dubrelle",
+                "Canteen dairy supply contract",
+                "Wedding season platters Hubmann",
                 "Mountain cheese 12 months for Käsehandel Lindhuber",
             ],
             tasks=[
-                "Monthly hygiene swab sampling", "Turn and brush cheese in cellar 2", "Renew organic certification audit",
-                "Calibrate cold store temperature loggers", "Plan Christmas gift box production",
+                "Monthly hygiene swab sampling",
+                "Turn and brush cheese in cellar 2",
+                "Renew organic certification audit",
+                "Calibrate cold store temperature loggers",
+                "Plan Christmas gift box production",
             ],
             payment_days=14,
             quotes=36,
@@ -429,30 +650,43 @@ CASES: dict[str, Case] = {
             industry="Franchise system",
             summary="Coffee bar franchisor with its own roastery and nine franchise locations, Cologne.",
             customers=[
-                ("Hartwig Gastro GmbH (Bohnquell Nord)", "DE"), ("Kaya & Schulte OHG (Bohnquell Altstadt)", "DE"),
+                ("Hartwig Gastro GmbH (Bohnquell Nord)", "DE"),
+                ("Kaya & Schulte OHG (Bohnquell Altstadt)", "DE"),
                 ("Café Uferweg Partners GmbH (Bohnquell Ufer)", "DE"),
                 ("Brandauer Systemgastronomie GmbH (Bohnquell West)", "DE"),
-                ("Vermolen Koffie B.V. (Bohnquell Grens)", "NL"), ("Lenz & Lenz GbR (Bohnquell Domplatz)", "DE"),
-                ("Sauerbrey Food Concepts GmbH (Bohnquell Zeche)", "DE"), ("Petit Café Mosane SRL (Bohnquell Meuse)", "BE"),
+                ("Vermolen Koffie B.V. (Bohnquell Grens)", "NL"),
+                ("Lenz & Lenz GbR (Bohnquell Domplatz)", "DE"),
+                ("Sauerbrey Food Concepts GmbH (Bohnquell Zeche)", "DE"),
+                ("Petit Café Mosane SRL (Bohnquell Meuse)", "BE"),
                 ("Nowaczyk Gastronomie UG (Bohnquell Talbahn)", "DE"),
             ],
             suppliers=[
-                ("Rohkaffee Import Kaffeespeicher GmbH", "DE", "goods"), ("Finca Cerro Nublino Exportadora S.A.", "CO", "goods"),
-                ("Gastro-Service Tafelwerk GmbH", "DE", "services"), ("Gewerbehof Ziegelfeld GmbH", "DE", "rent"),
+                ("Rohkaffee Import Kaffeespeicher GmbH", "DE", "goods"),
+                ("Finca Cerro Nublino Exportadora S.A.", "CO", "goods"),
+                ("Gastro-Service Tafelwerk GmbH", "DE", "services"),
+                ("Gewerbehof Ziegelfeld GmbH", "DE", "rent"),
             ],
             expenses=[
-                ("Roastery and head office rent", "rent", 5200), ("Salaries", "wages", 34000),
-                ("Machine servicing for the network", "services", 2800), ("Brand campaigns", "marketing", 4500),
+                ("Roastery and head office rent", "rent", 5200),
+                ("Salaries", "wages", 34000),
+                ("Machine servicing for the network", "services", 2800),
+                ("Brand campaigns", "marketing", 4500),
                 ("POS and franchise portal", "software", 1200),
             ],
             deals=[
-                "New location Bohnquell Bahnhof", "Second site Hartwig Gastro", "Seasonal menu launch spring",
-                "Franchise agreement renewal Kaya & Schulte", "Oat drink supply framework", "Airport kiosk concept",
+                "New location Bohnquell Bahnhof",
+                "Second site Hartwig Gastro",
+                "Seasonal menu launch spring",
+                "Franchise agreement renewal Kaya & Schulte",
+                "Oat drink supply framework",
+                "Airport kiosk concept",
                 "Master franchise Benelux",
             ],
             tasks=[
-                "Quarterly brand audit Bohnquell Zeche", "Roast plan for the new espresso blend",
-                "Send royalty statements for October", "Barista training for the Grens team",
+                "Quarterly brand audit Bohnquell Zeche",
+                "Roast plan for the new espresso blend",
+                "Send royalty statements for October",
+                "Barista training for the Grens team",
                 "Review franchise handbook chapter hygiene",
             ],
             quotes=40,
@@ -465,29 +699,45 @@ CASES: dict[str, Case] = {
             industry="Legal services",
             summary="Commercial law firm with six partners advising owner-managed businesses, Manchester.",
             customers=[
-                ("Northmarsh Foods Ltd", "GB"), ("Kellbeck Engineering Ltd", "GB"), ("Fellgate Software Ltd", "GB"),
-                ("Harlow & Lytton Retail plc", "GB"), ("Tidemoor Freight Services Ltd", "GB"), ("St Elbrin's Medical Group", "GB"),
-                ("Stonebridge Vale Property Holdings Ltd", "GB"), ("Oakmorrow Academy Trust", "GB"),
-                ("Kesselring Automotive GmbH", "DE"), ("Lindgrove Media AB", "SE"), ("Mr and Mrs Patel", "GB"),
+                ("Northmarsh Foods Ltd", "GB"),
+                ("Kellbeck Engineering Ltd", "GB"),
+                ("Fellgate Software Ltd", "GB"),
+                ("Harlow & Lytton Retail plc", "GB"),
+                ("Tidemoor Freight Services Ltd", "GB"),
+                ("St Elbrin's Medical Group", "GB"),
+                ("Stonebridge Vale Property Holdings Ltd", "GB"),
+                ("Oakmorrow Academy Trust", "GB"),
+                ("Kesselring Automotive GmbH", "DE"),
+                ("Lindgrove Media AB", "SE"),
+                ("Mr and Mrs Patel", "GB"),
             ],
             suppliers=[
-                ("Quillstone Counsel Chambers", "GB", "services"), ("Lexmoor Research Ltd", "GB", "software"),
+                ("Quillstone Counsel Chambers", "GB", "services"),
+                ("Lexmoor Research Ltd", "GB", "software"),
                 ("Loomhall Office Estates Ltd", "GB", "rent"),
             ],
             expenses=[
-                ("Office rent", "rent", 9500), ("Salaries", "wages", 68000), ("Counsel and expert fees", "services", 4200),
-                ("Legal research and case management", "software", 1800), ("Professional indemnity insurance", "other", 2100),
+                ("Office rent", "rent", 9500),
+                ("Salaries", "wages", 68000),
+                ("Counsel and expert fees", "services", 4200),
+                ("Legal research and case management", "software", 1800),
+                ("Professional indemnity insurance", "other", 2100),
                 ("Directories and client events", "marketing", 1200),
             ],
             deals=[
-                "Acquisition of Harlow & Lytton store portfolio", "Employment handbook refresh Fellgate Software",
-                "Trade mark portfolio Northmarsh Foods", "Commercial lease renewals Stonebridge Vale",
-                "Academy trust governance retainer", "UK distribution agreements Kesselring Automotive",
+                "Acquisition of Harlow & Lytton store portfolio",
+                "Employment handbook refresh Fellgate Software",
+                "Trade mark portfolio Northmarsh Foods",
+                "Commercial lease renewals Stonebridge Vale",
+                "Academy trust governance retainer",
+                "UK distribution agreements Kesselring Automotive",
                 "Shareholder dispute Tidemoor Freight",
             ],
             tasks=[
-                "Conflict check for the Stonebridge Vale acquisition", "File defence in Northmarsh v Carter",
-                "Renew professional indemnity cover", "Send engagement letter to Lindgrove Media",
+                "Conflict check for the Stonebridge Vale acquisition",
+                "File defence in Northmarsh v Carter",
+                "Renew professional indemnity cover",
+                "Send engagement letter to Lindgrove Media",
                 "Month-end WIP review with partners",
             ],
             quotes=34,
@@ -501,27 +751,45 @@ CASES: dict[str, Case] = {
             industry="Tax advisory",
             summary="Tax advisory and accounting firm for owner-managed businesses and professionals, Nuremberg.",
             customers=[
-                ("Bäckerei Schmiedl GmbH", "DE"), ("Zahnarztpraxis Dr. Ottmers", "DE"), ("Autowerkstatt Langhammer e.K.", "DE"),
-                ("Grafikbüro Weißdorn", "DE"), ("Pension Schilfblick GbR", "DE"), ("IT-Systemhaus Bitquelle GmbH", "DE"),
-                ("Weinhandel Bauerfeind KG", "DE"), ("Dr. Hanna Vogel", "DE"), ("Kanzlei Rothlauf Rechtsanwälte", "DE"),
-                ("Fahrschule Meierling", "DE"), ("Physiotherapie am Weiherpark", "DE"), ("Kräuterwiese Online UG", "DE"),
+                ("Bäckerei Schmiedl GmbH", "DE"),
+                ("Zahnarztpraxis Dr. Ottmers", "DE"),
+                ("Autowerkstatt Langhammer e.K.", "DE"),
+                ("Grafikbüro Weißdorn", "DE"),
+                ("Pension Schilfblick GbR", "DE"),
+                ("IT-Systemhaus Bitquelle GmbH", "DE"),
+                ("Weinhandel Bauerfeind KG", "DE"),
+                ("Dr. Hanna Vogel", "DE"),
+                ("Kanzlei Rothlauf Rechtsanwälte", "DE"),
+                ("Fahrschule Meierling", "DE"),
+                ("Physiotherapie am Weiherpark", "DE"),
+                ("Kräuterwiese Online UG", "DE"),
             ],
             suppliers=[
-                ("Lohnservice Zahlwerk GmbH", "DE", "services"), ("Kanzleidaten Genossenschaft eG", "DE", "software"),
+                ("Lohnservice Zahlwerk GmbH", "DE", "services"),
+                ("Kanzleidaten Genossenschaft eG", "DE", "software"),
                 ("Bürohaus Torbogen GmbH", "DE", "rent"),
             ],
             expenses=[
-                ("Office rent", "rent", 4800), ("Salaries", "wages", 52000), ("Outsourced payroll runs", "services", 1600),
-                ("Tax software and data centre", "software", 2400), ("Liability insurance and chamber fees", "other", 900),
+                ("Office rent", "rent", 4800),
+                ("Salaries", "wages", 52000),
+                ("Outsourced payroll runs", "services", 1600),
+                ("Tax software and data centre", "software", 2400),
+                ("Liability insurance and chamber fees", "other", 900),
             ],
             deals=[
-                "Bookkeeping mandate IT-Systemhaus Bitquelle", "Annual accounts package Weinhandel Bauerfeind",
-                "Payroll takeover Bäckerei Schmiedl", "Start-up advice Kräuterwiese", "Tax audit support Autowerkstatt Langhammer",
-                "Practice succession planning Dr. Ottmers", "Digital receipts onboarding Pension Schilfblick",
+                "Bookkeeping mandate IT-Systemhaus Bitquelle",
+                "Annual accounts package Weinhandel Bauerfeind",
+                "Payroll takeover Bäckerei Schmiedl",
+                "Start-up advice Kräuterwiese",
+                "Tax audit support Autowerkstatt Langhammer",
+                "Practice succession planning Dr. Ottmers",
+                "Digital receipts onboarding Pension Schilfblick",
             ],
             tasks=[
-                "Monthly VAT pre-returns by the 10th", "Collect receipts from Pension Schilfblick",
-                "Prepare annual accounts Weinhandel Bauerfeind", "Reply to tax office query Autowerkstatt Langhammer",
+                "Monthly VAT pre-returns by the 10th",
+                "Collect receipts from Pension Schilfblick",
+                "Prepare annual accounts Weinhandel Bauerfeind",
+                "Reply to tax office query Autowerkstatt Langhammer",
                 "Plan filing deadlines for annual returns",
             ],
             payment_days=14,
@@ -534,28 +802,44 @@ CASES: dict[str, Case] = {
             industry="Creative studio",
             summary="Branding, campaign and content studio with twelve designers and makers, Rotterdam.",
             customers=[
-                ("Kademolen Brouwerij B.V.", "NL"), ("Spaakwind Fietsen B.V.", "NL"), ("Cultuurfonds Waterpoort", "NL"),
-                ("Kaasmakerij De Vreeling", "NL"), ("Blauwtegel Living B.V.", "NL"), ("Brandauer Mode GmbH", "DE"),
-                ("Stichting Scheepshuis", "NL"), ("Windvlinder Energie Coöperatie U.A.", "NL"), ("Lucerna Optics N.V.", "BE"),
-                ("Hotel Kadezicht", "NL"), ("Zorggroep Lindehof", "NL"),
+                ("Kademolen Brouwerij B.V.", "NL"),
+                ("Spaakwind Fietsen B.V.", "NL"),
+                ("Cultuurfonds Waterpoort", "NL"),
+                ("Kaasmakerij De Vreeling", "NL"),
+                ("Blauwtegel Living B.V.", "NL"),
+                ("Brandauer Mode GmbH", "DE"),
+                ("Stichting Scheepshuis", "NL"),
+                ("Windvlinder Energie Coöperatie U.A.", "NL"),
+                ("Lucerna Optics N.V.", "BE"),
+                ("Hotel Kadezicht", "NL"),
+                ("Zorggroep Lindehof", "NL"),
             ],
             suppliers=[
-                ("Fotostudio Lichtkamer", "NL", "services"), ("Beeldbron Licenties B.V.", "NL", "software"),
+                ("Fotostudio Lichtkamer", "NL", "services"),
+                ("Beeldbron Licenties B.V.", "NL", "software"),
                 ("Creative Hub Werfkwartier", "NL", "rent"),
             ],
             expenses=[
-                ("Studio rent", "rent", 3800), ("Salaries", "wages", 36000),
+                ("Studio rent", "rent", 3800),
+                ("Salaries", "wages", 36000),
                 ("Freelance photographers and illustrators", "services", 3500),
-                ("Design software and stock licences", "software", 1100), ("Portfolio and awards", "marketing", 600),
+                ("Design software and stock licences", "software", 1100),
+                ("Portfolio and awards", "marketing", 600),
             ],
             deals=[
-                "Rebrand Kademolen Brouwerij", "Spring campaign Spaakwind Fietsen", "Exhibition identity Scheepshuis",
-                "Packaging range Kaasmakerij De Vreeling", "Content retainer Windvlinder Energie", "Product film Lucerna Optics",
+                "Rebrand Kademolen Brouwerij",
+                "Spring campaign Spaakwind Fietsen",
+                "Exhibition identity Scheepshuis",
+                "Packaging range Kaasmakerij De Vreeling",
+                "Content retainer Windvlinder Energie",
+                "Product film Lucerna Optics",
                 "Employer brand Zorggroep Lindehof",
             ],
             tasks=[
-                "Present key visual to Spaakwind Fietsen", "Book photographer for Blauwtegel shoot",
-                "Renew image usage rights Hotel Kadezicht", "Archive final files Kademolen Brouwerij",
+                "Present key visual to Spaakwind Fietsen",
+                "Book photographer for Blauwtegel shoot",
+                "Renew image usage rights Hotel Kadezicht",
+                "Archive final files Kademolen Brouwerij",
                 "Plan content calendar for Windvlinder Energie",
             ],
             quotes=34,
@@ -568,28 +852,45 @@ CASES: dict[str, Case] = {
             industry="Real estate",
             summary="Estate agency and property management for 640 residential and commercial units, Graz.",
             customers=[
-                ("Eigentümergemeinschaft Ahornweg 24", "AT"), ("Flusswohnen Vermietungs GmbH", "AT"),
-                ("Familie Pichler", "AT"), ("Dr. Karin Strobl", "AT"), ("Gewerbeflächen Hochwald AG", "AT"),
-                ("Eigentümergemeinschaft Erlengasse 8", "AT"), ("Hotel Burgblick Rosental Betriebs GmbH", "AT"),
-                ("Müllner Investments GmbH", "DE"), ("Ing. Thomas Wallner", "AT"), ("Praxisgemeinschaft Lindenau-Süd", "AT"),
+                ("Eigentümergemeinschaft Ahornweg 24", "AT"),
+                ("Flusswohnen Vermietungs GmbH", "AT"),
+                ("Familie Pichler", "AT"),
+                ("Dr. Karin Strobl", "AT"),
+                ("Gewerbeflächen Hochwald AG", "AT"),
+                ("Eigentümergemeinschaft Erlengasse 8", "AT"),
+                ("Hotel Burgblick Rosental Betriebs GmbH", "AT"),
+                ("Müllner Investments GmbH", "DE"),
+                ("Ing. Thomas Wallner", "AT"),
+                ("Praxisgemeinschaft Lindenau-Süd", "AT"),
                 ("Eigentümergemeinschaft Mühlplatz 3", "AT"),
             ],
             suppliers=[
-                ("Hausbetreuung Grünmark GmbH", "AT", "services"), ("Wohnfinder Media GmbH", "AT", "marketing"),
-                ("Büro am Brunnenplatz GmbH", "AT", "rent"), ("Verwaltwerk Software GmbH", "AT", "software"),
+                ("Hausbetreuung Grünmark GmbH", "AT", "services"),
+                ("Wohnfinder Media GmbH", "AT", "marketing"),
+                ("Büro am Brunnenplatz GmbH", "AT", "rent"),
+                ("Verwaltwerk Software GmbH", "AT", "software"),
             ],
             expenses=[
-                ("Office rent", "rent", 3100), ("Salaries", "wages", 31000), ("Caretaking and cleaning", "services", 2900),
-                ("Listing portals and photography", "marketing", 2200), ("Property management software", "software", 650),
+                ("Office rent", "rent", 3100),
+                ("Salaries", "wages", 31000),
+                ("Caretaking and cleaning", "services", 2900),
+                ("Listing portals and photography", "marketing", 2200),
+                ("Property management software", "software", 650),
             ],
             deals=[
-                "Sale of penthouse Ahornweg", "Management mandate Mühlplatz 3", "Letting of retail unit Herrengasse",
-                "Valuation portfolio Müllner Investments", "Office lettings Gewerbeflächen Hochwald",
-                "Owners' meeting Erlengasse", "Sale of family home Pichler",
+                "Sale of penthouse Ahornweg",
+                "Management mandate Mühlplatz 3",
+                "Letting of retail unit Herrengasse",
+                "Valuation portfolio Müllner Investments",
+                "Office lettings Gewerbeflächen Hochwald",
+                "Owners' meeting Erlengasse",
+                "Sale of family home Pichler",
             ],
             tasks=[
-                "Send service charge statements 2026", "Schedule owners' meeting Ahornweg",
-                "Lift inspection follow-up Erlengasse", "Publish listing for penthouse Ahornweg",
+                "Send service charge statements 2026",
+                "Schedule owners' meeting Ahornweg",
+                "Lift inspection follow-up Erlengasse",
+                "Publish listing for penthouse Ahornweg",
                 "Collect quotes for roof repair Mühlplatz",
             ],
             payment_days=14,
@@ -603,35 +904,59 @@ CASES: dict[str, Case] = {
             industry="Dental practice",
             summary="Private dental practice with three dentists, prophylaxis team and in-house lab, Freiburg.",
             customers=[
-                ("Martin Keller", "DE"), ("Sabine Wolf", "DE"), ("Familie Huber", "DE"), ("Elena Rossi", "DE"),
-                ("Thomas Brandt", "DE"), ("Katharina Schulz", "DE"), ("Jonas Becker", "DE"), ("Ursula Hartmann", "DE"),
-                ("Dr. Peter Fuchs", "DE"), ("Miriam Yilmaz", "DE"), ("Georg Albrecht", "DE"), ("Lea Zimmermann", "DE"),
+                ("Martin Keller", "DE"),
+                ("Sabine Wolf", "DE"),
+                ("Familie Huber", "DE"),
+                ("Elena Rossi", "DE"),
+                ("Thomas Brandt", "DE"),
+                ("Katharina Schulz", "DE"),
+                ("Jonas Becker", "DE"),
+                ("Ursula Hartmann", "DE"),
+                ("Dr. Peter Fuchs", "DE"),
+                ("Miriam Yilmaz", "DE"),
+                ("Georg Albrecht", "DE"),
+                ("Lea Zimmermann", "DE"),
             ],
             suppliers=[
-                ("Dentaldepot Weißtanne GmbH", "DE", "goods"), ("Dentallabor Feinzahn GmbH", "DE", "services"),
-                ("Ärztehaus Lindenbrunnen GmbH", "DE", "rent"), ("Praxiswerk Software GmbH", "DE", "software"),
+                ("Dentaldepot Weißtanne GmbH", "DE", "goods"),
+                ("Dentallabor Feinzahn GmbH", "DE", "services"),
+                ("Ärztehaus Lindenbrunnen GmbH", "DE", "rent"),
+                ("Praxiswerk Software GmbH", "DE", "software"),
             ],
             expenses=[
-                ("Practice rent", "rent", 3800), ("Salaries", "wages", 30000), ("External dental lab", "services", 4500),
-                ("Consumables and hygiene materials", "goods", 2600), ("Practice software and IT support", "software", 650),
+                ("Practice rent", "rent", 3800),
+                ("Salaries", "wages", 30000),
+                ("External dental lab", "services", 4500),
+                ("Consumables and hygiene materials", "goods", 2600),
+                ("Practice software and IT support", "software", 650),
                 ("Recall reminders and website", "marketing", 300),
             ],
             deals=[
-                "Implant treatment plan Keller", "Full-mouth rehabilitation Hartmann", "Aligner treatment Becker",
-                "Prophylaxis programme for Energiewerke staff", "Referral partnership oral surgery practice",
-                "Whitening campaign spring", "Second opinion patients via website",
+                "Implant treatment plan Keller",
+                "Full-mouth rehabilitation Hartmann",
+                "Aligner treatment Becker",
+                "Prophylaxis programme for Energiewerke staff",
+                "Referral partnership oral surgery practice",
+                "Whitening campaign spring",
+                "Second opinion patients via website",
             ],
             tasks=[
-                "Autoclave validation and sterilisation log review", "Recall reminders for overdue check-ups",
-                "Order composite and impression material", "Annual radiation protection briefing for staff",
+                "Autoclave validation and sterilisation log review",
+                "Recall reminders for overdue check-ups",
+                "Order composite and impression material",
+                "Annual radiation protection briefing for staff",
                 "Update the hygiene plan",
             ],
             quotes=60,
             b2c=True,
             extra={
                 "rates": {
-                    "Conservative dentistry": 0, "Prophylaxis": 0, "Prosthetics": 0, "Implantology": 0,
-                    "Orthodontics": 0, "In-house lab": 7,
+                    "Conservative dentistry": 0,
+                    "Prophylaxis": 0,
+                    "Prosthetics": 0,
+                    "Implantology": 0,
+                    "Orthodontics": 0,
+                    "In-house lab": 7,
                 },
                 "input_vat": False,
             },
@@ -643,26 +968,43 @@ CASES: dict[str, Case] = {
             industry="Physiotherapy",
             summary="Physiotherapy and osteopathy practice with wellness massages and courses, Münster.",
             customers=[
-                ("Heidbrink Logistik GmbH", "DE"), ("Tennisclub Grün-Gold Heidbrink e.V.", "DE"), ("Anna Krüger", "DE"),
-                ("Michael Hoffmann", "DE"), ("Petra Neumann", "DE"), ("Lukas Wagner", "DE"), ("Sophie Schäfer", "DE"),
-                ("Gerd Richter", "DE"), ("Laura König", "DE"), ("Orthopädie am Weidensee", "DE"),
+                ("Heidbrink Logistik GmbH", "DE"),
+                ("Tennisclub Grün-Gold Heidbrink e.V.", "DE"),
+                ("Anna Krüger", "DE"),
+                ("Michael Hoffmann", "DE"),
+                ("Petra Neumann", "DE"),
+                ("Lukas Wagner", "DE"),
+                ("Sophie Schäfer", "DE"),
+                ("Gerd Richter", "DE"),
+                ("Laura König", "DE"),
+                ("Orthopädie am Weidensee", "DE"),
             ],
             suppliers=[
-                ("Physio-Bedarf Bewegwerk GmbH", "DE", "goods"), ("Wäscherei Schneeweiß", "DE", "services"),
+                ("Physio-Bedarf Bewegwerk GmbH", "DE", "goods"),
+                ("Wäscherei Schneeweiß", "DE", "services"),
                 ("Silbertann Gewerbehof KG", "DE", "rent"),
             ],
             expenses=[
-                ("Practice rent", "rent", 3200), ("Salaries", "wages", 24000), ("Laundry service", "services", 450),
-                ("Appointment and therapy software", "software", 220), ("Course flyers and website", "marketing", 350),
+                ("Practice rent", "rent", 3200),
+                ("Salaries", "wages", 24000),
+                ("Laundry service", "services", 450),
+                ("Appointment and therapy software", "software", 220),
+                ("Course flyers and website", "marketing", 350),
             ],
             deals=[
-                "Corporate health programme Heidbrink Logistik", "Back school for Tennisclub Grün-Gold",
-                "Pilates course series autumn", "Referral cooperation Orthopädie am Weidensee",
-                "Osteopathy self-pay packages", "Prevention courses with health insurers",
+                "Corporate health programme Heidbrink Logistik",
+                "Back school for Tennisclub Grün-Gold",
+                "Pilates course series autumn",
+                "Referral cooperation Orthopädie am Weidensee",
+                "Osteopathy self-pay packages",
+                "Prevention courses with health insurers",
             ],
             tasks=[
-                "Check validity of open treatment series", "Service treatment couches and sling table",
-                "Renew laundry contract", "Plan autumn course timetable", "Update cleaning and hygiene plan",
+                "Check validity of open treatment series",
+                "Service treatment couches and sling table",
+                "Renew laundry contract",
+                "Plan autumn course timetable",
+                "Update cleaning and hygiene plan",
             ],
             b2c=True,
             quotes=40,
@@ -681,25 +1023,44 @@ CASES: dict[str, Case] = {
             industry="Beauty salon",
             summary="Hair and beauty salon with six stylists, nail bar and retail shelf, Vienna Neubau.",
             customers=[
-                ("Hotel Kranzgasse Suites", "AT"), ("Weissl & Weissl Hochzeitsplanung OG", "AT"), ("Julia Gruber", "AT"),
-                ("Magdalena Steiner", "AT"), ("Lisa Bauer", "AT"), ("Katrin Hofer", "AT"), ("Andrea Wimmer", "AT"),
-                ("Stefanie Mayr", "AT"), ("Modehaus Leitgeb", "AT"), ("Theatergruppe Kulissenwerk", "AT"),
+                ("Hotel Kranzgasse Suites", "AT"),
+                ("Weissl & Weissl Hochzeitsplanung OG", "AT"),
+                ("Julia Gruber", "AT"),
+                ("Magdalena Steiner", "AT"),
+                ("Lisa Bauer", "AT"),
+                ("Katrin Hofer", "AT"),
+                ("Andrea Wimmer", "AT"),
+                ("Stefanie Mayr", "AT"),
+                ("Modehaus Leitgeb", "AT"),
+                ("Theatergruppe Kulissenwerk", "AT"),
             ],
             suppliers=[
-                ("Friseurbedarf Scherenwerk GmbH", "AT", "goods"), ("Kosmetik Großhandel Rosalie", "AT", "goods"),
-                ("Textilpflege Flussweiß", "AT", "services"), ("Hausverwaltung Fliedergasse", "AT", "rent"),
+                ("Friseurbedarf Scherenwerk GmbH", "AT", "goods"),
+                ("Kosmetik Großhandel Rosalie", "AT", "goods"),
+                ("Textilpflege Flussweiß", "AT", "services"),
+                ("Hausverwaltung Fliedergasse", "AT", "rent"),
             ],
             expenses=[
-                ("Salon rent", "rent", 2600), ("Salaries", "wages", 17000), ("Towel and gown laundry", "services", 450),
-                ("Online booking system", "software", 160), ("Social media ads", "marketing", 600),
+                ("Salon rent", "rent", 2600),
+                ("Salaries", "wages", 17000),
+                ("Towel and gown laundry", "services", 450),
+                ("Online booking system", "software", 160),
+                ("Social media ads", "marketing", 600),
             ],
             deals=[
-                "Bridal packages Weissl & Weissl", "Hotel guest styling Kranzgasse Suites", "Fashion show styling Modehaus Leitgeb",
-                "Theatre premiere make-up", "Voucher partnership with florist", "Nail bar expansion",
+                "Bridal packages Weissl & Weissl",
+                "Hotel guest styling Kranzgasse Suites",
+                "Fashion show styling Modehaus Leitgeb",
+                "Theatre premiere make-up",
+                "Voucher partnership with florist",
+                "Nail bar expansion",
             ],
             tasks=[
-                "Order colour stock for December", "Train new stylist on balayage", "Clean and disinfect tools log",
-                "Plan Christmas voucher campaign", "Reorder retail shelf best-sellers",
+                "Order colour stock for December",
+                "Train new stylist on balayage",
+                "Clean and disinfect tools log",
+                "Plan Christmas voucher campaign",
+                "Reorder retail shelf best-sellers",
             ],
             b2c=True,
             quotes=36,
@@ -713,27 +1074,45 @@ CASES: dict[str, Case] = {
             industry="Restaurant",
             summary="Harbour-side café bistro with 90 seats, takeaway counter, catering and private events, Kiel.",
             customers=[
-                ("Reederei Wellenreiter GmbH", "DE"), ("Agentur Leuchtfeuer Events GmbH", "DE"), ("Segelclub Windkante e.V.", "DE"),
-                ("Kanzlei Petersmann & Lundt", "DE"), ("Buchtwerk Software GmbH", "DE"), ("Hochzeitsplanung Seeschwalbe", "DE"),
-                ("Forschungsstation Seegras", "DE"), ("Seglarvik Yachting AB", "SE"), ("Hafenkontor Möwenkai GmbH", "DE"),
+                ("Reederei Wellenreiter GmbH", "DE"),
+                ("Agentur Leuchtfeuer Events GmbH", "DE"),
+                ("Segelclub Windkante e.V.", "DE"),
+                ("Kanzlei Petersmann & Lundt", "DE"),
+                ("Buchtwerk Software GmbH", "DE"),
+                ("Hochzeitsplanung Seeschwalbe", "DE"),
+                ("Forschungsstation Seegras", "DE"),
+                ("Seglarvik Yachting AB", "SE"),
+                ("Hafenkontor Möwenkai GmbH", "DE"),
             ],
             suppliers=[
-                ("Frischeküche Großmarkt Kombüse GmbH", "DE", "goods"), ("Getränke Gischt GmbH", "DE", "goods"),
-                ("Rösterei Bohnenkai", "DE", "goods"), ("Gebäudereinigung Blankenhorn", "DE", "services"),
+                ("Frischeküche Großmarkt Kombüse GmbH", "DE", "goods"),
+                ("Getränke Gischt GmbH", "DE", "goods"),
+                ("Rösterei Bohnenkai", "DE", "goods"),
+                ("Gebäudereinigung Blankenhorn", "DE", "services"),
                 ("Hafenimmobilien Möwenkai GmbH", "DE", "rent"),
             ],
             expenses=[
-                ("Restaurant rent", "rent", 5200), ("Salaries", "wages", 32000), ("Cleaning service", "services", 900),
-                ("Energy and gas", "other", 2100), ("POS and table reservations", "software", 260),
+                ("Restaurant rent", "rent", 5200),
+                ("Salaries", "wages", 32000),
+                ("Cleaning service", "services", 900),
+                ("Energy and gas", "other", 2100),
+                ("POS and table reservations", "software", 260),
                 ("Local marketing", "marketing", 500),
             ],
             deals=[
-                "Summer party Buchtwerk Software", "Regatta catering Segelclub Windkante", "Wedding reception Seeschwalbe",
-                "Weekly lunch delivery Hafenkontor", "Christmas dinners Reederei Wellenreiter", "Conference coffee breaks institute",
+                "Summer party Buchtwerk Software",
+                "Regatta catering Segelclub Windkante",
+                "Wedding reception Seeschwalbe",
+                "Weekly lunch delivery Hafenkontor",
+                "Christmas dinners Reederei Wellenreiter",
+                "Conference coffee breaks institute",
             ],
             tasks=[
-                "Daily HACCP temperature log", "Order fish for the weekend menu", "Deep clean of the extraction hood",
-                "Plan staff rota for regatta week", "Check allergen labelling on new menu",
+                "Daily HACCP temperature log",
+                "Order fish for the weekend menu",
+                "Deep clean of the extraction hood",
+                "Plan staff rota for regatta week",
+                "Check allergen labelling on new menu",
             ],
             b2c=True,
             quotes=30,
@@ -750,26 +1129,44 @@ CASES: dict[str, Case] = {
             industry="Hotel",
             summary="Lakeside country hotel with 34 rooms, seminar rooms and a small spa, Ammersee.",
             customers=[
-                ("Segelschule Tannweiher GmbH", "DE"), ("Reisebüro Gipfelglück GmbH", "DE"), ("Pharmaseminare Vendura GmbH", "DE"),
-                ("Hochzeit Familie Gruber", "DE"), ("TSV Tannweiher Fußball e.V.", "DE"), ("Wanderreisen Gipfelpfad GmbH", "DE"),
-                ("Software Campus Isarlicht GmbH", "DE"), ("Busreisen Hubmann KG", "DE"), ("Lysbro Travel ApS", "DK"),
+                ("Segelschule Tannweiher GmbH", "DE"),
+                ("Reisebüro Gipfelglück GmbH", "DE"),
+                ("Pharmaseminare Vendura GmbH", "DE"),
+                ("Hochzeit Familie Gruber", "DE"),
+                ("TSV Tannweiher Fußball e.V.", "DE"),
+                ("Wanderreisen Gipfelpfad GmbH", "DE"),
+                ("Software Campus Isarlicht GmbH", "DE"),
+                ("Busreisen Hubmann KG", "DE"),
+                ("Lysbro Travel ApS", "DK"),
             ],
             suppliers=[
-                ("Gastro-Großhandel Seetal GmbH", "DE", "goods"), ("Brauerei Mönchsquell GmbH", "DE", "goods"),
-                ("Großwäscherei Linnenweiß GmbH", "DE", "services"), ("Grundstücksgesellschaft Tannweiher KG", "DE", "rent"),
+                ("Gastro-Großhandel Seetal GmbH", "DE", "goods"),
+                ("Brauerei Mönchsquell GmbH", "DE", "goods"),
+                ("Großwäscherei Linnenweiß GmbH", "DE", "services"),
+                ("Grundstücksgesellschaft Tannweiher KG", "DE", "rent"),
             ],
             expenses=[
-                ("Hotel lease", "rent", 9500), ("Salaries", "wages", 34000), ("Linen and laundry", "services", 2400),
-                ("Energy and heating", "other", 3100), ("Property management system and channel manager", "software", 690),
+                ("Hotel lease", "rent", 9500),
+                ("Salaries", "wages", 34000),
+                ("Linen and laundry", "services", 2400),
+                ("Energy and heating", "other", 3100),
+                ("Property management system and channel manager", "software", 690),
                 ("Booking platform commissions", "marketing", 4800),
             ],
             deals=[
-                "Spring seminar series Pharmaseminare Vendura", "Wedding Familie Gruber", "Group tours 2027 Busreisen Hubmann",
-                "Team offsite Software Campus", "Hiking packages Gipfelpfad", "Scandinavian tour series Lysbro Travel",
+                "Spring seminar series Pharmaseminare Vendura",
+                "Wedding Familie Gruber",
+                "Group tours 2027 Busreisen Hubmann",
+                "Team offsite Software Campus",
+                "Hiking packages Gipfelpfad",
+                "Scandinavian tour series Lysbro Travel",
             ],
             tasks=[
-                "Monthly room inspection checklist", "Service the sauna and steam room", "Update winter rates on booking channels",
-                "Confirm rooming list Busreisen Hubmann", "Order linen replacement for 12 rooms",
+                "Monthly room inspection checklist",
+                "Service the sauna and steam room",
+                "Update winter rates on booking channels",
+                "Confirm rooming list Busreisen Hubmann",
+                "Order linen replacement for 12 rooms",
             ],
             b2c=True,
             quotes=30,
@@ -786,26 +1183,43 @@ CASES: dict[str, Case] = {
             industry="Fitness studio",
             summary="Boutique fitness and yoga studio with 900 members and corporate programmes, Lyon.",
             customers=[
-                ("Lucenne Logiciels SAS", "FR"), ("Cabinet Morvan & Associés", "FR"), ("Groupe Hôtelier Clairval", "FR"),
-                ("Association Sportive Belcolline", "FR"), ("Novaterre Tech Campus", "FR"), ("Pharmacie des Tilleuls", "FR"),
-                ("Clinique du Parc Ombrelle", "FR"), ("Atelier Soierie Martinel", "FR"),
+                ("Lucenne Logiciels SAS", "FR"),
+                ("Cabinet Morvan & Associés", "FR"),
+                ("Groupe Hôtelier Clairval", "FR"),
+                ("Association Sportive Belcolline", "FR"),
+                ("Novaterre Tech Campus", "FR"),
+                ("Pharmacie des Tilleuls", "FR"),
+                ("Clinique du Parc Ombrelle", "FR"),
+                ("Atelier Soierie Martinel", "FR"),
             ],
             suppliers=[
-                ("Sport Équipement Pro SARL", "FR", "goods"), ("Nutrivia Active SAS", "FR", "goods"),
-                ("Nettoyage Clairflot Services", "FR", "services"), ("SCI Les Quais Dorés", "FR", "rent"),
+                ("Sport Équipement Pro SARL", "FR", "goods"),
+                ("Nutrivia Active SAS", "FR", "goods"),
+                ("Nettoyage Clairflot Services", "FR", "services"),
+                ("SCI Les Quais Dorés", "FR", "rent"),
             ],
             expenses=[
-                ("Studio rent", "rent", 7200), ("Salaries", "wages", 21000), ("Cleaning service", "services", 1300),
-                ("Equipment leasing", "other", 1400), ("Booking and membership app", "software", 380),
+                ("Studio rent", "rent", 7200),
+                ("Salaries", "wages", 21000),
+                ("Cleaning service", "services", 1300),
+                ("Equipment leasing", "other", 1400),
+                ("Booking and membership app", "software", 380),
                 ("Membership campaigns", "marketing", 1500),
             ],
             deals=[
-                "Corporate membership Lucenne Logiciels", "Desk yoga workshops Cabinet Morvan", "Hotel guest passes Clairval",
-                "Back health programme Clinique du Parc", "Summer outdoor classes", "Student offer Novaterre Tech Campus",
+                "Corporate membership Lucenne Logiciels",
+                "Desk yoga workshops Cabinet Morvan",
+                "Hotel guest passes Clairval",
+                "Back health programme Clinique du Parc",
+                "Summer outdoor classes",
+                "Student offer Novaterre Tech Campus",
             ],
             tasks=[
-                "Monthly equipment safety check", "Publish class schedule for January", "Renew instructor certifications",
-                "Follow up cancelled memberships", "Reorder protein shakes and towels",
+                "Monthly equipment safety check",
+                "Publish class schedule for January",
+                "Renew instructor certifications",
+                "Follow up cancelled memberships",
+                "Reorder protein shakes and towels",
             ],
             b2c=True,
             quotes=30,
@@ -818,26 +1232,45 @@ CASES: dict[str, Case] = {
             industry="Education and training",
             summary="Language school and professional training provider with certified funded courses, Mainz.",
             customers=[
-                ("Arbeitsförderung Kreis Rebenhang", "DE"), ("Rebhügel Logistik GmbH", "DE"), ("Energiewerke Auenlicht GmbH", "DE"),
-                ("Gesundheitszentrum Rebenhang", "DE"), ("Weingut Schäferling KG", "DE"), ("Netzwerk Integration Brückenschlag e.V.", "DE"),
-                ("Software Atelier Quellstadt GmbH", "DE"), ("Volkshochschule Rebenhang", "DE"), ("Ana Popescu", "DE"),
-                ("Mehmet Yilmaz", "DE"), ("Olena Kovalenko", "DE"),
+                ("Arbeitsförderung Kreis Rebenhang", "DE"),
+                ("Rebhügel Logistik GmbH", "DE"),
+                ("Energiewerke Auenlicht GmbH", "DE"),
+                ("Gesundheitszentrum Rebenhang", "DE"),
+                ("Weingut Schäferling KG", "DE"),
+                ("Netzwerk Integration Brückenschlag e.V.", "DE"),
+                ("Software Atelier Quellstadt GmbH", "DE"),
+                ("Volkshochschule Rebenhang", "DE"),
+                ("Ana Popescu", "DE"),
+                ("Mehmet Yilmaz", "DE"),
+                ("Olena Kovalenko", "DE"),
             ],
             suppliers=[
-                ("Linguara Verlagsauslieferung GmbH", "DE", "goods"), ("Trainerpool Lernfeld GmbH", "DE", "services"),
-                ("Büropark Hafenkran GmbH", "DE", "rent"), ("Lernwolke Plattform GmbH", "DE", "software"),
+                ("Linguara Verlagsauslieferung GmbH", "DE", "goods"),
+                ("Trainerpool Lernfeld GmbH", "DE", "services"),
+                ("Büropark Hafenkran GmbH", "DE", "rent"),
+                ("Lernwolke Plattform GmbH", "DE", "software"),
             ],
             expenses=[
-                ("Classroom rent", "rent", 4600), ("Salaries", "wages", 24000), ("Freelance trainers", "services", 9500),
-                ("Learning platform", "software", 600), ("Course marketing", "marketing", 1400),
+                ("Classroom rent", "rent", 4600),
+                ("Salaries", "wages", 24000),
+                ("Freelance trainers", "services", 9500),
+                ("Learning platform", "software", 600),
+                ("Course marketing", "marketing", 1400),
             ],
             deals=[
-                "Funded retraining places 2027", "Business English for Rebhügel Logistik", "Nursing German B2 Gesundheitszentrum",
-                "Leadership programme Energiewerke Auenlicht", "Excel seminars Software Atelier", "Integration course cooperation",
+                "Funded retraining places 2027",
+                "Business English for Rebhügel Logistik",
+                "Nursing German B2 Gesundheitszentrum",
+                "Leadership programme Energiewerke Auenlicht",
+                "Excel seminars Software Atelier",
+                "Integration course cooperation",
             ],
             tasks=[
-                "Renew course certification with the state authority", "Plan January intensive courses",
-                "Send attendance lists to Arbeitsförderung", "Order course books B1", "Collect trainer invoices for October",
+                "Renew course certification with the state authority",
+                "Plan January intensive courses",
+                "Send attendance lists to Arbeitsförderung",
+                "Order course books B1",
+                "Collect trainer invoices for October",
             ],
             quotes=38,
             lines_per_doc=(1, 3),
@@ -855,13 +1288,31 @@ CASES: dict[str, Case] = {
 _I = tuple[str, str, str, str, str, str, bool, int]
 ITEMS: dict[str, list[_I]] = {
     "trade_distribution": [
-        ("KM-1001", "Stretch film 500 mm x 300 m, pallet of 36 rolls", "pallet", "Packaging", "389.00", "252.96", True, 40),
+        (
+            "KM-1001",
+            "Stretch film 500 mm x 300 m, pallet of 36 rolls",
+            "pallet",
+            "Packaging",
+            "389.00",
+            "252.96",
+            True,
+            40,
+        ),
         ("KM-1002", "Corrugated boxes 400x300x300, bundle of 250", "bundle", "Packaging", "142.50", "92.81", True, 200),
         ("KM-1003", "Packing tape 50 mm brown, carton of 36", "carton", "Packaging", "54.00", "34.32", True, 150),
         ("KM-1004", "Edge protectors 35x35x1200, pack of 100", "pack", "Packaging", "46.00", "28.37", True, 120),
         ("KM-2010", "Nitrile gloves L, carton of 1,000", "carton", "Safety and PPE", "64.90", "42.97", True, 300),
         ("KM-2020", "Safety goggles EN 166, box of 10", "box", "Safety and PPE", "58.00", "36.27", True, 100),
-        ("KM-2030", "High-visibility vest EN ISO 20471, pack of 10", "pack", "Safety and PPE", "49.00", "29.76", True, 100),
+        (
+            "KM-2030",
+            "High-visibility vest EN ISO 20471, pack of 10",
+            "pack",
+            "Safety and PPE",
+            "49.00",
+            "29.76",
+            True,
+            100,
+        ),
         ("KM-2050", "Hex bolts M10x40 A2, box of 500", "box", "Fasteners", "48.20", "30.78", True, 250),
         ("KM-2060", "Washers M10 A2, box of 1,000", "box", "Fasteners", "21.40", "13.21", True, 250),
         ("KM-2070", "Wood screws 5x60 Torx, box of 500", "box", "Fasteners", "26.80", "17.11", True, 250),
@@ -878,8 +1329,26 @@ ITEMS: dict[str, list[_I]] = {
         ("SV-SENIOR", "Senior consultant day rate", "day", "Consulting days", "1250.00", "450.00", False, 20),
         ("SV-CONSULT", "Consultant day rate", "day", "Consulting days", "890.00", "330.00", False, 30),
         ("SV-ANALYST", "Analyst day rate", "day", "Consulting days", "650.00", "240.00", False, 30),
-        ("SV-WORKSHOP", "Strategy workshop, half day incl. preparation", "session", "Workshops", "3200.00", "1100.00", False, 3),
-        ("SV-TRAIN", "Finance training for managers, per participant", "participant", "Workshops", "690.00", "180.00", False, 20),
+        (
+            "SV-WORKSHOP",
+            "Strategy workshop, half day incl. preparation",
+            "session",
+            "Workshops",
+            "3200.00",
+            "1100.00",
+            False,
+            3,
+        ),
+        (
+            "SV-TRAIN",
+            "Finance training for managers, per participant",
+            "participant",
+            "Workshops",
+            "690.00",
+            "180.00",
+            False,
+            20,
+        ),
         ("SV-DD", "Financial due diligence package", "flat", "Fixed-fee projects", "14500.00", "5200.00", False, 1),
         ("SV-BENCH", "Finance function benchmark report", "flat", "Fixed-fee projects", "7800.00", "2600.00", False, 1),
         ("SV-RET", "Monthly advisory retainer", "month", "Retainers", "4500.00", "1500.00", False, 1),
@@ -925,7 +1394,16 @@ ITEMS: dict[str, list[_I]] = {
         ("CP-VALVE", "Expansion valve, universal", "pcs", "Spare parts", "165.00", "82.00", True, 10),
         ("CP-FAN", "Condenser fan motor", "pcs", "Spare parts", "285.00", "148.00", True, 6),
         ("CP-INST", "Installation split AC 3.5 kW incl. unit", "pcs", "Installations", "2490.00", "1290.00", True, 10),
-        ("CP-HP", "Air-to-water heat pump 8 kW incl. installation", "pcs", "Installations", "11900.00", "7400.00", True, 2),
+        (
+            "CP-HP",
+            "Air-to-water heat pump 8 kW incl. installation",
+            "pcs",
+            "Installations",
+            "11900.00",
+            "7400.00",
+            True,
+            2,
+        ),
     ],
     "logistics": [
         ("BB-FTL-PL-SE", "Full truckload Gdańsk to Stockholm", "trip", "Road freight", "2150.00", "1640.00", False, 10),
@@ -933,8 +1411,26 @@ ITEMS: dict[str, list[_I]] = {
         ("BB-FTL-PL-NO", "Full truckload Gdańsk to Oslo", "trip", "Road freight", "2480.00", "1890.00", False, 8),
         ("BB-LTL", "Groupage per pallet place", "pallet", "Road freight", "96.00", "68.00", False, 66),
         ("BB-REEF", "Reefer surcharge per trip", "trip", "Road freight", "340.00", "250.00", False, 6),
-        ("BB-FCL20", "Sea freight 20ft container Gdańsk to Gothenburg", "container", "Sea freight", "1650.00", "1210.00", False, 6),
-        ("BB-FCL40", "Sea freight 40ft container Gdańsk to Aarhus", "container", "Sea freight", "2350.00", "1760.00", False, 4),
+        (
+            "BB-FCL20",
+            "Sea freight 20ft container Gdańsk to Gothenburg",
+            "container",
+            "Sea freight",
+            "1650.00",
+            "1210.00",
+            False,
+            6,
+        ),
+        (
+            "BB-FCL40",
+            "Sea freight 40ft container Gdańsk to Aarhus",
+            "container",
+            "Sea freight",
+            "2350.00",
+            "1760.00",
+            False,
+            4,
+        ),
         ("BB-CUST", "Customs clearance per declaration", "declaration", "Customs", "85.00", "20.00", False, 12),
         ("BB-STOR", "Warehouse storage per pallet-week", "pallet-week", "Warehousing", "4.80", "2.10", False, 600),
         ("BB-HAND", "Warehouse handling in/out per pallet", "pallet", "Warehousing", "9.50", "4.00", False, 300),
@@ -956,8 +1452,26 @@ ITEMS: dict[str, list[_I]] = {
     "nonprofit": [
         ("GC-WS", "School workshop: climate and nature (half day)", "session", "Education", "320.00", "0", False, 12),
         ("GC-EXC", "Guided nature excursion, per group", "group", "Education", "180.00", "0", False, 15),
-        ("GC-TRAIN", "Train-the-trainer seminar, per participant", "participant", "Education", "145.00", "0", False, 30),
-        ("GC-COURSE", "Weekend course nature photography, per participant", "participant", "Education", "95.00", "0", False, 20),
+        (
+            "GC-TRAIN",
+            "Train-the-trainer seminar, per participant",
+            "participant",
+            "Education",
+            "145.00",
+            "0",
+            False,
+            30,
+        ),
+        (
+            "GC-COURSE",
+            "Weekend course nature photography, per participant",
+            "participant",
+            "Education",
+            "95.00",
+            "0",
+            False,
+            20,
+        ),
         ("GC-EVENT", "Event organisation package", "flat", "Events", "1850.00", "0", False, 1),
         ("GC-STAND", "Exhibition stand at environmental fair", "flat", "Events", "650.00", "0", False, 1),
         ("GC-SPON", "Corporate sponsorship package", "flat", "Partnerships", "2500.00", "0", False, 1),
@@ -1031,7 +1545,16 @@ ITEMS: dict[str, list[_I]] = {
         ("KP-EST", "Personal income tax return", "flat", "Tax returns", "890.00", "0", False, 1),
         ("KP-BER", "Tax advice, per hour", "hour", "Advisory", "165.00", "0", False, 20),
         ("KP-BP", "Tax audit support, per hour", "hour", "Advisory", "185.00", "0", False, 30),
-        ("KP-START", "Start-up package: incorporation and tax registration", "flat", "Advisory", "1900.00", "0", False, 1),
+        (
+            "KP-START",
+            "Start-up package: incorporation and tax registration",
+            "flat",
+            "Advisory",
+            "1900.00",
+            "0",
+            False,
+            1,
+        ),
         ("KP-AUSL", "Postage and telecom, flat", "flat", "Expenses", "20.00", "0", False, 1),
     ],
     "creative_studio": [
@@ -1052,7 +1575,16 @@ ITEMS: dict[str, list[_I]] = {
         ("KI-LET", "Letting commission, two months' rent", "flat", "Brokerage", "1900.00", "0", False, 1),
         ("KI-VAL", "Valuation report, residential", "flat", "Valuations", "890.00", "0", False, 1),
         ("KI-EPC", "Energy certificate arrangement", "flat", "Valuations", "280.00", "0", False, 1),
-        ("KI-PM", "Property management fee, per unit and month", "unit", "Property management", "28.00", "0", False, 80),
+        (
+            "KI-PM",
+            "Property management fee, per unit and month",
+            "unit",
+            "Property management",
+            "28.00",
+            "0",
+            False,
+            80,
+        ),
         ("KI-PMC", "Commercial property management, monthly", "month", "Property management", "950.00", "0", False, 1),
         ("KI-MEET", "Owners' meeting incl. minutes", "meeting", "Property management", "420.00", "0", False, 1),
         ("KI-SC", "Annual service charge statement, per unit", "unit", "Service charges", "45.00", "0", False, 60),
@@ -1140,17 +1672,80 @@ ITEMS: dict[str, list[_I]] = {
         ("EQ-TOWEL", "Towel rental", "pcs", "Bar and shop", "2.00", "0", False, 120),
     ],
     "education_training": [
-        ("RB-DE-B1", "German course B1, 8 weeks intensive", "participant", "Language courses", "690.00", "0", False, 12),
-        ("RB-DE-B2", "German for professionals B2, evenings", "participant", "Language courses", "540.00", "0", False, 12),
-        ("RB-EN-BIZ", "Business English in-company, per lesson", "lesson", "Corporate training", "68.00", "0", False, 40),
+        (
+            "RB-DE-B1",
+            "German course B1, 8 weeks intensive",
+            "participant",
+            "Language courses",
+            "690.00",
+            "0",
+            False,
+            12,
+        ),
+        (
+            "RB-DE-B2",
+            "German for professionals B2, evenings",
+            "participant",
+            "Language courses",
+            "540.00",
+            "0",
+            False,
+            12,
+        ),
+        (
+            "RB-EN-BIZ",
+            "Business English in-company, per lesson",
+            "lesson",
+            "Corporate training",
+            "68.00",
+            "0",
+            False,
+            40,
+        ),
         ("RB-EXAM", "Certificate exam B1/B2", "participant", "Exams", "185.00", "0", False, 12),
         ("RB-BOOK", "Course book B1 with workbook", "copy", "Learning materials", "34.90", "22.00", True, 20),
-        ("RB-EXCEL", "Excel for controllers, 2-day seminar", "participant", "Vocational courses", "890.00", "0", False, 10),
+        (
+            "RB-EXCEL",
+            "Excel for controllers, 2-day seminar",
+            "participant",
+            "Vocational courses",
+            "890.00",
+            "0",
+            False,
+            10,
+        ),
         ("RB-PM", "Project management basics, 3 days", "participant", "Vocational courses", "1290.00", "0", False, 10),
-        ("RB-LEAD", "Leadership training for team leads, in-house day", "day", "Corporate training", "1850.00", "0", False, 3),
-        ("RB-FUND", "Funded retraining module, per participant and month", "participant", "Vocational courses", "1150.00", "0", False, 8),
+        (
+            "RB-LEAD",
+            "Leadership training for team leads, in-house day",
+            "day",
+            "Corporate training",
+            "1850.00",
+            "0",
+            False,
+            3,
+        ),
+        (
+            "RB-FUND",
+            "Funded retraining module, per participant and month",
+            "participant",
+            "Vocational courses",
+            "1150.00",
+            "0",
+            False,
+            8,
+        ),
         ("RB-ROOM", "Seminar room hire, per day", "day", "Room hire", "280.00", "0", False, 3),
-        ("RB-ELEARN", "E-learning licence, per learner and year", "licence", "Corporate training", "120.00", "0", False, 50),
+        (
+            "RB-ELEARN",
+            "E-learning licence, per learner and year",
+            "licence",
+            "Corporate training",
+            "120.00",
+            "0",
+            False,
+            50,
+        ),
     ],
 }
 
@@ -1221,14 +1816,21 @@ async def _install_is_stale(session: AsyncSession, case: Case, tenant: str) -> b
     if await session.scalar(select(Item.id).where(Item.tenant_id == tenant, Item.sku.like("NW-%")).limit(1)):
         return True
     # Missing bank account or opening balance means an older build seeded it.
-    opening = await session.scalar(select(BankAccount.opening_balance_date).where(
-        BankAccount.tenant_id == tenant, BankAccount.name == bank_account_name(case.company)))
+    opening = await session.scalar(
+        select(BankAccount.opening_balance_date).where(
+            BankAccount.tenant_id == tenant, BankAccount.name == bank_account_name(case.company)
+        )
+    )
     if opening is None:
         return True
     # A renamed demo company leaves its old account behind, double-counting the statement lines.
-    orphan = await session.scalar(select(BankAccount.id).where(
-        BankAccount.tenant_id == tenant, BankAccount.iban == demo_bank_iban(case),
-        BankAccount.name != bank_account_name(case.company)))
+    orphan = await session.scalar(
+        select(BankAccount.id).where(
+            BankAccount.tenant_id == tenant,
+            BankAccount.iban == demo_bank_iban(case),
+            BankAccount.name != bank_account_name(case.company),
+        )
+    )
     return orphan is not None
 
 
@@ -1237,9 +1839,7 @@ def _months_back(d: date, n: int) -> date:
     return date(y, m + 1, 1)
 
 
-async def _ensure_ledger(
-    session: AsyncSession, country: str, start: date, end: date, tenant_id: str
-) -> dict[str, str]:
+async def _ensure_ledger(session: AsyncSession, country: str, start: date, end: date, tenant_id: str) -> dict[str, str]:
     gl = GLService(session, tenant_id)
     mine = GLAccount.tenant_id == tenant_id
     tpl = await session.scalar(select(GLAccount.template).where(mine, GLAccount.template.is_not(None)).limit(1))
@@ -1254,7 +1854,8 @@ async def _ensure_ledger(
         ys, ye = date(year, 1, 1), date(year, 12, 31)
         overlap = await session.scalar(
             select(GLFiscalYear.id).where(
-                GLFiscalYear.tenant_id == tenant_id, GLFiscalYear.start_date <= ye, GLFiscalYear.end_date >= ys)
+                GLFiscalYear.tenant_id == tenant_id, GLFiscalYear.start_date <= ye, GLFiscalYear.end_date >= ys
+            )
         )
         if overlap is None:
             await gl.create_fiscal_year(f"FY{year}", ys, ye)
@@ -1266,8 +1867,14 @@ async def _ensure_stages(session: AsyncSession) -> dict[str, PipelineStage]:
     for code, name, order, prob, final, won, lost, color in _CRM_STAGES:
         if code not in stages:
             st = PipelineStage(
-                code=code, name=name, display_order=order, default_probability_percent=prob,
-                is_final=final, is_won=won, is_lost=lost, color=color,
+                code=code,
+                name=name,
+                display_order=order,
+                default_probability_percent=prob,
+                is_final=final,
+                is_won=won,
+                is_lost=lost,
+                color=color,
             )
             session.add(st)
             stages[code] = st
@@ -1324,11 +1931,13 @@ async def install_business_demo(
     if settings.get("country_code") != case.country:
         # The demo company is a real-world entity of its own country: its books run in that currency.
         from app.core.business_settings import write_business_settings
+
         cur = _CASE_CURRENCY.get(case.country, "EUR")
         write_business_settings({"country_code": case.country, "base_currency": cur})
         settings = {**settings, "country_code": case.country, "base_currency": cur}
     if not str(settings.get("company_name") or "").strip():
         from app.core.business_settings import write_business_settings
+
         write_business_settings({"company_name": case.company})
     country = settings.get("country_code") or case.country
     currency = str(settings.get("base_currency") or base_currency()).upper()
@@ -1350,19 +1959,44 @@ async def install_business_demo(
     tag = f"demo:{case_key}"
     customers: list[Account] = []
     for name, cc in case.customers:
-        a = Account(name=name, country=cc, industry=None, role="customer", status="active",
-                    size_category="sme", tags=[tag], description=f"Customer of {case.company}", owner_user_id=owner)
+        a = Account(
+            name=name,
+            country=cc,
+            industry=None,
+            role="customer",
+            status="active",
+            size_category="sme",
+            tags=[tag],
+            description=f"Customer of {case.company}",
+            owner_user_id=owner,
+        )
         session.add(a)
         customers.append(a)
     for name, cc, cat in case.suppliers:
-        session.add(Account(name=name, country=cc, role="supplier", status="active", size_category="sme",
-                            tags=[tag, cat], description=f"Supplier ({cat}) of {case.company}", owner_user_id=owner))
+        session.add(
+            Account(
+                name=name,
+                country=cc,
+                role="supplier",
+                status="active",
+                size_category="sme",
+                tags=[tag, cat],
+                description=f"Supplier ({cat}) of {case.company}",
+                owner_user_id=owner,
+            )
+        )
     webshop = None
     if profile.get("webshop"):
-        webshop = Account(name=case.extra.get("walk_in", WEBSHOP_CUSTOMER), country=country, role="customer",
-                          status="active", size_category="sme", tags=[tag],
-                          description=f"Card and counter settlements of {case.company}",
-                          owner_user_id=owner)
+        webshop = Account(
+            name=case.extra.get("walk_in", WEBSHOP_CUSTOMER),
+            country=country,
+            role="customer",
+            status="active",
+            size_category="sme",
+            tags=[tag],
+            description=f"Card and counter settlements of {case.company}",
+            owner_user_id=owner,
+        )
         session.add(webshop)
     await session.flush()
 
@@ -1395,9 +2029,15 @@ async def install_business_demo(
         if cost <= 0:
             return
         await gl.create_entry(
-            entry_date=day, memo=f"Cost of sales {inv.number}", source_type=COGS_SOURCE,
-            lines=[LineInput(acc["cogs"], debit=cost, description=f"Cost of goods sold {inv.number}"),
-                   LineInput(acc["inventory"], credit=cost, description=f"Stock issue {inv.number}")], **meta)
+            entry_date=day,
+            memo=f"Cost of sales {inv.number}",
+            source_type=COGS_SOURCE,
+            lines=[
+                LineInput(acc["cogs"], debit=cost, description=f"Cost of goods sold {inv.number}"),
+                LineInput(acc["inventory"], credit=cost, description=f"Stock issue {inv.number}"),
+            ],
+            **meta,
+        )
         m = day.replace(day=1)
         cogs_month[m] = cogs_month.get(m, D(0)) + cost
 
@@ -1405,7 +2045,8 @@ async def install_business_demo(
     span = (today - start).days
     months = D(span) / D("30.4")
     doc_target = D(profile.get("doc_value") or 0) or (
-        D(profile.get("revenue", 20000)) * months / (D(case.quotes) * INVOICE_CONVERSION))
+        D(profile.get("revenue", 20000)) * months / (D(case.quotes) * INVOICE_CONVERSION)
+    )
     chased = False
     for i in range(case.quotes):
         qd = start + timedelta(days=int(span * i / case.quotes) + rng.randint(0, 4))
@@ -1415,8 +2056,9 @@ async def install_business_demo(
         cc = case.customers[cust_i][1]
         common = {"customer_id": cust.id, "customer_name": cust.name, "currency": currency}
         lines = pick_lines(cc, doc_target * D(rng.randint(50, 150)) / 100)
-        q = await sales.create("quote", lines=lines, doc_date=qd, created_by=created_by,
-                               due_date=qd + timedelta(days=30), **common)
+        q = await sales.create(
+            "quote", lines=lines, doc_date=qd, created_by=created_by, due_date=qd + timedelta(days=30), **common
+        )
         counts["quotes"] += 1
         age = (today - qd).days
         roll = rng.random()
@@ -1466,12 +2108,18 @@ async def install_business_demo(
             pay_day = min(pay_day, today)
             if rng.random() < 0.12:
                 part = money(inv.gross_total * D("0.5"))
-                await sales.record_payment(inv.id, amount=part, pay_date=pay_day, reference="Instalment 1",
-                                           created_by=created_by)
+                await sales.record_payment(
+                    inv.id, amount=part, pay_date=pay_day, reference="Instalment 1", created_by=created_by
+                )
                 counts["payments"] += 1
                 continue
-            await sales.record_payment(inv.id, amount=inv.gross_total, pay_date=pay_day,
-                                       reference=f"Bank transfer {cust.name}"[:100], created_by=created_by)
+            await sales.record_payment(
+                inv.id,
+                amount=inv.gross_total,
+                pay_date=pay_day,
+                reference=f"Bank transfer {cust.name}"[:100],
+                created_by=created_by,
+            )
             counts["payments"] += 1
 
     # B2C: weekly settlement invoice for web-shop or counter sales, paid out by the card processor.
@@ -1480,15 +2128,28 @@ async def install_business_demo(
         d = start + timedelta(days=6)
         while d < today:
             lines = pick_lines(country, week * D(rng.randint(85, 115)) / 100, k=len(items_def))
-            inv = await sales.create("invoice", lines=lines, doc_date=d, due_date=d + timedelta(days=3),
-                                     created_by=created_by, customer_id=webshop.id, customer_name=webshop.name,
-                                     currency=currency, notes=f"{case.extra.get('walk_in_note', 'Web shop orders')} week {d:%G-%V}")
+            inv = await sales.create(
+                "invoice",
+                lines=lines,
+                doc_date=d,
+                due_date=d + timedelta(days=3),
+                created_by=created_by,
+                customer_id=webshop.id,
+                customer_name=webshop.name,
+                currency=currency,
+                notes=f"{case.extra.get('walk_in_note', 'Web shop orders')} week {d:%G-%V}",
+            )
             await sales.issue_invoice(inv.id, created_by=created_by)
             await book_cogs(inv, lines, d)
             counts["invoices"] += 1
             if d + timedelta(days=2) <= today:
-                await sales.record_payment(inv.id, amount=inv.gross_total, pay_date=d + timedelta(days=2),
-                                           reference=f"Card payout week {d:%G-%V}", created_by=created_by)
+                await sales.record_payment(
+                    inv.id,
+                    amount=inv.gross_total,
+                    pay_date=d + timedelta(days=2),
+                    reference=f"Card payout week {d:%G-%V}",
+                    created_by=created_by,
+                )
                 counts["payments"] += 1
             d += timedelta(days=7)
 
@@ -1507,14 +2168,21 @@ async def install_business_demo(
         if tax > 0 and reclaim:
             lines.append(LineInput(acc["input_vat"], debit=tax, description=f"{ref} input VAT"))
         lines.append(LineInput(acc["payables"], credit=net + tax, description=f"{name} {ref}"[:500]))
-        await gl.create_entry(entry_date=day, lines=lines, memo=f"Supplier bill {ref} {name}",
-                              source_type=BILL_SOURCE, **meta)
+        await gl.create_entry(
+            entry_date=day, lines=lines, memo=f"Supplier bill {ref} {name}", source_type=BILL_SOURCE, **meta
+        )
         pay = day + timedelta(days=SUPPLIER_TERMS + rng.randint(-4, 6))
         if pay <= today:
             await gl.create_entry(
-                entry_date=pay, memo=f"Payment supplier bill {ref} {name}", source_type=BILL_PAY_SOURCE,
-                lines=[LineInput(acc["payables"], debit=net + tax, description=f"{name} {ref}"[:500]),
-                       LineInput(acc["bank"], credit=net + tax, description=f"Payment {ref}")], **meta)
+                entry_date=pay,
+                memo=f"Payment supplier bill {ref} {name}",
+                source_type=BILL_PAY_SOURCE,
+                lines=[
+                    LineInput(acc["payables"], debit=net + tax, description=f"{name} {ref}"[:500]),
+                    LineInput(acc["bank"], credit=net + tax, description=f"Payment {ref}"),
+                ],
+                **meta,
+            )
             bills["bills_paid"] += 1
 
     # Stock purchases on credit: an opening stock, then each month's issues plus a small buffer.
@@ -1551,29 +2219,46 @@ async def install_business_demo(
             if tax > 0 and reclaim:
                 lines.append(LineInput(acc["input_vat"], debit=tax, description=f"{label} input VAT"))
             lines.append(LineInput(acc["bank"], credit=net + tax, description=label))
-            await gl.create_entry(entry_date=day, lines=lines, memo=f"{label} {day:%b %Y}",
-                                  source_type=EXPENSE_SOURCE, **meta)
+            await gl.create_entry(
+                entry_date=day, lines=lines, memo=f"{label} {day:%b %Y}", source_type=EXPENSE_SOURCE, **meta
+            )
         month = _months_back(month, -1)
 
     # Bank loan: drawn at the start, 48 monthly instalments plus interest.
     loan = D(profile.get("loan", 0))
     if loan > 0:
         await gl.create_entry(
-            entry_date=start, memo=f"Bank loan drawdown {case.company}", source_type=LOAN_SOURCE,
-            lines=[LineInput(acc["bank"], debit=loan, description="Loan drawdown"),
-                   LineInput(acc["loan"], credit=loan, description="Term loan, 48 months")], **meta)
+            entry_date=start,
+            memo=f"Bank loan drawdown {case.company}",
+            source_type=LOAN_SOURCE,
+            lines=[
+                LineInput(acc["bank"], debit=loan, description="Loan drawdown"),
+                LineInput(acc["loan"], credit=loan, description="Term loan, 48 months"),
+            ],
+            **meta,
+        )
         balance, month = loan, _months_back(start, -1)
         while month + timedelta(days=27) <= today:
             interest, principal = money(balance * D("0.055") / 12), money(loan / 48)
             await gl.create_entry(
-                entry_date=month + timedelta(days=27), memo=f"Loan instalment {month:%b %Y}", source_type=LOAN_SOURCE,
-                lines=[LineInput(acc["interest"], debit=interest, description="Loan interest"),
-                       LineInput(acc["loan"], debit=principal, description="Loan repayment"),
-                       LineInput(acc["bank"], credit=interest + principal, description="Loan instalment")], **meta)
+                entry_date=month + timedelta(days=27),
+                memo=f"Loan instalment {month:%b %Y}",
+                source_type=LOAN_SOURCE,
+                lines=[
+                    LineInput(acc["interest"], debit=interest, description="Loan interest"),
+                    LineInput(acc["loan"], debit=principal, description="Loan repayment"),
+                    LineInput(acc["bank"], credit=interest + principal, description="Loan instalment"),
+                ],
+                **meta,
+            )
             balance -= principal
             month = _months_back(month, -1)
 
-    p2p = await _seed_purchasing(session, case, tenant, currency, vat, country, today, created_by)         if case_key in P2P_CASES else 0
+    p2p = (
+        await _seed_purchasing(session, case, tenant, currency, vat, country, today, created_by)
+        if case_key in P2P_CASES
+        else 0
+    )
 
     # Paid-in capital sized so the bank never dips below one month of fixed costs; doubles as
     # the idempotency marker.
@@ -1581,7 +2266,8 @@ async def install_business_demo(
         select(GLJournalEntry.entry_date, func.sum(GLJournalLine.base_debit - GLJournalLine.base_credit))
         .join(GLJournalEntry, GLJournalEntry.id == GLJournalLine.entry_id)
         .where(GLJournalLine.account_id == acc["bank"], GLJournalEntry.tenant_id == tenant)
-        .group_by(GLJournalEntry.entry_date).order_by(GLJournalEntry.entry_date)
+        .group_by(GLJournalEntry.entry_date)
+        .order_by(GLJournalEntry.entry_date)
     )
     run = low = D(0)
     for _, v in flows:
@@ -1590,18 +2276,40 @@ async def install_business_demo(
     cushion = D(sum(e[2] for e in case.expenses))
     capital = max(D(25000), ((cushion - low) / 10000).to_integral_value(rounding=ROUND_CEILING) * 10000)
     await gl.create_entry(
-        entry_date=start, memo=f"Opening balance {case.company}", source_type=MARKER_SOURCE,
-        lines=[LineInput(acc["bank"], debit=capital, description="Opening bank balance"),
-               LineInput(acc["equity"], credit=capital, description="Paid-in capital")], **meta)
+        entry_date=start,
+        memo=f"Opening balance {case.company}",
+        source_type=MARKER_SOURCE,
+        lines=[
+            LineInput(acc["bank"], debit=capital, description="Opening bank balance"),
+            LineInput(acc["equity"], credit=capital, description="Paid-in capital"),
+        ],
+        **meta,
+    )
 
     await _seed_bank_account(session, case, tenant, currency, codes["bank"], acc["bank"], today)
     deals = await _seed_deals(session, case, customers, currency, today, rng, owner)
     tasks, pos = await _seed_operations(session, case, owner, currency, vat, today, rng)
     bookings = await _seed_appointments(session, case, tenant, today, rng, created_by)
     await session.flush()
-    result = {"case": case_key, "company": case.company, "already_installed": False, "currency": currency,
-              "customers": len(case.customers), "suppliers": len(case.suppliers), **counts,
-              "expenses": expenses, **bills, "items": n_items, "capital": capital, "loan": loan, "deals": deals, "tasks": tasks, "appointments": bookings, "purchase_orders": pos, "p2p_orders": p2p}
+    result = {
+        "case": case_key,
+        "company": case.company,
+        "already_installed": False,
+        "currency": currency,
+        "customers": len(case.customers),
+        "suppliers": len(case.suppliers),
+        **counts,
+        "expenses": expenses,
+        **bills,
+        "items": n_items,
+        "capital": capital,
+        "loan": loan,
+        "deals": deals,
+        "tasks": tasks,
+        "appointments": bookings,
+        "purchase_orders": pos,
+        "p2p_orders": p2p,
+    }
     logger.info("Business demo %s installed: %s", case_key, result)
     return result
 
@@ -1610,24 +2318,63 @@ async def install_business_demo(
 APPOINTMENT_DEMO: dict[str, dict[str, Any]] = {
     "trade_distribution": {
         "resources": [
-            ("Jonas Vettermann", "staff", "#2563eb"), ("Mara Ellenbogen", "staff", "#059669"),
+            ("Jonas Vettermann", "staff", "#2563eb"),
+            ("Mara Ellenbogen", "staff", "#059669"),
             ("Showroom Hamburg", "room", "#d97706"),
-            ("Loading bay 1", "equipment", "#7c3aed"), ("Loading bay 2", "equipment", "#db2777"),
+            ("Loading bay 1", "equipment", "#7c3aed"),
+            ("Loading bay 2", "equipment", "#db2777"),
         ],
         # name, description, minutes, buffer after, price, resource kind, online
         "services": [
-            ("Product consultation", "Range, volume prices and delivery terms with your account manager.", 45, 10, 0, "staff", True),
-            ("Packaging audit", "On-site review of your packaging spend with a written savings estimate.", 90, 15, 120, "staff", True),
-            ("Showroom visit and sample review", "Walk through the range and test samples in our showroom.", 60, 15, 0, "room", True),
-            ("Goods pickup, loading bay", "Collect a ready order at the loading bay; please bring the order number.", 30, 10, 0, "equipment", True),
-            ("Key account review", "Quarterly review for contract customers.", 60, 0, 0, "staff", False),
+            (
+                "Product consultation",
+                "Range, volume prices and delivery terms with your account manager.",
+                45,
+                10,
+                85,
+                "staff",
+                True,
+            ),
+            (
+                "Packaging audit",
+                "On-site review of your packaging spend with a written savings estimate.",
+                90,
+                15,
+                120,
+                "staff",
+                True,
+            ),
+            (
+                "Showroom visit and sample review",
+                "Walk through the range and test samples in our showroom.",
+                60,
+                15,
+                45,
+                "room",
+                True,
+            ),
+            (
+                "Goods pickup, loading bay",
+                "Collect a ready order at the loading bay; please bring the order number.",
+                30,
+                10,
+                25,
+                "equipment",
+                True,
+            ),
+            ("Key account review", "Quarterly review for contract customers.", 60, 0, 150, "staff", False),
         ],
         "clients": [
-            ("Katrin Vollmer", "kestner-maschinenbau"), ("Ole Brandhorst", "varnholt-logistik"),
-            ("Silke Dornquist", "dornquist-metallwaren"), ("Henrik Zellbrook", "zellbrook-verpackung"),
-            ("Femke de Waal", "veldmoor-industrie"), ("Lars Tallvik", "tallvik-produktion"),
-            ("Tobias Wendt", "wendt-soehne"), ("Ines Quellhain", "quellhain-lebensmitteltechnik"),
-            ("Marek Felsgrat", "felsgrat-werkzeuge"), ("Sonja Ravenholt", "ravenholt-handwerk"),
+            ("Katrin Vollmer", "kestner-maschinenbau"),
+            ("Ole Brandhorst", "varnholt-logistik"),
+            ("Silke Dornquist", "dornquist-metallwaren"),
+            ("Henrik Zellbrook", "zellbrook-verpackung"),
+            ("Femke de Waal", "veldmoor-industrie"),
+            ("Lars Tallvik", "tallvik-produktion"),
+            ("Tobias Wendt", "wendt-soehne"),
+            ("Ines Quellhain", "quellhain-lebensmitteltechnik"),
+            ("Marek Felsgrat", "felsgrat-werkzeuge"),
+            ("Sonja Ravenholt", "ravenholt-handwerk"),
         ],
     },
 }
@@ -1639,8 +2386,11 @@ async def _appointments_stale(session: AsyncSession, case: Case, tenant: str) ->
         return False
     from app.modules.appointments.models import AppointmentSettings
 
-    row = await session.scalar(select(AppointmentSettings).where(
-        AppointmentSettings.tenant_id == tenant, AppointmentSettings.public_title == case.company))
+    row = await session.scalar(
+        select(AppointmentSettings).where(
+            AppointmentSettings.tenant_id == tenant, AppointmentSettings.public_title == case.company
+        )
+    )
     return row is None or not row.online_enabled
 
 
@@ -1651,9 +2401,16 @@ async def _seed_appointments(session, case, tenant, today, rng, created_by) -> i
     from app.modules.appointments.service import AppointmentsService
 
     svc = AppointmentsService(session, tenant)
-    await svc.update_settings(public_title=case.company, online_enabled=True, auto_confirm=False,
-                              slot_step_min=15, min_notice_hours=2, max_days_ahead=60,
-                              reminders_enabled=True, reminder_hours=24)
+    await svc.update_settings(
+        public_title=case.company,
+        online_enabled=True,
+        auto_confirm=False,
+        slot_step_min=15,
+        min_notice_hours=2,
+        max_days_ahead=60,
+        reminders_enabled=True,
+        reminder_hours=24,
+    )
     for i, (name, kind, color) in enumerate(cfg["resources"]):
         week = [{"weekday": d, "start_min": 480, "end_min": 1020 if d < 4 else 960} for d in range(5)]
         week += [{"weekday": d, "start_min": 720, "end_min": 765, "kind": "break"} for d in range(5)]
@@ -1661,9 +2418,19 @@ async def _seed_appointments(session, case, tenant, today, rng, created_by) -> i
     colors = ("#2563eb", "#059669", "#d97706", "#7c3aed", "#64748b")
     services = []
     for i, (name, desc, minutes, after, price, kind, online) in enumerate(cfg["services"]):
-        services.append(await svc.create_service(
-            name=name, description=desc, duration_min=minutes, buffer_after_min=after, price=D(price),
-            currency="EUR", resource_kind=kind, online=online, color=colors[i % len(colors)]))
+        services.append(
+            await svc.create_service(
+                name=name,
+                description=desc,
+                duration_min=minutes,
+                buffer_after_min=after,
+                price=D(price),
+                currency="EUR",
+                resource_kind=kind,
+                online=online,
+                color=colors[i % len(colors)],
+            )
+        )
     monday = today - timedelta(days=today.weekday())
     now = datetime.combine(today, time(12))
     weights = [4, 1, 2, 3, 1]
@@ -1687,11 +2454,18 @@ async def _seed_appointments(session, case, tenant, today, rng, created_by) -> i
                     final = "confirmed" if roll < 0.70 else "requested" if roll < 0.90 else "cancelled"
                 online = final == "requested" or rng.random() < 0.35
                 rows = await svc.create_booking(
-                    service_id=service.id, resource_id=rid, start_at=start, client_name=name, client_email=email,
-                    client_phone=phone, source="online" if online else "staff",
+                    service_id=service.id,
+                    resource_id=rid,
+                    start_at=start,
+                    client_name=name,
+                    client_email=email,
+                    client_phone=phone,
+                    source="online" if online else "staff",
                     status="requested" if final == "requested" else "confirmed",
-                    consent_at=datetime.now(UTC) if online else None, created_by=_APPT_MARKER + case.key,
-                    notes="Booked via the online booking page." if online else "")
+                    consent_at=datetime.now(UTC) if online else None,
+                    created_by=_APPT_MARKER + case.key,
+                    notes="Booked via the online booking page." if online else "",
+                )
                 if final not in ("requested", "confirmed"):
                     await svc.set_status(rows[0].id, final)
                 created += 1
@@ -1710,16 +2484,40 @@ async def _reset_appointments(session, case, tenant) -> int:
         return 0
     from app.modules.appointments import models as am
 
-    svc_ids = list((await session.execute(select(am.AppointmentService.id).where(
-        am.AppointmentService.tenant_id == tenant,
-        am.AppointmentService.name.in_([s[0] for s in cfg["services"]])))).scalars())
-    res_ids = list((await session.execute(select(am.AppointmentResource.id).where(
-        am.AppointmentResource.tenant_id == tenant,
-        am.AppointmentResource.name.in_([r[0] for r in cfg["resources"]])))).scalars())
-    book_ids = list((await session.execute(select(am.AppointmentBooking.id).where(
-        am.AppointmentBooking.tenant_id == tenant,
-        or_(am.AppointmentBooking.created_by == _APPT_MARKER + case.key,
-            am.AppointmentBooking.service_id.in_(svc_ids), am.AppointmentBooking.resource_id.in_(res_ids))))).scalars())
+    svc_ids = list(
+        (
+            await session.execute(
+                select(am.AppointmentService.id).where(
+                    am.AppointmentService.tenant_id == tenant,
+                    am.AppointmentService.name.in_([s[0] for s in cfg["services"]]),
+                )
+            )
+        ).scalars()
+    )
+    res_ids = list(
+        (
+            await session.execute(
+                select(am.AppointmentResource.id).where(
+                    am.AppointmentResource.tenant_id == tenant,
+                    am.AppointmentResource.name.in_([r[0] for r in cfg["resources"]]),
+                )
+            )
+        ).scalars()
+    )
+    book_ids = list(
+        (
+            await session.execute(
+                select(am.AppointmentBooking.id).where(
+                    am.AppointmentBooking.tenant_id == tenant,
+                    or_(
+                        am.AppointmentBooking.created_by == _APPT_MARKER + case.key,
+                        am.AppointmentBooking.service_id.in_(svc_ids),
+                        am.AppointmentBooking.resource_id.in_(res_ids),
+                    ),
+                )
+            )
+        ).scalars()
+    )
 
     async def drop(model, *where) -> int:
         res = await session.execute(delete(model).where(*where).execution_options(synchronize_session=False))
@@ -1735,8 +2533,11 @@ async def _reset_appointments(session, case, tenant) -> int:
         await drop(am.AppointmentResource, am.AppointmentResource.id.in_(res_ids))
     if svc_ids:
         await drop(am.AppointmentService, am.AppointmentService.id.in_(svc_ids))
-    await drop(am.AppointmentSettings, am.AppointmentSettings.tenant_id == tenant,
-               am.AppointmentSettings.public_title == case.company)
+    await drop(
+        am.AppointmentSettings,
+        am.AppointmentSettings.tenant_id == tenant,
+        am.AppointmentSettings.public_title == case.company,
+    )
     return n
 
 
@@ -1776,10 +2577,14 @@ async def _seed_items(session, case, currency, vat, tenant, created_by, codes, c
     cats: dict[str, uuid.UUID] = {}
     for name in dict.fromkeys(r[3] for r in rows):
         cid = await session.scalar(
-            select(ItemsCategory.id).where(ItemsCategory.tenant_id == tenant, ItemsCategory.name == name))
+            select(ItemsCategory.id).where(ItemsCategory.tenant_id == tenant, ItemsCategory.name == name)
+        )
         cats[name] = cid or (await svc.create_category(name=name, description=f"{case.company} demo")).id
-    have = set((await session.execute(
-        select(Item.sku).where(Item.tenant_id == tenant, Item.sku.in_([r[0] for r in rows])))).scalars())
+    have = set(
+        (
+            await session.execute(select(Item.sku).where(Item.tenant_id == tenant, Item.sku.in_([r[0] for r in rows])))
+        ).scalars()
+    )
     breaks: list[dict[str, Any]] = []
     n = 0
     for row in rows:
@@ -1787,11 +2592,21 @@ async def _seed_items(session, case, currency, vat, tenant, created_by, codes, c
         if sku in have:
             continue
         item = await svc.create_item(
-            created_by=created_by, sku=sku, name=name, description=f"{name} ({case.company})", uom=uom,
-            item_type="goods" if goods else "service", sales_price=D(price), purchase_cost=D(cost),
-            currency=currency, tax_code=_item_tax_code(case, cat, vat, country), revenue_account=codes["revenue"],
-            expense_account=codes["cogs"] if goods else codes["services"], stock_tracked=goods,
-            category_id=cats[cat])
+            created_by=created_by,
+            sku=sku,
+            name=name,
+            description=f"{name} ({case.company})",
+            uom=uom,
+            item_type="goods" if goods else "service",
+            sales_price=D(price),
+            purchase_cost=D(cost),
+            currency=currency,
+            tax_code=_item_tax_code(case, cat, vat, country),
+            revenue_account=codes["revenue"],
+            expense_account=codes["cogs"] if goods else codes["services"],
+            stock_tracked=goods,
+            category_id=cats[cat],
+        )
         n += 1
         breaks.append({"item_id": item.id, "min_qty": D(0), "unit_price": D(price)})
         brk = _price_break(row)
@@ -1799,7 +2614,8 @@ async def _seed_items(session, case, currency, vat, tenant, created_by, codes, c
             breaks.append({"item_id": item.id, "min_qty": D(brk[0]), "unit_price": brk[1]})
     pl_name = f"{case.company} volume prices"
     exists = await session.scalar(
-        select(ItemPriceList.id).where(ItemPriceList.tenant_id == tenant, ItemPriceList.name == pl_name))
+        select(ItemPriceList.id).where(ItemPriceList.tenant_id == tenant, ItemPriceList.name == pl_name)
+    )
     if breaks and exists is None:
         await svc.create_price_list(items=breaks, name=pl_name, currency=currency, priority=10)
     return n
@@ -1815,20 +2631,41 @@ async def _seed_deals(session, case, customers, currency, today, rng, owner) -> 
         st = stages[code]
         cust = customers[rng.randrange(len(customers))]
         value = money(top * D(rng.randint(60, 400)) / 100)
-        close = today + timedelta(days=rng.randint(10, 120)) if not st.is_final else today - timedelta(days=rng.randint(3, 40))
+        close = (
+            today + timedelta(days=rng.randint(10, 120))
+            if not st.is_final
+            else today - timedelta(days=rng.randint(3, 40))
+        )
         prob = st.default_probability_percent
         opp = Opportunity(
-            account_id=cust.id, title=title, description=f"{title} for {cust.name}", estimated_value=value,
-            currency=currency, expected_close_date=close.isoformat(), probability_percent=prob, stage_id=st.id,
-            weighted_value=money(value * prob / 100), source=rng.choice(["inbound", "referral", "outbound", "event"]),
-            owner_user_id=owner, status="won" if st.is_won else "lost" if st.is_lost else "open",
-            won_at=close.isoformat() if st.is_won else None, lost_at=close.isoformat() if st.is_lost else None,
-            notes="", competitor_names=[],
+            account_id=cust.id,
+            title=title,
+            description=f"{title} for {cust.name}",
+            estimated_value=value,
+            currency=currency,
+            expected_close_date=close.isoformat(),
+            probability_percent=prob,
+            stage_id=st.id,
+            weighted_value=money(value * prob / 100),
+            source=rng.choice(["inbound", "referral", "outbound", "event"]),
+            owner_user_id=owner,
+            status="won" if st.is_won else "lost" if st.is_lost else "open",
+            won_at=close.isoformat() if st.is_won else None,
+            lost_at=close.isoformat() if st.is_lost else None,
+            notes="",
+            competitor_names=[],
         )
         session.add(opp)
         await session.flush()
-        session.add(OpportunityStageHistory(opportunity_id=opp.id, from_stage_id=None, to_stage_id=st.id,
-                                            changed_at=today.isoformat(), changed_by=owner))
+        session.add(
+            OpportunityStageHistory(
+                opportunity_id=opp.id,
+                from_stage_id=None,
+                to_stage_id=st.id,
+                changed_at=today.isoformat(),
+                changed_by=owner,
+            )
+        )
         n += 1
     return n
 
@@ -1841,16 +2678,32 @@ async def _seed_operations(session, case, owner, currency, vat, today, rng) -> t
     from app.modules.projects.models import Project
     from app.modules.tasks.models import Task
 
-    ws = Project(name=f"{case.company} operations", description=case.summary, currency=currency, locale="en",
-                 status="active", owner_id=owner, metadata_={"business_demo": case.key})
+    ws = Project(
+        name=f"{case.company} operations",
+        description=case.summary,
+        currency=currency,
+        locale="en",
+        status="active",
+        owner_id=owner,
+        metadata_={"business_demo": case.key},
+    )
     session.add(ws)
     await session.flush()
     statuses = ["open", "in_progress", "open", "completed", "in_progress"]
     for i, title in enumerate(case.tasks):
-        session.add(Task(project_id=ws.id, task_type="task", title=title, status=statuses[i % len(statuses)],
-                         priority=rng.choice(["normal", "normal", "high", "low"]), responsible_id=str(owner),
-                         due_date=(today + timedelta(days=rng.randint(-5, 30))).isoformat(), created_by=str(owner),
-                         metadata_={"business_demo": case.key}))
+        session.add(
+            Task(
+                project_id=ws.id,
+                task_type="task",
+                title=title,
+                status=statuses[i % len(statuses)],
+                priority=rng.choice(["normal", "normal", "high", "low"]),
+                responsible_id=str(owner),
+                due_date=(today + timedelta(days=rng.randint(-5, 30))).isoformat(),
+                created_by=str(owner),
+                metadata_={"business_demo": case.key},
+            )
+        )
     pos = 0
     buys = [(n, cat) for n, _, cat in case.suppliers if cat in ("goods", "services")]
     for i, (vendor, cat) in enumerate(buys * 2):
@@ -1863,17 +2716,34 @@ async def _seed_operations(session, case, owner, currency, vat, today, rng) -> t
         rows = rows or [(vendor, 1, D(1000))]
         sub = sum((money(q * v) for _, q, v in rows), D(0))
         tax = money(sub * vat / 100)
-        po = PurchaseOrder(project_id=ws.id, po_number=f"PO-{i + 1:04d}", issue_date=issue.isoformat(),
-                           delivery_date=(issue + timedelta(days=rng.randint(3, 21))).isoformat(),
-                           currency_code=currency, amount_subtotal=str(sub), tax_amount=str(tax),
-                           amount_total=str(sub + tax), status=rng.choice(["completed", "completed", "issued", "approved"]),
-                           payment_terms="30 days net", notes=vendor, created_by=owner,
-                           metadata_={"business_demo": case.key, "vendor_name": vendor})
+        po = PurchaseOrder(
+            project_id=ws.id,
+            po_number=f"PO-{i + 1:04d}",
+            issue_date=issue.isoformat(),
+            delivery_date=(issue + timedelta(days=rng.randint(3, 21))).isoformat(),
+            currency_code=currency,
+            amount_subtotal=str(sub),
+            tax_amount=str(tax),
+            amount_total=str(sub + tax),
+            status=rng.choice(["completed", "completed", "issued", "approved"]),
+            payment_terms="30 days net",
+            notes=vendor,
+            created_by=owner,
+            metadata_={"business_demo": case.key, "vendor_name": vendor},
+        )
         session.add(po)
         await session.flush()
         for j, (label, q, v) in enumerate(rows):
-            session.add(PurchaseOrderItem(po_id=po.id, description=label, quantity=str(q), unit_rate=str(money(v)),
-                                          amount=str(money(q * v)), sort_order=j))
+            session.add(
+                PurchaseOrderItem(
+                    po_id=po.id,
+                    description=label,
+                    quantity=str(q),
+                    unit_rate=str(money(v)),
+                    amount=str(money(q * v)),
+                    sort_order=j,
+                )
+            )
         pos += 1
     return len(case.tasks), pos
 
@@ -1893,39 +2763,79 @@ async def _seed_bank_account(session, case, tenant, currency, bank_code, bank_ac
     name = bank_account_name(case.company)
     if await session.scalar(select(BankAccount.id).where(BankAccount.tenant_id == tenant, BankAccount.name == name)):
         return
-    ba = BankAccount(tenant_id=tenant, name=name, iban=demo_bank_iban(case),
-                     currency=currency, gl_account_code=bank_code, active=True)
+    ba = BankAccount(
+        tenant_id=tenant,
+        name=name,
+        iban=demo_bank_iban(case),
+        currency=currency,
+        gl_account_code=bank_code,
+        active=True,
+    )
     session.add(ba)
     await session.flush()
-    rows = (await session.execute(
-        select(GLJournalEntry.id, GLJournalEntry.entry_date, GLJournalEntry.memo,
-               GLJournalLine.base_debit - GLJournalLine.base_credit)
-        .join(GLJournalEntry, GLJournalEntry.id == GLJournalLine.entry_id)
-        .where(GLJournalLine.account_id == bank_acc_id, GLJournalEntry.tenant_id == tenant,
-               GLJournalEntry.entry_date <= today)
-        .order_by(GLJournalEntry.entry_date.desc()).limit(30))).all()
+    rows = (
+        await session.execute(
+            select(
+                GLJournalEntry.id,
+                GLJournalEntry.entry_date,
+                GLJournalEntry.memo,
+                GLJournalLine.base_debit - GLJournalLine.base_credit,
+            )
+            .join(GLJournalEntry, GLJournalEntry.id == GLJournalLine.entry_id)
+            .where(
+                GLJournalLine.account_id == bank_acc_id,
+                GLJournalEntry.tenant_id == tenant,
+                GLJournalEntry.entry_date <= today,
+            )
+            .order_by(GLJournalEntry.entry_date.desc())
+            .limit(30)
+        )
+    ).all()
     # Opening balance = ledger balance before the imported window, so bank balance equals the GL balance.
     gl_total = await session.scalar(
         select(func.coalesce(func.sum(GLJournalLine.base_debit - GLJournalLine.base_credit), 0))
         .join(GLJournalEntry, GLJournalEntry.id == GLJournalLine.entry_id)
-        .where(GLJournalLine.account_id == bank_acc_id, GLJournalEntry.tenant_id == tenant,
-               GLJournalEntry.entry_date <= today))
+        .where(
+            GLJournalLine.account_id == bank_acc_id,
+            GLJournalEntry.tenant_id == tenant,
+            GLJournalEntry.entry_date <= today,
+        )
+    )
     ba.opening_balance = money(D(gl_total or 0) - sum((money(a) for _, _, _, a in rows if a), D(0)))
     ba.opening_balance_date = min((d for _, d, _, a in rows if a), default=today)
     for n, (eid, day, memo, amt) in enumerate(rows):
         if not amt:
             continue
         done = n >= 6  # the six most recent lines wait for matching
-        session.add(BankTransaction(
-            tenant_id=tenant, account_id=ba.id, booking_date=day, value_date=day, amount=money(amt), currency=currency,
-            counterparty_name=(memo or "")[:255], remittance=memo or "", reference=str(eid)[:8],
-            dedupe_key=f"demo-{eid}", status="matched" if done else "unmatched",
-            matched_amount=abs(money(amt)) if done else D(0)))
+        session.add(
+            BankTransaction(
+                tenant_id=tenant,
+                account_id=ba.id,
+                booking_date=day,
+                value_date=day,
+                amount=money(amt),
+                currency=currency,
+                counterparty_name=(memo or "")[:255],
+                remittance=memo or "",
+                reference=str(eid)[:8],
+                dedupe_key=f"demo-{eid}",
+                status="matched" if done else "unmatched",
+                matched_amount=abs(money(amt)) if done else D(0),
+            )
+        )
     await session.flush()
 
 
-P2P_CASES = {"trade_distribution", "retail_ecommerce", "manufacturing", "craft_trades", "food_production",
-             "restaurant_cafe", "franchise_multisite", "field_service"}
+P2P_CASES = {
+    "trade_distribution",
+    "retail_ecommerce",
+    "manufacturing",
+    "craft_trades",
+    "food_production",
+    "restaurant_cafe",
+    "franchise_multisite",
+    "field_service",
+}
 
 
 async def _seed_purchasing(session, case, tenant, currency, vat, country, today, created_by) -> int:
@@ -1935,23 +2845,46 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
 
     svc = PurchasingService(session, tenant)
     goods = [(n, cc) for n, cc, cat in case.suppliers if cat == "goods"] or [case.suppliers[0][:2]]
-    sup = {a.name: a.id for a in (await session.execute(select(Account).where(Account.role == "supplier"))).scalars()
-           if f"demo:{case.key}" in (a.tags or [])}
+    sup = {
+        a.name: a.id
+        for a in (await session.execute(select(Account).where(Account.role == "supplier"))).scalars()
+        if f"demo:{case.key}" in (a.tags or [])
+    }
     rows = [r for r in ITEMS[case.key] if r[6]] or ITEMS[case.key]
-    ids = {i.sku: i.id for i in (await session.execute(
-        select(Item).where(Item.tenant_id == tenant, Item.sku.in_([r[0] for r in rows])))).scalars()}
+    ids = {
+        i.sku: i.id
+        for i in (
+            await session.execute(select(Item).where(Item.tenant_id == tenant, Item.sku.in_([r[0] for r in rows])))
+        ).scalars()
+    }
 
     def lines(k: int, vcc: str) -> list[LineData]:
         rate = vat if vcc == country else D(0)
         picked = [rows[(k + j) % len(rows)] for j in range(2)]
-        return [LineData(description=r[1], sku=r[0], qty=D(max(4, r[7] // 2)), unit_price=money(D(r[5])),
-                         tax_rate=rate, item_id=ids.get(r[0])) for r in dict.fromkeys(picked)]
+        return [
+            LineData(
+                description=r[1],
+                sku=r[0],
+                qty=D(max(4, r[7] // 2)),
+                unit_price=money(D(r[5])),
+                tax_rate=rate,
+                item_id=ids.get(r[0]),
+            )
+            for r in dict.fromkeys(picked)
+        ]
 
     async def order(k: int, day: date):
         name, vcc = goods[k % len(goods)]
-        po = await svc.create_order(lines=lines(k, vcc), doc_date=day, created_by=created_by, supplier_id=sup.get(name),
-                                    supplier_name=name, currency=currency, due_date=day + timedelta(days=14),
-                                    notes=f"Replenishment {case.company}")
+        po = await svc.create_order(
+            lines=lines(k, vcc),
+            doc_date=day,
+            created_by=created_by,
+            supplier_id=sup.get(name),
+            supplier_name=name,
+            currency=currency,
+            due_date=day + timedelta(days=14),
+            notes=f"Replenishment {case.company}",
+        )
         await svc.set_order_status(po.id, "confirmed")
         return po
 
@@ -1960,20 +2893,35 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
     po = await order(0, d0)
     await svc.receive(po.id, doc_date=d0 + timedelta(days=5), created_by=created_by)
     bill = await svc.create_bill(
-        "bill", doc_date=d0 + timedelta(days=7), created_by=created_by, order_id=po.id, supplier_id=po.supplier_id,
-        supplier_name=po.supplier_name, supplier_ref=f"INV-{d0:%y%m}-17", currency=currency,
-        lines=[LineData(pl.description, pl.sku, pl.qty, money(pl.unit_price * D("1.02")), pl.tax_rate, pl.item_id, pl.id)
-               for pl in po.lines])
+        "bill",
+        doc_date=d0 + timedelta(days=7),
+        created_by=created_by,
+        order_id=po.id,
+        supplier_id=po.supplier_id,
+        supplier_name=po.supplier_name,
+        supplier_ref=f"INV-{d0:%y%m}-17",
+        currency=currency,
+        lines=[
+            LineData(pl.description, pl.sku, pl.qty, money(pl.unit_price * D("1.02")), pl.tax_rate, pl.item_id, pl.id)
+            for pl in po.lines
+        ],
+    )
     await svc.post_bill(bill.id, created_by=created_by)
-    await svc.record_payment(bill.id, amount=bill.gross_total, pay_date=d0 + timedelta(days=30),
-                             reference=bill.supplier_ref, created_by=created_by)
+    await svc.record_payment(
+        bill.id,
+        amount=bill.gross_total,
+        pay_date=d0 + timedelta(days=30),
+        reference=bill.supplier_ref,
+        created_by=created_by,
+    )
 
     # Partially received: half of the first line delivered.
     d1 = today - timedelta(days=12)
     po = await order(1, d1)
     first = po.lines[0]
-    await svc.receive(po.id, {first.id: (first.qty / 2).to_integral_value()}, doc_date=d1 + timedelta(days=4),
-                      created_by=created_by)
+    await svc.receive(
+        po.id, {first.id: (first.qty / 2).to_integral_value()}, doc_date=d1 + timedelta(days=4), created_by=created_by
+    )
 
     # Open: confirmed, nothing delivered yet.
     await order(2, today - timedelta(days=3))
@@ -1988,19 +2936,48 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
     rate = vat if vcc == country else D(0)
     d2 = today - timedelta(days=40)
     po = await svc.create_order(
-        lines=[LineData(description=r[1], sku=r[0], qty=D(max(1, minimum[r[0]] // 2) if r[0] in low else max(4, r[7] // 2)),
-                        unit_price=money(D(r[5])), tax_rate=rate, item_id=ids.get(r[0])) for r in tracked],
-        doc_date=d2, created_by=created_by, supplier_id=sup.get(name), supplier_name=name, currency=currency,
-        due_date=d2 + timedelta(days=5), notes=f"Opening stock {case.company}")
+        lines=[
+            LineData(
+                description=r[1],
+                sku=r[0],
+                qty=D(max(1, minimum[r[0]] // 2) if r[0] in low else max(4, r[7] // 2)),
+                unit_price=money(D(r[5])),
+                tax_rate=rate,
+                item_id=ids.get(r[0]),
+            )
+            for r in tracked
+        ],
+        doc_date=d2,
+        created_by=created_by,
+        supplier_id=sup.get(name),
+        supplier_name=name,
+        currency=currency,
+        due_date=d2 + timedelta(days=5),
+        notes=f"Opening stock {case.company}",
+    )
     await svc.set_order_status(po.id, "confirmed")
     await svc.receive(po.id, doc_date=d2 + timedelta(days=3), created_by=created_by)
     bill = await svc.create_bill(
-        "bill", doc_date=d2 + timedelta(days=4), created_by=created_by, order_id=po.id, supplier_id=po.supplier_id,
-        supplier_name=po.supplier_name, supplier_ref=f"INV-{d2:%y%m}-OS", currency=currency,
-        lines=[LineData(pl.description, pl.sku, pl.qty, pl.unit_price, pl.tax_rate, pl.item_id, pl.id) for pl in po.lines])
+        "bill",
+        doc_date=d2 + timedelta(days=4),
+        created_by=created_by,
+        order_id=po.id,
+        supplier_id=po.supplier_id,
+        supplier_name=po.supplier_name,
+        supplier_ref=f"INV-{d2:%y%m}-OS",
+        currency=currency,
+        lines=[
+            LineData(pl.description, pl.sku, pl.qty, pl.unit_price, pl.tax_rate, pl.item_id, pl.id) for pl in po.lines
+        ],
+    )
     await svc.post_bill(bill.id, created_by=created_by)
-    await svc.record_payment(bill.id, amount=bill.gross_total, pay_date=d2 + timedelta(days=30),
-                             reference=bill.supplier_ref, created_by=created_by)
+    await svc.record_payment(
+        bill.id,
+        amount=bill.gross_total,
+        pay_date=d2 + timedelta(days=30),
+        reference=bill.supplier_ref,
+        created_by=created_by,
+    )
 
     # Monthly supplier bills over six months: older ones paid, one overdue, two falling due this week.
     vendors = [(n, cc) for n, cc, _cat in case.suppliers]
@@ -2010,14 +2987,32 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
         day = today - timedelta(days=age)
         net = money(D(2800 + 650 * ((k * 3) % 5)))
         b = await svc.create_bill(
-            "bill", doc_date=day, created_by=created_by, supplier_id=sup.get(vname), supplier_name=vname,
-            supplier_ref=f"INV-{day:%y%m}-{k + 1:02d}", currency=currency, due_date=day + timedelta(days=30),
-            lines=[LineData(description=f"Goods and services {day:%b %Y}", qty=D(1), unit_price=net,
-                            tax_rate=vat if vcc == country else D(0))])
+            "bill",
+            doc_date=day,
+            created_by=created_by,
+            supplier_id=sup.get(vname),
+            supplier_name=vname,
+            supplier_ref=f"INV-{day:%y%m}-{k + 1:02d}",
+            currency=currency,
+            due_date=day + timedelta(days=30),
+            lines=[
+                LineData(
+                    description=f"Goods and services {day:%b %Y}",
+                    qty=D(1),
+                    unit_price=net,
+                    tax_rate=vat if vcc == country else D(0),
+                )
+            ],
+        )
         await svc.post_bill(b.id, created_by=created_by)
         if paid:
-            await svc.record_payment(b.id, amount=b.gross_total, pay_date=min(today, day + timedelta(days=28)),
-                                     reference=b.supplier_ref, created_by=created_by)
+            await svc.record_payment(
+                b.id,
+                amount=b.gross_total,
+                pay_date=min(today, day + timedelta(days=28)),
+                reference=b.supplier_ref,
+                created_by=created_by,
+            )
     return 4
 
 
@@ -2043,39 +3038,109 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
 
     accounts = [a for a in (await session.execute(select(Account))).scalars() if tag in (a.tags or [])]
     acc_ids = [a.id for a in accounts]
-    doc_ids = list((await session.execute(select(SalesDocument.id).where(
-        SalesDocument.tenant_id == tenant, SalesDocument.customer_id.in_(acc_ids)))).scalars()) if acc_ids else []
-    pay_ids = list((await session.execute(
-        select(SalesPayment.id).where(SalesPayment.invoice_id.in_(doc_ids)))).scalars()) if doc_ids else []
+    doc_ids = (
+        list(
+            (
+                await session.execute(
+                    select(SalesDocument.id).where(
+                        SalesDocument.tenant_id == tenant, SalesDocument.customer_id.in_(acc_ids)
+                    )
+                )
+            ).scalars()
+        )
+        if acc_ids
+        else []
+    )
+    pay_ids = (
+        list((await session.execute(select(SalesPayment.id).where(SalesPayment.invoice_id.in_(doc_ids)))).scalars())
+        if doc_ids
+        else []
+    )
     sales_refs = [(SOURCE_INVOICE, str(i)) for i in doc_ids] + [(SOURCE_PAYMENT, str(i)) for i in pay_ids]
-    entry_ids = list((await session.execute(select(GLJournalEntry.id).where(
-        GLJournalEntry.tenant_id == tenant, GLJournalEntry.source_type.in_(DEMO_SOURCES),
-        GLJournalEntry.source_id == case_key))).scalars())
+    entry_ids = list(
+        (
+            await session.execute(
+                select(GLJournalEntry.id).where(
+                    GLJournalEntry.tenant_id == tenant,
+                    GLJournalEntry.source_type.in_(DEMO_SOURCES),
+                    GLJournalEntry.source_id == case_key,
+                )
+            )
+        ).scalars()
+    )
     for i in range(0, len(sales_refs), 500):
-        chunk = sales_refs[i:i + 500]
+        chunk = sales_refs[i : i + 500]
         for st in (SOURCE_INVOICE, SOURCE_PAYMENT):
             ids = [sid for t, sid in chunk if t == st]
             if ids:
-                entry_ids += list((await session.execute(select(GLJournalEntry.id).where(
-                    GLJournalEntry.tenant_id == tenant, GLJournalEntry.source_type == st,
-                    GLJournalEntry.source_id.in_(ids)))).scalars())
+                entry_ids += list(
+                    (
+                        await session.execute(
+                            select(GLJournalEntry.id).where(
+                                GLJournalEntry.tenant_id == tenant,
+                                GLJournalEntry.source_type == st,
+                                GLJournalEntry.source_id.in_(ids),
+                            )
+                        )
+                    ).scalars()
+                )
     if acc_ids:
         from app.modules.purchasing import models as pm
         from app.modules.purchasing import service as ps
 
-        po_ids = list((await session.execute(select(pm.PurchasingOrder.id).where(
-            pm.PurchasingOrder.tenant_id == tenant, pm.PurchasingOrder.supplier_id.in_(acc_ids)))).scalars())
-        bill_ids = list((await session.execute(select(pm.PurchasingBill.id).where(
-            pm.PurchasingBill.tenant_id == tenant, pm.PurchasingBill.supplier_id.in_(acc_ids)))).scalars())
-        gr_ids = list((await session.execute(select(pm.PurchasingReceipt.id).where(
-            pm.PurchasingReceipt.order_id.in_(po_ids)))).scalars()) if po_ids else []
-        bp_ids = list((await session.execute(select(pm.PurchasingPayment.id).where(
-            pm.PurchasingPayment.bill_id.in_(bill_ids)))).scalars()) if bill_ids else []
+        po_ids = list(
+            (
+                await session.execute(
+                    select(pm.PurchasingOrder.id).where(
+                        pm.PurchasingOrder.tenant_id == tenant, pm.PurchasingOrder.supplier_id.in_(acc_ids)
+                    )
+                )
+            ).scalars()
+        )
+        bill_ids = list(
+            (
+                await session.execute(
+                    select(pm.PurchasingBill.id).where(
+                        pm.PurchasingBill.tenant_id == tenant, pm.PurchasingBill.supplier_id.in_(acc_ids)
+                    )
+                )
+            ).scalars()
+        )
+        gr_ids = (
+            list(
+                (
+                    await session.execute(
+                        select(pm.PurchasingReceipt.id).where(pm.PurchasingReceipt.order_id.in_(po_ids))
+                    )
+                ).scalars()
+            )
+            if po_ids
+            else []
+        )
+        bp_ids = (
+            list(
+                (
+                    await session.execute(
+                        select(pm.PurchasingPayment.id).where(pm.PurchasingPayment.bill_id.in_(bill_ids))
+                    )
+                ).scalars()
+            )
+            if bill_ids
+            else []
+        )
         for st, ids in ((ps.SOURCE_RECEIPT, gr_ids), (ps.SOURCE_BILL, bill_ids), (ps.SOURCE_PAYMENT, bp_ids)):
             if ids:
-                entry_ids += list((await session.execute(select(GLJournalEntry.id).where(
-                    GLJournalEntry.tenant_id == tenant, GLJournalEntry.source_type == st,
-                    GLJournalEntry.source_id.in_([str(i) for i in ids])))).scalars())
+                entry_ids += list(
+                    (
+                        await session.execute(
+                            select(GLJournalEntry.id).where(
+                                GLJournalEntry.tenant_id == tenant,
+                                GLJournalEntry.source_type == st,
+                                GLJournalEntry.source_id.in_([str(i) for i in ids]),
+                            )
+                        )
+                    ).scalars()
+                )
         if bill_ids:
             await drop(pm.PurchasingPayment, pm.PurchasingPayment.bill_id.in_(bill_ids))
             await drop(pm.PurchasingBillLine, pm.PurchasingBillLine.bill_id.in_(bill_ids))
@@ -2086,15 +3151,25 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
                 await drop(pm.PurchasingReceipt, pm.PurchasingReceipt.id.in_(gr_ids))
             await drop(pm.PurchasingOrderLine, pm.PurchasingOrderLine.order_id.in_(po_ids))
             out["p2p_orders"] = await drop(pm.PurchasingOrder, pm.PurchasingOrder.id.in_(po_ids))
-        await drop(pm.PurchasingStock, pm.PurchasingStock.tenant_id == tenant, pm.PurchasingStock.sku.in_(
-            _all_skus(case_key)))
+        await drop(
+            pm.PurchasingStock, pm.PurchasingStock.tenant_id == tenant, pm.PurchasingStock.sku.in_(_all_skus(case_key))
+        )
     from app.modules.banking.models import BankAccount, BankTransaction
 
     # Match the IBAN too: it derives from the case key, so it survives renames of the demo company.
-    ba_ids = list((await session.execute(select(BankAccount.id).where(
-        BankAccount.tenant_id == tenant,
-        or_(BankAccount.name == bank_account_name(CASES[case_key].company),
-            BankAccount.iban == demo_bank_iban(CASES[case_key]))))).scalars())
+    ba_ids = list(
+        (
+            await session.execute(
+                select(BankAccount.id).where(
+                    BankAccount.tenant_id == tenant,
+                    or_(
+                        BankAccount.name == bank_account_name(CASES[case_key].company),
+                        BankAccount.iban == demo_bank_iban(CASES[case_key]),
+                    ),
+                )
+            )
+        ).scalars()
+    )
     if ba_ids:
         await drop(BankTransaction, BankTransaction.account_id.in_(ba_ids))
         await drop(BankAccount, BankAccount.id.in_(ba_ids))
@@ -2107,18 +3182,22 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
         await session.execute(update(SalesDocument).where(SalesDocument.id.in_(doc_ids)).values(source_id=None))
         out["sales_documents"] = await drop(SalesDocument, SalesDocument.id.in_(doc_ids))
     if acc_ids:
-        opp_ids = list((await session.execute(
-            select(Opportunity.id).where(Opportunity.account_id.in_(acc_ids)))).scalars())
+        opp_ids = list(
+            (await session.execute(select(Opportunity.id).where(Opportunity.account_id.in_(acc_ids)))).scalars()
+        )
         if opp_ids:
             await drop(OpportunityStageHistory, OpportunityStageHistory.opportunity_id.in_(opp_ids))
             out["deals"] = await drop(Opportunity, Opportunity.id.in_(opp_ids))
         out["accounts"] = await drop(Account, Account.id.in_(acc_ids))
-    projects = [p.id for p in (await session.execute(
-        select(Project).where(Project.name == f"{case.company} operations"))).scalars()
-        if (p.metadata_ or {}).get("business_demo") == case_key]
+    projects = [
+        p.id
+        for p in (await session.execute(select(Project).where(Project.name == f"{case.company} operations"))).scalars()
+        if (p.metadata_ or {}).get("business_demo") == case_key
+    ]
     if projects:
-        po_ids = list((await session.execute(
-            select(PurchaseOrder.id).where(PurchaseOrder.project_id.in_(projects)))).scalars())
+        po_ids = list(
+            (await session.execute(select(PurchaseOrder.id).where(PurchaseOrder.project_id.in_(projects)))).scalars()
+        )
         if po_ids:
             await drop(PurchaseOrderItem, PurchaseOrderItem.po_id.in_(po_ids))
             out["purchase_orders"] = await drop(PurchaseOrder, PurchaseOrder.id.in_(po_ids))
@@ -2126,12 +3205,20 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
         await drop(Project, Project.id.in_(projects))
     out["appointments"] = await _reset_appointments(session, case, tenant)
     skus = _all_skus(case_key)
-    out["price_lists"] = await drop(ItemPriceList, ItemPriceList.tenant_id == tenant,
-                                    ItemPriceList.name == f"{case.company} volume prices")
+    out["price_lists"] = await drop(
+        ItemPriceList, ItemPriceList.tenant_id == tenant, ItemPriceList.name == f"{case.company} volume prices"
+    )
     out["items"] = await drop(Item, Item.tenant_id == tenant, Item.sku.in_(skus))
     cats = {r[3] for r in ITEMS[case_key]}
-    used = set((await session.execute(select(ItemsCategory.name).join(Item, Item.category_id == ItemsCategory.id)
-                                      .where(ItemsCategory.tenant_id == tenant))).scalars())
+    used = set(
+        (
+            await session.execute(
+                select(ItemsCategory.name)
+                .join(Item, Item.category_id == ItemsCategory.id)
+                .where(ItemsCategory.tenant_id == tenant)
+            )
+        ).scalars()
+    )
     if cats - used:
         await drop(ItemsCategory, ItemsCategory.tenant_id == tenant, ItemsCategory.name.in_(cats - used))
     await session.flush()
@@ -2140,7 +3227,11 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
 
 
 async def reinstall_business_demo(
-    session: AsyncSession, case_key: str, *, owner_id: uuid.UUID | None = None, tenant_id: str | None = None,
+    session: AsyncSession,
+    case_key: str,
+    *,
+    owner_id: uuid.UUID | None = None,
+    tenant_id: str | None = None,
     today: date | None = None,
 ) -> dict[str, Any]:
     removed = await reset_business_demo(session, case_key, tenant_id=tenant_id)

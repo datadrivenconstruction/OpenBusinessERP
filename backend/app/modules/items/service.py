@@ -203,8 +203,14 @@ class ItemsService:
             raise ItemsValidationError(f"Unknown alert filter {alert}")
         margin = case((Item.sales_price > 0, (Item.sales_price - Item.purchase_cost) / Item.sales_price), else_=None)
         cols = {
-            "sku": Item.sku, "name": Item.name, "sales_price": Item.sales_price, "purchase_cost": Item.purchase_cost,
-            "item_type": Item.item_type, "uom": Item.uom, "tax_code": Item.tax_code, "updated_at": Item.updated_at,
+            "sku": Item.sku,
+            "name": Item.name,
+            "sales_price": Item.sales_price,
+            "purchase_cost": Item.purchase_cost,
+            "item_type": Item.item_type,
+            "uom": Item.uom,
+            "tax_code": Item.tax_code,
+            "updated_at": Item.updated_at,
             "margin": margin,
         }
         if sort not in cols:
@@ -309,9 +315,17 @@ class ItemsService:
         rows = await self.session.execute(stmt.order_by(SalesDocument.doc_date.desc()).limit(limit))
         return [
             {
-                "document_id": d.id, "kind": d.kind, "number": d.number, "status": d.status, "doc_date": d.doc_date,
-                "customer_name": d.customer_name, "currency": d.currency, "qty": ln.qty,
-                "unit_price": ln.unit_price, "discount_pct": ln.discount_pct, "net": ln.net,
+                "document_id": d.id,
+                "kind": d.kind,
+                "number": d.number,
+                "status": d.status,
+                "doc_date": d.doc_date,
+                "customer_name": d.customer_name,
+                "currency": d.currency,
+                "qty": ln.qty,
+                "unit_price": ln.unit_price,
+                "discount_pct": ln.discount_pct,
+                "net": ln.net,
             }
             for ln, d in rows
         ]
@@ -331,9 +345,16 @@ class ItemsService:
         rows = await self.session.execute(stmt.order_by(PurchasingOrder.doc_date.desc()).limit(limit))
         return [
             {
-                "order_id": o.id, "number": o.number, "status": o.status, "doc_date": o.doc_date,
-                "supplier_name": o.supplier_name, "currency": o.currency, "qty": ln.qty,
-                "qty_received": ln.qty_received, "unit_price": ln.unit_price, "net": ln.net,
+                "order_id": o.id,
+                "number": o.number,
+                "status": o.status,
+                "doc_date": o.doc_date,
+                "supplier_name": o.supplier_name,
+                "currency": o.currency,
+                "qty": ln.qty,
+                "qty_received": ln.qty_received,
+                "unit_price": ln.unit_price,
+                "net": ln.net,
             }
             for ln, o in rows
         ]
@@ -348,9 +369,16 @@ class ItemsService:
         ).order_by(ItemPriceList.name, ItemPriceBreak.min_qty)
         return [
             {
-                "price_list_id": pl.id, "price_list_name": pl.name, "currency": pl.currency,
-                "customer_group": pl.customer_group, "customer_id": pl.customer_id, "valid_from": pl.valid_from,
-                "valid_to": pl.valid_to, "active": pl.active, "min_qty": b.min_qty, "unit_price": b.unit_price,
+                "price_list_id": pl.id,
+                "price_list_name": pl.name,
+                "currency": pl.currency,
+                "customer_group": pl.customer_group,
+                "customer_id": pl.customer_id,
+                "valid_from": pl.valid_from,
+                "valid_to": pl.valid_to,
+                "active": pl.active,
+                "min_qty": b.min_qty,
+                "unit_price": b.unit_price,
             }
             for b, pl in await self.session.execute(stmt)
         ]

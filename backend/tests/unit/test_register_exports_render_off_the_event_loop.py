@@ -116,8 +116,6 @@ async def test_the_contacts_workbook_is_written_off_the_loop(monkeypatch: pytest
     assert threading.get_ident() not in seen
 
 
-
-
 @pytest.mark.asyncio
 async def test_the_award_letter_is_drawn_off_the_loop(monkeypatch: pytest.MonkeyPatch) -> None:
     from app.modules.tendering import pdf_documents

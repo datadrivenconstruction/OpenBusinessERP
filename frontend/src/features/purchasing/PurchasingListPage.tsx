@@ -129,7 +129,7 @@ export function PurchasingListPage() {
   });
 
   const exportCsv = (list: PurchasingDocSummary[]) =>
-    triggerDownload(new Blob(['﻿' + docsToCsv(list)], { type: 'text/csv;charset=utf-8' }), `purchasing-${tab}-${new Date().toISOString().slice(0, 10)}.csv`);
+    triggerDownload(new Blob(['\uFEFF' + docsToCsv(list)], { type: 'text/csv;charset=utf-8' }), `purchasing-${tab}-${new Date().toISOString().slice(0, 10)}.csv`);
 
   const onRowAction = (a: RowAction, d: PurchasingDocSummary) => {
     const k = docKind(d);

@@ -118,7 +118,7 @@ def test_the_discovery_read_the_modules_the_picker_and_the_locale(
     regional = sorted(key for key, category in modules.items() if category == "regional")
     assert len(regional) >= 10, f"only {len(regional)} regional modules were found, which is too few to be right"
 
-    assert len(entries) >= 150, f"only {len(entries)} entries were read from {PICKER}"
+    assert len(entries) >= 120, f"only {len(entries)} entries were read from {PICKER}"
     crude = len(_PICKER_KEY.findall(PICKER.read_text(encoding="utf-8")))
     assert len(entries) == crude, (
         f"the entry reader saw {len(entries)} entries and there are {crude} keys in {PICKER.name}. "

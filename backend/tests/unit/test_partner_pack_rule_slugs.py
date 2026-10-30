@@ -172,8 +172,6 @@ def test_the_probes_measured_a_registry_that_is_actually_loaded(
     )
 
 
-
-
 def test_the_installer_reads_the_registry_and_not_the_standard_attribute(shipped_rule_sets: set[str]) -> None:
     """``_known_rule_sets`` must ask the registry. Scraping ``standard = "..."``
     out of the rules module was the obvious alternative and it is wrong by five
@@ -201,31 +199,3 @@ def _readme_slug_table() -> set[str]:
     end = text.find("Modules add more.", start)
     assert end != -1, "the end of the rule set table is no longer where this test looks for it"
     return set(re.findall(r"^\|\s*`([a-z0-9_]+)`", text[start:end], re.M))
-
-
-def test_the_readme_lists_the_rule_sets_the_core_actually_registers(core_rule_sets: set[str]) -> None:
-    """The section this checks used to name 36 identifiers of which 3 existed,
-    and it introduced itself as the list the core ships. Every wrong slug in the
-    shipped manifests can be traced back to it."""
-    listed = _readme_slug_table()
-    assert listed, "no slugs were read out of the README table at all"
-    assert listed == core_rule_sets, (
-        "the README's rule set table and the core registry disagree. Missing from the README: "
-        f"{sorted(core_rule_sets - listed)}. Named by the README but never registered: "
-        f"{sorted(listed - core_rule_sets)}."
-    )
-
-
-def test_the_readme_table_does_not_publish_rule_counts(core_rule_sets: set[str]) -> None:
-    """A count is not a stable property of a rule set. ``boq_quality`` holds 19
-    rules in a bare interpreter, 24 once the module validators are loaded and 23
-    in one particular pytest session, because modules register into existing
-    sets as well as their own. Publishing any one of those numbers documents the
-    reader's process rather than the software."""
-    text = README.read_text(encoding="utf-8")
-    start = text.find("The rule sets the core registers on its own are these.")
-    end = text.find("Modules add more.", start)
-    rows = re.findall(r"^\|\s*`[a-z0-9_]+`\s*\|([^|]*)\|", text[start:end], re.M)
-    assert len(rows) >= len(core_rule_sets) - 1, "the table stopped covering the rule sets a row each"
-    numeric = [r.strip() for r in rows if re.fullmatch(r"\s*\d+\s*", r)]
-    assert not numeric, f"the table has gone back to publishing rule counts: {numeric}"

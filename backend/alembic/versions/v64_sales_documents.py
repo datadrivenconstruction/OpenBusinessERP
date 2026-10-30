@@ -34,7 +34,7 @@ def upgrade() -> None:
     if "oe_sales_send_log" not in tables:
         op.create_table(
             "oe_sales_send_log",
-            sa.Column("id", sa.Uuid(), nullable=False),
+            sa.Column("id", sa.String(36), nullable=False),
             sa.Column(
                 "created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
             ),
@@ -43,7 +43,7 @@ def upgrade() -> None:
             ),
             sa.Column("tenant_id", sa.String(36), nullable=False),
             sa.Column(
-                "document_id", sa.Uuid(), sa.ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False
+                "document_id", sa.String(36), sa.ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False
             ),
             sa.Column("sent_by", sa.String(64), nullable=True),
             sa.Column("sent_at", sa.DateTime(timezone=True), nullable=False),

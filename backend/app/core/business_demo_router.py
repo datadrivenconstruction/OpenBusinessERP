@@ -1,8 +1,8 @@
 """Business demo cases API (mounted at /api/v1/business-demo).
 
-    GET  /cases/                 -- Cases with an ``installed`` flag
-    POST /cases/{key}/install/   -- Seed one case (idempotent, admin)
-    POST /cases/{key}/reinstall/ -- Delete the case's demo rows for the tenant and seed it again (admin)
+GET  /cases/                 -- Cases with an ``installed`` flag
+POST /cases/{key}/install/   -- Seed one case (idempotent, admin)
+POST /cases/{key}/reinstall/ -- Delete the case's demo rows for the tenant and seed it again (admin)
 """
 
 from __future__ import annotations

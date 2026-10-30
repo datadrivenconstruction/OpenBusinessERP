@@ -191,7 +191,8 @@ def _done_payload(body: str) -> dict[str, Any]:
 def _seeded_accounts() -> list[str]:
     from app.core.demo_accounts import DEMO_ACCOUNT_EMAILS
 
-    return sorted(DEMO_ACCOUNT_EMAILS)
+    # Pre-rebrand addresses are listed for old installs only; a fresh one seeds none of them.
+    return sorted(e for e in DEMO_ACCOUNT_EMAILS if not e.endswith("@openconstructionerp.com"))
 
 
 async def test_every_seeded_demo_account_signs_in_with_the_role_the_seeder_gave_it(self_installed) -> None:
@@ -210,9 +211,11 @@ async def test_every_seeded_demo_account_signs_in_with_the_role_the_seeder_gave_
 @pytest.mark.timeout(900)
 async def test_the_demo_administrator_installs_a_pack_from_the_modules_page(self_installed) -> None:
     """Every request the Modules page sends for a pack install, as the demo administrator."""
-    from app.core.partner_pack.discovery import get_pack_by_slug
+    from app.core.partner_pack.discovery import _packs_dir, get_pack_by_slug
     from app.core.partner_pack.state import load_applied_state
 
+    if _packs_dir() is None:
+        pytest.skip("this distribution ships no pack tree")
     client, _factory = self_installed
     headers = await _demo_login(client, DEMO_ADMIN)
     pack = get_pack_by_slug(PACK_SLUG)

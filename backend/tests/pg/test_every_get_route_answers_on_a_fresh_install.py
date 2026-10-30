@@ -633,6 +633,12 @@ async def test_every_get_route_answers_the_demo_admin_on_a_fresh_install() -> No
                 projects, _elapsed, _err = await walker.get("/api/v1/projects/")
                 assert projects is not None and projects.status_code == 200, "the project list itself failed"
                 rows = _items(projects.json())
+                if not rows:
+                    # A fresh install without a business preset seeds no project; make one to walk under.
+                    made = await client.post("/api/v1/projects/", json={"name": "Route walk"}, headers=walker.headers)
+                    assert made.status_code in (200, 201), f"could not create a project: {made.text}"
+                    projects, _elapsed, _err = await walker.get("/api/v1/projects/")
+                    rows = _items(projects.json())
                 assert rows, "a fresh install with the demo seed on has no project for the demo admin"
                 walker.project_id = report.project_id = str(rows[0]["id"])
 

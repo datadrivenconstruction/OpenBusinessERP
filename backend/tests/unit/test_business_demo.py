@@ -35,12 +35,18 @@ GOODS_CASES = {"trade_distribution", "manufacturing", "retail_ecommerce"}
 async def _figures(session, key):
     """Month-end bank balances, payables balance, period revenue and expenses (base currency)."""
     codes = EXPENSE_ACCOUNTS["de_skr03" if CASES[key].country == "DE" else "ifrs_generic"]
-    rows = (await session.execute(
-        select(GLAccount.code, GLAccount.account_type, GLJournalEntry.entry_date,
-               GLJournalLine.base_debit - GLJournalLine.base_credit)
-        .join(GLJournalLine, GLJournalLine.account_id == GLAccount.id)
-        .join(GLJournalEntry, GLJournalEntry.id == GLJournalLine.entry_id)
-    )).all()
+    rows = (
+        await session.execute(
+            select(
+                GLAccount.code,
+                GLAccount.account_type,
+                GLJournalEntry.entry_date,
+                GLJournalLine.base_debit - GLJournalLine.base_credit,
+            )
+            .join(GLJournalLine, GLJournalLine.account_id == GLAccount.id)
+            .join(GLJournalEntry, GLJournalEntry.id == GLJournalLine.entry_id)
+        )
+    ).all()
     ends = [date(2026, m, 1) - timedelta(days=1) for m in range(2, 7)] + [TODAY]
     bank = [sum(v for c, _, d, v in rows if c == codes["bank"] and d <= e) for e in ends]
     payables = -sum(v for c, _, _, v in rows if c == codes["payables"])

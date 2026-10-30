@@ -39,21 +39,19 @@ import asyncio
 import os
 import uuid
 from collections.abc import Iterator
-from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 import pytest
 import pytest_asyncio
-from fastapi import HTTPException
 from sqlalchemy import create_engine, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from app.modules.catalog.models import CatalogResource
 from app.modules.costs import base_state
 from app.modules.costs import router as costs_router
-from app.modules.costs.models import CostBaseState, CostItem, ResourcePrice
+from app.modules.costs.models import CostBaseState, CostItem
 from app.modules.costs.resource_pricing import ResourcePriceService
 from tests._pg import isolated_engine
 
@@ -198,8 +196,6 @@ async def test_nothing_stored_is_unknown_not_home(db: AsyncEngine) -> None:
         await base_state.write_base_state(s, BASE, active_market=MARKET)
         await base_state.forget_base_state(s, BASE)
         assert await base_state.read_base_state(s, BASE) is None
-
-
 
 
 # ── The lock ──────────────────────────────────────────────────────────────
@@ -485,27 +481,7 @@ async def _switch_to_london(s: AsyncSession, user: str) -> dict:
     return await costs_router.load_base_market(BASE, MARKET, session=s, _user_id=user, service=ResourcePriceService(s))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ── The catalogue import shares the row builder ───────────────────────────
-
-
 
 
 # ── Retrying the home language on a later load ────────────────────────────

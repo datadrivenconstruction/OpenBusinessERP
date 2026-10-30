@@ -696,6 +696,7 @@ async def _step_catalog(loaded_regions: list[str]) -> StepResult:
 
     from app.database import async_session_factory
     from app.modules.catalog.models import CatalogResource
+
     REGION_MAP: dict[str, Any] = {}  # regional price catalogs removed
     import_region_catalog = None
     from app.modules.costs import base_registry

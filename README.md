@@ -20,10 +20,23 @@
   <a href="#a-tour-of-the-workspace">Feature tour</a> ·
   <a href="#architecture">Architecture</a> ·
   <a href="#configuration">Configuration</a> ·
+  <a href="#faq">FAQ</a> ·
   <a href="#contributing">Contributing</a>
 </p>
 
 ---
+
+OpenBusinessERP is a free, open-source ERP (enterprise resource planning) system for small and mid-sized companies. It covers quotes and invoicing, CRM, products and stock, purchasing, double-entry accounting, bank reconciliation, receivables and appointments in a single web application that you host yourself. It is a modular business suite you can run on your own server, adapt and extend.
+
+## Who it's for
+
+- **Trading and wholesale companies** that buy, stock and resell goods and need quotes, orders, invoices, purchase orders and stock in one place.
+- **Service businesses** that sell time or fixed-price services, book appointments and invoice them.
+- **Small teams without an IT department.** One command starts the server with an embedded database and a demo company to explore.
+- **Companies that want their own data.** Everything runs on your hardware or your cloud account; there is no vendor-hosted tenant.
+- **Developers and integrators** who want a FastAPI + React codebase with a documented REST API and a module system to build on.
+
+It is not a replacement for a certified payroll package or for the statutory filings your accountant submits; see the [disclaimer](#disclaimer).
 
 ## Why OpenBusinessERP
 
@@ -206,6 +219,32 @@ AI providers, e-mail, e-invoicing, company data and number formats are configure
 - **Interface:** 45 locale bundles in `frontend/src/app/locales/`. They include right-to-left languages (Arabic, Hebrew, Persian, Urdu) and regional variants such as `en-GB`, `pt-BR` and `es-MX`.
 - **Documents:** quotes and invoices can be issued in a language other than the one the user works in.
 - **Regional formats:** currency, date and number formats and tax rates are set per company.
+
+## FAQ
+
+**Can I self-host it?**
+Yes, self-hosting is the only way to run it. Use Docker Compose (`make quickstart`, with `docker-compose.prod.yml` as the production template) or install the Python package and run `openbusinesserp serve`. Without `DATABASE_URL`, an embedded PostgreSQL is started in the data directory; for production, point it at your own PostgreSQL server.
+
+**What does it cost, and what is the license?**
+The software is free under the AGPL-3.0. There are no per-user fees. If you modify it and offer it to others over a network, you must publish your changes under the same license. A commercial license is available on request.
+
+**Which languages are supported?**
+The interface ships with 45 locale bundles, including right-to-left languages. Quotes and invoices can be issued in the customer's language, independently of the language the user works in.
+
+**Which chart of accounts does it use?**
+Two templates are included: a generic IFRS-style chart and the German SKR03. Accounts can be added, renamed or deactivated afterwards.
+
+**How do I move my data in?**
+The import wizard reads CSV and XLSX files for customers, suppliers, products, opening balances, open invoices and open bills. Export these lists from your current tool or spreadsheet, map the columns, check the dry run, then import. An import can be undone.
+
+**Does it handle e-invoicing?**
+Invoices can be exported as CII XML. Check the generated files against the rules that apply to you; see the [disclaimer](#disclaimer).
+
+**Is there an API?**
+Yes. The backend is a FastAPI application, and every screen in the UI uses the same REST API under `/api/v1/`. Outside production mode the backend also serves the OpenAPI schema (`/api/openapi.json`) with interactive docs.
+
+**Do I need an AI provider?**
+No. The AI chat is optional and uses your own API key. Without a key, every other feature works.
 
 ## Contributing
 

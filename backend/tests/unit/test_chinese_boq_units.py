@@ -220,6 +220,7 @@ SHIPPED_CHINESE_DEMO_UNITS = {
 # The demo projects the census above was read from.
 _CHINESE_DEMO_IDS = ("office-shanghai", "residential-shenzhen")
 
+
 @pytest.mark.parametrize("unit", CHINESE_IMPERIAL_UNITS)
 def test_chinese_imperial_units_are_recognised_as_imperial(unit: str) -> None:
     """This is the direction a Chinese project actually depends on.

@@ -290,7 +290,7 @@ function HowCrmWorks() {
       icon: <FileSignature size={14} className="text-oe-blue" />,
       title: t('crm.flow_5_title', { defaultValue: 'Hand off' }),
       desc: t('crm.flow_5_desc', {
-        defaultValue: 'A won deal links to its project and flows on to bids and contracts.',
+        defaultValue: 'A won deal becomes a quote, then an order and an invoice.',
       }),
     },
   ];
@@ -304,7 +304,7 @@ function HowCrmWorks() {
       <p className="text-xs text-content-tertiary">
         {t('crm.flow_intro', {
           defaultValue:
-            'The CRM turns an enquiry into a qualified deal, moves it across the pipeline, and hands a win off to delivery. People come from Contacts; won work flows on to bids and contracts.',
+            'The CRM turns an enquiry into a qualified deal, moves it across the pipeline, and hands a win off to sales. People come from Contacts; won deals flow on to quotes and invoices.',
         })}
       </p>
 
@@ -348,16 +348,8 @@ function HowCrmWorks() {
           <span className="font-medium text-content-secondary">
             {t('crm.flow_feeds', { defaultValue: 'Feeds:' })}
           </span>{' '}
-          <ModLink to="/bid-management">
-            {t('crm.mod_bid', { defaultValue: 'Bid Management' })}
-          </ModLink>{' '}
-          ·{' '}
-          <ModLink to="/contracts">
-            {t('crm.mod_contracts', { defaultValue: 'Contracts' })}
-          </ModLink>{' '}
-          ·{' '}
-          <ModLink to="/tendering">
-            {t('crm.mod_tendering', { defaultValue: 'Tendering' })}
+          <ModLink to="/sales">
+            {t('nav.sales', { defaultValue: 'Quotes & invoices' })}
           </ModLink>
         </span>
       </div>
@@ -515,7 +507,7 @@ export function CRMPage() {
         srTitle={t('nav.crm', { defaultValue: 'CRM' })}
         subtitle={t('crm.subtitle_amo', {
           defaultValue:
-            'Drag deals across the pipeline, log activity in a click. People come from Contacts, won deals link to Projects.',
+            'Drag deals across the pipeline, log activity in a click. People come from Contacts, won deals become quotes.',
         })}
         actions={
           <>
@@ -552,18 +544,14 @@ export function CRMPage() {
             onClick: () => navigate('/contacts'),
           },
           {
-            label: t('nav.bid_management', { defaultValue: 'Bid Management' }),
-            onClick: () => navigate('/bid-management'),
-          },
-          {
-            label: t('nav.contracts', { defaultValue: 'Contracts' }),
-            onClick: () => navigate('/contracts'),
+            label: t('nav.sales', { defaultValue: 'Quotes & invoices' }),
+            onClick: () => navigate('/sales'),
           },
         ]}
       >
         {t('crm.intro_body', {
           defaultValue:
-            'Qualify a lead and drag the deal stage by stage across the pipeline board, logging each call or email in one click. People and companies come from Contacts, and a won deal links to its delivery project and flows on to bid packages and contracts.',
+            'Qualify a lead and drag the deal stage by stage across the pipeline board, logging each call or email in one click. People and companies come from Contacts, and a won deal becomes a quote and then an invoice.',
         })}
       </DismissibleInfo>
 

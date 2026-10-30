@@ -60,7 +60,11 @@ def test_line_rounding_half_up():
 def test_transitions():
     check_transition("quote", "draft", "sent")
     check_transition("invoice", "issued", "paid")
-    for kind, cur, tgt in (("quote", "draft", "accepted"), ("order", "invoiced", "draft"), ("invoice", "paid", "cancelled")):
+    for kind, cur, tgt in (
+        ("quote", "draft", "accepted"),
+        ("order", "invoiced", "draft"),
+        ("invoice", "paid", "cancelled"),
+    ):
         with pytest.raises(SalesConflictError):
             check_transition(kind, cur, tgt)
 
@@ -108,7 +112,11 @@ async def test_payment_closes_invoice(svc, session):
     assert inv.status == "partially_paid"
     await svc.record_payment(inv.id, amount=D("100.00"), pay_date=DAY)
     assert inv.status == "paid" and inv.amount_paid == inv.gross_total
-    pays = (await session.execute(select(GLJournalEntry).where(GLJournalEntry.source_type == "sales_payment"))).scalars().all()
+    pays = (
+        (await session.execute(select(GLJournalEntry).where(GLJournalEntry.source_type == "sales_payment")))
+        .scalars()
+        .all()
+    )
     assert len(pays) == 2 and all(e.status == "posted" for e in pays)
     with pytest.raises(SalesConflictError):
         await svc.record_payment(inv.id, amount=D("1"))
@@ -127,7 +135,9 @@ def test_omitted_tax_rate_uses_company_country(monkeypatch):
     from app.modules.sales.service import build_lines, default_tax_rate
 
     monkeypatch.setattr(sales_service, "read_business_settings", lambda: {"country_code": "AT"})
-    [ln, explicit] = build_lines([LineData("A", "", D(1), D(100), D(0), None), LineData("B", "", D(1), D(100), D(0), D(0))])
+    [ln, explicit] = build_lines(
+        [LineData("A", "", D(1), D(100), D(0), None), LineData("B", "", D(1), D(100), D(0), D(0))]
+    )
     assert (ln.tax_rate, ln.tax) == (D(20), D("20.00"))
     assert explicit.tax == 0
     assert default_tax_rate("US") == 0 and default_tax_rate("") == 0 and default_tax_rate("de") == 19
@@ -142,7 +152,7 @@ async def test_summary_kpis(svc):
     assert s["receivables"] == inv.gross_total - D("60.58")
     assert s["open_quotes_value"] > 0 and s["open_orders_value"] == 0
     assert s["payables"] == 0 and len(s["revenue_by_month"]) == 6
-    assert dict((m["month"], m["revenue"]) for m in s["revenue_by_month"])["2026-03"] == inv.net_total
+    assert {m["month"]: m["revenue"] for m in s["revenue_by_month"]}["2026-03"] == inv.net_total
 
 
 async def test_summary_window_and_month_leaders(svc):

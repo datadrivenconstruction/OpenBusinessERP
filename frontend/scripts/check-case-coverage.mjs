@@ -660,6 +660,11 @@ function run(args) {
     return 2;
   }
 
+  if (!args.update && !args.fromGit && !existsSync(args.dataDir)) {
+    console.log('check-case-coverage: no playbook data directory in this tree, nothing to check');
+    return 0;
+  }
+
   let analysis;
   try {
     const sources = args.update || args.fromGit ? gitSources(args.fromGit || 'HEAD', REPO_ROOT) : treeSources(args);

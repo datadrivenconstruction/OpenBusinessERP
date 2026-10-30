@@ -41,8 +41,6 @@ def _demo_projects_source() -> str:
     return _DEMO_PROJECTS.read_text(encoding="utf-8")
 
 
-
-
 def test_the_pinned_weather_key_is_what_the_frontend_actually_selects() -> None:
     """The pin above is not allowed to drift away from the real reader."""
     if not _DIARY_INSIGHTS.is_file():

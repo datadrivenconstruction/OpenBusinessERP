@@ -1284,7 +1284,6 @@ async def load_base_market(
     else:
         target_lang = base_registry.home_language_code(base_region) or base_registry.home_parquet_text_lang(base_region)
 
-
     actor = _parse_user_uuid(_user_id)
     # One text swap plus reprice per base at a time, across every worker: two
     # market clicks on the same base interleaved could leave one market's text
@@ -5010,8 +5009,7 @@ async def import_cost_file(
 
 # GitHub repository info for downloading CWICR parquet files
 REMOTE_CATALOGUES_REMOVED = (
-    "Bundled and downloadable cost catalogues are not available. "
-    "Import your own cost data (CSV/XLSX) instead."
+    "Bundled and downloadable cost catalogues are not available. Import your own cost data (CSV/XLSX) instead."
 )
 _GITHUB_CWICR_BASE_URL = "https://github.com/datadrivenconstruction/OpenConstructionEstimate-DDC-CWICR/raw/main"
 

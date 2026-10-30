@@ -30,11 +30,19 @@ async def svc(session):
 
 
 async def _seed(svc):
-    a = await svc.create_item(sku="A", name="Anchor", sales_price=D("10"), purchase_cost=D("6"),
-                              stock_tracked=True, min_stock=D("5"), tax_code="std")
+    a = await svc.create_item(
+        sku="A",
+        name="Anchor",
+        sales_price=D("10"),
+        purchase_cost=D("6"),
+        stock_tracked=True,
+        min_stock=D("5"),
+        tax_code="std",
+    )
     b = await svc.create_item(sku="B", name="Bolt", sales_price=D("0"), purchase_cost=D("1"))
-    c = await svc.create_item(sku="C", name="Consulting", item_type="service", sales_price=D("100"),
-                              purchase_cost=D("50"), tax_code="std")
+    c = await svc.create_item(
+        sku="C", name="Consulting", item_type="service", sales_price=D("100"), purchase_cost=D("50"), tax_code="std"
+    )
     return a, b, c
 
 

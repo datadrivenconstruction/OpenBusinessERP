@@ -1057,9 +1057,7 @@ _A_COUNTRY_NO_TABLE_HOLDS = "BD"
 
 #: Dimension and a country the registry holds. The control above is the other
 #: half of each case.
-_NEW_DIMENSIONS = (
-    ("estimate.markup_region", "DE"),
-)
+_NEW_DIMENSIONS = (("estimate.markup_region", "DE"),)
 
 
 @pytest.mark.parametrize(("dimension", "held"), _NEW_DIMENSIONS)

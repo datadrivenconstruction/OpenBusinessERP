@@ -134,7 +134,6 @@ class OpenItemOut(BaseModel):
     due_date: date | None
 
 
-
 class AccountSummaryOut(BaseModel):
     account_id: uuid.UUID
     name: str

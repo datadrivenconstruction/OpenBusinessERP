@@ -224,5 +224,3 @@ def test_an_inherited_country_reaches_a_national_markup_stack(country: str) -> N
         f"a project inheriting {country} from its pack is still seeded with the neutral "
         f"international markup stack, so installing that pack does not change what the bill costs."
     )
-
-

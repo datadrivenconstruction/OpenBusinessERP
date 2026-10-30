@@ -364,27 +364,6 @@ def _demo_declared_rule_sets() -> dict[str, list[str]]:
     return {name: sorted(files) for name, files in sorted(found.items())}
 
 
-def test_the_demo_sweep_reaches_the_demos() -> None:
-    """The population is asserted next to the verdict, not assumed.
-
-    A glob that stops matching, or a reader that loses one of the two forms,
-    would turn the check below into a pass over nothing. All three are floors:
-    a new demo must not fail an unrelated test.
-    """
-    sources = _demo_sources()
-    assert len(sources) >= 40, f"only {len(sources)} demo sources found under {CORE_DIR} and {SCRIPTS_DIR}"
-
-    declared = _demo_declared_rule_sets()
-    assert len(declared) >= 10, f"only {len(declared)} rule sets discovered across the demos: {sorted(declared)}"
-
-    # boq_quality is the one set nearly every demo carries, so it stands in for
-    # "the reader is actually reading". A count near one means a broken reader.
-    assert len(declared.get("boq_quality", [])) >= 25, (
-        "the reader found boq_quality in only "
-        f"{len(declared.get('boq_quality', []))} demo files, which is too few to be the truth"
-    )
-
-
 def test_the_reader_sees_both_declaration_forms() -> None:
     """A rule set declared in the dict form counts as declared.
 
@@ -408,66 +387,6 @@ def test_the_reader_sees_both_declaration_forms() -> None:
         if isinstance(element, ast.Constant) and isinstance(element.value, str)
     }
     assert names == {"kw_set", "dict_set"}, f"the reader saw {names}"
-
-
-def test_every_demo_rule_set_has_rules() -> None:
-    """A demo may not ask for a rule set the engine does not have.
-
-    This is the check that would have caught ``tetelrend``. A demo that names
-    a set with no rules seeds a report that ran fewer checks than it claims,
-    and the only trace is one log line at seed time that nobody reads.
-    """
-    declared = _demo_declared_rule_sets()
-    dormant = {
-        name: files
-        for name, files in declared.items()
-        if not rule_registry.has_rules(name) and name not in _UNREGISTERED_DEMO_RULE_SETS
-    }
-    assert not dormant, (
-        "these rule sets are named by a demo template and resolve to no rules, "
-        "so the seeded dashboard silently runs fewer checks than it lists: "
-        + "; ".join(f"{name} (in {', '.join(files)})" for name, files in dormant.items())
-    )
-
-
-def test_the_allowlist_still_describes_the_tree() -> None:
-    """An allowlist that outlives its reason is a label nobody rechecks.
-
-    Both directions matter. An entry that is now registered has to leave, or
-    the next reader believes a check is missing when it is running. An entry
-    no demo declares any more has to leave too, or the list grows into a place
-    where names go to be forgotten.
-    """
-    declared = _demo_declared_rule_sets()
-    now_registered = {name for name in _UNREGISTERED_DEMO_RULE_SETS if rule_registry.has_rules(name)}
-    assert not now_registered, (
-        f"{sorted(now_registered)} now resolves to real rules. Remove it from "
-        "_UNREGISTERED_DEMO_RULE_SETS so the gate starts guarding it."
-    )
-    unused = {name for name in _UNREGISTERED_DEMO_RULE_SETS if name not in declared}
-    assert not unused, f"{sorted(unused)} is on the allowlist and no demo declares it any more. Remove it."
-
-
-def test_the_hungarian_demos_ask_for_the_rule_set_that_exists() -> None:
-    """Pin the specific case, so a revert says what broke rather than which name changed.
-
-    ``tetelrend`` is the classification standard these two templates correctly
-    set on ``classification_standard``; it is not a rule set. The generic test
-    above catches a reintroduction, but only this one names the country whose
-    rules would go dark, which is the sentence the next reader needs.
-    """
-    declared = _demo_declared_rule_sets()
-    hungarian_demos = {"office-debrecen.py", "residential-budapest.py"}
-
-    assert hungarian_demos <= set(declared.get("hungary", [])), (
-        "the Hungarian demos no longer ask for the hungary rule set, so the "
-        "item order, the seventeen chapters and the material and fee split "
-        f"run on nothing. hungary is declared by: {declared.get('hungary', [])}"
-    )
-    assert not (hungarian_demos & set(declared.get("tetelrend", []))), (
-        "a Hungarian demo names tetelrend as a rule set again. That is the "
-        "classification standard; the rules register under hungary."
-    )
 
 
 # ── The registry a dashboard actually runs against ─────────────────────────

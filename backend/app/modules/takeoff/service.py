@@ -2516,8 +2516,7 @@ class TakeoffService:
                 status_code=400,
                 detail=(
                     "Symbol search could not load its PDF reader (PyMuPDF). It ships with "
-                    "the platform, so this usually means a broken install. "
-                    + repair_hint("Reinstall openbusinesserp.")
+                    "the platform, so this usually means a broken install. " + repair_hint("Reinstall openbusinesserp.")
                 ),
             ) from exc
 

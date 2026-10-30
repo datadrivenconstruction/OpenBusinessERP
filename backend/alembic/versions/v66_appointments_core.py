@@ -27,9 +27,13 @@ _TABLES = (
 
 def _base(table: str) -> list:
     return [
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column("id", sa.String(36), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id", name=f"pk_{table}"),
     ]
 
@@ -57,12 +61,21 @@ def upgrade() -> None:
     t = "oe_appointments_settings"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             sa.Column("tenant_id", sa.String(36), nullable=False),
-            _str("public_title", 255), _flag("online_enabled", False), sa.Column("slug", sa.String(80), nullable=False),
-            _flag("auto_confirm", False), _str("privacy_url", 500), _int("slot_step_min", 15),
-            _int("min_notice_hours", 2), _int("max_days_ahead", 60), _int("retention_days", 0),
-            _flag("reminders_enabled", False), _int("reminder_hours", 24), _str("timezone", 64, "Europe/Berlin"),
+            _str("public_title", 255),
+            _flag("online_enabled", False),
+            sa.Column("slug", sa.String(80), nullable=False),
+            _flag("auto_confirm", False),
+            _str("privacy_url", 500),
+            _int("slot_step_min", 15),
+            _int("min_notice_hours", 2),
+            _int("max_days_ahead", 60),
+            _int("retention_days", 0),
+            _flag("reminders_enabled", False),
+            _int("reminder_hours", 24),
+            _str("timezone", 64, "Europe/Berlin"),
             sa.UniqueConstraint("tenant_id", name="uq_oe_appointments_settings_tenant_id"),
             sa.UniqueConstraint("slug", name="uq_oe_appointments_settings_slug"),
         )
@@ -70,36 +83,50 @@ def upgrade() -> None:
     t = "oe_appointments_service"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             sa.Column("tenant_id", sa.String(36), nullable=False),
             sa.Column("name", sa.String(255), nullable=False),
             sa.Column("description", sa.Text(), nullable=False, server_default=""),
-            _int("duration_min", 30), _int("buffer_before_min", 0), _int("buffer_after_min", 0),
+            _int("duration_min", 30),
+            _int("buffer_before_min", 0),
+            _int("buffer_after_min", 0),
             sa.Column("price", sa.Numeric(18, 4), nullable=False, server_default="0"),
             _str("currency", 3, "EUR"),
-            sa.Column("item_id", sa.Uuid(), sa.ForeignKey("oe_items_item.id", ondelete="SET NULL"), nullable=True),
+            sa.Column("item_id", sa.String(36), sa.ForeignKey("oe_items_item.id", ondelete="SET NULL"), nullable=True),
             _str("resource_kind", 16, "staff"),
             sa.Column("resource_ids", sa.JSON(), nullable=False, server_default="[]"),
-            _str("color", 16), _flag("online", True), _flag("active", True),
+            _str("color", 16),
+            _flag("online", True),
+            _flag("active", True),
         )
         _index(t, "tenant_id")
 
     t = "oe_appointments_resource"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             sa.Column("tenant_id", sa.String(36), nullable=False),
             sa.Column("name", sa.String(255), nullable=False),
-            _str("kind", 16, "staff"), _str("color", 16), _flag("active", True), _int("sort_order", 0),
+            _str("kind", 16, "staff"),
+            _str("color", 16),
+            _flag("active", True),
+            _int("sort_order", 0),
         )
         _index(t, "tenant_id")
 
     t = "oe_appointments_hours"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
-            sa.Column("resource_id", sa.Uuid(), sa.ForeignKey("oe_appointments_resource.id", ondelete="CASCADE"),
-                      nullable=False),
+            t,
+            *_base(t),
+            sa.Column(
+                "resource_id",
+                sa.String(36),
+                sa.ForeignKey("oe_appointments_resource.id", ondelete="CASCADE"),
+                nullable=False,
+            ),
             sa.Column("weekday", sa.Integer(), nullable=False),
             sa.Column("start_min", sa.Integer(), nullable=False),
             sa.Column("end_min", sa.Integer(), nullable=False),
@@ -110,9 +137,14 @@ def upgrade() -> None:
     t = "oe_appointments_exception"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
-            sa.Column("resource_id", sa.Uuid(), sa.ForeignKey("oe_appointments_resource.id", ondelete="CASCADE"),
-                      nullable=False),
+            t,
+            *_base(t),
+            sa.Column(
+                "resource_id",
+                sa.String(36),
+                sa.ForeignKey("oe_appointments_resource.id", ondelete="CASCADE"),
+                nullable=False,
+            ),
             sa.Column("day", sa.Date(), nullable=False),
             _str("kind", 8, "closed"),
             sa.Column("start_min", sa.Integer(), nullable=True),
@@ -124,40 +156,60 @@ def upgrade() -> None:
     t = "oe_appointments_booking"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             sa.Column("tenant_id", sa.String(36), nullable=False),
-            sa.Column("service_id", sa.Uuid(), sa.ForeignKey("oe_appointments_service.id", ondelete="RESTRICT"),
-                      nullable=False),
-            sa.Column("resource_id", sa.Uuid(), sa.ForeignKey("oe_appointments_resource.id", ondelete="RESTRICT"),
-                      nullable=False),
-            sa.Column("contact_id", sa.Uuid(), nullable=True),
-            _str("client_name", 255), _str("client_email", 255), _str("client_phone", 64),
+            sa.Column(
+                "service_id",
+                sa.String(36),
+                sa.ForeignKey("oe_appointments_service.id", ondelete="RESTRICT"),
+                nullable=False,
+            ),
+            sa.Column(
+                "resource_id",
+                sa.String(36),
+                sa.ForeignKey("oe_appointments_resource.id", ondelete="RESTRICT"),
+                nullable=False,
+            ),
+            sa.Column("contact_id", sa.String(36), nullable=True),
+            _str("client_name", 255),
+            _str("client_email", 255),
+            _str("client_phone", 64),
             sa.Column("start_at", sa.DateTime(timezone=False), nullable=False),
             sa.Column("end_at", sa.DateTime(timezone=False), nullable=False),
             sa.Column("block_start", sa.DateTime(timezone=False), nullable=False),
             sa.Column("block_end", sa.DateTime(timezone=False), nullable=False),
-            _str("status", 16, "confirmed"), _str("source", 8, "staff"),
+            _str("status", 16, "confirmed"),
+            _str("source", 8, "staff"),
             sa.Column("notes", sa.Text(), nullable=False, server_default=""),
             sa.Column("cancel_token", sa.String(64), nullable=False),
             sa.Column("consent_at", sa.DateTime(timezone=True), nullable=True),
-            sa.Column("series_id", sa.Uuid(), nullable=True),
-            sa.Column("invoice_id", sa.Uuid(), nullable=True),
+            sa.Column("series_id", sa.String(36), nullable=True),
+            sa.Column("invoice_id", sa.String(36), nullable=True),
             sa.Column("created_by", sa.String(64), nullable=True),
             sa.UniqueConstraint("cancel_token", name="uq_oe_appointments_booking_cancel_token"),
         )
-        _index(t, "tenant_id", "service_id", "resource_id", "contact_id", "client_email", "start_at", "status",
-               "series_id")
+        _index(
+            t, "tenant_id", "service_id", "resource_id", "contact_id", "client_email", "start_at", "status", "series_id"
+        )
 
     t = "oe_appointments_reminder"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             sa.Column("tenant_id", sa.String(36), nullable=False),
-            sa.Column("booking_id", sa.Uuid(), sa.ForeignKey("oe_appointments_booking.id", ondelete="CASCADE"),
-                      nullable=False),
-            _str("channel", 8, "email"), _str("recipient", 255),
+            sa.Column(
+                "booking_id",
+                sa.String(36),
+                sa.ForeignKey("oe_appointments_booking.id", ondelete="CASCADE"),
+                nullable=False,
+            ),
+            _str("channel", 8, "email"),
+            _str("recipient", 255),
             sa.Column("due_at", sa.DateTime(timezone=False), nullable=False),
-            _str("status", 8, "queued"), _str("detail", 255),
+            _str("status", 8, "queued"),
+            _str("detail", 255),
         )
         _index(t, "tenant_id", "booking_id", "due_at")
 

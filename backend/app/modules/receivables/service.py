@@ -37,39 +37,80 @@ OPEN_STATUSES = ("issued", "partially_paid")
 # (§288 BGB) is the base rate plus 5 or 9 points; the user enters the rate.
 INTEREST_RATE_HINT = "base rate + 5 (consumers) / + 9 (businesses) percentage points"
 
-PLACEHOLDERS = ("customer", "number", "doc_date", "due_date", "outstanding", "currency", "days_overdue", "fee", "interest", "total")
+PLACEHOLDERS = (
+    "customer",
+    "number",
+    "doc_date",
+    "due_date",
+    "outstanding",
+    "currency",
+    "days_overdue",
+    "fee",
+    "interest",
+    "total",
+)
 
 DEFAULT_LEVELS: dict[str, list[tuple[int, str, int, str, str]]] = {
     "en": [
-        (1, "Reminder", 7, "Payment reminder for invoice {number}",
-         "Hello {customer},\n\nour records show that invoice {number} dated {doc_date} "
-         "(due {due_date}) still has an open balance of {outstanding} {currency}. "
-         "This may simply have been overlooked.\n\nWe would appreciate payment at your convenience. "
-         "If you have already paid, please disregard this note.\n\nKind regards"),
-        (2, "First notice", 21, "Open balance on invoice {number}",
-         "Hello {customer},\n\ninvoice {number} (due {due_date}) is now {days_overdue} days past due "
-         "with {outstanding} {currency} outstanding.\n\nPlease arrange payment of {total} {currency} "
-         "within the next 10 days, or let us know if there is a question about the invoice.\n\nKind regards"),
-        (3, "Second notice", 35, "Second notice: invoice {number}",
-         "Hello {customer},\n\ndespite our earlier messages, invoice {number} (due {due_date}) remains unpaid "
-         "with {outstanding} {currency} open.\n\nWe ask you to settle {total} {currency} within 7 days. "
-         "If something stands in the way, please contact us so we can find a solution together.\n\nKind regards"),
+        (
+            1,
+            "Reminder",
+            7,
+            "Payment reminder for invoice {number}",
+            "Hello {customer},\n\nour records show that invoice {number} dated {doc_date} "
+            "(due {due_date}) still has an open balance of {outstanding} {currency}. "
+            "This may simply have been overlooked.\n\nWe would appreciate payment at your convenience. "
+            "If you have already paid, please disregard this note.\n\nKind regards",
+        ),
+        (
+            2,
+            "First notice",
+            21,
+            "Open balance on invoice {number}",
+            "Hello {customer},\n\ninvoice {number} (due {due_date}) is now {days_overdue} days past due "
+            "with {outstanding} {currency} outstanding.\n\nPlease arrange payment of {total} {currency} "
+            "within the next 10 days, or let us know if there is a question about the invoice.\n\nKind regards",
+        ),
+        (
+            3,
+            "Second notice",
+            35,
+            "Second notice: invoice {number}",
+            "Hello {customer},\n\ndespite our earlier messages, invoice {number} (due {due_date}) remains unpaid "
+            "with {outstanding} {currency} open.\n\nWe ask you to settle {total} {currency} within 7 days. "
+            "If something stands in the way, please contact us so we can find a solution together.\n\nKind regards",
+        ),
     ],
     "de": [
-        (1, "Zahlungserinnerung", 7, "Zahlungserinnerung zur Rechnung {number}",
-         "Guten Tag {customer},\n\nfür die Rechnung {number} vom {doc_date} (fällig am {due_date}) ist bei uns "
-         "noch ein Betrag von {outstanding} {currency} offen. Vielleicht ist die Zahlung einfach untergegangen.\n\n"
-         "Wir freuen uns über einen Ausgleich in den nächsten Tagen. Falls Sie bereits gezahlt haben, "
-         "betrachten Sie diese Nachricht bitte als gegenstandslos.\n\nFreundliche Grüße"),
-        (2, "1. Mahnung", 21, "Offener Betrag zur Rechnung {number}",
-         "Guten Tag {customer},\n\ndie Rechnung {number} (fällig am {due_date}) ist seit {days_overdue} Tagen "
-         "überfällig; offen sind {outstanding} {currency}.\n\nBitte überweisen Sie {total} {currency} innerhalb "
-         "von 10 Tagen oder sprechen Sie uns an, falls es Fragen zur Rechnung gibt.\n\nFreundliche Grüße"),
-        (3, "2. Mahnung", 35, "2. Mahnung zur Rechnung {number}",
-         "Guten Tag {customer},\n\ntrotz unserer bisherigen Schreiben ist die Rechnung {number} "
-         "(fällig am {due_date}) mit {outstanding} {currency} weiterhin offen.\n\nBitte gleichen Sie {total} "
-         "{currency} innerhalb von 7 Tagen aus. Wenn etwas dagegen spricht, melden Sie sich gern, damit wir "
-         "gemeinsam eine Lösung finden.\n\nFreundliche Grüße"),
+        (
+            1,
+            "Zahlungserinnerung",
+            7,
+            "Zahlungserinnerung zur Rechnung {number}",
+            "Guten Tag {customer},\n\nfür die Rechnung {number} vom {doc_date} (fällig am {due_date}) ist bei uns "
+            "noch ein Betrag von {outstanding} {currency} offen. Vielleicht ist die Zahlung einfach untergegangen.\n\n"
+            "Wir freuen uns über einen Ausgleich in den nächsten Tagen. Falls Sie bereits gezahlt haben, "
+            "betrachten Sie diese Nachricht bitte als gegenstandslos.\n\nFreundliche Grüße",
+        ),
+        (
+            2,
+            "1. Mahnung",
+            21,
+            "Offener Betrag zur Rechnung {number}",
+            "Guten Tag {customer},\n\ndie Rechnung {number} (fällig am {due_date}) ist seit {days_overdue} Tagen "
+            "überfällig; offen sind {outstanding} {currency}.\n\nBitte überweisen Sie {total} {currency} innerhalb "
+            "von 10 Tagen oder sprechen Sie uns an, falls es Fragen zur Rechnung gibt.\n\nFreundliche Grüße",
+        ),
+        (
+            3,
+            "2. Mahnung",
+            35,
+            "2. Mahnung zur Rechnung {number}",
+            "Guten Tag {customer},\n\ntrotz unserer bisherigen Schreiben ist die Rechnung {number} "
+            "(fällig am {due_date}) mit {outstanding} {currency} weiterhin offen.\n\nBitte gleichen Sie {total} "
+            "{currency} innerhalb von 7 Tagen aus. Wenn etwas dagegen spricht, melden Sie sich gern, damit wir "
+            "gemeinsam eine Lösung finden.\n\nFreundliche Grüße",
+        ),
     ],
 }
 
@@ -108,7 +149,9 @@ def bucket_for(days_overdue: int) -> str:
 
 def next_level(levels: list[DunningLevel], current: int, days_overdue: int) -> DunningLevel | None:
     """Highest level above ``current`` that is due, stepping one level per run."""
-    due = [lv for lv in sorted(levels, key=lambda x: x.level) if lv.level > current and days_overdue >= lv.days_after_due]
+    due = [
+        lv for lv in sorted(levels, key=lambda x: x.level) if lv.level > current and days_overdue >= lv.days_after_due
+    ]
     return due[0] if due else None
 
 
@@ -144,20 +187,34 @@ class ReceivablesService:
             key = partner_key(inv.customer_id, inv.customer_name)
             open_amt = (inv.gross_total - inv.amount_paid) * (inv.fx_rate or 1)
             days = (as_of - (inv.due_date or inv.doc_date)).days
-            r = rows.setdefault(key, {
-                "partner_key": key, "customer_id": inv.customer_id, "customer_name": inv.customer_name,
-                **{b: ZERO for b in BUCKETS}, "total": ZERO, "invoices": [],
-            })
+            r = rows.setdefault(
+                key,
+                {
+                    "partner_key": key,
+                    "customer_id": inv.customer_id,
+                    "customer_name": inv.customer_name,
+                    **dict.fromkeys(BUCKETS, ZERO),
+                    "total": ZERO,
+                    "invoices": [],
+                },
+            )
             b = bucket_for(days)
             r[b] += open_amt
             r["total"] += open_amt
             totals[b] += open_amt
             totals["total"] += open_amt
-            r["invoices"].append({
-                "id": inv.id, "number": inv.number, "doc_date": inv.doc_date, "due_date": inv.due_date,
-                "open": money(inv.gross_total - inv.amount_paid), "currency": inv.currency,
-                "days_overdue": max(days, 0), "bucket": b,
-            })
+            r["invoices"].append(
+                {
+                    "id": inv.id,
+                    "number": inv.number,
+                    "doc_date": inv.doc_date,
+                    "due_date": inv.due_date,
+                    "open": money(inv.gross_total - inv.amount_paid),
+                    "currency": inv.currency,
+                    "days_overdue": max(days, 0),
+                    "bucket": b,
+                }
+            )
         out = sorted(rows.values(), key=lambda r: -r["total"])
         for r in out:
             for k in (*BUCKETS, "total"):
@@ -168,8 +225,13 @@ class ReceivablesService:
     async def settings(self) -> DunningSettings:
         row = await self.session.scalar(select(DunningSettings).where(DunningSettings.tenant_id == self.tenant_id))
         if row is None:
-            row = DunningSettings(tenant_id=self.tenant_id, fees_enabled=False, interest_enabled=False,
-                                  interest_rate_pct=ZERO, min_days_between=7)
+            row = DunningSettings(
+                tenant_id=self.tenant_id,
+                fees_enabled=False,
+                interest_enabled=False,
+                interest_rate_pct=ZERO,
+                min_days_between=7,
+            )
             self.session.add(row)
             await self.session.flush()
         return row
@@ -187,8 +249,15 @@ class ReceivablesService:
         rows = list((await self.session.execute(q)).scalars())
         if not rows:
             for lv, name, days, subject, body in DEFAULT_LEVELS[_lang()]:
-                row = DunningLevel(tenant_id=self.tenant_id, level=lv, name=name, days_after_due=days,
-                                   fee=ZERO, subject=subject, body=body)
+                row = DunningLevel(
+                    tenant_id=self.tenant_id,
+                    level=lv,
+                    name=name,
+                    days_after_due=days,
+                    fee=ZERO,
+                    subject=subject,
+                    body=body,
+                )
                 self.session.add(row)
                 rows.append(row)
             await self.session.flush()
@@ -218,8 +287,9 @@ class ReceivablesService:
         return list((await self.session.execute(q)).scalars())
 
     async def block(self, key: str, customer_name: str = "", reason: str = "", by: str | None = None) -> DunningBlock:
-        row = await self.session.scalar(select(DunningBlock).where(
-            DunningBlock.tenant_id == self.tenant_id, DunningBlock.partner_key == key))
+        row = await self.session.scalar(
+            select(DunningBlock).where(DunningBlock.tenant_id == self.tenant_id, DunningBlock.partner_key == key)
+        )
         if row is None:
             row = DunningBlock(tenant_id=self.tenant_id, partner_key=key, customer_name=customer_name, created_by=by)
             self.session.add(row)
@@ -254,9 +324,26 @@ class ReceivablesService:
         for lt in await self._proposals(as_of or date.today()):
             if key and lt.partner_key != key:
                 continue
-            out.append({k: getattr(lt, k) for k in (
-                "invoice_id", "invoice_number", "partner_key", "customer_name", "level", "letter_date",
-                "days_overdue", "currency", "outstanding", "fee", "interest", "subject", "body")})
+            out.append(
+                {
+                    k: getattr(lt, k)
+                    for k in (
+                        "invoice_id",
+                        "invoice_number",
+                        "partner_key",
+                        "customer_name",
+                        "level",
+                        "letter_date",
+                        "days_overdue",
+                        "currency",
+                        "outstanding",
+                        "fee",
+                        "interest",
+                        "subject",
+                        "body",
+                    )
+                }
+            )
         return out
 
     async def _proposals(self, as_of: date) -> list[DunningLetter]:
@@ -288,23 +375,44 @@ class ReceivablesService:
             fee = money(lv.fee) if cfg.fees_enabled else ZERO
             interest = (
                 money(outstanding * cfg.interest_rate_pct / 100 * days / 365)
-                if cfg.interest_enabled and cfg.interest_rate_pct > 0 else ZERO
+                if cfg.interest_enabled and cfg.interest_rate_pct > 0
+                else ZERO
             )
             values = {
-                "customer": inv.customer_name or "", "number": inv.number, "doc_date": inv.doc_date.isoformat(),
-                "due_date": (inv.due_date or inv.doc_date).isoformat(), "outstanding": f"{outstanding:.2f}",
-                "currency": inv.currency, "days_overdue": days, "fee": f"{fee:.2f}", "interest": f"{interest:.2f}",
+                "customer": inv.customer_name or "",
+                "number": inv.number,
+                "doc_date": inv.doc_date.isoformat(),
+                "due_date": (inv.due_date or inv.doc_date).isoformat(),
+                "outstanding": f"{outstanding:.2f}",
+                "currency": inv.currency,
+                "days_overdue": days,
+                "fee": f"{fee:.2f}",
+                "interest": f"{interest:.2f}",
                 "total": f"{outstanding + fee + interest:.2f}",
             }
             body = render(lv.body, values)
             if fee or interest:
                 body += f"\n\n{lv.name}: fee {fee:.2f} {inv.currency}, interest {interest:.2f} {inv.currency}."
-            letters.append(DunningLetter(
-                tenant_id=self.tenant_id, invoice_id=inv.id, invoice_number=inv.number, partner_key=key,
-                customer_name=inv.customer_name, level=lv.level, letter_date=as_of, days_overdue=days, currency=inv.currency,
-                outstanding=outstanding, fee=fee, interest=interest, channel="letter",
-                subject=render(lv.subject, values), body=body, status="draft",
-            ))
+            letters.append(
+                DunningLetter(
+                    tenant_id=self.tenant_id,
+                    invoice_id=inv.id,
+                    invoice_number=inv.number,
+                    partner_key=key,
+                    customer_name=inv.customer_name,
+                    level=lv.level,
+                    letter_date=as_of,
+                    days_overdue=days,
+                    currency=inv.currency,
+                    outstanding=outstanding,
+                    fee=fee,
+                    interest=interest,
+                    channel="letter",
+                    subject=render(lv.subject, values),
+                    body=body,
+                    status="draft",
+                )
+            )
         return letters
 
     async def list_runs(self, limit: int = 50) -> list[DunningRun]:

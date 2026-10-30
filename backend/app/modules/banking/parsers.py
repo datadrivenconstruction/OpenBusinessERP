@@ -42,8 +42,14 @@ class ParsedTxn:
         if self.reference:
             return f"ref:{self.reference}"[:128]
         basis = "|".join(
-            (self.booking_date.isoformat(), str(self.amount), self.currency, self.counterparty_iban,
-             self.counterparty_name, self.remittance)
+            (
+                self.booking_date.isoformat(),
+                str(self.amount),
+                self.currency,
+                self.counterparty_iban,
+                self.counterparty_name,
+                self.remittance,
+            )
         )
         return "h:" + hashlib.sha256(basis.encode()).hexdigest()[:40]
 
@@ -246,8 +252,13 @@ def parse_mt940(data: bytes | str) -> list[ParsedTxn]:
         ref = bref or (cref if cref.upper() != "NONREF" else "")
         out.append(
             ParsedTxn(
-                booking_date=booking, value_date=vd, amount=signed, currency=currency,
-                counterparty_name=name, counterparty_iban=iban, remittance=remit,
+                booking_date=booking,
+                value_date=vd,
+                amount=signed,
+                currency=currency,
+                counterparty_name=name,
+                counterparty_iban=iban,
+                remittance=remit,
                 # Bank refs repeat across days at some banks; anchor them to the value date.
                 reference=f"{vd.isoformat()}:{ref}" if ref else "",
             )
@@ -257,8 +268,16 @@ def parse_mt940(data: bytes | str) -> list[ParsedTxn]:
 
 # ── Generic CSV ───────────────────────────────────────────────────────────
 CSV_FIELDS = (
-    "date", "value_date", "amount", "debit", "credit", "currency",
-    "counterparty_name", "counterparty_iban", "remittance", "reference",
+    "date",
+    "value_date",
+    "amount",
+    "debit",
+    "credit",
+    "currency",
+    "counterparty_name",
+    "counterparty_iban",
+    "remittance",
+    "reference",
 )
 
 
@@ -266,7 +285,7 @@ def parse_csv(data: bytes | str, mapping: dict[str, Any]) -> list[ParsedTxn]:
     """``mapping``: column header (or 0-based index) per field in CSV_FIELDS plus optional
     ``delimiter``, ``decimal`` (',' or '.'), ``date_format``, ``skip_rows``, ``default_currency``."""
     text = _text(data)
-    lines = text.splitlines()[int(mapping.get("skip_rows") or 0):]
+    lines = text.splitlines()[int(mapping.get("skip_rows") or 0) :]
     sample = "\n".join(lines[:5])
     delimiter = mapping.get("delimiter")
     if not delimiter:
@@ -307,7 +326,9 @@ def parse_csv(data: bytes | str, mapping: dict[str, Any]) -> list[ParsedTxn]:
                 amount = parse_amount(get(row, "amount"), dec)
             else:
                 cr, dr = get(row, "credit"), get(row, "debit")
-                amount = (parse_amount(cr, dec) if cr else Decimal(0)) - (abs(parse_amount(dr, dec)) if dr else Decimal(0))
+                amount = (parse_amount(cr, dec) if cr else Decimal(0)) - (
+                    abs(parse_amount(dr, dec)) if dr else Decimal(0)
+                )
             vd = get(row, "value_date")
             out.append(
                 ParsedTxn(
@@ -378,7 +399,9 @@ def parse_opening_balance(data: bytes | str, fmt: str | None = None) -> tuple[De
     return None
 
 
-def parse_statement(data: bytes | str, fmt: str | None = None, mapping: dict[str, Any] | None = None) -> list[ParsedTxn]:
+def parse_statement(
+    data: bytes | str, fmt: str | None = None, mapping: dict[str, Any] | None = None
+) -> list[ParsedTxn]:
     fmt = fmt or detect_format(data)
     if fmt in ("camt053", "camt054"):
         return parse_camt(data)

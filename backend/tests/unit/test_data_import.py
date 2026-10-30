@@ -84,8 +84,13 @@ def test_vat_and_auto_map():
     m = DataImportService.suggest_mapping(
         "customers", ["Kundennummer", "Firmenname", "E-Mail-Adresse", "USt-IdNr.", "PLZ", "Foo"]
     )
-    assert m == {"Kundennummer": "customer_number", "Firmenname": "name", "E-Mail-Adresse": "email",
-                 "USt-IdNr.": "vat_number", "PLZ": "postal_code"}
+    assert m == {
+        "Kundennummer": "customer_number",
+        "Firmenname": "name",
+        "E-Mail-Adresse": "email",
+        "USt-IdNr.": "vat_number",
+        "PLZ": "postal_code",
+    }
 
 
 # ── customers / suppliers ─────────────────────────────────────────────────
@@ -113,7 +118,9 @@ async def test_customers_validate_commit_dedupe_undo(session, svc):
     assert all(c.contact_type == "customer" for c in rows)
 
     # second import: same customer number -> update; unknown -> create
-    job2, res2 = await _run(svc, "customers", "Kundennummer;Name;E-Mail\n10001;Müller GmbH & Co;new@m.de\n;Neu;n@x.de\n")
+    job2, res2 = await _run(
+        svc, "customers", "Kundennummer;Name;E-Mail\n10001;Müller GmbH & Co;new@m.de\n;Neu;n@x.de\n"
+    )
     assert (res2["summary"]["update"], res2["summary"]["create"]) == (1, 1)
     await svc.commit(job2.id, job2.mapping)
     m = (await session.execute(select(Contact).where(Contact.vat_number == "DE123456789"))).scalar_one()
@@ -147,8 +154,10 @@ async def test_suppliers_and_tenant_isolation(session, svc):
 # ── items ─────────────────────────────────────────────────────────────────
 async def test_items_upsert_by_sku_and_german_prices(session, svc):
     await ItemsService(session, T1).create_item(sku="A-1", name="Old", sales_price=D("1"))
-    csv = ("Artikelnummer;Bezeichnung;Verkaufspreis;Typ\n"
-           "A-1;Schraube;1.234,50;Ware\nB-2;Montage;80,00;Dienstleistung\nC-3;X;abc;Ware\n")
+    csv = (
+        "Artikelnummer;Bezeichnung;Verkaufspreis;Typ\n"
+        "A-1;Schraube;1.234,50;Ware\nB-2;Montage;80,00;Dienstleistung\nC-3;X;abc;Ware\n"
+    )
     job, res = await _run(svc, "items", csv)
     assert (res["summary"]["update"], res["summary"]["create"], res["summary"]["error"]) == (1, 1, 1)
     await svc.commit(job.id, job.mapping, {"skip_invalid": True})
@@ -189,8 +198,13 @@ async def test_opening_balances_balanced_and_undo(session, svc):
     job, res = await _run(svc, "opening_balances", csv, options=opts)
     assert res["summary"]["ok"], res
     await svc.commit(job.id, job.mapping, opts)
-    entry = (await session.execute(select(GLJournalEntry).where(
-        GLJournalEntry.tenant_id == T1, GLJournalEntry.source_type == "data_import:opening"))).scalar_one()
+    entry = (
+        await session.execute(
+            select(GLJournalEntry).where(
+                GLJournalEntry.tenant_id == T1, GLJournalEntry.source_type == "data_import:opening"
+            )
+        )
+    ).scalar_one()
     assert entry.status == "posted" and len(entry.lines) == 3
     assert sum(ln.debit for ln in entry.lines) == D("10500.00")
     _, res2 = await _run(svc, "opening_balances", csv, options=opts)
@@ -214,10 +228,12 @@ async def test_opening_balances_unbalanced_rejected(session, svc):
 async def test_open_invoices(session, svc):
     jc, _ = await _run(svc, "customers", "Kundennummer;Name\n10001;Müller GmbH\n")
     await svc.commit(jc.id, jc.mapping)
-    csv = ("Rechnungsnummer;Kunde;Rechnungsdatum;Fällig;Brutto;Bezahlt\n"
-           "RE-1;Müller GmbH;15.12.2025;14.01.2026;1.190,00;190,00\n"
-           "RE-2;Unbekannt;16.12.2025;;500,00;500,00\n"
-           "RE-3;Müller GmbH;32.12.2025;;100,00;\n")
+    csv = (
+        "Rechnungsnummer;Kunde;Rechnungsdatum;Fällig;Brutto;Bezahlt\n"
+        "RE-1;Müller GmbH;15.12.2025;14.01.2026;1.190,00;190,00\n"
+        "RE-2;Unbekannt;16.12.2025;;500,00;500,00\n"
+        "RE-3;Müller GmbH;32.12.2025;;100,00;\n"
+    )
     job, res = await _run(svc, "open_invoices", csv)
     assert (res["summary"]["create"], res["summary"]["skip"], res["summary"]["error"]) == (1, 1, 1)
     await svc.commit(job.id, job.mapping, {"skip_invalid": True})
@@ -231,7 +247,9 @@ async def test_open_invoices(session, svc):
 
 
 def test_auto_map_scored_confidence():
-    scored = parsing.auto_map_scored(["Firmenname", "E-Mail", "Telefonnr"], {"name": ["Firmenname"], "email": ["email"], "phone": ["telefon"]})
+    scored = parsing.auto_map_scored(
+        ["Firmenname", "E-Mail", "Telefonnr"], {"name": ["Firmenname"], "email": ["email"], "phone": ["telefon"]}
+    )
     assert scored["Firmenname"] == ("name", 1.0)
     assert scored["E-Mail"][1] == 1.0
     assert 0.82 <= scored["Telefonnr"][1] < 1.0
@@ -241,7 +259,9 @@ async def test_job_stores_confidence_and_existing_skip(session, svc):
     job, _ = await _run(svc, "customers", "Kundennummer;Name\n10001;Alt GmbH\n")
     assert job.summary["confidence"]["Name"] == 1.0
     await svc.commit(job.id, job.mapping)
-    job2, res = await _run(svc, "customers", "Kundennummer;Name\n10001;Alt GmbH 2\n20002;Neu AG\n", options={"existing": "skip"})
+    job2, res = await _run(
+        svc, "customers", "Kundennummer;Name\n10001;Alt GmbH 2\n20002;Neu AG\n", options={"existing": "skip"}
+    )
     assert (res["summary"]["skip"], res["summary"]["create"], res["summary"]["update"]) == (1, 1, 0)
     await svc.commit(job2.id, job2.mapping, {"existing": "skip"})
     assert {c.company_name for c in await _contacts(session)} == {"Alt GmbH", "Neu AG"}

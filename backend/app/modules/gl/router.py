@@ -67,7 +67,7 @@ def _svc(session: SessionDep, tenant_id: CurrentCompanyTenantId = None) -> GLSer
     return GLService(session, tenant_id)
 
 
-async def _call(aw: Awaitable[T]) -> T:
+async def _call[T](aw: Awaitable[T]) -> T:
     """Map service errors onto HTTP status codes."""
     try:
         return await aw
@@ -342,8 +342,13 @@ async def gl_kpis(
 # ── Attachments ───────────────────────────────────────────────────────────
 def _att(a: Any) -> dict[str, Any]:
     return {
-        "id": a.id, "entry_id": a.entry_id, "filename": a.filename, "content_type": a.content_type,
-        "size": a.size, "uploaded_by": a.uploaded_by, "created_at": a.created_at,
+        "id": a.id,
+        "entry_id": a.entry_id,
+        "filename": a.filename,
+        "content_type": a.content_type,
+        "size": a.size,
+        "uploaded_by": a.uploaded_by,
+        "created_at": a.created_at,
     }
 
 
@@ -379,7 +384,9 @@ async def download_attachment(
 ) -> Response:
     a = await _call(svc.get_attachment(attachment_id))
     safe = a.filename.replace('"', "")
-    return Response(a.data, media_type=a.content_type, headers={"Content-Disposition": f'attachment; filename="{safe}"'})
+    return Response(
+        a.data, media_type=a.content_type, headers={"Content-Disposition": f'attachment; filename="{safe}"'}
+    )
 
 
 @router.delete("/attachments/{attachment_id}/", status_code=204)

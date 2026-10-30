@@ -37,20 +37,20 @@ from app.modules.purchasing import pdf as po_pdf
 from app.modules.purchasing.schemas import (
     AccountMapping,
     ActivityEvent,
-    BillRelated,
-    BulkRequest,
-    BulkResponse,
-    OrderRelated,
-    PurchasingStats,
     BillCreate,
+    BillRelated,
     BillResponse,
     BillSummary,
     BillUpdate,
+    BulkRequest,
+    BulkResponse,
     OrderCreate,
+    OrderRelated,
     OrderResponse,
     OrderSummary,
     OrderUpdate,
     PaymentCreate,
+    PurchasingStats,
     ReceiptResponse,
     ReceiveRequest,
     StatusRequest,
@@ -84,7 +84,7 @@ def _bill_kind(kind: str) -> str:
     return BILL_PATHS[kind]
 
 
-async def _call(aw: Awaitable[T]) -> T:
+async def _call[T](aw: Awaitable[T]) -> T:
     try:
         return await aw
     except PurchasingNotFoundError as exc:
@@ -177,7 +177,9 @@ async def bulk_orders(body: BulkRequest, _u: CurrentUserId, svc: PurchasingServi
 
 
 @router.post("/orders/", response_model=OrderResponse, status_code=201)
-async def create_order(body: OrderCreate, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE):
+async def create_order(
+    body: OrderCreate, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+):
     data = _payload(body)
     return await _call(svc.create_order(lines=data.pop("lines", []), created_by=user_id, **data))
 
@@ -195,14 +197,20 @@ async def update_order(
 
 
 @router.delete("/orders/{order_id}/", status_code=204)
-async def delete_order(order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE):
+async def delete_order(
+    order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+):
     await _call(svc.delete_order(order_id))
     return Response(status_code=204)
 
 
 @router.post("/orders/{order_id}/status/", response_model=OrderResponse)
 async def order_status(
-    order_id: uuid.UUID, body: StatusRequest, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+    order_id: uuid.UUID,
+    body: StatusRequest,
+    _u: CurrentUserId,
+    svc: PurchasingService = Depends(_svc),
+    _p: None = WRITE,
 ):
     return await _call(svc.set_order_status(order_id, body.status))
 
@@ -220,17 +228,23 @@ async def receive(
 
 
 @router.post("/orders/{order_id}/duplicate/", response_model=OrderResponse, status_code=201)
-async def duplicate_order(order_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE):
+async def duplicate_order(
+    order_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+):
     return await _call(svc.duplicate_order(order_id, created_by=user_id))
 
 
 @router.get("/orders/{order_id}/activity/", response_model=list[ActivityEvent])
-async def order_activity(order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def order_activity(
+    order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     return await _call(svc.order_activity(order_id))
 
 
 @router.get("/orders/{order_id}/related/", response_model=OrderRelated)
-async def order_related(order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def order_related(
+    order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     return await _call(svc.order_related(order_id))
 
 
@@ -240,13 +254,17 @@ async def order_pdf(order_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingServi
     return Response(
         po_pdf.render_pdf(po, "order", _company()),
         media_type="application/pdf",
-        headers={"Content-Disposition": attachment_disposition(po_pdf.filename("order", po.number), inline=True),
-                 "Content-Language": "en"},
+        headers={
+            "Content-Disposition": attachment_disposition(po_pdf.filename("order", po.number), inline=True),
+            "Content-Language": "en",
+        },
     )
 
 
 @router.post("/orders/{order_id}/bill/", response_model=BillResponse, status_code=201)
-async def bill_from_order(order_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE):
+async def bill_from_order(
+    order_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+):
     return await _call(svc.bill_from_order(order_id, created_by=user_id))
 
 
@@ -259,7 +277,9 @@ async def list_receipts(
 
 
 @router.get("/receipts/{receipt_id}/", response_model=ReceiptResponse)
-async def get_receipt(receipt_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def get_receipt(
+    receipt_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     return await _call(svc.get_receipt(receipt_id))
 
 
@@ -273,7 +293,11 @@ async def bill_from_receipt(
 # ── Bills / credit notes ──────────────────────────────────────────────────
 @router.post("/bills/{bill_id}/payments/", response_model=BillResponse, status_code=201)
 async def record_payment(
-    bill_id: uuid.UUID, body: PaymentCreate, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = POST
+    bill_id: uuid.UUID,
+    body: PaymentCreate,
+    user_id: CurrentUserId,
+    svc: PurchasingService = Depends(_svc),
+    _p: None = POST,
 ):
     return await _call(svc.record_payment(bill_id, created_by=user_id, **body.model_dump()))
 
@@ -309,7 +333,9 @@ async def list_bills(
 
 
 @router.post("/{kind}/bulk/", response_model=BulkResponse)
-async def bulk_bills(kind: str, body: BulkRequest, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE):
+async def bulk_bills(
+    kind: str, body: BulkRequest, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+):
     return await _call(svc.bulk(_bill_kind(kind), body.action, body.ids))
 
 
@@ -322,7 +348,9 @@ async def create_bill(
 
 
 @router.get("/{kind}/{bill_id}/", response_model=BillResponse)
-async def get_bill(kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def get_bill(
+    kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     return await _call(svc.get_bill(bill_id, _bill_kind(kind)))
 
 
@@ -340,20 +368,26 @@ async def update_bill(
 
 
 @router.delete("/{kind}/{bill_id}/", status_code=204)
-async def delete_bill(kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE):
+async def delete_bill(
+    kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = WRITE
+):
     await _call(svc.get_bill(bill_id, _bill_kind(kind)))
     await _call(svc.delete_bill(bill_id))
     return Response(status_code=204)
 
 
 @router.post("/{kind}/{bill_id}/post/", response_model=BillResponse)
-async def post_bill(kind: str, bill_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = POST):
+async def post_bill(
+    kind: str, bill_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = POST
+):
     await _call(svc.get_bill(bill_id, _bill_kind(kind)))
     return await _call(svc.post_bill(bill_id, created_by=user_id))
 
 
 @router.post("/{kind}/{bill_id}/cancel/", response_model=BillResponse)
-async def cancel_bill(kind: str, bill_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = POST):
+async def cancel_bill(
+    kind: str, bill_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = POST
+):
     await _call(svc.get_bill(bill_id, _bill_kind(kind)))
     return await _call(svc.cancel_bill(bill_id, created_by=user_id))
 
@@ -366,21 +400,29 @@ async def duplicate_bill(
 
 
 @router.get("/{kind}/{bill_id}/activity/", response_model=list[ActivityEvent])
-async def bill_activity(kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def bill_activity(
+    kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     return await _call(svc.bill_activity(bill_id, _bill_kind(kind)))
 
 
 @router.get("/{kind}/{bill_id}/related/", response_model=BillRelated)
-async def bill_related(kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def bill_related(
+    kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     return await _call(svc.bill_related(bill_id, _bill_kind(kind)))
 
 
 @router.get("/{kind}/{bill_id}/pdf/")
-async def bill_pdf(kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ):
+async def bill_pdf(
+    kind: str, bill_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
+):
     bill = await _call(svc.get_bill(bill_id, _bill_kind(kind)))
     return Response(
         po_pdf.render_pdf(bill, bill.kind, _company()),
         media_type="application/pdf",
-        headers={"Content-Disposition": attachment_disposition(po_pdf.filename(bill.kind, bill.number), inline=True),
-                 "Content-Language": "en"},
+        headers={
+            "Content-Disposition": attachment_disposition(po_pdf.filename(bill.kind, bill.number), inline=True),
+            "Content-Language": "en",
+        },
     )

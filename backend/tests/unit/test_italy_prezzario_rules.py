@@ -22,7 +22,6 @@ import pytest
 from app.core.validation.engine import ValidationContext, rule_registry
 from app.core.validation.messages import is_key_present
 from app.core.validation.rules.italy_prezzario import (
-    ITALY_PREZZARIO_RULES,
     PrezzarioCostiSicurezzaSeparated,
     PrezzarioIncidenzaManodoperaDocumented,
     PrezzarioOverheadsNotAppliedTwice,
@@ -34,13 +33,7 @@ from app.modules.boq.router import _build_rule_sets
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 RULE_PACK = (
-    REPO_ROOT
-    / "packs"
-    / "italy-it"
-    / "src"
-    / "openbusinesserp_italy_it"
-    / "rule_packs"
-    / "prezzario_regionale.json"
+    REPO_ROOT / "packs" / "italy-it" / "src" / "openbusinesserp_italy_it" / "rule_packs" / "prezzario_regionale.json"
 )
 IMPLEMENTED = {
     "prezzario.voce_code_format_valid",
@@ -393,16 +386,12 @@ def test_the_xpwe_bill_import_raises_no_finding_its_file_does_not_deserve() -> N
 # ── Wiring ──────────────────────────────────────────────────────────────────
 
 
-
-
 def test_the_rules_are_registered_into_the_italy_set() -> None:
     from app.core.validation.rules import register_builtin_rules
 
     register_builtin_rules()
     members = {entry["rule_id"] for entry in rule_registry.list_rules(rule_set="italy")}
     assert members == IMPLEMENTED
-
-
 
 
 @pytest.mark.parametrize(

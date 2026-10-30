@@ -85,12 +85,20 @@ async def test_vat_report_nets_output_against_input(svc):
     a = svc.acc
     await svc.create_entry(
         entry_date=date(2026, 4, 1),
-        lines=[LineInput(a["1400"], debit=D("119")), LineInput(a["4000"], credit=D("100")), LineInput(a["2300"], credit=D("19"))],
+        lines=[
+            LineInput(a["1400"], debit=D("119")),
+            LineInput(a["4000"], credit=D("100")),
+            LineInput(a["2300"], credit=D("19")),
+        ],
         post=True,
     )
     await svc.create_entry(
         entry_date=date(2026, 4, 2),
-        lines=[LineInput(a["5100"], debit=D("50")), LineInput(a["1450"], debit=D("9.50")), LineInput(a["2200"], credit=D("59.50"))],
+        lines=[
+            LineInput(a["5100"], debit=D("50")),
+            LineInput(a["1450"], debit=D("9.50")),
+            LineInput(a["2200"], credit=D("59.50")),
+        ],
         post=True,
     )
     rep = await svc.vat_report(date(2026, 4, 1), date(2026, 4, 30), ["2300"], ["1450"])

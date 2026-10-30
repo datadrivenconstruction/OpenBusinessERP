@@ -26,7 +26,6 @@ read one call site would put that cost on every collection of this directory.
 from __future__ import annotations
 
 import inspect
-from pathlib import Path
 
 from app.core import demo_enrichment
 
@@ -39,5 +38,3 @@ def test_the_seed_is_wired_into_the_boot_backfill() -> None:
     # the seed runs over the demo estate only. A delivery invented inside a
     # customer's live project is a data incident, not a cosmetic one.
     assert "seed_site_logistics_demo(s, _demo_pids)" in source, "the delivery board seeder is not demo-gated"
-
-

@@ -109,10 +109,6 @@ def test_lock_is_green_on_the_current_tree() -> None:
     assert "probe actually executed" in result.stdout, "the report must print the population it speaks for"
 
 
-
-
-
-
 def _run_lock(*extra: str) -> subprocess.CompletedProcess[str]:
     """Run the lock in its own interpreter.
 

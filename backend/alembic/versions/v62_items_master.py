@@ -25,9 +25,13 @@ _TABLES = (
 
 def _base(table: str) -> list:
     return [
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column("id", sa.String(36), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id", name=f"pk_{table}"),
     ]
 
@@ -58,7 +62,9 @@ def upgrade() -> None:
             *_base("oe_items_category"),
             _tenant(),
             sa.Column("name", sa.String(128), nullable=False),
-            sa.Column("parent_id", sa.Uuid(), sa.ForeignKey("oe_items_category.id", ondelete="SET NULL"), nullable=True),
+            sa.Column(
+                "parent_id", sa.String(36), sa.ForeignKey("oe_items_category.id", ondelete="SET NULL"), nullable=True
+            ),
             sa.Column("description", sa.Text(), nullable=False, server_default=""),
             sa.UniqueConstraint("tenant_id", "name", name="uq_oe_items_category_tenant_name"),
         )
@@ -82,7 +88,9 @@ def upgrade() -> None:
             sa.Column("expense_account", sa.String(32), nullable=False, server_default=""),
             _flag("stock_tracked", False),
             sa.Column("barcode", sa.String(64), nullable=False, server_default=""),
-            sa.Column("category_id", sa.Uuid(), sa.ForeignKey("oe_items_category.id", ondelete="SET NULL"), nullable=True),
+            sa.Column(
+                "category_id", sa.String(36), sa.ForeignKey("oe_items_category.id", ondelete="SET NULL"), nullable=True
+            ),
             _flag("active", True),
             sa.Column("created_by", sa.String(64), nullable=True),
             sa.UniqueConstraint("tenant_id", "sku", name="uq_oe_items_item_tenant_sku"),
@@ -97,7 +105,7 @@ def upgrade() -> None:
             sa.Column("name", sa.String(128), nullable=False),
             sa.Column("currency", sa.String(3), nullable=False, server_default="EUR"),
             sa.Column("customer_group", sa.String(64), nullable=False, server_default=""),
-            sa.Column("customer_id", sa.Uuid(), nullable=True),
+            sa.Column("customer_id", sa.String(36), nullable=True),
             *_validity(),
             sa.Column("priority", sa.Integer(), nullable=False, server_default="0"),
             _flag("active", True),
@@ -108,8 +116,13 @@ def upgrade() -> None:
         op.create_table(
             "oe_items_price_list_item",
             *_base("oe_items_price_list_item"),
-            sa.Column("price_list_id", sa.Uuid(), sa.ForeignKey("oe_items_price_list.id", ondelete="CASCADE"), nullable=False),
-            sa.Column("item_id", sa.Uuid(), sa.ForeignKey("oe_items_item.id", ondelete="CASCADE"), nullable=False),
+            sa.Column(
+                "price_list_id",
+                sa.String(36),
+                sa.ForeignKey("oe_items_price_list.id", ondelete="CASCADE"),
+                nullable=False,
+            ),
+            sa.Column("item_id", sa.String(36), sa.ForeignKey("oe_items_item.id", ondelete="CASCADE"), nullable=False),
             sa.Column("min_qty", sa.Numeric(18, 4), nullable=False, server_default="0"),
             sa.Column("unit_price", sa.Numeric(18, 4), nullable=False),
             sa.UniqueConstraint("price_list_id", "item_id", "min_qty", name="uq_oe_items_price_list_item_break"),
@@ -122,10 +135,12 @@ def upgrade() -> None:
             *_base("oe_items_discount_rule"),
             _tenant(),
             sa.Column("name", sa.String(128), nullable=False),
-            sa.Column("item_id", sa.Uuid(), sa.ForeignKey("oe_items_item.id", ondelete="CASCADE"), nullable=True),
-            sa.Column("category_id", sa.Uuid(), sa.ForeignKey("oe_items_category.id", ondelete="CASCADE"), nullable=True),
+            sa.Column("item_id", sa.String(36), sa.ForeignKey("oe_items_item.id", ondelete="CASCADE"), nullable=True),
+            sa.Column(
+                "category_id", sa.String(36), sa.ForeignKey("oe_items_category.id", ondelete="CASCADE"), nullable=True
+            ),
             sa.Column("customer_group", sa.String(64), nullable=False, server_default=""),
-            sa.Column("customer_id", sa.Uuid(), nullable=True),
+            sa.Column("customer_id", sa.String(36), nullable=True),
             sa.Column("min_qty", sa.Numeric(18, 4), nullable=False, server_default="0"),
             sa.Column("discount_pct", sa.Numeric(7, 4), nullable=False),
             *_validity(),

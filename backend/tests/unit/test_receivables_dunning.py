@@ -42,14 +42,26 @@ async def _setup(session, tenant="default"):
 
 
 async def _invoice(sales, name, net, due=DUE):
-    inv = await sales.create("invoice", lines=[LineData("Work", "", D(1), D(net), D(0), D(0))],
-                             doc_date=DAY, due_date=due, customer_name=name)
+    inv = await sales.create(
+        "invoice",
+        lines=[LineData("Work", "", D(1), D(net), D(0), D(0))],
+        doc_date=DAY,
+        due_date=due,
+        customer_name=name,
+    )
     return await sales.issue_invoice(inv.id)
 
 
 def test_buckets_and_render():
     assert [bucket_for(d) for d in (-3, 0, 1, 30, 31, 61, 91)] == [
-        "current", "current", "d1_30", "d1_30", "d31_60", "d61_90", "d90_plus"]
+        "current",
+        "current",
+        "d1_30",
+        "d1_30",
+        "d31_60",
+        "d61_90",
+        "d90_plus",
+    ]
     assert render("Hi {customer}, {unknown}", {"customer": "Ann"}) == "Hi Ann, {unknown}"
 
 
@@ -106,8 +118,17 @@ async def test_dunning_progression_and_never_sends(session):
 async def test_fees_and_interest_off_by_default_then_configurable(session):
     sales, rec = await _setup(session)
     await _invoice(sales, "Acme", "1000")
-    levels = [{"level": lv.level, "name": lv.name, "days_after_due": lv.days_after_due, "fee": D("5"),
-               "subject": lv.subject, "body": lv.body} for lv in await rec.levels()]
+    levels = [
+        {
+            "level": lv.level,
+            "name": lv.name,
+            "days_after_due": lv.days_after_due,
+            "fee": D("5"),
+            "subject": lv.subject,
+            "body": lv.body,
+        }
+        for lv in await rec.levels()
+    ]
     await rec.set_levels(levels)
     (letter,) = (await rec.propose_run(DUE + timedelta(days=10))).letters
     assert letter.fee == 0 and letter.interest == 0

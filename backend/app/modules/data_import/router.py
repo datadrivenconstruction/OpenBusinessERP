@@ -65,9 +65,17 @@ class PresetIn(BaseModel):
 
 def _job_out(job: ImportJob, preview: bool = False) -> dict[str, Any]:
     out = {
-        "id": str(job.id), "target": job.target, "filename": job.filename, "status": job.status,
-        "encoding": job.encoding, "delimiter": job.delimiter, "headers": job.headers, "mapping": job.mapping,
-        "options": job.options, "summary": job.summary, "row_count": job.row_count,
+        "id": str(job.id),
+        "target": job.target,
+        "filename": job.filename,
+        "status": job.status,
+        "encoding": job.encoding,
+        "delimiter": job.delimiter,
+        "headers": job.headers,
+        "mapping": job.mapping,
+        "options": job.options,
+        "summary": job.summary,
+        "row_count": job.row_count,
         "created_at": job.created_at.isoformat() if job.created_at else None,
     }
     if preview:
@@ -78,8 +86,11 @@ def _job_out(job: ImportJob, preview: bool = False) -> dict[str, Any]:
 @router.get("/targets/")
 async def list_targets(_user_id: CurrentUserId, _perm: None = Read):
     return [
-        {"key": t, "label": TARGETS[t]["label"],
-         "fields": [{"key": f.key, "label": f.label, "kind": f.kind, "required": f.required} for f in fields_of(t)]}
+        {
+            "key": t,
+            "label": TARGETS[t]["label"],
+            "fields": [{"key": f.key, "label": f.label, "kind": f.kind, "required": f.required} for f in fields_of(t)],
+        }
         for t in targets_available()
     ]
 
@@ -89,7 +100,8 @@ async def template(target: str, _user_id: CurrentUserId, _perm: None = Read):
     if target not in TARGETS:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown target")
     return Response(
-        content="﻿" + template_csv(target), media_type="text/csv; charset=utf-8",
+        content="﻿" + template_csv(target),
+        media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="import-{target}-template.csv"'},
     )
 

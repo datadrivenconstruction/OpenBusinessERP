@@ -282,7 +282,7 @@ export function toCsv(rows: (string | number)[][]): string {
     const s = String(v);
     return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  return '﻿' + rows.map((r) => r.map(cell).join(',')).join('\r\n');
+  return '\uFEFF' + rows.map((r) => r.map(cell).join(',')).join('\r\n');
 }
 
 export const STATUS_VARIANT: Record<string, 'neutral' | 'blue' | 'success' | 'warning' | 'error'> = {

@@ -25,7 +25,7 @@ from typing import TypeVar
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.dependencies import CurrentCompanyTenantId, CurrentUserId, RequirePermission, SessionDep
-from app.modules.receivables import schemas as S
+from app.modules.receivables import schemas as S  # noqa: N812
 from app.modules.receivables.customer import CustomerAccountService, followup_out
 from app.modules.receivables.service import (
     INTEREST_RATE_HINT,
@@ -45,7 +45,7 @@ def _svc(session: SessionDep, tenant_id: CurrentCompanyTenantId = None) -> Recei
     return ReceivablesService(session, tenant_id)
 
 
-async def _call(aw: Awaitable[T]) -> T:
+async def _call[T](aw: Awaitable[T]) -> T:
     try:
         return await aw
     except ReceivablesNotFoundError as exc:
@@ -73,11 +73,19 @@ async def aging(_u: CurrentUserId, as_of: date | None = None, svc: ReceivablesSe
 
 
 @router.get("/statement/")
-async def statement(partner_key: str, _u: CurrentUserId, as_of: date | None = None,
-                    svc: ReceivablesService = Depends(_svc), _p: None = READ):
+async def statement(
+    partner_key: str,
+    _u: CurrentUserId,
+    as_of: date | None = None,
+    svc: ReceivablesService = Depends(_svc),
+    _p: None = READ,
+):
     pdf = await _call(svc.statement_pdf(partner_key, as_of))
-    return Response(pdf, media_type="application/pdf",
-                    headers={"Content-Disposition": "attachment; filename=statement.pdf", "Content-Language": "en"})
+    return Response(
+        pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=statement.pdf", "Content-Language": "en"},
+    )
 
 
 @router.get("/levels/", response_model=list[S.LevelIO])
@@ -86,8 +94,9 @@ async def get_levels(_u: CurrentUserId, svc: ReceivablesService = Depends(_svc),
 
 
 @router.put("/levels/", response_model=list[S.LevelIO])
-async def put_levels(body: list[S.LevelIO], _u: CurrentUserId, svc: ReceivablesService = Depends(_svc),
-                     _p: None = MANAGE):
+async def put_levels(
+    body: list[S.LevelIO], _u: CurrentUserId, svc: ReceivablesService = Depends(_svc), _p: None = MANAGE
+):
     return await _call(svc.set_levels([lv.model_dump() for lv in body]))
 
 
@@ -98,8 +107,9 @@ async def get_settings(_u: CurrentUserId, svc: ReceivablesService = Depends(_svc
 
 
 @router.put("/settings/", response_model=S.SettingsIO)
-async def put_settings(body: S.SettingsIO, _u: CurrentUserId, svc: ReceivablesService = Depends(_svc),
-                       _p: None = MANAGE):
+async def put_settings(
+    body: S.SettingsIO, _u: CurrentUserId, svc: ReceivablesService = Depends(_svc), _p: None = MANAGE
+):
     return await svc.update_settings(**body.model_dump())
 
 
@@ -109,14 +119,14 @@ async def list_blocks(_u: CurrentUserId, svc: ReceivablesService = Depends(_svc)
 
 
 @router.post("/blocks/", response_model=S.BlockOut, status_code=201)
-async def add_block(body: S.BlockIn, user_id: CurrentUserId, svc: ReceivablesService = Depends(_svc),
-                    _p: None = WRITE):
+async def add_block(body: S.BlockIn, user_id: CurrentUserId, svc: ReceivablesService = Depends(_svc), _p: None = WRITE):
     return await svc.block(body.partner_key, body.customer_name, body.reason, user_id)
 
 
 @router.delete("/blocks/{block_id}/", status_code=204)
-async def remove_block(block_id: uuid.UUID, _u: CurrentUserId, svc: ReceivablesService = Depends(_svc),
-                       _p: None = WRITE):
+async def remove_block(
+    block_id: uuid.UUID, _u: CurrentUserId, svc: ReceivablesService = Depends(_svc), _p: None = WRITE
+):
     await _call(svc.unblock(block_id))
     return Response(status_code=204)
 
@@ -127,14 +137,18 @@ async def list_runs(_u: CurrentUserId, svc: ReceivablesService = Depends(_svc), 
 
 
 @router.post("/runs/", response_model=S.RunOut, status_code=201)
-async def create_run(body: S.RunIn, user_id: CurrentUserId, svc: ReceivablesService = Depends(_svc),
-                     _p: None = WRITE):
+async def create_run(body: S.RunIn, user_id: CurrentUserId, svc: ReceivablesService = Depends(_svc), _p: None = WRITE):
     return await svc.propose_run(body.as_of, user_id)
 
 
 @router.get("/runs/preview/")
-async def preview_run(_u: CurrentUserId, as_of: date | None = None, partner_key: str | None = None,
-                      svc: ReceivablesService = Depends(_svc), _p: None = READ):
+async def preview_run(
+    _u: CurrentUserId,
+    as_of: date | None = None,
+    partner_key: str | None = None,
+    svc: ReceivablesService = Depends(_svc),
+    _p: None = READ,
+):
     return await svc.preview_run(as_of, partner_key)
 
 
@@ -144,52 +158,80 @@ async def get_run(run_id: uuid.UUID, _u: CurrentUserId, svc: ReceivablesService 
 
 
 @router.patch("/letters/{letter_id}/", response_model=S.LetterOut)
-async def update_letter(letter_id: uuid.UUID, body: S.LetterUpdate, _u: CurrentUserId,
-                        svc: ReceivablesService = Depends(_svc), _p: None = WRITE):
+async def update_letter(
+    letter_id: uuid.UUID,
+    body: S.LetterUpdate,
+    _u: CurrentUserId,
+    svc: ReceivablesService = Depends(_svc),
+    _p: None = WRITE,
+):
     return await _call(svc.update_letter(letter_id, **body.model_dump()))
 
 
 @router.post("/letters/{letter_id}/decision/", response_model=S.LetterOut)
-async def decide(letter_id: uuid.UUID, body: S.DecisionIn, user_id: CurrentUserId,
-                 svc: ReceivablesService = Depends(_svc), _p: None = WRITE):
+async def decide(
+    letter_id: uuid.UUID,
+    body: S.DecisionIn,
+    user_id: CurrentUserId,
+    svc: ReceivablesService = Depends(_svc),
+    _p: None = WRITE,
+):
     return await _call(svc.decide(letter_id, body.decision, user_id))
 
 
 @router.get("/history/", response_model=list[S.LetterOut])
-async def history(_u: CurrentUserId, partner_key: str | None = None, svc: ReceivablesService = Depends(_svc),
-                  _p: None = READ):
+async def history(
+    _u: CurrentUserId, partner_key: str | None = None, svc: ReceivablesService = Depends(_svc), _p: None = READ
+):
     return await svc.history(partner_key)
 
 
 @router.get("/customer/")
-async def customer_detail(partner_key: str, _u: CurrentUserId, as_of: date | None = None,
-                          svc: CustomerAccountService = Depends(_cust), _p: None = READ):
+async def customer_detail(
+    partner_key: str,
+    _u: CurrentUserId,
+    as_of: date | None = None,
+    svc: CustomerAccountService = Depends(_cust),
+    _p: None = READ,
+):
     out = await _call(svc.detail(partner_key, as_of))
     out["letters"] = [S.LetterOut.model_validate(lt).model_dump() for lt in out["letters"]]
     return out
 
 
 @router.get("/followups/")
-async def list_followups(_u: CurrentUserId, partner_key: str | None = None, status_filter: str | None = "open",
-                         svc: CustomerAccountService = Depends(_cust), _p: None = READ):
+async def list_followups(
+    _u: CurrentUserId,
+    partner_key: str | None = None,
+    status_filter: str | None = "open",
+    svc: CustomerAccountService = Depends(_cust),
+    _p: None = READ,
+):
     rows = await svc.followups(partner_key) if partner_key else await svc.promises(status_filter or None)
     return [followup_out(f) for f in rows]
 
 
 @router.post("/followups/", status_code=201)
-async def add_followup(body: S.FollowUpIn, user_id: CurrentUserId, svc: CustomerAccountService = Depends(_cust),
-                       _p: None = WRITE):
+async def add_followup(
+    body: S.FollowUpIn, user_id: CurrentUserId, svc: CustomerAccountService = Depends(_cust), _p: None = WRITE
+):
     return followup_out(await _call(svc.add(body.model_dump(), user_id)))
 
 
 @router.patch("/followups/{followup_id}/")
-async def set_followup_status(followup_id: uuid.UUID, body: S.FollowUpStatusIn, _u: CurrentUserId,
-                              svc: CustomerAccountService = Depends(_cust), _p: None = WRITE):
+async def set_followup_status(
+    followup_id: uuid.UUID,
+    body: S.FollowUpStatusIn,
+    _u: CurrentUserId,
+    svc: CustomerAccountService = Depends(_cust),
+    _p: None = WRITE,
+):
     return followup_out(await _call(svc.set_status(followup_id, body.status)))
 
 
 @router.delete("/followups/{followup_id}/", status_code=204)
-async def delete_followup(followup_id: uuid.UUID, _u: CurrentUserId, svc: CustomerAccountService = Depends(_cust),
-                          _p: None = WRITE):
+async def delete_followup(
+    followup_id: uuid.UUID, _u: CurrentUserId, svc: CustomerAccountService = Depends(_cust), _p: None = WRITE
+):
     await _call(svc.delete(followup_id))
     return Response(status_code=204)

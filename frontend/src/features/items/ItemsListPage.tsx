@@ -134,7 +134,7 @@ export function ItemsListPage({ routeId }: Props = {}) {
       const chosen = rows.filter((r) => selected.has(r.id));
       const data = chosen.length ? { items: chosen, on_hand: onHand } : await itemsApi.list({ ...filters, limit: 500, offset: 0 });
       const csv = itemsToCsv(data.items, catName, data.on_hand);
-      triggerDownload(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), `products-${new Date().toISOString().slice(0, 10)}.csv`);
+      triggerDownload(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' }), `products-${new Date().toISOString().slice(0, 10)}.csv`);
     } catch (e) {
       addToast({ type: 'error', title: getErrorMessage(e) });
     }

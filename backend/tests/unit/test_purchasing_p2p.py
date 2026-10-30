@@ -96,7 +96,10 @@ async def test_full_purchase_to_pay(svc, session):
     # Bill from PO matches; a price change flags price variance.
     bill = await svc.bill_from_order(po.id)
     assert bill.number == "BILL-000001" and bill.match_status == "matched"
-    lines = [LineData(ln.description, ln.sku, ln.qty, ln.unit_price, ln.tax_rate, ln.item_id, ln.order_line_id) for ln in bill.lines]
+    lines = [
+        LineData(ln.description, ln.sku, ln.qty, ln.unit_price, ln.tax_rate, ln.item_id, ln.order_line_id)
+        for ln in bill.lines
+    ]
     lines[0].unit_price = D("10.50")
     await svc.update_bill(bill.id, lines=lines)
     assert bill.match_status == "price_variance" and bill.net_total == D("155.00")
@@ -129,7 +132,9 @@ async def test_qty_variance_and_credit_note(svc, session):
     await svc.receive(po.id, {w.id: D(2)}, doc_date=DAY)
     bill = await svc.create_bill(
         lines=[LineData("Widget", w.sku, D(5), D(10), D(19), item.id, w.id)],
-        order_id=po.id, supplier_name="Supplier GmbH", doc_date=DAY,
+        order_id=po.id,
+        supplier_name="Supplier GmbH",
+        doc_date=DAY,
     )
     assert bill.match_status == "qty_variance" and bill.lines[0].match_status == "qty_variance"
     await svc.post_bill(bill.id)
@@ -152,7 +157,9 @@ async def test_qty_variance_and_credit_note(svc, session):
 
 
 async def test_standalone_bill_and_rules(svc, session):
-    bill = await svc.create_bill(lines=[LineData("Rent", "", D(1), D(1000), D(0))], supplier_name="Landlord", doc_date=DAY)
+    bill = await svc.create_bill(
+        lines=[LineData("Rent", "", D(1), D(1000), D(0))], supplier_name="Landlord", doc_date=DAY
+    )
     assert bill.match_status == "none"
     await svc.post_bill(bill.id)
     tb = await _tb(svc)

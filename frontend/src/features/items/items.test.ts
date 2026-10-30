@@ -14,7 +14,7 @@ describe('items helpers', () => {
   });
 
   it('parses semicolon CSV with quotes, flags and decimal commas', () => {
-    const csv = '﻿SKU;Name;Item type;Sales price;Stock tracked\n' +
+    const csv = '\uFEFFSKU;Name;Item type;Sales price;Stock tracked\n' +
       'B-1;"Bolt; M8";goods;0,25;yes\n' +
       'S-1;Install;SERVICE;80;no\n' +
       ';missing sku;goods;1;no\n';

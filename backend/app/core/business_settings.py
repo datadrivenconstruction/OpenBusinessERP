@@ -164,7 +164,9 @@ def sanitise(raw: Any) -> dict[str, Any]:
         for kind in DOC_TEXT_KINDS:
             entry = texts.get(kind)
             if isinstance(entry, dict):
-                kept = {k: v[:cap] for k, cap in DOC_TEXT_KEYS.items() if isinstance(v := entry.get(k), str) and v.strip()}
+                kept = {
+                    k: v[:cap] for k, cap in DOC_TEXT_KEYS.items() if isinstance(v := entry.get(k), str) and v.strip()
+                }
                 if kept:
                     clean[kind] = kept
         out["document_texts"] = clean

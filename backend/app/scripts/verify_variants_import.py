@@ -214,7 +214,7 @@ def section_b_real_parquet(parquet_path: Path) -> None:
 if __name__ == "__main__":
     section_a_synthetic()
 
-    parquet = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(
-        "ENG_TORONTO_workitems_costs_resources_DDC_CWICR.parquet"
+    parquet = (
+        Path(sys.argv[1]) if len(sys.argv) > 1 else Path("ENG_TORONTO_workitems_costs_resources_DDC_CWICR.parquet")
     )
     section_b_real_parquet(parquet)
