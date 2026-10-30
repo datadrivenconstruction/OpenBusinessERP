@@ -376,5 +376,3 @@ class TestTheInterpreterFloor:
         _tiny_tree(tmp_path)
         _text, warnings = guard.render_tree(tmp_path)
         assert warnings == []
-
-

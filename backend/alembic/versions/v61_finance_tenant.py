@@ -15,8 +15,16 @@ branch_labels = None
 depends_on = None
 
 _TABLES = (
-    "oe_gl_account", "oe_gl_fiscal_year", "oe_gl_period", "oe_gl_journal_entry", "oe_gl_journal_line",
-    "oe_sales_document", "oe_sales_line", "oe_sales_payment", "oe_sales_sequence", "oe_sales_account_map",
+    "oe_gl_account",
+    "oe_gl_fiscal_year",
+    "oe_gl_period",
+    "oe_gl_journal_entry",
+    "oe_gl_journal_line",
+    "oe_sales_document",
+    "oe_sales_line",
+    "oe_sales_payment",
+    "oe_sales_sequence",
+    "oe_sales_account_map",
 )
 # table -> (old unique columns, new unique name)
 _UNIQUES = {

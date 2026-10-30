@@ -150,7 +150,9 @@ class GLService:
     async def create_account(self, **data: Any) -> GLAccount:
         if data.get("account_type") not in ACCOUNT_TYPES:
             raise GLValidationError(f"account_type must be one of {ACCOUNT_TYPES}")
-        exists = await self.session.scalar(select(GLAccount.id).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == data["code"]))
+        exists = await self.session.scalar(
+            select(GLAccount.id).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == data["code"])
+        )
         if exists:
             raise GLConflictError(f"Account code {data['code']} already exists")
         acc = GLAccount(**data, tenant_id=self.tenant_id)
@@ -201,22 +203,43 @@ class GLService:
         overlap = await self.session.scalar(
             select(GLFiscalYear.id).where(
                 GLFiscalYear.tenant_id == self.tenant_id,
-                GLFiscalYear.start_date <= end_date, GLFiscalYear.end_date >= start_date)
+                GLFiscalYear.start_date <= end_date,
+                GLFiscalYear.end_date >= start_date,
+            )
         )
         if overlap:
             raise GLConflictError("Fiscal year overlaps an existing one")
-        fy = GLFiscalYear(tenant_id=self.tenant_id, name=name, start_date=start_date, end_date=end_date, status=PERIOD_OPEN, last_number=0)
+        fy = GLFiscalYear(
+            tenant_id=self.tenant_id,
+            name=name,
+            start_date=start_date,
+            end_date=end_date,
+            status=PERIOD_OPEN,
+            last_number=0,
+        )
         cur, n = start_date, 1
         while cur <= end_date:
             end = min(_month_end(cur), end_date)
-            fy.periods.append(GLPeriod(tenant_id=self.tenant_id, name=f"{name}-{n:02d}", start_date=cur, end_date=end, status=PERIOD_OPEN))
+            fy.periods.append(
+                GLPeriod(
+                    tenant_id=self.tenant_id, name=f"{name}-{n:02d}", start_date=cur, end_date=end, status=PERIOD_OPEN
+                )
+            )
             cur, n = end + timedelta(days=1), n + 1
         self.session.add(fy)
         await self.session.flush()
         return fy
 
     async def list_fiscal_years(self) -> list[GLFiscalYear]:
-        return list((await self.session.execute(select(GLFiscalYear).where(GLFiscalYear.tenant_id == self.tenant_id).order_by(GLFiscalYear.start_date))).scalars())
+        return list(
+            (
+                await self.session.execute(
+                    select(GLFiscalYear)
+                    .where(GLFiscalYear.tenant_id == self.tenant_id)
+                    .order_by(GLFiscalYear.start_date)
+                )
+            ).scalars()
+        )
 
     async def set_period_status(self, period_id: uuid.UUID, status: str) -> GLPeriod:
         if status not in (PERIOD_OPEN, PERIOD_CLOSED):
@@ -230,7 +253,9 @@ class GLService:
 
     async def period_for(self, on: date) -> GLPeriod:
         period = await self.session.scalar(
-            select(GLPeriod).where(GLPeriod.tenant_id == self.tenant_id, GLPeriod.start_date <= on, GLPeriod.end_date >= on)
+            select(GLPeriod).where(
+                GLPeriod.tenant_id == self.tenant_id, GLPeriod.start_date <= on, GLPeriod.end_date >= on
+            )
         )
         if period is None:
             raise GLValidationError(f"No accounting period covers {on}")
@@ -254,7 +279,11 @@ class GLService:
         limit: int = 200,
         offset: int = 0,
     ) -> list[GLJournalEntry]:
-        stmt = select(GLJournalEntry).where(GLJournalEntry.tenant_id == self.tenant_id).order_by(GLJournalEntry.entry_date, GLJournalEntry.seq)
+        stmt = (
+            select(GLJournalEntry)
+            .where(GLJournalEntry.tenant_id == self.tenant_id)
+            .order_by(GLJournalEntry.entry_date, GLJournalEntry.seq)
+        )
         if status:
             stmt = stmt.where(GLJournalEntry.status == status)
         if date_from:
@@ -269,7 +298,14 @@ class GLService:
 
     async def _check_accounts(self, lines: list[LineInput]) -> None:
         ids = {ln.account_id for ln in lines}
-        accs = {a.id: a for a in (await self.session.execute(select(GLAccount).where(GLAccount.tenant_id == self.tenant_id, GLAccount.id.in_(ids)))).scalars()}
+        accs = {
+            a.id: a
+            for a in (
+                await self.session.execute(
+                    select(GLAccount).where(GLAccount.tenant_id == self.tenant_id, GLAccount.id.in_(ids))
+                )
+            ).scalars()
+        }
         for aid in ids:
             acc = accs.get(aid)
             if acc is None:
@@ -431,9 +467,7 @@ class GLService:
         return rev
 
     # ── Reports ───────────────────────────────────────────────────────────
-    async def _sums(
-        self, *, date_from: date | None, date_to: date | None
-    ) -> dict[uuid.UUID, tuple[Decimal, Decimal]]:
+    async def _sums(self, *, date_from: date | None, date_to: date | None) -> dict[uuid.UUID, tuple[Decimal, Decimal]]:
         from sqlalchemy import func
 
         stmt = (
@@ -495,9 +529,7 @@ class GLService:
         acc = await self.get_account(account_id)
         opening = ZERO
         if date_from:
-            dr, cr = (await self._sums(date_from=None, date_to=date_from - timedelta(days=1))).get(
-                acc.id, (ZERO, ZERO)
-            )
+            dr, cr = (await self._sums(date_from=None, date_to=date_from - timedelta(days=1))).get(acc.id, (ZERO, ZERO))
             opening = dr - cr
         stmt = (
             select(GLJournalLine, GLJournalEntry)
@@ -641,8 +673,13 @@ class GLService:
         if len(data) > self.MAX_ATTACHMENT:
             raise GLValidationError("File is larger than 10 MB")
         att = GLAttachment(
-            tenant_id=self.tenant_id, entry_id=entry_id, filename=(filename or "file")[:255],
-            content_type=content_type or "application/octet-stream", size=len(data), data=data, uploaded_by=by,
+            tenant_id=self.tenant_id,
+            entry_id=entry_id,
+            filename=(filename or "file")[:255],
+            content_type=content_type or "application/octet-stream",
+            size=len(data),
+            data=data,
+            uploaded_by=by,
         )
         self.session.add(att)
         await self.session.flush()

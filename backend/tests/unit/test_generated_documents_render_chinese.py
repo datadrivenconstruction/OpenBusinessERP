@@ -683,8 +683,6 @@ def build_invoice_page(*, chinese: bool) -> bytes:
     return _readable_pdf(build_einvoice(invoice=payload, line_items=lines, profile="zugferd"), "de")
 
 
-
-
 def test_a_chinese_invoice_renders_its_chinese() -> None:
     data = build_invoice_page(chinese=True)
     assert pdf_fonts.CJK_FONT in referenced_faces(data)
@@ -1405,8 +1403,6 @@ def first_line_not_redrawn[T](was: list[T], now: list[T]) -> T | None:
     return None
 
 
-
-
 # ── The AIA summary tables ──────────────────────────────────────────────────
 #
 # The commit that faced every Paragraph in this document said, in its own
@@ -1564,8 +1560,6 @@ def test_a_latin_methodology_built_after_a_chinese_one_is_unaffected() -> None:
     per-process switch would show up here."""
     methodology_export(name=CN_METHODOLOGY, step=CN_STEP)
     assert_renders(methodology_export(), "Unit rate method", "Overheads")
-
-
 
 
 # ── Why the Brazilian invoice needs no font commands, and what protects that ──

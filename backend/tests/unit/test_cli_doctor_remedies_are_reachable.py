@@ -195,9 +195,7 @@ class TestTheServerInstallStillGetsPipAdvice:
 
     def test_pip_advice_survives_where_pip_exists(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(sys, "frozen", False, raising=False)
-        assert (
-            cli._repair_hint("pip install 'openbusinesserp[vector]'") == "pip install 'openbusinesserp[vector]'"
-        )
+        assert cli._repair_hint("pip install 'openbusinesserp[vector]'") == "pip install 'openbusinesserp[vector]'"
 
     def test_the_bundle_gets_the_bundle_answer(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(sys, "frozen", True, raising=False)

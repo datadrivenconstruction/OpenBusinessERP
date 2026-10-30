@@ -16,7 +16,7 @@ export const crmGuide: ModuleGuideContent = {
   titleDefault: 'CRM',
   introKey: 'guide.crm.intro',
   introDefault:
-    'CRM is your sales pipeline for winning new work. Qualify leads, track deals as they move stage by stage on a Kanban board, log every call and email, and hand a won deal straight to delivery. Use it from first enquiry to signed contract.',
+    'CRM is your sales pipeline for winning new customers. Qualify leads, track deals as they move stage by stage on a Kanban board, log every call and email, and turn a won deal straight into a quote. Use it from first enquiry to signed order.',
   sections: [
     {
       icon: 'Workflow',
@@ -64,7 +64,7 @@ export const crmGuide: ModuleGuideContent = {
       titleDefault: 'Close it, then hand it on',
       bodyKey: 'guide.crm.close.body',
       bodyDefault:
-        'Open a deal and use Win or Lose to close it, recording a win or loss reason for later analysis. A won deal links on to Bid Management and Contracts, and the Insights tab turns your win and loss history into rates, cycle times and reasons.',
+        'Open a deal and use Win or Lose to close it, recording a win or loss reason for later analysis. A won deal turns into a quote in Quotes & invoices, and the Insights tab turns your win and loss history into rates, cycle times and reasons.',
     },
   ],
   ctaKey: 'guide.crm.cta',

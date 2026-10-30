@@ -91,15 +91,21 @@ async def test_price_resolution(svc):
     assert (res.unit_price, res.source) == (D("10.0000"), "item")
 
     await svc.create_price_list(
-        name="Generic", currency="EUR",
-        items=[{"item_id": item.id, "min_qty": D(0), "unit_price": D("9")},
-               {"item_id": item.id, "min_qty": D(10), "unit_price": D("8")}],
+        name="Generic",
+        currency="EUR",
+        items=[
+            {"item_id": item.id, "min_qty": D(0), "unit_price": D("9")},
+            {"item_id": item.id, "min_qty": D(10), "unit_price": D("8")},
+        ],
     )
     assert (await svc.resolve_price(item.id, D(5), DAY)).unit_price == D("9.0000")
     assert (await svc.resolve_price(item.id, D(10), DAY)).unit_price == D("8.0000")
 
     vip = await svc.create_price_list(
-        name="VIP", customer_group="vip", valid_from=date(2026, 1, 1), valid_to=date(2026, 6, 30),
+        name="VIP",
+        customer_group="vip",
+        valid_from=date(2026, 1, 1),
+        valid_to=date(2026, 6, 30),
         items=[{"item_id": item.id, "min_qty": D(0), "unit_price": D("7.5")}],
     )
     res = await svc.resolve_price(item.id, D(1), DAY, customer_group="vip")
@@ -110,7 +116,9 @@ async def test_price_resolution(svc):
     await svc.create_price_list(
         name="ACME", customer_id=CUST, items=[{"item_id": item.id, "min_qty": D(0), "unit_price": D("7")}]
     )
-    assert (await svc.resolve_price(item.id, D(1), DAY, customer_id=CUST, customer_group="vip")).unit_price == D("7.0000")
+    assert (await svc.resolve_price(item.id, D(1), DAY, customer_id=CUST, customer_group="vip")).unit_price == D(
+        "7.0000"
+    )
 
     # Largest applicable discount wins; min_qty respected.
     await svc.create_discount_rule(name="Cat 5%", category_id=cat.id, discount_pct=D(5))
@@ -131,9 +139,7 @@ async def test_price_list_validation_and_replace(svc):
     with pytest.raises(ItemsValidationError):
         await svc.create_price_list(name="Bad", valid_from=date(2026, 2, 1), valid_to=date(2026, 1, 1))
     with pytest.raises(ItemsValidationError):
-        await svc.create_price_list(
-            name="Dup", items=[{"item_id": item.id, "min_qty": D(1), "unit_price": D(1)}] * 2
-        )
+        await svc.create_price_list(name="Dup", items=[{"item_id": item.id, "min_qty": D(1), "unit_price": D(1)}] * 2)
     pl = await svc.create_price_list(name="L", items=[{"item_id": item.id, "min_qty": D(0), "unit_price": D(3)}])
     pl = await svc.update_price_list(pl.id, items=[{"item_id": item.id, "min_qty": D(5), "unit_price": D(2)}])
     assert [(r.min_qty, r.unit_price) for r in pl.items] == [(D(5), D(2))]

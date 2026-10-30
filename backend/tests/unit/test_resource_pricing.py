@@ -103,8 +103,6 @@ def test_resource_key_codeless_same_name_same_key():
 # ── seeding ──────────────────────────────────────────────────────────────────
 
 
-
-
 @pytest.mark.asyncio
 async def test_seed_priced_base_keeps_observed_price(session):
     region = "ES_SEEDTEST"
@@ -362,8 +360,6 @@ def test_component_quantity_tells_absent_from_zero():
     # Legacy alias, and only when the canonical key carries nothing.
     assert component_quantity({"factor": 0.18}) == Decimal("0.18")
     assert component_quantity({"quantity": 3, "factor": 9}) == Decimal("3")
-
-
 
 
 @pytest.mark.asyncio

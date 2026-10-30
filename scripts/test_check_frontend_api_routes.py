@@ -213,7 +213,7 @@ def test_the_lifespan_aliases_are_read_from_main() -> None:
     mounts = guard._lifespan_mounts(REPO_ROOT / "backend" / "app" / "main.py")
     prefixes = {prefix for _, _, prefix in mounts}
     assert "/api/v1/variations" in prefixes
-    assert "/api/v1/coordination" in prefixes
+    assert "/api/v1/procurement/tenders" in prefixes
     assert all(module.startswith("app.") for module, _, _ in mounts)
 
 

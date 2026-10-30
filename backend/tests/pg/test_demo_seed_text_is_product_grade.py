@@ -88,7 +88,6 @@ def _seeder_calls(project_ids: list[uuid.UUID]) -> list[tuple[str, object]]:
     the first one and hiding the rest.
     """
     from app.modules.bid_management.seed import seed_bid_management_demo
-    from app.modules.bim_hub.seed import seed_bim_hub
     from app.modules.contracts.seed import seed_contracts_demo
     from app.modules.crm.seed import seed_crm_demo
     from app.modules.moc.seed import seed_moc
@@ -110,7 +109,6 @@ def _seeder_calls(project_ids: list[uuid.UUID]) -> list[tuple[str, object]]:
         ("bid_management", lambda s: seed_bid_management_demo(s, project_ids)),
         ("norm_expansion", lambda s: seed_norm_expansion(s)),
         ("supplier_catalogs", lambda s: seed_supplier_catalogs(s, project_ids[0])),
-        ("bim_hub", lambda s: seed_bim_hub(s, list(project_ids))),
         ("price_index", lambda s: seed_price_index_demo(s)),
         ("property_dev", lambda s: seed_property_dev_demo(s, project_ids)),
     ]

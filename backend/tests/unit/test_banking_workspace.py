@@ -73,8 +73,13 @@ async def _setup(session, tenant="default"):
 
 
 async def _invoice(sales, name, net):
-    inv = await sales.create("invoice", lines=[LineData("Work", "", D(1), D(net), D(0), D(19))],
-                             doc_date=DAY, due_date=date(2026, 3, 10), customer_name=name)
+    inv = await sales.create(
+        "invoice",
+        lines=[LineData("Work", "", D(1), D(net), D(0), D(19))],
+        doc_date=DAY,
+        due_date=date(2026, 3, 10),
+        customer_name=name,
+    )
     return await sales.issue_invoice(inv.id)
 
 
@@ -108,8 +113,9 @@ async def test_summary_bulk_accept_and_rules(session):
         await ws.create_rule(name="Bad", pattern="office", account_code="NOPE")
     with pytest.raises(BankingValidationError):
         await ws.create_rule(name="Bad", pattern="/[x/", account_code="4930")
-    rule = await ws.create_rule(name="Office", match_field="counterparty", pattern="office supply",
-                                direction="out", account_code="4930")
+    rule = await ws.create_rule(
+        name="Office", match_field="counterparty", pattern="office supply", direction="out", account_code="4930"
+    )
     fee = next(t for t in await ws.list_transactions(acc.id) if t.amount == D("-45.90"))
     assert (await ws.rule_for(fee.id)).id == rule.id
     dry = await ws.apply_rules(dry_run=True)
@@ -140,7 +146,7 @@ async def test_rules_are_tenant_scoped(session):
 
 
 _CAMT_BAL = (
-    "<Bal><Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp><Amt Ccy=\"EUR\">250.50</Amt>"
+    '<Bal><Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp><Amt Ccy="EUR">250.50</Amt>'
     "<CdtDbtInd>DBIT</CdtDbtInd><Dt><Dt>2026-03-10</Dt></Dt></Bal>"
 )
 

@@ -62,18 +62,34 @@ def test_parse_mt940():
 
 def test_parse_csv_semicolon_comma_decimal():
     data = (FIX / "csv_semicolon_comma.csv").read_bytes()
-    mapping = {"date": "Buchungstag", "value_date": "Wertstellung", "amount": "Betrag", "currency": "Währung",
-               "counterparty_name": "Empfänger/Auftraggeber", "counterparty_iban": "IBAN",
-               "remittance": "Verwendungszweck"}
+    mapping = {
+        "date": "Buchungstag",
+        "value_date": "Wertstellung",
+        "amount": "Betrag",
+        "currency": "Währung",
+        "counterparty_name": "Empfänger/Auftraggeber",
+        "counterparty_iban": "IBAN",
+        "remittance": "Verwendungszweck",
+    }
     t1, t2 = parse_csv(data, mapping)
-    assert (t1.amount, t1.booking_date, t1.counterparty_iban) == (D("1190.00"), date(2026, 3, 11), "DE02120300000000202051")
+    assert (t1.amount, t1.booking_date, t1.counterparty_iban) == (
+        D("1190.00"),
+        date(2026, 3, 11),
+        "DE02120300000000202051",
+    )
     assert t2.amount == D("-45.90") and t1.reference == "" and t1.dedupe_key.startswith("h:")
 
 
 def test_parse_csv_comma_debit_credit():
     data = (FIX / "csv_comma_dot.csv").read_text()
-    mapping = {"date": "date", "debit": "debit", "credit": "credit", "counterparty_name": "payee",
-               "remittance": "memo", "reference": "ref"}
+    mapping = {
+        "date": "date",
+        "debit": "debit",
+        "credit": "credit",
+        "counterparty_name": "payee",
+        "remittance": "memo",
+        "reference": "ref",
+    }
     t1, t2 = parse_csv(data, mapping)
     assert t1.amount == D("1190.00") and t2.amount == D("-45.90") and t1.reference == "TX-1"
 
@@ -135,8 +151,13 @@ async def _setup(session, tenant="default"):
 
 
 async def _invoice(sales, name, net, due=date(2026, 3, 10)):
-    inv = await sales.create("invoice", lines=[LineData("Work", "", D(1), D(net), D(0), D(19))],
-                             doc_date=DAY, due_date=due, customer_name=name)
+    inv = await sales.create(
+        "invoice",
+        lines=[LineData("Work", "", D(1), D(net), D(0), D(19))],
+        doc_date=DAY,
+        due_date=due,
+        customer_name=name,
+    )
     return await sales.issue_invoice(inv.id)
 
 
@@ -161,7 +182,9 @@ async def test_import_dedupe_and_confirm_posts_payment(session):
     bal = await _assert_tb(gl)
     assert bal["1400"] == 0 and bal["1200"] == D("1190.00")
     # The IBAN is learned for the next suggestion round.
-    learned = await session.scalar(select(BankPartnerIban.iban).where(BankPartnerIban.partner_key == "name:acmebuildersgmbh"))
+    learned = await session.scalar(
+        select(BankPartnerIban.iban).where(BankPartnerIban.partner_key == "name:acmebuildersgmbh")
+    )
     assert learned == "DE02120300000000202051"
 
 
@@ -170,8 +193,12 @@ async def test_partial_and_split(session):
     i1 = await _invoice(sales, "Beta AG", "100")  # 119.00
     i2 = await _invoice(sales, "Beta AG", "200")  # 238.00
     csv = "date;amount;name;text\n2026-03-12;357,00;Beta AG;INV-000001 INV-000002\n2026-03-13;50,00;Beta AG;part\n"
-    await bank.import_statement(acc.id, csv, fmt="csv", mapping={
-        "date": "date", "amount": "amount", "counterparty_name": "name", "remittance": "text"})
+    await bank.import_statement(
+        acc.id,
+        csv,
+        fmt="csv",
+        mapping={"date": "date", "amount": "amount", "counterparty_name": "name", "remittance": "text"},
+    )
     lines = sorted(await bank.list_transactions(acc.id), key=lambda t: t.booking_date)
     split, part = lines
     top = (await bank.suggestions(split.id))[0]
@@ -200,8 +227,9 @@ async def test_writeoff_small_difference(session):
 
 async def test_manual_entry_and_overallocation(session):
     gl, _sales, bank, acc = await _setup(session)
-    await bank.import_statement(acc.id, "d;a;t\n2026-03-12;-12,00;fees\n", fmt="csv",
-                                mapping={"date": "d", "amount": "a", "remittance": "t"})
+    await bank.import_statement(
+        acc.id, "d;a;t\n2026-03-12;-12,00;fees\n", fmt="csv", mapping={"date": "d", "amount": "a", "remittance": "t"}
+    )
     (txn,) = await bank.list_transactions(acc.id)
     await bank.manual_entry(txn.id, account_code="4970")
     assert txn.status == "matched"
@@ -214,11 +242,16 @@ async def test_manual_entry_and_overallocation(session):
 async def test_supplier_bill_payment(session):
     gl, _sales, bank, acc = await _setup(session)
     purch = PurchasingService(session)
-    bill = await purch.create_bill(lines=[PLine("Material", "", D(1), D(100), D(19))],
-                                   supplier_name="Supplier GmbH", doc_date=DAY)
+    bill = await purch.create_bill(
+        lines=[PLine("Material", "", D(1), D(100), D(19))], supplier_name="Supplier GmbH", doc_date=DAY
+    )
     await purch.post_bill(bill.id)
-    await bank.import_statement(acc.id, "d;a;n\n2026-03-12;-119,00;Supplier GmbH\n", fmt="csv",
-                                mapping={"date": "d", "amount": "a", "counterparty_name": "n"})
+    await bank.import_statement(
+        acc.id,
+        "d;a;n\n2026-03-12;-119,00;Supplier GmbH\n",
+        fmt="csv",
+        mapping={"date": "d", "amount": "a", "counterparty_name": "n"},
+    )
     (txn,) = await bank.list_transactions(acc.id)
     top = (await bank.suggestions(txn.id))[0]
     assert top.allocations[0].id == bill.id
@@ -266,8 +299,9 @@ async def test_supplier_writeoff_default_account_and_undo(session):
     cfg = await bank.settings()
     cfg.writeoff_account_code = ""  # resolve the default from the SKR03 chart
     purch = PurchasingService(session)
-    bill = await purch.create_bill(lines=[PLine("Material", "", D(1), D(100), D(19))],
-                                   supplier_name="Supplier GmbH", doc_date=DAY)
+    bill = await purch.create_bill(
+        lines=[PLine("Material", "", D(1), D(100), D(19))], supplier_name="Supplier GmbH", doc_date=DAY
+    )
     await purch.post_bill(bill.id)
     await bank.import_statement(acc.id, "d;a\n2026-03-12;-118,00\n", fmt="csv", mapping={"date": "d", "amount": "a"})
     (txn,) = await bank.list_transactions(acc.id)

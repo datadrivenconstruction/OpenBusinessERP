@@ -30,9 +30,13 @@ _TABLES = (
 
 def _base(table: str) -> list:
     return [
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column("id", sa.String(36), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
         sa.Column("tenant_id", sa.String(36), nullable=False, server_default="default"),
         sa.PrimaryKeyConstraint("id", name=f"pk_{table}"),
     ]
@@ -51,14 +55,14 @@ def _str(name: str, length: int, default: str = "") -> sa.Column:
 
 
 def _fk(name: str, target: str, ondelete: str, nullable: bool) -> sa.Column:
-    return sa.Column(name, sa.Uuid(), sa.ForeignKey(f"{target}.id", ondelete=ondelete), nullable=nullable)
+    return sa.Column(name, sa.String(36), sa.ForeignKey(f"{target}.id", ondelete=ondelete), nullable=nullable)
 
 
 def _header() -> list:
     return [
         _str("number", 32),
         _str("status", 24, "draft"),
-        sa.Column("supplier_id", sa.Uuid(), nullable=True),
+        sa.Column("supplier_id", sa.String(36), nullable=True),
         _str("supplier_name", 255),
         _str("currency", 3, "EUR"),
         sa.Column("fx_rate", sa.Numeric(20, 10), nullable=False, server_default="1"),
@@ -75,7 +79,7 @@ def _header() -> list:
 def _line() -> list:
     return [
         sa.Column("line_no", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("item_id", sa.Uuid(), nullable=True),
+        sa.Column("item_id", sa.String(36), nullable=True),
         _str("sku", 64),
         _str("description", 500),
         _num("qty", "1"),
@@ -98,7 +102,9 @@ def upgrade() -> None:
     t = "oe_purchasing_order"
     if t not in existing:
         op.create_table(
-            t, *_base(t), *_header(),
+            t,
+            *_base(t),
+            *_header(),
             sa.UniqueConstraint("tenant_id", "number", name="uq_oe_purchasing_order_tenant_number"),
         )
         _index(t, "tenant_id", "number", "status", "supplier_id")
@@ -106,7 +112,8 @@ def upgrade() -> None:
     t = "oe_purchasing_order_line"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _fk("order_id", "oe_purchasing_order", "CASCADE", False),
             *_line(),
             _num("qty_received"),
@@ -117,7 +124,8 @@ def upgrade() -> None:
     t = "oe_purchasing_receipt"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _str("number", 32),
             _str("status", 24, "posted"),
             _fk("order_id", "oe_purchasing_order", "CASCADE", False),
@@ -127,7 +135,7 @@ def upgrade() -> None:
             sa.Column("fx_rate", sa.Numeric(20, 10), nullable=False, server_default="1"),
             sa.Column("doc_date", sa.Date(), nullable=False),
             _money("value_total"),
-            sa.Column("gl_entry_id", sa.Uuid(), nullable=True),
+            sa.Column("gl_entry_id", sa.String(36), nullable=True),
             sa.Column("notes", sa.Text(), nullable=False, server_default=""),
             sa.Column("created_by", sa.String(64), nullable=True),
             sa.UniqueConstraint("tenant_id", "number", name="uq_oe_purchasing_receipt_tenant_number"),
@@ -137,11 +145,12 @@ def upgrade() -> None:
     t = "oe_purchasing_receipt_line"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _fk("receipt_id", "oe_purchasing_receipt", "CASCADE", False),
             _fk("order_line_id", "oe_purchasing_order_line", "CASCADE", False),
             sa.Column("line_no", sa.Integer(), nullable=False, server_default="0"),
-            sa.Column("item_id", sa.Uuid(), nullable=True),
+            sa.Column("item_id", sa.String(36), nullable=True),
             _str("sku", 64),
             _str("description", 500),
             sa.Column("qty", sa.Numeric(18, 4), nullable=False),
@@ -154,7 +163,9 @@ def upgrade() -> None:
     t = "oe_purchasing_bill"
     if t not in existing:
         op.create_table(
-            t, *_base(t), *_header(),
+            t,
+            *_base(t),
+            *_header(),
             _str("kind", 16, "bill"),
             _str("supplier_ref", 64),
             _fk("order_id", "oe_purchasing_order", "SET NULL", True),
@@ -162,15 +173,27 @@ def upgrade() -> None:
             _fk("source_id", "oe_purchasing_bill", "SET NULL", True),
             _money("amount_paid"),
             _str("match_status", 24, "none"),
-            sa.Column("gl_entry_id", sa.Uuid(), nullable=True),
+            sa.Column("gl_entry_id", sa.String(36), nullable=True),
             sa.UniqueConstraint("tenant_id", "kind", "number", name="uq_oe_purchasing_bill_tenant_kind_number"),
         )
-        _index(t, "tenant_id", "kind", "number", "status", "supplier_id", "order_id", "receipt_id", "source_id", "match_status")
+        _index(
+            t,
+            "tenant_id",
+            "kind",
+            "number",
+            "status",
+            "supplier_id",
+            "order_id",
+            "receipt_id",
+            "source_id",
+            "match_status",
+        )
 
     t = "oe_purchasing_bill_line"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _fk("bill_id", "oe_purchasing_bill", "CASCADE", False),
             _fk("order_line_id", "oe_purchasing_order_line", "SET NULL", True),
             *_line(),
@@ -181,21 +204,23 @@ def upgrade() -> None:
     t = "oe_purchasing_payment"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _fk("bill_id", "oe_purchasing_bill", "CASCADE", False),
             sa.Column("pay_date", sa.Date(), nullable=False),
             sa.Column("amount", sa.Numeric(18, 2), nullable=False),
             _str("method", 32, "bank_transfer"),
             _str("reference", 128),
-            sa.Column("gl_entry_id", sa.Uuid(), nullable=True),
+            sa.Column("gl_entry_id", sa.String(36), nullable=True),
         )
         _index(t, "tenant_id", "bill_id")
 
     t = "oe_purchasing_stock"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
-            sa.Column("item_id", sa.Uuid(), nullable=False),
+            t,
+            *_base(t),
+            sa.Column("item_id", sa.String(36), nullable=False),
             _str("sku", 64),
             _num("qty"),
             _money("value"),
@@ -206,7 +231,8 @@ def upgrade() -> None:
     t = "oe_purchasing_sequence"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _str("kind", 16),
             sa.Column("last_number", sa.Integer(), nullable=False, server_default="0"),
             sa.UniqueConstraint("tenant_id", "kind", name="uq_oe_purchasing_sequence_tenant_kind"),
@@ -216,7 +242,8 @@ def upgrade() -> None:
     t = "oe_purchasing_account_map"
     if t not in existing:
         op.create_table(
-            t, *_base(t),
+            t,
+            *_base(t),
             _str("role", 32),
             _str("account_code", 32),
             sa.UniqueConstraint("tenant_id", "role", name="uq_oe_purchasing_account_map_tenant_role"),

@@ -545,8 +545,6 @@ def test_text_that_looks_like_a_formula_comes_back_as_it_was_typed(
     assert _FORMULA_TEXT in [str(record.get(field, "")) for record in parse(blob)]
 
 
-
-
 # -- Import errors name the row the spreadsheet shows ------------------------------
 
 

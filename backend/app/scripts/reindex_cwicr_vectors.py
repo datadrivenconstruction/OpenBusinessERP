@@ -505,8 +505,7 @@ def _check_infrastructure() -> str | None:
     if backend == "qdrant":
         if not _installed("qdrant_client"):
             return "VECTOR_BACKEND=qdrant but qdrant-client is not installed. " + repair_hint(
-                "Install the client extra and start Qdrant, then rerun: "
-                "pip install openbusinesserp[semantic-clients]"
+                "Install the client extra and start Qdrant, then rerun: pip install openbusinesserp[semantic-clients]"
             )
     elif not _installed("lancedb"):
         return "the LanceDB vector store is not installed. " + repair_hint(

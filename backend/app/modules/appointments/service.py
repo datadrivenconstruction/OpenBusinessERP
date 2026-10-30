@@ -247,7 +247,9 @@ class AppointmentsService:
     # Resources
     async def list_resources(self) -> list[AppointmentResource]:
         q = select(AppointmentResource).where(AppointmentResource.tenant_id == self.tenant_id)
-        return list((await self.session.execute(q.order_by(AppointmentResource.sort_order, AppointmentResource.name))).scalars())
+        return list(
+            (await self.session.execute(q.order_by(AppointmentResource.sort_order, AppointmentResource.name))).scalars()
+        )
 
     async def get_resource(self, resource_id: uuid.UUID) -> AppointmentResource:
         row = await self.session.get(AppointmentResource, resource_id)
@@ -288,7 +290,9 @@ class AppointmentsService:
     async def get_hours(self, resource_id: uuid.UUID) -> list[AppointmentHours]:
         await self.get_resource(resource_id)
         q = select(AppointmentHours).where(AppointmentHours.resource_id == resource_id)
-        return list((await self.session.execute(q.order_by(AppointmentHours.weekday, AppointmentHours.start_min))).scalars())
+        return list(
+            (await self.session.execute(q.order_by(AppointmentHours.weekday, AppointmentHours.start_min))).scalars()
+        )
 
     async def set_hours(self, resource_id: uuid.UUID, hours: list[dict[str, Any]]) -> list[AppointmentHours]:
         await self.get_resource(resource_id)
@@ -298,8 +302,16 @@ class AppointmentsService:
             if h.get("kind", "work") not in ("work", "break"):
                 raise AppointmentsValidationError("Hours kind must be work or break")
         await self.session.execute(delete(AppointmentHours).where(AppointmentHours.resource_id == resource_id))
-        rows = [AppointmentHours(resource_id=resource_id, kind=h.get("kind", "work"), weekday=h["weekday"],
-                                 start_min=h["start_min"], end_min=h["end_min"]) for h in hours]
+        rows = [
+            AppointmentHours(
+                resource_id=resource_id,
+                kind=h.get("kind", "work"),
+                weekday=h["weekday"],
+                start_min=h["start_min"],
+                end_min=h["end_min"],
+            )
+            for h in hours
+        ]
         self.session.add_all(rows)
         await self.session.flush()
         return rows
@@ -341,8 +353,9 @@ class AppointmentsService:
             resources = [r for r in resources if r.id == resource_id]
         return resources
 
-    async def _busy(self, resource_id: uuid.UUID, start: datetime, end: datetime,
-                    exclude: set[uuid.UUID] | None = None) -> list[tuple[datetime, datetime]]:
+    async def _busy(
+        self, resource_id: uuid.UUID, start: datetime, end: datetime, exclude: set[uuid.UUID] | None = None
+    ) -> list[tuple[datetime, datetime]]:
         q = select(AppointmentBooking.id, AppointmentBooking.block_start, AppointmentBooking.block_end).where(
             AppointmentBooking.tenant_id == self.tenant_id,
             AppointmentBooking.resource_id == resource_id,
@@ -379,8 +392,16 @@ class AppointmentsService:
             for i in range(days):
                 day = from_date + timedelta(days=i)
                 windows = day_windows(day.weekday(), hours, [e for e in exceptions if e.day == day])
-                for s in free_slots(day, windows, busy, svc.duration_min, svc.buffer_before_min,
-                                    svc.buffer_after_min, settings.slot_step_min, not_before):
+                for s in free_slots(
+                    day,
+                    windows,
+                    busy,
+                    svc.duration_min,
+                    svc.buffer_before_min,
+                    svc.buffer_after_min,
+                    settings.slot_step_min,
+                    not_before,
+                ):
                     out.append((s, res.id))
         out.sort(key=lambda x: (x[0], str(x[1])))
         return out[:limit]
@@ -415,8 +436,9 @@ class AppointmentsService:
     def _blocks(svc: AppointmentService, start: datetime, end: datetime) -> tuple[datetime, datetime]:
         return start - timedelta(minutes=svc.buffer_before_min), end + timedelta(minutes=svc.buffer_after_min)
 
-    async def _assert_free(self, resource_id: uuid.UUID, bs: datetime, be: datetime,
-                           exclude: set[uuid.UUID] | None = None) -> None:
+    async def _assert_free(
+        self, resource_id: uuid.UUID, bs: datetime, be: datetime, exclude: set[uuid.UUID] | None = None
+    ) -> None:
         if await self._busy(resource_id, bs, be, exclude):
             raise AppointmentsConflictError("The resource is already booked at this time")
 
@@ -507,11 +529,24 @@ class AppointmentsService:
         rows: list[AppointmentBooking] = []
         for s, e, bs, be in occurrences:
             row = AppointmentBooking(
-                tenant_id=self.tenant_id, service_id=svc.id, resource_id=resource_id, contact_id=contact_id,
-                client_name=client_name.strip(), client_email=(client_email or "").strip(),
-                client_phone=(client_phone or "").strip(), start_at=s, end_at=e, block_start=bs, block_end=be,
-                status=status, source=source, notes=notes or "", cancel_token=secrets.token_urlsafe(32),
-                consent_at=consent_at, series_id=series_id, created_by=created_by,
+                tenant_id=self.tenant_id,
+                service_id=svc.id,
+                resource_id=resource_id,
+                contact_id=contact_id,
+                client_name=client_name.strip(),
+                client_email=(client_email or "").strip(),
+                client_phone=(client_phone or "").strip(),
+                start_at=s,
+                end_at=e,
+                block_start=bs,
+                block_end=be,
+                status=status,
+                source=source,
+                notes=notes or "",
+                cancel_token=secrets.token_urlsafe(32),
+                consent_at=consent_at,
+                series_id=series_id,
+                created_by=created_by,
             )
             self.session.add(row)
             await self.session.flush()
@@ -594,8 +629,13 @@ class AppointmentsService:
             tax_rate=tax_rate,
         )
         doc = await SalesService(self.session, self.tenant_id).create(
-            "invoice", lines=[line], customer_id=row.contact_id, customer_name=row.client_name,
-            currency=svc.currency, created_by=created_by, notes=f"Appointment {row.id}",
+            "invoice",
+            lines=[line],
+            customer_id=row.contact_id,
+            customer_name=row.client_name,
+            currency=svc.currency,
+            created_by=created_by,
+            notes=f"Appointment {row.id}",
         )
         row.invoice_id = doc.id
         await self.session.flush()
@@ -647,13 +687,25 @@ class AppointmentsService:
         due = row.start_at - timedelta(hours=settings.reminder_hours)
         if row.start_at <= datetime.now():
             return
-        existing = await self.session.scalar(select(AppointmentReminder).where(
-            AppointmentReminder.booking_id == row.id, AppointmentReminder.status == "queued"))
+        existing = await self.session.scalar(
+            select(AppointmentReminder).where(
+                AppointmentReminder.booking_id == row.id, AppointmentReminder.status == "queued"
+            )
+        )
         if existing is not None:
             existing.due_at, existing.recipient = due, row.client_email
         else:
-            self.session.add(AppointmentReminder(tenant_id=self.tenant_id, booking_id=row.id, channel="email",
-                                                 recipient=row.client_email, due_at=due, status="queued", detail=""))
+            self.session.add(
+                AppointmentReminder(
+                    tenant_id=self.tenant_id,
+                    booking_id=row.id,
+                    channel="email",
+                    recipient=row.client_email,
+                    due_at=due,
+                    status="queued",
+                    detail="",
+                )
+            )
         await self.session.flush()
 
     async def _reschedule_reminder(self, row: AppointmentBooking) -> None:
@@ -709,15 +761,24 @@ class AppointmentsService:
             raise AppointmentsValidationError("Only upcoming bookings can get a reminder")
         if not booking.client_email:
             raise AppointmentsValidationError("The booking has no email address")
-        existing = await self.session.scalar(select(AppointmentReminder).where(
-            AppointmentReminder.booking_id == booking.id,
-            AppointmentReminder.status.in_(("queued", "draft"))))
+        existing = await self.session.scalar(
+            select(AppointmentReminder).where(
+                AppointmentReminder.booking_id == booking.id, AppointmentReminder.status.in_(("queued", "draft"))
+            )
+        )
         if existing is not None:
             existing.status, existing.recipient = "draft", booking.client_email
             await self.session.flush()
             return existing
-        row = AppointmentReminder(tenant_id=self.tenant_id, booking_id=booking.id, channel="email",
-                                  recipient=booking.client_email, due_at=datetime.now(), status="draft", detail="")
+        row = AppointmentReminder(
+            tenant_id=self.tenant_id,
+            booking_id=booking.id,
+            channel="email",
+            recipient=booking.client_email,
+            due_at=datetime.now(),
+            status="draft",
+            detail="",
+        )
         self.session.add(row)
         await self.session.flush()
         return row
@@ -729,8 +790,16 @@ class AppointmentsService:
             raise AppointmentsNotFoundError("Booking not found")
         svc = await self.session.get(AppointmentService, booking.service_id)
         subject, body = reminder_text(await self.get_settings(), booking, svc.name if svc else "")
-        return {"id": rem.id, "booking_id": booking.id, "recipient": rem.recipient, "status": rem.status,
-                "subject": subject, "body": body, "client_name": booking.client_name, "start_at": booking.start_at}
+        return {
+            "id": rem.id,
+            "booking_id": booking.id,
+            "recipient": rem.recipient,
+            "status": rem.status,
+            "subject": subject,
+            "body": body,
+            "client_name": booking.client_name,
+            "start_at": booking.start_at,
+        }
 
     async def mark_reminder(self, reminder_id: uuid.UUID, status: str) -> AppointmentReminder:
         """Record what staff did with a draft: sent by hand, or skipped."""
@@ -751,7 +820,7 @@ def reminder_text(settings: AppointmentSettings, booking: AppointmentBooking, se
     subject = f"Reminder: {service_name} on {when}"
     body = (
         f"Hello {booking.client_name},\n\n"
-        f"this is a reminder of your appointment \"{service_name}\" on {when}"
+        f'this is a reminder of your appointment "{service_name}" on {when}'
         f"{f' with {who}' if who else ''}.\n\n"
         "If you cannot attend, please use the cancellation link from your booking confirmation "
         "or reply to this message.\n"

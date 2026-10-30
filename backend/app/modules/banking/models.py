@@ -57,9 +57,7 @@ class BankStatement(Base):
 
 class BankTransaction(Base):
     __tablename__ = "oe_bank_transaction"
-    __table_args__ = (
-        UniqueConstraint("tenant_id", "account_id", "dedupe_key", name="uq_oe_bank_transaction_dedupe"),
-    )
+    __table_args__ = (UniqueConstraint("tenant_id", "account_id", "dedupe_key", name="uq_oe_bank_transaction_dedupe"),)
 
     tenant_id: Mapped[str] = mapped_column(String(36), nullable=False, default=DEFAULT_TENANT, index=True)
     account_id: Mapped[uuid.UUID] = mapped_column(

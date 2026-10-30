@@ -14,16 +14,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
 from app.modules.purchasing.models import (
+    PurchasingAccountMap,
+    PurchasingBill,
+    PurchasingBillLine,
+    PurchasingOrder,
+    PurchasingOrderLine,
     PurchasingPayment,
     PurchasingReceipt,
     PurchasingReceiptLine,
-    PurchasingOrder,
-    PurchasingOrderLine,
-    PurchasingAccountMap,
     PurchasingSequence,
     PurchasingStock,
-    PurchasingBill,
-    PurchasingBillLine,
 )
 from app.modules.sales.service import default_tax_rate, money
 
@@ -50,12 +50,20 @@ ROLES = ("inventory", "grni", "expense", "input_vat", "payables", "bank")
 # Default account codes per loaded chart template; overridden by oe_purchasing_account_map.
 DEFAULT_ACCOUNTS: dict[str, dict[str, str]] = {
     "de_skr03": {
-        "inventory": "3980", "grni": "1720", "expense": "3400",
-        "input_vat": "1576", "payables": "1600", "bank": "1200",
+        "inventory": "3980",
+        "grni": "1720",
+        "expense": "3400",
+        "input_vat": "1576",
+        "payables": "1600",
+        "bank": "1200",
     },
     "ifrs_generic": {
-        "inventory": "1300", "grni": "2550", "expense": "5000",
-        "input_vat": "1450", "payables": "2200", "bank": "1710",
+        "inventory": "1300",
+        "grni": "2550",
+        "expense": "5000",
+        "input_vat": "1450",
+        "payables": "2200",
+        "bank": "1710",
     },
 }
 
@@ -92,9 +100,7 @@ class LineData:
     discount_pct: Decimal = ZERO
 
 
-def line_amounts(
-    qty: Any, unit_price: Any, tax_rate: Any, discount_pct: Any = 0
-) -> tuple[Decimal, Decimal, Decimal]:
+def line_amounts(qty: Any, unit_price: Any, tax_rate: Any, discount_pct: Any = 0) -> tuple[Decimal, Decimal, Decimal]:
     qty, unit_price, tax_rate = Decimal(str(qty)), Decimal(str(unit_price)), Decimal(str(tax_rate))
     discount_pct = Decimal(str(discount_pct))
     if not ZERO <= discount_pct <= HUNDRED:
@@ -235,7 +241,9 @@ class PurchasingService:
 
         if not ids:
             return {}
-        rows = (await self.session.execute(select(Item).where(Item.tenant_id == self.tenant_id, Item.id.in_(ids)))).scalars()
+        rows = (
+            await self.session.execute(select(Item).where(Item.tenant_id == self.tenant_id, Item.id.in_(ids)))
+        ).scalars()
         return {it.id: it for it in rows}
 
     # ── Purchase orders ───────────────────────────────────────────────────
@@ -405,7 +413,9 @@ class PurchasingService:
             gl_lines.append(LineInput(acc["expense"], debit=other_val, description=gr.number))
         gl_lines.append(LineInput(acc["grni"], credit=gr.value_total, description=f"{gr.number} GRNI"))
         if gr.value_total > 0:
-            entry = await self._post(gr, gl_lines, f"Goods receipt {gr.number} ({po.number})", SOURCE_RECEIPT, str(gr.id), created_by)
+            entry = await self._post(
+                gr, gl_lines, f"Goods receipt {gr.number} ({po.number})", SOURCE_RECEIPT, str(gr.id), created_by
+            )
             gr.gl_entry_id = entry.id
 
         for ln in gr.lines:
@@ -418,7 +428,9 @@ class PurchasingService:
 
     async def _add_stock(self, item_id: uuid.UUID, sku: str, qty: Decimal, value: Decimal) -> None:
         row = await self.session.scalar(
-            select(PurchasingStock).where(PurchasingStock.tenant_id == self.tenant_id, PurchasingStock.item_id == item_id)
+            select(PurchasingStock).where(
+                PurchasingStock.tenant_id == self.tenant_id, PurchasingStock.item_id == item_id
+            )
         )
         if row is None:
             row = PurchasingStock(tenant_id=self.tenant_id, item_id=item_id, sku=sku, qty=ZERO, value=ZERO)
@@ -520,7 +532,10 @@ class PurchasingService:
             await self.get_order(bill.order_id)
         if bill.source_id:
             src = await self.get_bill(bill.source_id, "bill")
-            bill.supplier_id, bill.supplier_name = bill.supplier_id or src.supplier_id, bill.supplier_name or src.supplier_name
+            bill.supplier_id, bill.supplier_name = (
+                bill.supplier_id or src.supplier_id,
+                bill.supplier_name or src.supplier_name,
+            )
         bill.lines = await self._bill_lines(bill, lines)
         bill.payments = []
         _totals(bill)
@@ -539,12 +554,22 @@ class PurchasingService:
         for pl in po.lines:
             open_qty = (pl.qty_received if received else pl.qty) - pl.qty_billed
             if open_qty > 0:
-                lines.append(LineData(pl.description, pl.sku, open_qty, pl.unit_price, pl.tax_rate, pl.item_id, pl.id, pl.discount_pct))
+                lines.append(
+                    LineData(
+                        pl.description, pl.sku, open_qty, pl.unit_price, pl.tax_rate, pl.item_id, pl.id, pl.discount_pct
+                    )
+                )
         if not lines:
             raise PurchasingConflictError("Nothing left to bill on this order")
         return await self.create_bill(
-            "bill", lines=lines, created_by=created_by, order_id=po.id, supplier_id=po.supplier_id,
-            supplier_name=po.supplier_name, currency=po.currency, fx_rate=po.fx_rate,
+            "bill",
+            lines=lines,
+            created_by=created_by,
+            order_id=po.id,
+            supplier_id=po.supplier_id,
+            supplier_name=po.supplier_name,
+            currency=po.currency,
+            fx_rate=po.fx_rate,
         )
 
     async def bill_from_receipt(self, receipt_id: uuid.UUID, created_by: str | None = None) -> PurchasingBill:
@@ -552,12 +577,27 @@ class PurchasingService:
         po = await self.get_order(gr.order_id)
         po_lines = {pl.id: pl for pl in po.lines}
         lines = [
-            LineData(ln.description, ln.sku, ln.qty, ln.unit_cost, po_lines[ln.order_line_id].tax_rate, ln.item_id, ln.order_line_id)
+            LineData(
+                ln.description,
+                ln.sku,
+                ln.qty,
+                ln.unit_cost,
+                po_lines[ln.order_line_id].tax_rate,
+                ln.item_id,
+                ln.order_line_id,
+            )
             for ln in gr.lines
         ]
         return await self.create_bill(
-            "bill", lines=lines, created_by=created_by, order_id=po.id, receipt_id=gr.id,
-            supplier_id=po.supplier_id, supplier_name=po.supplier_name, currency=po.currency, fx_rate=po.fx_rate,
+            "bill",
+            lines=lines,
+            created_by=created_by,
+            order_id=po.id,
+            receipt_id=gr.id,
+            supplier_id=po.supplier_id,
+            supplier_name=po.supplier_name,
+            currency=po.currency,
+            fx_rate=po.fx_rate,
         )
 
     async def update_bill(self, bill_id: uuid.UUID, **data: Any) -> PurchasingBill:
@@ -565,7 +605,16 @@ class PurchasingService:
         if bill.status != "draft":
             raise PurchasingConflictError(f"Only draft bills can be edited (is {bill.status})")
         lines: list[LineData] | None = data.pop("lines", None)
-        for k in ("supplier_id", "supplier_name", "supplier_ref", "currency", "fx_rate", "doc_date", "due_date", "notes"):
+        for k in (
+            "supplier_id",
+            "supplier_name",
+            "supplier_ref",
+            "currency",
+            "fx_rate",
+            "doc_date",
+            "due_date",
+            "notes",
+        ):
             if k in data and data[k] is not None:
                 setattr(bill, k, data[k].upper() if k == "currency" else data[k])
         if lines is not None:
@@ -598,11 +647,15 @@ class PurchasingService:
         acc = await self._accounts("grni", "expense", "input_vat", "payables")
         num = bill.number
         if bill.kind == "credit_note":
-            lines = [LineInput(acc["payables"], debit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip())]
+            lines = [
+                LineInput(acc["payables"], debit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip())
+            ]
             lines.append(LineInput(acc["expense"], credit=bill.net_total, description=num))
             if bill.tax_total:
                 lines.append(LineInput(acc["input_vat"], credit=bill.tax_total, description=f"{num} VAT"))
-            entry = await self._post(bill, lines, f"Supplier credit note {num}", SOURCE_CREDIT, str(bill.id), created_by)
+            entry = await self._post(
+                bill, lines, f"Supplier credit note {num}", SOURCE_CREDIT, str(bill.id), created_by
+            )
             bill.gl_entry_id = entry.id
             bill.status = "posted"
             if bill.source_id:
@@ -635,7 +688,9 @@ class PurchasingService:
             lines.append(_signed(acc["expense"], expense, num))
         if bill.tax_total:
             lines.append(LineInput(acc["input_vat"], debit=bill.tax_total, description=f"{num} VAT"))
-        lines.append(LineInput(acc["payables"], credit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip()))
+        lines.append(
+            LineInput(acc["payables"], credit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip())
+        )
         entry = await self._post(bill, lines, f"Supplier bill {num}", SOURCE_BILL, str(bill.id), created_by)
         bill.gl_entry_id = entry.id
         bill.status = "posted"
@@ -648,7 +703,9 @@ class PurchasingService:
             bill.status = "cancelled"
         elif bill.status == "posted" and not bill.payments and bill.amount_paid == 0:
             if bill.gl_entry_id:
-                await self._gl(self.gl.reverse_entry(bill.gl_entry_id, memo=f"Cancel {bill.number}", created_by=created_by))
+                await self._gl(
+                    self.gl.reverse_entry(bill.gl_entry_id, memo=f"Cancel {bill.number}", created_by=created_by)
+                )
             if bill.order_id and bill.kind == "bill":
                 po_lines = {pl.id: pl for pl in (await self.get_order(bill.order_id)).lines}
                 for ln in bill.lines:
@@ -679,7 +736,11 @@ class PurchasingService:
             raise PurchasingValidationError(f"Payment must be between 0.01 and the outstanding {outstanding}")
         acc = await self._accounts("payables", "bank")
         pay = PurchasingPayment(
-            tenant_id=self.tenant_id, pay_date=pay_date or date.today(), amount=amount, method=method, reference=reference
+            tenant_id=self.tenant_id,
+            pay_date=pay_date or date.today(),
+            amount=amount,
+            method=method,
+            reference=reference,
         )
         bill.payments.append(pay)
         await self.session.flush()
@@ -749,8 +810,10 @@ class PurchasingService:
             select(M).where(M.tenant_id == self.tenant_id), M, statuses, supplier_id, q, date_from, date_to
         )
         if overdue is not None:
-            late = M.due_date.is_not(None) & (M.due_date < (today or date.today())) & M.status.in_(
-                ("confirmed", "partially_received")
+            late = (
+                M.due_date.is_not(None)
+                & (M.due_date < (today or date.today()))
+                & M.status.in_(("confirmed", "partially_received"))
             )
             stmt = stmt.where(late if overdue else ~late)
         cols = {
@@ -859,7 +922,10 @@ class PurchasingService:
         src = await self.get_order(order_id)
         today = date.today()
         return await self.create_order(
-            lines=[LineData(ln.description, ln.sku, ln.qty, ln.unit_price, ln.tax_rate, ln.item_id, None, ln.discount_pct) for ln in src.lines],
+            lines=[
+                LineData(ln.description, ln.sku, ln.qty, ln.unit_price, ln.tax_rate, ln.item_id, None, ln.discount_pct)
+                for ln in src.lines
+            ],
             doc_date=today,
             created_by=created_by,
             due_date=today + (src.due_date - src.doc_date) if src.due_date else None,
@@ -870,13 +936,18 @@ class PurchasingService:
             notes=src.notes,
         )
 
-    async def duplicate_bill(self, bill_id: uuid.UUID, kind: str | None = None, created_by: str | None = None) -> PurchasingBill:
+    async def duplicate_bill(
+        self, bill_id: uuid.UUID, kind: str | None = None, created_by: str | None = None
+    ) -> PurchasingBill:
         """Fresh draft with the same header and lines; no order, receipt, source or payments are carried over."""
         src = await self.get_bill(bill_id, kind)
         today = date.today()
         return await self.create_bill(
             src.kind,
-            lines=[LineData(ln.description, ln.sku, ln.qty, ln.unit_price, ln.tax_rate, ln.item_id, None, ln.discount_pct) for ln in src.lines],
+            lines=[
+                LineData(ln.description, ln.sku, ln.qty, ln.unit_price, ln.tax_rate, ln.item_id, None, ln.discount_pct)
+                for ln in src.lines
+            ],
             doc_date=today,
             created_by=created_by,
             due_date=today + (src.due_date - src.doc_date) if src.due_date else None,
@@ -945,10 +1016,16 @@ class PurchasingService:
             ev.append(self._event(at, "posted", None, f"Posted {b.number} to the general ledger", b.gl_entry_id))
         for p in b.payments:
             ev.append(
-                self._event(p.created_at or p.pay_date, "payment", None, f"Payment {p.amount} {b.currency} ({p.method})", p.id)
+                self._event(
+                    p.created_at or p.pay_date, "payment", None, f"Payment {p.amount} {b.currency} ({p.method})", p.id
+                )
             )
         for c in (await self.bill_related(b.id))["derived"]:
-            ev.append(self._event(c.created_at or c.doc_date, "credit_note", c.created_by, f"Credit note {c.number} created", c.id))
+            ev.append(
+                self._event(
+                    c.created_at or c.doc_date, "credit_note", c.created_by, f"Credit note {c.number} created", c.id
+                )
+            )
         return sorted(ev, key=lambda e: e["at"], reverse=True)
 
     def _event(self, at: Any, type_: str, actor: str | None, message: str, ref_id: uuid.UUID | None) -> dict[str, Any]:
@@ -959,7 +1036,9 @@ class PurchasingService:
         B = PurchasingBill
         bills = (
             await self.session.execute(
-                select(B).where(B.tenant_id == self.tenant_id, B.order_id == po.id, B.kind == "bill").order_by(B.created_at)
+                select(B)
+                .where(B.tenant_id == self.tenant_id, B.order_id == po.id, B.kind == "bill")
+                .order_by(B.created_at)
             )
         ).scalars()
         receipts = await self.list_receipts(po.id)

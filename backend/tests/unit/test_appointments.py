@@ -86,7 +86,11 @@ async def test_exceptions_close_and_open(session):
     tue = MON + timedelta(days=1)
     await svc.add_exception(res.id, day=tue, kind="open", start_min=8 * 60, end_min=10 * 60)
     assert [s for s, _ in await svc.availability(service.id, tue, 1)] == [
-        at(tue, "08:00"), at(tue, "08:15"), at(tue, "08:30"), at(tue, "08:45"), at(tue, "09:00")
+        at(tue, "08:00"),
+        at(tue, "08:15"),
+        at(tue, "08:30"),
+        at(tue, "08:45"),
+        at(tue, "09:00"),
     ]
 
 
@@ -106,13 +110,16 @@ async def test_conflicting_booking_is_rejected(session):
 
 async def test_weekly_series_is_all_or_nothing(session):
     svc, res, service = await _setup(session)
-    await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON + timedelta(weeks=2), "09:00"),
-                             client_name="Busy")
+    await svc.create_booking(
+        service_id=service.id, resource_id=res.id, start_at=at(MON + timedelta(weeks=2), "09:00"), client_name="Busy"
+    )
     with pytest.raises(AppointmentsConflictError):
-        await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"),
-                                 client_name="S", repeat_weeks=3)
-    rows = await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "10:00"),
-                                    client_name="S", repeat_weeks=3)
+        await svc.create_booking(
+            service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"), client_name="S", repeat_weeks=3
+        )
+    rows = await svc.create_booking(
+        service_id=service.id, resource_id=res.id, start_at=at(MON, "10:00"), client_name="S", repeat_weeks=3
+    )
     assert len(rows) == 4 and len({r.series_id for r in rows}) == 1
 
 
@@ -120,8 +127,14 @@ async def test_public_booking_happy_path_without_leaks(session):
     svc, res, service = await _setup(session)
     await svc.update_settings(online_enabled=True, public_title="Studio", auto_confirm=False)
     settings = await svc.get_settings()
-    await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"),
-                             client_name="Secret Person", client_email="secret@example.com", notes="private")
+    await svc.create_booking(
+        service_id=service.id,
+        resource_id=res.id,
+        start_at=at(MON, "09:00"),
+        client_name="Secret Person",
+        client_email="secret@example.com",
+        notes="private",
+    )
     profile = await appt_router.public_profile(settings.slug, _req(), session)
     dumped = profile.model_dump_json()
     assert "Secret" not in dumped and "secret@" not in dumped and str(res.id) not in dumped
@@ -129,8 +142,9 @@ async def test_public_booking_happy_path_without_leaks(session):
     assert at(MON, "09:00") not in [s.start_at for s in slots]
     assert all(set(s.model_dump()) == {"start_at"} for s in slots)
 
-    body = PublicBookingIn(service_id=service.id, start_at=at(MON, "10:00"), name="Eve", email="eve@example.com",
-                           consent=True)
+    body = PublicBookingIn(
+        service_id=service.id, start_at=at(MON, "10:00"), name="Eve", email="eve@example.com", consent=True
+    )
     resp = await appt_router.public_book(settings.slug, body, _req(), session)
     assert resp.status == "requested" and len(resp.cancel_token) >= 20
     assert set(resp.model_dump()) == {"status", "service_name", "start_at", "end_at", "cancel_token"}
@@ -138,15 +152,18 @@ async def test_public_booking_happy_path_without_leaks(session):
     assert created.source == "online" and created.consent_at is not None
     # The same slot cannot be taken twice.
     with pytest.raises(HTTPException) as exc:
-        await appt_router.public_book(settings.slug, body.model_copy(update={"email": "x@example.com"}), _req(), session)
+        await appt_router.public_book(
+            settings.slug, body.model_copy(update={"email": "x@example.com"}), _req(), session
+        )
     assert exc.value.status_code == 409
 
 
 async def test_public_booking_requires_consent_and_enabled_page(session):
     svc, _res, service = await _setup(session)
     settings = await svc.get_settings()
-    body = PublicBookingIn(service_id=service.id, start_at=at(MON, "10:00"), name="Eve", email="eve@example.com",
-                           consent=True)
+    body = PublicBookingIn(
+        service_id=service.id, start_at=at(MON, "10:00"), name="Eve", email="eve@example.com", consent=True
+    )
     with pytest.raises(HTTPException) as exc:  # page not enabled
         await appt_router.public_book(settings.slug, body, _req(), session)
     assert exc.value.status_code == 404
@@ -173,8 +190,9 @@ async def test_cancellation_token(session):
     svc, _res, service = await _setup(session)
     await svc.update_settings(online_enabled=True, auto_confirm=True)
     slug = (await svc.get_settings()).slug
-    body = PublicBookingIn(service_id=service.id, start_at=at(MON, "10:00"), name="Eve", email="eve@example.com",
-                           consent=True)
+    body = PublicBookingIn(
+        service_id=service.id, start_at=at(MON, "10:00"), name="Eve", email="eve@example.com", consent=True
+    )
     resp = await appt_router.public_book(slug, body, _req(), session)
     assert resp.status == "confirmed"
     with pytest.raises(HTTPException):
@@ -188,14 +206,26 @@ async def test_cancellation_token(session):
 
 async def test_reminders_are_never_queued_when_disabled(session):
     svc, res, service = await _setup(session)
-    await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"),
-                             client_name="A", client_email="a@example.com")
+    await svc.create_booking(
+        service_id=service.id,
+        resource_id=res.id,
+        start_at=at(MON, "09:00"),
+        client_name="A",
+        client_email="a@example.com",
+    )
     assert await svc.list_reminders() == []  # off by default: nothing queued
     assert await svc.prepare_due_reminders(now=at(MON, "08:00")) == {"draft": 0, "skipped": 0}
 
     await svc.update_settings(reminders_enabled=True, reminder_hours=24)
-    b = (await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "14:00"),
-                                  client_name="B", client_email="b@example.com"))[0]
+    b = (
+        await svc.create_booking(
+            service_id=service.id,
+            resource_id=res.id,
+            start_at=at(MON, "14:00"),
+            client_name="B",
+            client_email="b@example.com",
+        )
+    )[0]
     [rem] = await svc.list_reminders()
     assert rem.due_at == b.start_at - timedelta(hours=24) and rem.status == "queued"
     await svc.update_settings(reminders_enabled=False)
@@ -212,8 +242,13 @@ async def test_due_reminder_becomes_draft_and_is_never_sent(session, monkeypatch
     monkeypatch.setattr(core_email, "get_email_service", _boom, raising=False)
     svc, res, service = await _setup(session)
     await svc.update_settings(reminders_enabled=True, reminder_hours=2, public_title="Studio")
-    await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "14:00"),
-                             client_name="B", client_email="b@example.com")
+    await svc.create_booking(
+        service_id=service.id,
+        resource_id=res.id,
+        start_at=at(MON, "14:00"),
+        client_name="B",
+        client_email="b@example.com",
+    )
     assert (await svc.prepare_due_reminders(now=at(MON, "11:00")))["draft"] == 0
     assert (await svc.prepare_due_reminders(now=at(MON, "12:30")))["draft"] == 1
     [rem] = await svc.list_reminders()
@@ -228,8 +263,15 @@ async def test_due_reminder_becomes_draft_and_is_never_sent(session, monkeypatch
 
 async def test_on_demand_reminder_draft_is_reused_and_tenant_scoped(session):
     svc, res, service = await _setup(session)
-    b = (await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "10:00"),
-                                  client_name="C", client_email="c@example.com"))[0]
+    b = (
+        await svc.create_booking(
+            service_id=service.id,
+            resource_id=res.id,
+            start_at=at(MON, "10:00"),
+            client_name="C",
+            client_email="c@example.com",
+        )
+    )[0]
     first = await svc.draft_for_booking(b.id)
     again = await svc.draft_for_booking(b.id)
     assert first.id == again.id and first.status == "draft"
@@ -238,20 +280,25 @@ async def test_on_demand_reminder_draft_is_reused_and_tenant_scoped(session):
     other = AppointmentsService(session, "tenant-b")
     with pytest.raises(AppointmentsNotFoundError):
         await other.reminder_draft(first.id)
-    no_mail = (await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "14:00"),
-                                        client_name="D"))[0]
+    no_mail = (
+        await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "14:00"), client_name="D")
+    )[0]
     with pytest.raises(AppointmentsValidationError):
         await svc.draft_for_booking(no_mail.id)
 
 
 async def test_invoice_from_completed_booking_uses_item_tax_code(session):
-    item = Item(tenant_id=T, sku="TRT-1", name="Treatment", item_type="service", sales_price=Decimal("90"),
-                tax_code="EXEMPT")
+    item = Item(
+        tenant_id=T, sku="TRT-1", name="Treatment", item_type="service", sales_price=Decimal("90"), tax_code="EXEMPT"
+    )
     session.add(item)
     await session.flush()
     svc, res, service = await _setup(session, item_id=item.id, price=Decimal("0"))
-    b = (await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"),
-                                  client_name="Pat"))[0]
+    b = (
+        await svc.create_booking(
+            service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"), client_name="Pat"
+        )
+    )[0]
     with pytest.raises(AppointmentsConflictError):
         await svc.create_invoice(b.id)
     await svc.set_status(b.id, "checked_in")
@@ -272,8 +319,15 @@ def test_rate_from_tax_code():
 
 async def test_tenant_isolation(session):
     svc_a, res_a, service_a = await _setup(session, tenant="tenant-a")
-    b = (await svc_a.create_booking(service_id=service_a.id, resource_id=res_a.id, start_at=at(MON, "09:00"),
-                                    client_name="A", client_email="a@example.com"))[0]
+    b = (
+        await svc_a.create_booking(
+            service_id=service_a.id,
+            resource_id=res_a.id,
+            start_at=at(MON, "09:00"),
+            client_name="A",
+            client_email="a@example.com",
+        )
+    )[0]
     svc_b = AppointmentsService(session, "tenant-b")
     assert await svc_b.list_bookings() == [] and await svc_b.list_services() == []
     with pytest.raises(AppointmentsNotFoundError):
@@ -287,10 +341,20 @@ async def test_tenant_isolation(session):
 
 async def test_client_export_erase_and_retention(session):
     svc, res, service = await _setup(session)
-    await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "09:00"),
-                             client_name="A", client_email="a@example.com")
-    await svc.create_booking(service_id=service.id, resource_id=res.id, start_at=at(MON, "10:00"),
-                             client_name="B", client_email="b@example.com")
+    await svc.create_booking(
+        service_id=service.id,
+        resource_id=res.id,
+        start_at=at(MON, "09:00"),
+        client_name="A",
+        client_email="a@example.com",
+    )
+    await svc.create_booking(
+        service_id=service.id,
+        resource_id=res.id,
+        start_at=at(MON, "10:00"),
+        client_name="B",
+        client_email="b@example.com",
+    )
     assert await svc.erase_client("a@example.com", None) == 1
     assert [b.client_name for b in await svc.list_bookings()] == ["B"]
     assert await svc.purge_expired(now=at(MON, "12:00") + timedelta(days=400)) == 0  # retention off

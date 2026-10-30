@@ -31,26 +31,24 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Awaitable
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 from typing import TypeVar
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
-from app.core.email.service import EmailService, get_email_service
 from app.core.content_disposition import attachment_disposition
+from app.core.email.service import EmailService, get_email_service
 from app.dependencies import CurrentCompanyTenantId, CurrentUserId, RequirePermission, SessionDep
 from app.modules.sales.documents import service as docs
-from app.modules.sales.documents.i18n import lang
 from app.modules.sales.documents.checks import check_invoice
+from app.modules.sales.documents.i18n import lang
 from app.modules.sales.schemas import (
     AccountMapping,
     ActivityEvent,
     BulkRequest,
     BulkResponse,
     ConvertRequest,
-    RelatedResponse,
-    SalesStats,
     DocumentCreate,
     DocumentResponse,
     DocumentSummary,
@@ -58,6 +56,8 @@ from app.modules.sales.schemas import (
     EmailDraft,
     InvoiceCheckIssue,
     PaymentCreate,
+    RelatedResponse,
+    SalesStats,
     SendLogResponse,
     SendRequest,
     StatusRequest,
@@ -87,7 +87,7 @@ def _kind(kind: str) -> str:
     return KIND_PATHS[kind]
 
 
-async def _call(aw: Awaitable[T]) -> T:
+async def _call[T](aw: Awaitable[T]) -> T:
     try:
         return await aw
     except SalesNotFoundError as exc:
@@ -342,8 +342,10 @@ async def document_pdf(
     return Response(
         pdf,
         media_type="application/pdf",
-        headers={"Content-Disposition": attachment_disposition(docs.filename(doc), inline=True),
-                 "Content-Language": lang(doc.language)},
+        headers={
+            "Content-Disposition": attachment_disposition(docs.filename(doc), inline=True),
+            "Content-Language": lang(doc.language),
+        },
     )
 
 

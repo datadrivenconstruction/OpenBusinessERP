@@ -155,7 +155,15 @@ class CompanyPreset:
     """
 
     __slots__ = (
-        "key", "label", "description", "icon", "enabled_modules", "optional_modules", "tags", "section", "tax_hint",
+        "key",
+        "label",
+        "description",
+        "icon",
+        "enabled_modules",
+        "optional_modules",
+        "tags",
+        "section",
+        "tax_hint",
     )
 
     def __init__(
@@ -380,7 +388,15 @@ _BUSINESS_PRESETS: list[CompanyPreset] = [
         section="services",
         tags=["Work orders", "Technicians", "Equipment", "Inspections"],
         enabled_modules=[*_BUSINESS_BASE, "service", "equipment", "schedule", "inspections", "portal"],
-        optional_modules=["appointments", "contracts", "procurement", "supplier_catalogs", "safety", "risk", "ai_agents"],
+        optional_modules=[
+            "appointments",
+            "contracts",
+            "procurement",
+            "supplier_catalogs",
+            "safety",
+            "risk",
+            "ai_agents",
+        ],
     ),
     CompanyPreset(
         key="logistics",
@@ -400,7 +416,15 @@ _BUSINESS_PRESETS: list[CompanyPreset] = [
         icon="Stethoscope",
         section="health",
         tags=["Patients", "Appointments", "Private billing", "Consumables"],
-        enabled_modules=[*_BUSINESS_BASE, "appointments", "schedule", "procurement", "supplier_catalogs", "qms", "inspections"],
+        enabled_modules=[
+            *_BUSINESS_BASE,
+            "appointments",
+            "schedule",
+            "procurement",
+            "supplier_catalogs",
+            "qms",
+            "inspections",
+        ],
         optional_modules=["portal", "equipment", "safety", "enterprise_workflows", "integrations", "ai_agents"],
         tax_hint=(
             "Medical and dental treatment is VAT-exempt in the EU (DE: § 4 Nr. 14 UStG). Treatment items "
@@ -428,7 +452,14 @@ _BUSINESS_PRESETS: list[CompanyPreset] = [
         icon="Sparkles",
         section="health",
         tags=["Bookings", "Treatments", "Retail products", "Vouchers"],
-        enabled_modules=[*_BUSINESS_BASE, "appointments", "schedule", "procurement", "supplier_catalogs", "integrations"],
+        enabled_modules=[
+            *_BUSINESS_BASE,
+            "appointments",
+            "schedule",
+            "procurement",
+            "supplier_catalogs",
+            "integrations",
+        ],
         optional_modules=["portal", "service", "inspections", "ai_agents"],
     ),
     # Hospitality & leisure
@@ -498,9 +529,7 @@ _BUSINESS_PRESETS: list[CompanyPreset] = [
 ]
 
 # Every business module once, for the "all business apps" profile.
-_BUSINESS_ALL = list(
-    dict.fromkeys(m for p in _BUSINESS_PRESETS for m in [*p.enabled_modules, *p.optional_modules])
-)
+_BUSINESS_ALL = list(dict.fromkeys(m for p in _BUSINESS_PRESETS for m in [*p.enabled_modules, *p.optional_modules]))
 _BUSINESS_PRESETS.append(
     CompanyPreset(
         key="business_all",

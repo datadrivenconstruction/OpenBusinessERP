@@ -554,8 +554,7 @@ def check_data_dir(data_dir: Path) -> Check:
             # --data-dir" is read as a command line, and typed as one it is
             # `openbusinesserp --data-dir ...`, which exits 2: the flag is
             # declared on the subcommands, never on the top-level parser.
-            f"Start with a writable path, e.g. openbusinesserp serve "
-            f"--data-dir {Path.home() / 'openbusinesserp-data'}",
+            f"Start with a writable path, e.g. openbusinesserp serve --data-dir {Path.home() / 'openbusinesserp-data'}",
         )
 
 
@@ -1452,9 +1451,7 @@ def cmd_serve(args: argparse.Namespace) -> None:
         arrow = _u("\u2192", "->")
         if "address already in use" in str(exc).lower() or "10048" in str(exc):
             print(
-                _dim(
-                    f"  {arrow} Port {args.port} is already in use. Try: openbusinesserp serve --port {args.port + 1}"
-                )
+                _dim(f"  {arrow} Port {args.port} is already in use. Try: openbusinesserp serve --port {args.port + 1}")
             )
         else:
             print(_dim(f"  {arrow} See: {TROUBLESHOOTING_URL}"))

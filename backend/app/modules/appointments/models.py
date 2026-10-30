@@ -146,5 +146,7 @@ class AppointmentReminder(Base):
     channel: Mapped[str] = mapped_column(String(8), nullable=False, default="email")
     recipient: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), nullable=False, index=True)
-    status: Mapped[str] = mapped_column(String(8), nullable=False, default="queued")  # queued|draft|sent|skipped (never auto-sent)
+    status: Mapped[str] = mapped_column(
+        String(8), nullable=False, default="queued"
+    )  # queued|draft|sent|skipped (never auto-sent)
     detail: Mapped[str] = mapped_column(String(255), nullable=False, default="")

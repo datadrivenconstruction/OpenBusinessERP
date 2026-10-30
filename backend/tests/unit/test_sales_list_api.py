@@ -66,7 +66,15 @@ async def mk(svc, kind="invoice", *, qtys=(1,), issue=False, **kw):
 
 async def test_filters_sort_paging(svc):
     a = await mk(svc, customer_name="Alpha GmbH", customer_id=CUST_A, issue=True, due_date=PAST)
-    b = await mk(svc, customer_name="Beta AG", customer_id=CUST_B, issue=True, due_date=FUTURE, doc_date=date(2026, 4, 1), qtys=(5,))
+    b = await mk(
+        svc,
+        customer_name="Beta AG",
+        customer_id=CUST_B,
+        issue=True,
+        due_date=FUTURE,
+        doc_date=date(2026, 4, 1),
+        qtys=(5,),
+    )
     c = await mk(svc, customer_name="Alpha GmbH", customer_id=CUST_A, doc_date=date(2026, 5, 1))  # draft
     await svc.record_payment(b.id, amount=D("100"))
 
@@ -288,7 +296,9 @@ async def test_http_contract(client, svc):
     r = await client.get("/api/v1/sales/invoices/", params={"overdue": "true"})
     row = r.json()[0]
     assert row["id"] == str(a.id) and row["is_overdue"] is True and D(row["balance_due"]) == D("119.00")
-    assert (await client.get("/api/v1/sales/invoices/", params={"status_filter": "draft"})).headers["X-Total-Count"] == "1"
+    assert (await client.get("/api/v1/sales/invoices/", params={"status_filter": "draft"})).headers[
+        "X-Total-Count"
+    ] == "1"
     assert (await client.get("/api/v1/sales/invoices/", params={"sort": "nope"})).status_code == 422
 
     r = await client.get("/api/v1/sales/stats/")  # static route is not shadowed by /{kind}/
@@ -304,11 +314,15 @@ async def test_http_contract(client, svc):
     q = await mk(svc, "quote", qtys=(5,))
     await svc.set_status(q.id, "sent")
     lid = str(q.lines[0].id)
-    r = await client.post(f"/api/v1/sales/quotes/{q.id}/convert-to-order/", json={"lines": [{"line_id": lid, "qty": "2"}]})
+    r = await client.post(
+        f"/api/v1/sales/quotes/{q.id}/convert-to-order/", json={"lines": [{"line_id": lid, "qty": "2"}]}
+    )
     assert r.status_code == 201 and D(r.json()["lines"][0]["qty"]) == D(2)
     r = await client.get(f"/api/v1/sales/quotes/{q.id}/")
     assert D(r.json()["lines"][0]["remaining_qty"]) == D(3)
-    r = await client.post(f"/api/v1/sales/quotes/{q.id}/convert-to-order/", json={"lines": [{"line_id": lid, "qty": "9"}]})
+    r = await client.post(
+        f"/api/v1/sales/quotes/{q.id}/convert-to-order/", json={"lines": [{"line_id": lid, "qty": "9"}]}
+    )
     assert r.status_code == 422
     assert (await client.post(f"/api/v1/sales/quotes/{q.id}/convert-to-order/")).status_code == 201  # no body = rest
 

@@ -56,14 +56,6 @@ def manifest():
 # ── The manifest ─────────────────────────────────────────────────────────
 
 
-
-
-
-
-
-
-
-
 # ── The summary-estimate chapters, in three places ───────────────────────
 
 
@@ -75,28 +67,16 @@ def _manifest_chapters(manifest) -> dict[str, str]:
     return out
 
 
-
-
-
-
 def test_there_are_twelve_of_them_numbered_without_a_gap() -> None:
     from app.modules.methodology.templates import _CBS_CHAPTERS
 
     assert [row["code"] for row in _CBS_CHAPTERS] == [str(n) for n in range(1, 13)]
 
 
-
-
 # ── The norm code, published and compiled ────────────────────────────────
 
 
-
-
-
-
 # ── The rule packs on disk ───────────────────────────────────────────────
-
-
 
 
 def test_each_document_names_itself_by_its_own_file_stem() -> None:
@@ -116,11 +96,7 @@ def test_each_document_says_how_far_it_has_been_reviewed() -> None:
         assert document["standard"] == "gesn"
 
 
-
-
 # ── The engine seam ──────────────────────────────────────────────────────
-
-
 
 
 def test_a_russian_project_is_classified_against_the_norm_base() -> None:

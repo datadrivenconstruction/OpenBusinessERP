@@ -18,11 +18,17 @@ def upgrade() -> None:
         return
     op.create_table(
         "oe_gl_attachment",
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column("id", sa.String(36), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
         sa.Column("tenant_id", sa.String(36), nullable=False),
-        sa.Column("entry_id", sa.Uuid(), sa.ForeignKey("oe_gl_journal_entry.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "entry_id", sa.String(36), sa.ForeignKey("oe_gl_journal_entry.id", ondelete="CASCADE"), nullable=False
+        ),
         sa.Column("filename", sa.String(255), nullable=False),
         sa.Column("content_type", sa.String(128), nullable=False),
         sa.Column("size", sa.Integer(), nullable=False, server_default="0"),

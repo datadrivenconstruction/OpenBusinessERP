@@ -25,10 +25,16 @@ def render_pdf(doc: Any, kind: str, company: dict[str, Any]) -> bytes:
     """``doc`` is a PurchasingOrder (kind='order') or PurchasingBill (kind='bill' | 'credit_note')."""
     lg, cur, st = "en", doc.currency, _styles()
     buf = io.BytesIO()
-    page = SimpleDocTemplate(buf, pagesize=A4, leftMargin=25 * mm, rightMargin=20 * mm, topMargin=20 * mm, bottomMargin=20 * mm)
+    page = SimpleDocTemplate(
+        buf, pagesize=A4, leftMargin=25 * mm, rightMargin=20 * mm, topMargin=20 * mm, bottomMargin=20 * mm
+    )
     story: list[Any] = []
     if company.get("company_name"):
-        story += [_p(company["company_name"], st["bold"]), _p(company.get("address", ""), st["small"]), Spacer(1, 6 * mm)]
+        story += [
+            _p(company["company_name"], st["bold"]),
+            _p(company.get("address", ""), st["small"]),
+            Spacer(1, 6 * mm),
+        ]
     story += [_p(f"{TITLES[kind]} {doc.number}", st["title"]), Spacer(1, 4 * mm)]
     meta = [
         ["Supplier", doc.supplier_name],
@@ -37,7 +43,10 @@ def render_pdf(doc: Any, kind: str, company: dict[str, Any]) -> bytes:
     ]
     if kind != "order" and doc.supplier_ref:
         meta.append(["Supplier reference", doc.supplier_ref])
-    story += [Table([[_p(a, st["small"]), _p(b, st["body"])] for a, b in meta], colWidths=[40 * mm, 100 * mm]), Spacer(1, 6 * mm)]
+    story += [
+        Table([[_p(a, st["small"]), _p(b, st["body"])] for a, b in meta], colWidths=[40 * mm, 100 * mm]),
+        Spacer(1, 6 * mm),
+    ]
 
     rows = [[_p(h, st["head"]) for h in ("#", "Item", "Qty", "Unit price", "VAT %", "Net")]]
     for ln in doc.lines:

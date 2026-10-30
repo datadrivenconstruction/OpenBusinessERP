@@ -121,7 +121,10 @@ class PurchasingReceipt(Base):
     created_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     lines: Mapped[list[PurchasingReceiptLine]] = relationship(
-        back_populates="receipt", order_by="PurchasingReceiptLine.line_no", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="receipt",
+        order_by="PurchasingReceiptLine.line_no",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
 
@@ -149,9 +152,7 @@ class PurchasingReceiptLine(Base):
 
 class PurchasingBill(Base):
     __tablename__ = "oe_purchasing_bill"
-    __table_args__ = (
-        UniqueConstraint("tenant_id", "kind", "number", name="uq_oe_purchasing_bill_tenant_kind_number"),
-    )
+    __table_args__ = (UniqueConstraint("tenant_id", "kind", "number", name="uq_oe_purchasing_bill_tenant_kind_number"),)
 
     tenant_id: Mapped[str] = _tenant()
     kind: Mapped[str] = mapped_column(String(16), nullable=False, default="bill", index=True)

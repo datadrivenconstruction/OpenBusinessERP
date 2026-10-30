@@ -79,7 +79,7 @@ Write = Depends(RequirePermission("items.write"))
 Manage = Depends(RequirePermission("items.manage"))
 
 
-async def _call(aw: Awaitable[T]) -> T:
+async def _call[T](aw: Awaitable[T]) -> T:
     try:
         return await aw
     except ItemsNotFoundError as exc:
@@ -228,7 +228,9 @@ async def list_items(
     _perm: None = Read,
 ):
     rows, total = await _call(
-        svc.list_items(q, item_type, category_id, active, limit, offset, tax_code, min_price, max_price, alert, sort, desc)
+        svc.list_items(
+            q, item_type, category_id, active, limit, offset, tax_code, min_price, max_price, alert, sort, desc
+        )
     )
     on_hand = await svc.on_hand([r.id for r in rows if r.stock_tracked])
     return ItemPage(items=rows, total=total, on_hand=on_hand)

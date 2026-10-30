@@ -101,8 +101,11 @@ class BankingService:
         row = await self.session.scalar(select(BankSettings).where(BankSettings.tenant_id == self.tenant_id))
         if row is None:
             row = BankSettings(
-                tenant_id=self.tenant_id, amount_tolerance=Decimal("0.05"), date_window_days=30,
-                writeoff_account_code="", writeoff_max=Decimal("5.00"),
+                tenant_id=self.tenant_id,
+                amount_tolerance=Decimal("0.05"),
+                date_window_days=30,
+                writeoff_account_code="",
+                writeoff_max=Decimal("5.00"),
             )
             self.session.add(row)
             await self.session.flush()
@@ -130,15 +133,24 @@ class BankingService:
         return acc
 
     async def create_account(self, **data: Any) -> BankAccount:
-        code = data.get("gl_account_code") or (await SalesService(self.session, self.tenant_id).account_mapping()).get("bank") or ""
+        code = (
+            data.get("gl_account_code")
+            or (await SalesService(self.session, self.tenant_id).account_mapping()).get("bank")
+            or ""
+        )
         iban = (data.get("iban") or "").replace(" ", "").upper()
         if iban and await self.session.scalar(
             select(BankAccount.id).where(BankAccount.tenant_id == self.tenant_id, BankAccount.iban == iban)
         ):
             raise BankingConflictError("A bank account with this IBAN already exists")
         acc = BankAccount(
-            tenant_id=self.tenant_id, name=data["name"], iban=iban, bic=(data.get("bic") or "").upper(),
-            currency=(data.get("currency") or "EUR").upper(), gl_account_code=code, active=True,
+            tenant_id=self.tenant_id,
+            name=data["name"],
+            iban=iban,
+            bic=(data.get("bic") or "").upper(),
+            currency=(data.get("currency") or "EUR").upper(),
+            gl_account_code=code,
+            active=True,
             opening_balance=money(Decimal(str(data.get("opening_balance") or 0))),
             opening_balance_date=data.get("opening_balance_date"),
         )
@@ -159,9 +171,13 @@ class BankingService:
         return acc
 
     async def _account_id(self, code: str, what: str) -> uuid.UUID:
-        acc = await self.session.scalar(
-            select(GLAccount).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == code)
-        ) if code else None
+        acc = (
+            await self.session.scalar(
+                select(GLAccount).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == code)
+            )
+            if code
+            else None
+        )
         if acc is None:
             raise BankingConflictError(f"GL account for {what} is missing (code {code or 'unset'})")
         return acc.id
@@ -183,15 +199,22 @@ class BankingService:
         except StatementParseError as exc:
             raise BankingValidationError(str(exc)) from exc
         existing = set(
-            (await self.session.execute(
-                select(BankTransaction.dedupe_key).where(
-                    BankTransaction.tenant_id == self.tenant_id, BankTransaction.account_id == acc.id
+            (
+                await self.session.execute(
+                    select(BankTransaction.dedupe_key).where(
+                        BankTransaction.tenant_id == self.tenant_id, BankTransaction.account_id == acc.id
+                    )
                 )
-            )).scalars()
+            ).scalars()
         )
         stmt = BankStatement(
-            tenant_id=self.tenant_id, account_id=acc.id, filename=filename[:255],
-            format=fmt or "auto", created_by=created_by, imported_count=0, duplicate_count=0,
+            tenant_id=self.tenant_id,
+            account_id=acc.id,
+            filename=filename[:255],
+            format=fmt or "auto",
+            created_by=created_by,
+            imported_count=0,
+            duplicate_count=0,
         )
         self.session.add(stmt)
         if not existing:
@@ -205,13 +228,24 @@ class BankingService:
                 stmt.duplicate_count += 1
                 continue
             existing.add(key)
-            self.session.add(BankTransaction(
-                tenant_id=self.tenant_id, account_id=acc.id, statement_id=stmt.id,
-                booking_date=p.booking_date, value_date=p.value_date, amount=money(p.amount),
-                currency=p.currency.upper(), counterparty_name=p.counterparty_name[:255],
-                counterparty_iban=p.counterparty_iban[:34], remittance=p.remittance,
-                reference=p.reference[:140], dedupe_key=key, status="unmatched", matched_amount=ZERO,
-            ))
+            self.session.add(
+                BankTransaction(
+                    tenant_id=self.tenant_id,
+                    account_id=acc.id,
+                    statement_id=stmt.id,
+                    booking_date=p.booking_date,
+                    value_date=p.value_date,
+                    amount=money(p.amount),
+                    currency=p.currency.upper(),
+                    counterparty_name=p.counterparty_name[:255],
+                    counterparty_iban=p.counterparty_iban[:34],
+                    remittance=p.remittance,
+                    reference=p.reference[:140],
+                    dedupe_key=key,
+                    status="unmatched",
+                    matched_amount=ZERO,
+                )
+            )
             stmt.imported_count += 1
         await self.session.flush()
         return stmt
@@ -245,31 +279,61 @@ class BankingService:
     # ── Suggestions ───────────────────────────────────────────────────────
     async def open_items(self) -> list[OpenItem]:
         ibans: dict[str, list[str]] = {}
-        for row in (await self.session.execute(
-            select(BankPartnerIban).where(BankPartnerIban.tenant_id == self.tenant_id)
-        )).scalars():
+        for row in (
+            await self.session.execute(select(BankPartnerIban).where(BankPartnerIban.tenant_id == self.tenant_id))
+        ).scalars():
             ibans.setdefault(row.partner_key, []).append(row.iban)
         items: list[OpenItem] = []
         D = SalesDocument
-        for inv in (await self.session.execute(select(D).where(
-            D.tenant_id == self.tenant_id, D.kind == "invoice", D.status.in_(("issued", "partially_paid"))
-        ))).scalars():
+        for inv in (
+            await self.session.execute(
+                select(D).where(
+                    D.tenant_id == self.tenant_id, D.kind == "invoice", D.status.in_(("issued", "partially_paid"))
+                )
+            )
+        ).scalars():
             key = partner_key(inv.customer_id, inv.customer_name)
-            items.append(OpenItem(
-                "sales_invoice", inv.id, inv.number, inv.customer_name, inv.gross_total - inv.amount_paid,
-                inv.currency, inv.due_date, inv.doc_date, key, tuple(ibans.get(key, ())),
-            ))
+            items.append(
+                OpenItem(
+                    "sales_invoice",
+                    inv.id,
+                    inv.number,
+                    inv.customer_name,
+                    inv.gross_total - inv.amount_paid,
+                    inv.currency,
+                    inv.due_date,
+                    inv.doc_date,
+                    key,
+                    tuple(ibans.get(key, ())),
+                )
+            )
         _, Bill = _purchasing()
         if Bill is not None:
-            for bill in (await self.session.execute(select(Bill).where(
-                Bill.tenant_id == self.tenant_id, Bill.kind == "bill", Bill.status.in_(("posted", "partially_paid"))
-            ))).scalars():
+            for bill in (
+                await self.session.execute(
+                    select(Bill).where(
+                        Bill.tenant_id == self.tenant_id,
+                        Bill.kind == "bill",
+                        Bill.status.in_(("posted", "partially_paid")),
+                    )
+                )
+            ).scalars():
                 key = partner_key(bill.supplier_id, bill.supplier_name)
-                items.append(OpenItem(
-                    "purchase_bill", bill.id, bill.number, bill.supplier_name, bill.gross_total - bill.amount_paid,
-                    bill.currency, bill.due_date, bill.doc_date, key, tuple(ibans.get(key, ())),
-                    partner_ref=bill.supplier_ref or "",
-                ))
+                items.append(
+                    OpenItem(
+                        "purchase_bill",
+                        bill.id,
+                        bill.number,
+                        bill.supplier_name,
+                        bill.gross_total - bill.amount_paid,
+                        bill.currency,
+                        bill.due_date,
+                        bill.doc_date,
+                        key,
+                        tuple(ibans.get(key, ())),
+                        partner_ref=bill.supplier_ref or "",
+                    )
+                )
         return items
 
     async def suggestions(self, txn_id: uuid.UUID, limit: int = 5) -> list[Suggestion]:
@@ -279,34 +343,58 @@ class BankingService:
         cfg = await self.settings()
         remaining = abs(txn.amount) - txn.matched_amount
         line = BankLine(
-            amount=remaining if txn.amount > 0 else -remaining, booking_date=txn.booking_date, currency=txn.currency,
-            counterparty_name=txn.counterparty_name, counterparty_iban=txn.counterparty_iban, remittance=txn.remittance,
+            amount=remaining if txn.amount > 0 else -remaining,
+            booking_date=txn.booking_date,
+            currency=txn.currency,
+            counterparty_name=txn.counterparty_name,
+            counterparty_iban=txn.counterparty_iban,
+            remittance=txn.remittance,
         )
-        return suggest(line, await self.open_items(), tolerance=cfg.amount_tolerance,
-                       window_days=cfg.date_window_days, limit=limit)
+        return suggest(
+            line, await self.open_items(), tolerance=cfg.amount_tolerance, window_days=cfg.date_window_days, limit=limit
+        )
 
     # ── Confirmation ──────────────────────────────────────────────────────
     async def _learn_iban(self, txn: BankTransaction, key: str, name: str) -> None:
         if not txn.counterparty_iban:
             return
-        exists = await self.session.scalar(select(BankPartnerIban.id).where(
-            BankPartnerIban.tenant_id == self.tenant_id, BankPartnerIban.iban == txn.counterparty_iban,
-            BankPartnerIban.partner_key == key,
-        ))
+        exists = await self.session.scalar(
+            select(BankPartnerIban.id).where(
+                BankPartnerIban.tenant_id == self.tenant_id,
+                BankPartnerIban.iban == txn.counterparty_iban,
+                BankPartnerIban.partner_key == key,
+            )
+        )
         if not exists:
-            self.session.add(BankPartnerIban(
-                tenant_id=self.tenant_id, iban=txn.counterparty_iban, partner_key=key, partner_name=name[:255]
-            ))
+            self.session.add(
+                BankPartnerIban(
+                    tenant_id=self.tenant_id, iban=txn.counterparty_iban, partner_key=key, partner_name=name[:255]
+                )
+            )
 
     def _apply(self, txn: BankTransaction, amount: Decimal) -> None:
         txn.matched_amount = txn.matched_amount + amount
         txn.status = "matched" if txn.matched_amount >= abs(txn.amount) else "partially_matched"
 
-    def _add_match(self, txn: BankTransaction, kind: str, target_id: uuid.UUID | None, number: str,
-                   amount: Decimal, gl_entry_id: uuid.UUID | None, by: str | None, conf: Any = None) -> BankMatch:
+    def _add_match(
+        self,
+        txn: BankTransaction,
+        kind: str,
+        target_id: uuid.UUID | None,
+        number: str,
+        amount: Decimal,
+        gl_entry_id: uuid.UUID | None,
+        by: str | None,
+        conf: Any = None,
+    ) -> BankMatch:
         m = BankMatch(
-            tenant_id=self.tenant_id, target_type=kind, target_id=target_id, target_number=number[:64],
-            amount=amount, gl_entry_id=gl_entry_id, created_by=by,
+            tenant_id=self.tenant_id,
+            target_type=kind,
+            target_id=target_id,
+            target_number=number[:64],
+            amount=amount,
+            gl_entry_id=gl_entry_id,
+            created_by=by,
             confidence=Decimal(str(conf)) if conf is not None else None,
         )
         txn.matches.append(m)
@@ -346,21 +434,39 @@ class BankingService:
                     if txn.amount <= 0:
                         raise BankingValidationError("Outgoing payments cannot settle customer invoices")
                     inv = await sales.record_payment(
-                        a.target_id, amount=amt, pay_date=txn.booking_date, reference=ref,
-                        created_by=created_by, debit_account_id=bank_gl,
+                        a.target_id,
+                        amount=amt,
+                        pay_date=txn.booking_date,
+                        reference=ref,
+                        created_by=created_by,
+                        debit_account_id=bank_gl,
                     )
-                    self._add_match(txn, "sales_invoice", inv.id, inv.number, amt,
-                                    inv.payments[-1].gl_entry_id, created_by, confidence)
+                    self._add_match(
+                        txn,
+                        "sales_invoice",
+                        inv.id,
+                        inv.number,
+                        amt,
+                        inv.payments[-1].gl_entry_id,
+                        created_by,
+                        confidence,
+                    )
                     await self._learn_iban(txn, partner_key(inv.customer_id, inv.customer_name), inv.customer_name)
                     rest = inv.gross_total - inv.amount_paid
                     if wo_id and ZERO < rest <= wo_budget:
                         inv = await sales.record_payment(
-                            inv.id, amount=rest, pay_date=txn.booking_date, method="write_off",
-                            reference=f"Write-off {ref}"[:128], created_by=created_by, debit_account_id=wo_id,
+                            inv.id,
+                            amount=rest,
+                            pay_date=txn.booking_date,
+                            method="write_off",
+                            reference=f"Write-off {ref}"[:128],
+                            created_by=created_by,
+                            debit_account_id=wo_id,
                         )
                         wo_budget -= rest
-                        self._add_match(txn, "write_off", inv.id, inv.number, rest,
-                                        inv.payments[-1].gl_entry_id, created_by)
+                        self._add_match(
+                            txn, "write_off", inv.id, inv.number, rest, inv.payments[-1].gl_entry_id, created_by
+                        )
                 elif a.target_type == "purchase_bill":
                     if txn.amount >= 0:
                         raise BankingValidationError("Incoming payments cannot settle supplier bills")
@@ -369,7 +475,8 @@ class BankingService:
                     if wo_id and ZERO < rest <= wo_budget:
                         # Supplier accepted less than billed: clear payables against the write-off account.
                         entry_id, number, _ = await self._pay_bill(
-                            a.target_id, rest, txn, f"Write-off {ref}"[:128], wo_id, created_by, method="write_off")
+                            a.target_id, rest, txn, f"Write-off {ref}"[:128], wo_id, created_by, method="write_off"
+                        )
                         wo_budget -= rest
                         self._add_match(txn, "bill_write_off", a.target_id, number, rest, entry_id, created_by)
                 else:
@@ -385,8 +492,12 @@ class BankingService:
                         LineInput(bank_gl if incoming else wo_id, debit=leftover, description="Bank difference"),
                         LineInput(wo_id if incoming else bank_gl, credit=leftover, description="Bank difference"),
                     ],
-                    currency=txn.currency, memo=f"Bank difference {ref}".strip(), source_type=SOURCE_BANK,
-                    source_id=str(txn.id), created_by=created_by, post=True,
+                    currency=txn.currency,
+                    memo=f"Bank difference {ref}".strip(),
+                    source_type=SOURCE_BANK,
+                    source_id=str(txn.id),
+                    created_by=created_by,
+                    post=True,
                 )
                 self._add_match(txn, "write_off", None, "", leftover, entry.id, created_by)
                 self._apply(txn, leftover)
@@ -398,7 +509,13 @@ class BankingService:
         return txn
 
     async def _pay_bill(
-        self, bill_id: uuid.UUID, amount: Decimal, txn: BankTransaction, ref: str, bank_gl: uuid.UUID, by: str | None,
+        self,
+        bill_id: uuid.UUID,
+        amount: Decimal,
+        txn: BankTransaction,
+        ref: str,
+        bank_gl: uuid.UUID,
+        by: str | None,
         method: str = "bank_transfer",
     ) -> tuple[uuid.UUID | None, str, Decimal]:
         Purch, _ = _purchasing()
@@ -406,8 +523,9 @@ class BankingService:
             raise BankingConflictError("Purchasing module is not available; use a manual GL entry")
         svc = Purch(self.session, self.tenant_id)
         try:
-            bill = await svc.record_payment(bill_id, amount=amount, pay_date=txn.booking_date, reference=ref,
-                                          method=method, created_by=by)
+            bill = await svc.record_payment(
+                bill_id, amount=amount, pay_date=txn.booking_date, reference=ref, method=method, created_by=by
+            )
         except Exception as exc:  # purchasing has its own error hierarchy
             if exc.__class__.__name__.startswith("Purchasing"):
                 raise BankingConflictError(str(exc)) from exc
@@ -420,8 +538,13 @@ class BankingService:
                     LineInput(role_bank, debit=amount, description=f"Reclass {bill.number}"),
                     LineInput(bank_gl, credit=amount, description=f"Reclass {bill.number}"),
                 ],
-                currency=bill.currency, fx_rate=bill.fx_rate, memo=f"Bank account reclass {bill.number}",
-                source_type=SOURCE_BANK, source_id=str(txn.id), created_by=by, post=True,
+                currency=bill.currency,
+                fx_rate=bill.fx_rate,
+                memo=f"Bank account reclass {bill.number}",
+                source_type=SOURCE_BANK,
+                source_id=str(txn.id),
+                created_by=by,
+                post=True,
             )
         await self._learn_iban(txn, partner_key(bill.supplier_id, bill.supplier_name), bill.supplier_name)
         return bill.payments[-1].gl_entry_id, bill.number, bill.gross_total - bill.amount_paid
@@ -430,8 +553,9 @@ class BankingService:
         if cfg.writeoff_account_code:
             return await self._account_id(cfg.writeoff_account_code, "write-offs")
         for code in DEFAULT_WRITEOFF_CODES:
-            acc = await self.session.scalar(select(GLAccount.id).where(
-                GLAccount.tenant_id == self.tenant_id, GLAccount.code == code))
+            acc = await self.session.scalar(
+                select(GLAccount.id).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == code)
+            )
             if acc:
                 return acc
         raise BankingConflictError("No write-off account configured and none found in the chart")
@@ -448,8 +572,11 @@ class BankingService:
                 if m.gl_entry_id is None:
                     continue
                 entry_ids.add(m.gl_entry_id)
-                pay = await self.session.scalar(select(SalesPayment).where(
-                    SalesPayment.tenant_id == self.tenant_id, SalesPayment.gl_entry_id == m.gl_entry_id))
+                pay = await self.session.scalar(
+                    select(SalesPayment).where(
+                        SalesPayment.tenant_id == self.tenant_id, SalesPayment.gl_entry_id == m.gl_entry_id
+                    )
+                )
                 if pay is not None:
                     doc = await self.session.get(SalesDocument, pay.invoice_id)
                     doc.amount_paid -= pay.amount
@@ -458,22 +585,36 @@ class BankingService:
                     continue
                 if Bill is not None:
                     from app.modules.purchasing.models import PurchasingPayment
-                    bpay = await self.session.scalar(select(PurchasingPayment).where(
-                        PurchasingPayment.tenant_id == self.tenant_id, PurchasingPayment.gl_entry_id == m.gl_entry_id))
+
+                    bpay = await self.session.scalar(
+                        select(PurchasingPayment).where(
+                            PurchasingPayment.tenant_id == self.tenant_id,
+                            PurchasingPayment.gl_entry_id == m.gl_entry_id,
+                        )
+                    )
                     if bpay is not None:
                         bill = await self.session.get(Bill, bpay.bill_id)
                         bill.amount_paid -= bpay.amount
                         bill.status = "partially_paid" if bill.amount_paid > 0 else "posted"
                         bill.payments.remove(bpay)
             # Reclass and difference entries carry the bank line as their source.
-            entry_ids.update((await self.session.execute(select(GLJournalEntry.id).where(
-                GLJournalEntry.tenant_id == self.tenant_id, GLJournalEntry.source_type == SOURCE_BANK,
-                GLJournalEntry.source_id == str(txn.id), GLJournalEntry.status == ENTRY_POSTED,
-                GLJournalEntry.reversal_of_id.is_(None),
-            ))).scalars())
+            entry_ids.update(
+                (
+                    await self.session.execute(
+                        select(GLJournalEntry.id).where(
+                            GLJournalEntry.tenant_id == self.tenant_id,
+                            GLJournalEntry.source_type == SOURCE_BANK,
+                            GLJournalEntry.source_id == str(txn.id),
+                            GLJournalEntry.status == ENTRY_POSTED,
+                            GLJournalEntry.reversal_of_id.is_(None),
+                        )
+                    )
+                ).scalars()
+            )
             for eid in entry_ids:
-                await self.gl.reverse_entry(eid, memo=f"Undo bank match {txn.reference or txn.id}"[:500],
-                                            created_by=created_by)
+                await self.gl.reverse_entry(
+                    eid, memo=f"Undo bank match {txn.reference or txn.id}"[:500], created_by=created_by
+                )
         except GLError as exc:
             raise BankingConflictError(f"GL: {exc}") from exc
         for m in list(txn.matches):
@@ -484,7 +625,12 @@ class BankingService:
         return txn
 
     async def manual_entry(
-        self, txn_id: uuid.UUID, *, account_code: str, memo: str = "", amount: Decimal | None = None,
+        self,
+        txn_id: uuid.UUID,
+        *,
+        account_code: str,
+        memo: str = "",
+        amount: Decimal | None = None,
         created_by: str | None = None,
     ) -> BankTransaction:
         """Book an unmatched line (fees, interest, transfers) against any GL account."""
@@ -507,8 +653,12 @@ class BankingService:
                     LineInput(bank_gl if incoming else contra, debit=amt, description=text[:200]),
                     LineInput(contra if incoming else bank_gl, credit=amt, description=text[:200]),
                 ],
-                currency=txn.currency, memo=f"Bank: {text}"[:500], source_type=SOURCE_BANK,
-                source_id=str(txn.id), created_by=created_by, post=True,
+                currency=txn.currency,
+                memo=f"Bank: {text}"[:500],
+                source_type=SOURCE_BANK,
+                source_id=str(txn.id),
+                created_by=created_by,
+                post=True,
             )
         except GLError as exc:
             raise BankingConflictError(f"GL: {exc}") from exc

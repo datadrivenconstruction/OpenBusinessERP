@@ -19,9 +19,13 @@ _TABLES = ("oe_sales_payment", "oe_sales_line", "oe_sales_document", "oe_sales_s
 
 def _base(table: str) -> list:
     return [
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column("id", sa.String(36), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id", name=f"pk_{table}"),
     ]
 
@@ -40,18 +44,20 @@ def upgrade() -> None:
             sa.Column("kind", sa.String(16), nullable=False),
             sa.Column("number", sa.String(32), nullable=False),
             sa.Column("status", sa.String(24), nullable=False, server_default="draft"),
-            sa.Column("customer_id", sa.Uuid(), nullable=True),
+            sa.Column("customer_id", sa.String(36), nullable=True),
             sa.Column("customer_name", sa.String(255), nullable=False, server_default=""),
             sa.Column("currency", sa.String(3), nullable=False, server_default="EUR"),
             sa.Column("fx_rate", sa.Numeric(20, 10), nullable=False, server_default="1"),
             sa.Column("doc_date", sa.Date(), nullable=False),
             sa.Column("due_date", sa.Date(), nullable=True),
-            sa.Column("source_id", sa.Uuid(), sa.ForeignKey("oe_sales_document.id", ondelete="SET NULL"), nullable=True),
+            sa.Column(
+                "source_id", sa.String(36), sa.ForeignKey("oe_sales_document.id", ondelete="SET NULL"), nullable=True
+            ),
             _money("net_total"),
             _money("tax_total"),
             _money("gross_total"),
             _money("amount_paid"),
-            sa.Column("gl_entry_id", sa.Uuid(), nullable=True),
+            sa.Column("gl_entry_id", sa.String(36), nullable=True),
             sa.Column("notes", sa.Text(), nullable=False, server_default=""),
             sa.Column("created_by", sa.String(64), nullable=True),
             sa.UniqueConstraint("kind", "number", name="uq_oe_sales_document_kind_number"),
@@ -63,7 +69,9 @@ def upgrade() -> None:
         op.create_table(
             "oe_sales_line",
             *_base("oe_sales_line"),
-            sa.Column("document_id", sa.Uuid(), sa.ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False),
+            sa.Column(
+                "document_id", sa.String(36), sa.ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False
+            ),
             sa.Column("line_no", sa.Integer(), nullable=False, server_default="0"),
             sa.Column("sku", sa.String(64), nullable=False, server_default=""),
             sa.Column("description", sa.String(500), nullable=False, server_default=""),
@@ -81,12 +89,14 @@ def upgrade() -> None:
         op.create_table(
             "oe_sales_payment",
             *_base("oe_sales_payment"),
-            sa.Column("invoice_id", sa.Uuid(), sa.ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False),
+            sa.Column(
+                "invoice_id", sa.String(36), sa.ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False
+            ),
             sa.Column("pay_date", sa.Date(), nullable=False),
             sa.Column("amount", sa.Numeric(18, 2), nullable=False),
             sa.Column("method", sa.String(32), nullable=False, server_default="bank_transfer"),
             sa.Column("reference", sa.String(128), nullable=False, server_default=""),
-            sa.Column("gl_entry_id", sa.Uuid(), nullable=True),
+            sa.Column("gl_entry_id", sa.String(36), nullable=True),
         )
         op.create_index("ix_oe_sales_payment_invoice_id", "oe_sales_payment", ["invoice_id"])
 

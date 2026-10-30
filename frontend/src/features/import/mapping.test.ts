@@ -38,7 +38,7 @@ describe('import mapping helpers', () => {
 
   it('exports errors as CSV with BOM and quoting', () => {
     const csv = errorsToCsv([{ row: 3, message: 'E-mail: invalid "x;y"' }, { row: 0, message: 'Unbalanced' }]);
-    expect(csv.startsWith('﻿Row;Error\r\n')).toBe(true);
+    expect(csv.startsWith('\uFEFFRow;Error\r\n')).toBe(true);
     expect(csv).toContain('3;"E-mail: invalid ""x;y"""');
     expect(csv).toContain('\r\n;Unbalanced\r\n');
   });

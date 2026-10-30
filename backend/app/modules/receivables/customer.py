@@ -50,11 +50,19 @@ def payment_stats(payments: list[dict[str, Any]]) -> dict[str, Any]:
 def followup_out(f: ArFollowUp, as_of: date | None = None) -> dict[str, Any]:
     as_of = as_of or date.today()
     return {
-        "id": f.id, "partner_key": f.partner_key, "customer_name": f.customer_name, "kind": f.kind,
-        "text": f.text, "invoice_id": f.invoice_id, "invoice_number": f.invoice_number,
-        "promised_date": f.promised_date, "promised_amount": f.promised_amount, "status": f.status,
+        "id": f.id,
+        "partner_key": f.partner_key,
+        "customer_name": f.customer_name,
+        "kind": f.kind,
+        "text": f.text,
+        "invoice_id": f.invoice_id,
+        "invoice_number": f.invoice_number,
+        "promised_date": f.promised_date,
+        "promised_amount": f.promised_amount,
+        "status": f.status,
         "overdue": bool(f.kind == "promise" and f.status == "open" and f.promised_date and f.promised_date < as_of),
-        "created_at": f.created_at, "created_by": f.created_by,
+        "created_at": f.created_at,
+        "created_by": f.created_by,
     }
 
 
@@ -75,21 +83,36 @@ class CustomerAccountService:
 
     async def payments(self, key: str, limit: int = 200) -> list[dict[str, Any]]:
         D, P = SalesDocument, SalesPayment
-        q = (select(P, D).join(D, P.invoice_id == D.id)
-             .where(P.tenant_id == self.tenant_id, D.tenant_id == self.tenant_id, D.kind == "invoice",
-                    self._customer_filter(key))
-             .order_by(P.pay_date.desc()))
+        q = (
+            select(P, D)
+            .join(D, P.invoice_id == D.id)
+            .where(
+                P.tenant_id == self.tenant_id,
+                D.tenant_id == self.tenant_id,
+                D.kind == "invoice",
+                self._customer_filter(key),
+            )
+            .order_by(P.pay_date.desc())
+        )
         out: list[dict[str, Any]] = []
         for pay, inv in (await self.session.execute(q)).all():
             if partner_key(inv.customer_id, inv.customer_name) != key:
                 continue
             due = inv.due_date or inv.doc_date
-            out.append({
-                "id": pay.id, "invoice_id": inv.id, "invoice_number": inv.number, "pay_date": pay.pay_date,
-                "amount": money(pay.amount), "currency": inv.currency, "method": pay.method,
-                "reference": pay.reference, "days_to_pay": (pay.pay_date - inv.doc_date).days,
-                "days_late": (pay.pay_date - due).days,
-            })
+            out.append(
+                {
+                    "id": pay.id,
+                    "invoice_id": inv.id,
+                    "invoice_number": inv.number,
+                    "pay_date": pay.pay_date,
+                    "amount": money(pay.amount),
+                    "currency": inv.currency,
+                    "method": pay.method,
+                    "reference": pay.reference,
+                    "days_to_pay": (pay.pay_date - inv.doc_date).days,
+                    "days_late": (pay.pay_date - due).days,
+                }
+            )
             if len(out) >= limit:
                 break
         return out
@@ -112,9 +135,15 @@ class CustomerAccountService:
         row: dict[str, Any] = next((r for r in aging["rows"] if r["partner_key"] == key), None) or {}
         payments = await self.payments(key)
         L = DunningLetter
-        letters = list((await self.session.execute(
-            select(L).where(L.tenant_id == self.tenant_id, L.partner_key == key, L.status != "discarded")
-            .order_by(L.letter_date.desc()))).scalars())
+        letters = list(
+            (
+                await self.session.execute(
+                    select(L)
+                    .where(L.tenant_id == self.tenant_id, L.partner_key == key, L.status != "discarded")
+                    .order_by(L.letter_date.desc())
+                )
+            ).scalars()
+        )
         follow = await self.followups(key)
         if not row and not payments and not letters and not follow:
             raise ReceivablesNotFoundError("Customer has no receivables history")
@@ -123,12 +152,18 @@ class CustomerAccountService:
         total = row.get("total", ZERO)
         open_promises = [f for f in follow if f.kind == "promise" and f.status == "open"]
         return {
-            "partner_key": key, "customer_name": name, "as_of": as_of,
+            "partner_key": key,
+            "customer_name": name,
+            "as_of": as_of,
             "blocked": any(b.partner_key == key for b in await self.rec.blocks()),
-            "open_total": total, "overdue_total": money(total - buckets["current"]), "buckets": buckets,
+            "open_total": total,
+            "overdue_total": money(total - buckets["current"]),
+            "buckets": buckets,
             "invoices": row.get("invoices", []),
-            "payments": payments, "stats": payment_stats(payments),
-            "letters": letters, "followups": [followup_out(f, as_of) for f in follow],
+            "payments": payments,
+            "stats": payment_stats(payments),
+            "letters": letters,
+            "followups": [followup_out(f, as_of) for f in follow],
             "promised_open": money(sum((f.promised_amount or ZERO for f in open_promises), ZERO)),
             "next_dunning": await self.rec.preview_run(as_of, key),
         }
@@ -153,11 +188,17 @@ class CustomerAccountService:
             number = inv.number
         promise = kind == "promise"
         row = ArFollowUp(
-            tenant_id=self.tenant_id, partner_key=data["partner_key"], customer_name=data.get("customer_name") or "",
-            kind=kind, text=text, invoice_id=data.get("invoice_id"), invoice_number=number,
+            tenant_id=self.tenant_id,
+            partner_key=data["partner_key"],
+            customer_name=data.get("customer_name") or "",
+            kind=kind,
+            text=text,
+            invoice_id=data.get("invoice_id"),
+            invoice_number=number,
             promised_date=data.get("promised_date") if promise else None,
             promised_amount=money(data["promised_amount"]) if promise else None,
-            status="open" if promise else "", created_by=by,
+            status="open" if promise else "",
+            created_by=by,
         )
         self.session.add(row)
         await self.session.flush()

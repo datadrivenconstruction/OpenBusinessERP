@@ -83,7 +83,9 @@ class ItemPriceList(Base):
     active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     items: Mapped[list[ItemPriceBreak]] = relationship(
-        back_populates="price_list", cascade="all, delete-orphan", lazy="selectin",
+        back_populates="price_list",
+        cascade="all, delete-orphan",
+        lazy="selectin",
         order_by="ItemPriceBreak.min_qty",
     )
 

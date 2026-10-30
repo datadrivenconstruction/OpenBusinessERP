@@ -16,7 +16,7 @@ _T = "oe_items_item"
 _COLS = (
     sa.Column("min_stock", sa.Numeric(18, 4), nullable=False, server_default="0"),
     sa.Column("reorder_qty", sa.Numeric(18, 4), nullable=False, server_default="0"),
-    sa.Column("default_supplier_id", sa.Uuid(), nullable=True),
+    sa.Column("default_supplier_id", sa.String(36), nullable=True),
     sa.Column("image_url", sa.String(500), nullable=False, server_default=""),
     sa.Column("notes", sa.Text(), nullable=False, server_default=""),
 )

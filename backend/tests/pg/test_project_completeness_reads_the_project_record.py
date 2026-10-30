@@ -26,9 +26,8 @@ from collections.abc import Iterator
 from decimal import Decimal
 
 import pytest
-from sqlalchemy import select
 
-from app.core.validation.engine import Severity, ValidationStatus, validation_engine
+from app.core.validation.engine import ValidationStatus, validation_engine
 from app.core.validation.project_context import PROJECT_RECORD_KEY, with_project_context
 from app.core.validation.rules import register_builtin_rules
 from app.core.validation.rules.project_completeness import PROJECT_COMPLETENESS_RULE_SET
@@ -272,5 +271,3 @@ async def test_a_contract_employer_and_a_tender_package_answer_the_two_procureme
     assert by_rule["project_completeness.client_recorded"].passed, "an employer party is a recorded client"
     assert by_rule["project_completeness.procurement_started"].passed, "a tender package is procurement"
     assert not by_rule["project_completeness.planned_dates_set"].passed, "the end date is still missing"
-
-

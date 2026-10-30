@@ -468,7 +468,9 @@ class SalesService:
                 qtys[ln.line_no] = qtys.get(ln.line_no, ZERO) + Decimal(str(qty))
             for no, qty in qtys.items():
                 if qty <= 0 or qty > remaining[no]:
-                    raise SalesValidationError(f"Line {no}: convert between 0 and the remaining {max(ZERO, remaining[no])}")
+                    raise SalesValidationError(
+                        f"Line {no}: convert between 0 and the remaining {max(ZERO, remaining[no])}"
+                    )
         if not qtys and src.lines:
             raise SalesConflictError("Nothing left to convert on this document")
         doc = await self._copy(src, kind, created_by, qtys if src.lines else None)
@@ -505,7 +507,9 @@ class SalesService:
         await self.session.flush()
         return inv
 
-    async def duplicate(self, doc_id: uuid.UUID, kind: str | None = None, created_by: str | None = None) -> SalesDocument:
+    async def duplicate(
+        self, doc_id: uuid.UUID, kind: str | None = None, created_by: str | None = None
+    ) -> SalesDocument:
         src = await self.get(doc_id, kind)
         today = date.today()
         return await self.create(
@@ -642,7 +646,9 @@ class SalesService:
             await self.session.execute(
                 select(D).where(
                     D.tenant_id == self.tenant_id,
-                    or_(D.kind.in_(("quote", "invoice")), (D.kind == "order") & D.status.in_(("confirmed", "delivered"))),
+                    or_(
+                        D.kind.in_(("quote", "invoice")), (D.kind == "order") & D.status.in_(("confirmed", "delivered"))
+                    ),
                 )
             )
         ).scalars()
@@ -665,7 +671,9 @@ class SalesService:
                     if ln.qty > 0:
                         to_inv_v += ln.gross * max(ZERO, rem[ln.line_no]) / ln.qty * fx
             else:
-                if d.status in {"issued", "partially_paid", "paid"} and d.doc_date.replace(day=1) == today.replace(day=1):
+                if d.status in {"issued", "partially_paid", "paid"} and d.doc_date.replace(day=1) == today.replace(
+                    day=1
+                ):
                     invoiced += d.net_total * fx
                 if d.status in {"issued", "partially_paid"} and d.due_date and d.due_date < today and d.balance_due > 0:
                     overdue_n += 1
@@ -944,11 +952,16 @@ class SalesService:
             & D.status.in_(("issued", "partially_paid", "paid"))
             & (D.doc_date >= first)
         )
-        docs = (await self.session.execute(select(D.customer_id, D.customer_name, D.net_total, D.fx_rate).where(cond))).all()
+        docs = (
+            await self.session.execute(select(D.customer_id, D.customer_name, D.net_total, D.fx_rate).where(cond))
+        ).all()
         cust: dict[str, dict] = {}
         for cid, name, net, fx in docs:
             key = str(cid) if cid else (name or "").strip().lower()
-            row = cust.setdefault(key, {"customer_id": str(cid) if cid else None, "customer_name": name or "", "revenue": ZERO, "invoices": 0})
+            row = cust.setdefault(
+                key,
+                {"customer_id": str(cid) if cid else None, "customer_name": name or "", "revenue": ZERO, "invoices": 0},
+            )
             row["revenue"] += net * (fx or Decimal(1))
             row["invoices"] += 1
         lines = (
@@ -963,13 +976,25 @@ class SalesService:
             key = str(iid) if iid else (sku or desc or "").strip().lower()
             if not key:
                 continue
-            row = items.setdefault(key, {"item_id": str(iid) if iid else None, "sku": sku or "", "name": desc or sku or "", "qty": ZERO, "revenue": ZERO})
+            row = items.setdefault(
+                key,
+                {
+                    "item_id": str(iid) if iid else None,
+                    "sku": sku or "",
+                    "name": desc or sku or "",
+                    "qty": ZERO,
+                    "revenue": ZERO,
+                },
+            )
             row["qty"] += qty or ZERO
             row["revenue"] += (net or ZERO) * (fx or Decimal(1))
 
         def ranked(rows: dict[str, dict]) -> list[dict]:
             out = sorted(rows.values(), key=lambda r: r["revenue"], reverse=True)[:limit]
-            return [{**r, "revenue": money(r["revenue"]), **({"qty": str(r["qty"].normalize())} if "qty" in r else {})} for r in out]
+            return [
+                {**r, "revenue": money(r["revenue"]), **({"qty": str(r["qty"].normalize())} if "qty" in r else {})}
+                for r in out
+            ]
 
         return ranked(cust), ranked(items)
 

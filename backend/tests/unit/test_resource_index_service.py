@@ -330,8 +330,6 @@ def test_unjudged_lines_are_indexed_only_on_the_persons_confirmation() -> None:
     assert {e.reason for e in excluded} == {"not_base_prices"}
 
 
-
-
 def test_machine_without_operator_line_is_excluded_not_priced_with_otm_zero() -> None:
     bare = _Pos("bare", "1", [_res("labor", "1", "10000", "L"), _res("equipment", "1", "6000", "EX")])
     split = _Pos(

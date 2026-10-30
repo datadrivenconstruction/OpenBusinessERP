@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import ast
 import logging
-import re
 from pathlib import Path
 
 import pytest
@@ -161,8 +160,6 @@ def test_every_standard_the_table_names_can_be_rendered() -> None:
     named = set(COUNTRY_TO_STANDARD.values()) | set(KNOWN_CLASSIFICATION_STANDARDS)
     unlabelled = named - set(CLASSIFICATION_STANDARD_LABELS)
     assert not unlabelled, f"{sorted(unlabelled)} have no display label; section-path rendering would KeyError"
-
-
 
 
 def test_the_registry_is_the_only_country_to_standard_table_in_the_backend() -> None:

@@ -13,7 +13,7 @@ branch_labels = None
 depends_on = None
 
 _COLS = {
-    "oe_sales_line": [sa.Column("item_id", sa.Uuid(), nullable=True)],
+    "oe_sales_line": [sa.Column("item_id", sa.String(36), nullable=True)],
     "oe_sales_document": [sa.Column("payment_terms", sa.String(64), nullable=False, server_default="")],
     "oe_purchasing_order_line": [sa.Column("discount_pct", sa.Numeric(7, 4), nullable=False, server_default="0")],
     "oe_purchasing_bill_line": [sa.Column("discount_pct", sa.Numeric(7, 4), nullable=False, server_default="0")],

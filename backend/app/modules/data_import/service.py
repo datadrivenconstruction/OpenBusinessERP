@@ -78,12 +78,23 @@ class DataImportService:
             raise ImportInvalid("The file has no header row")
         scored = self.suggest_mapping_scored(target, table.headers)
         job = ImportJob(
-            tenant_id=self.tenant_id, target=target, filename=filename[:255], status="uploaded",
-            encoding=table.encoding, delimiter=table.delimiter, headers=table.headers, rows=table.rows,
-            mapping={h: f for h, (f, _c) in scored.items()}, options={},
-            summary={"warnings": table.warnings, "header_row": table.header_row,
-                     "confidence": {h: c for h, (_f, c) in scored.items()}},
-            row_count=len(table.rows), created_by=created_by,
+            tenant_id=self.tenant_id,
+            target=target,
+            filename=filename[:255],
+            status="uploaded",
+            encoding=table.encoding,
+            delimiter=table.delimiter,
+            headers=table.headers,
+            rows=table.rows,
+            mapping={h: f for h, (f, _c) in scored.items()},
+            options={},
+            summary={
+                "warnings": table.warnings,
+                "header_row": table.header_row,
+                "confidence": {h: c for h, (_f, c) in scored.items()},
+            },
+            row_count=len(table.rows),
+            created_by=created_by,
         )
         self.session.add(job)
         await self.session.flush()
@@ -108,13 +119,19 @@ class DataImportService:
         return job
 
     async def list_jobs(self, limit: int = 50) -> list[ImportJob]:
-        q = (select(ImportJob).where(ImportJob.tenant_id == self.tenant_id)
-             .order_by(ImportJob.created_at.desc()).limit(limit))
+        q = (
+            select(ImportJob)
+            .where(ImportJob.tenant_id == self.tenant_id)
+            .order_by(ImportJob.created_at.desc())
+            .limit(limit)
+        )
         return list((await self.session.execute(q)).scalars())
 
     # ── Presets ───────────────────────────────────────────────────────────
     async def list_presets(self, target: str) -> list[dict[str, Any]]:
-        out = [{"id": None, "name": n, "mapping": m, "builtin": True} for n, m in BUILTIN_PRESETS.get(target, {}).items()]
+        out = [
+            {"id": None, "name": n, "mapping": m, "builtin": True} for n, m in BUILTIN_PRESETS.get(target, {}).items()
+        ]
         q = select(ImportPreset).where(ImportPreset.tenant_id == self.tenant_id, ImportPreset.target == target)
         for p in (await self.session.execute(q.order_by(ImportPreset.name))).scalars():
             out.append({"id": str(p.id), "name": p.name, "mapping": p.mapping, "builtin": False})
@@ -122,8 +139,9 @@ class DataImportService:
 
     async def save_preset(self, target: str, name: str, mapping: dict[str, str]) -> ImportPreset:
         self._check_mapping(target, mapping)
-        q = select(ImportPreset).where(ImportPreset.tenant_id == self.tenant_id, ImportPreset.target == target,
-                                       ImportPreset.name == name)
+        q = select(ImportPreset).where(
+            ImportPreset.tenant_id == self.tenant_id, ImportPreset.target == target, ImportPreset.name == name
+        )
         p = (await self.session.execute(q)).scalar_one_or_none()
         if p is None:
             p = ImportPreset(tenant_id=self.tenant_id, target=target, name=name, mapping=mapping)
@@ -182,8 +200,11 @@ class DataImportService:
         if job.status in ("uploaded", "validated"):
             job.status = "validated"
         await self.session.flush()
-        return {"summary": job.summary, "errors": _errors(rows) + [{"row": 0, "message": m} for m in plan_errors],
-                "rows": [{"row": r.row_no, "action": r.action} for r in rows[: parsing.PREVIEW_ROWS]]}
+        return {
+            "summary": job.summary,
+            "errors": _errors(rows) + [{"row": 0, "message": m} for m in plan_errors],
+            "rows": [{"row": r.row_no, "action": r.action} for r in rows[: parsing.PREVIEW_ROWS]],
+        }
 
     # Each planner sets row.action (create/update/skip/error) and returns file-level errors.
     async def _contacts_index(self) -> list[Contact]:
@@ -285,13 +306,19 @@ class DataImportService:
             r.action = "create"
         errs: list[str] = []
         if debit != credit:
-            errs.append(f"Opening balances are not balanced: debit {debit} vs credit {credit} "
-                        f"(difference {debit - credit})")
+            errs.append(
+                f"Opening balances are not balanced: debit {debit} vs credit {credit} (difference {debit - credit})"
+            )
         if not first:
             errs.append("No non-zero balances found")
-        prev = await self.session.scalar(select(GLJournalEntry.id).where(
-            GLJournalEntry.tenant_id == self.tenant_id, GLJournalEntry.source_type == f"{SOURCE}:opening",
-            GLJournalEntry.reversed_by_id.is_(None), GLJournalEntry.status == "posted"))
+        prev = await self.session.scalar(
+            select(GLJournalEntry.id).where(
+                GLJournalEntry.tenant_id == self.tenant_id,
+                GLJournalEntry.source_type == f"{SOURCE}:opening",
+                GLJournalEntry.reversed_by_id.is_(None),
+                GLJournalEntry.status == "posted",
+            )
+        )
         if prev is not None:
             errs.append("Opening balances were already imported; undo that import first")
         try:
@@ -346,8 +373,9 @@ class DataImportService:
         return await self._plan_docs(rows, model, "bill", "supplier")
 
     # ── Commit ────────────────────────────────────────────────────────────
-    async def commit(self, job_id: uuid.UUID, mapping: dict[str, str], options: dict | None = None,
-                     created_by: str | None = None) -> dict[str, Any]:
+    async def commit(
+        self, job_id: uuid.UUID, mapping: dict[str, str], options: dict | None = None, created_by: str | None = None
+    ) -> dict[str, Any]:
         job = await self.get_job(job_id)
         if job.status in ("committed", "undone"):
             raise ImportInvalid(f"This import is already {job.status}")
@@ -378,8 +406,9 @@ class DataImportService:
         return {"summary": job.summary, "job_id": str(job.id)}
 
     def _rec(self, job: ImportJob, entity: str, rid: uuid.UUID, action: str, row: int) -> ImportRecord:
-        return ImportRecord(tenant_id=self.tenant_id, job_id=job.id, entity=entity, record_id=rid, action=action,
-                            row_no=row)
+        return ImportRecord(
+            tenant_id=self.tenant_id, job_id=job.id, entity=entity, record_id=rid, action=action, row_no=row
+        )
 
     async def _write_party(self, job, rows, _o, by, records) -> None:
         for r in rows:
@@ -388,12 +417,23 @@ class DataImportService:
             v = r.values
             c: Contact | None = v.get("_match")
             if c is None:
-                c = Contact(tenant_id=self.tenant_id, created_by=by, contact_type=v["_type"], module_tags=[],
-                            custom_properties={}, metadata_={})
+                c = Contact(
+                    tenant_id=self.tenant_id,
+                    created_by=by,
+                    contact_type=v["_type"],
+                    module_tags=[],
+                    custom_properties={},
+                    metadata_={},
+                )
                 self.session.add(c)
             c.company_name = v["name"]
-            for src, dst in (("email", "primary_email"), ("phone", "primary_phone"), ("website", "website"),
-                             ("currency_code", "currency_code"), ("notes", "notes")):
+            for src, dst in (
+                ("email", "primary_email"),
+                ("phone", "primary_phone"),
+                ("website", "website"),
+                ("currency_code", "currency_code"),
+                ("notes", "notes"),
+            ):
                 if src in v:
                     setattr(c, dst, str(v[src]))
             if "vat_number" in v:
@@ -408,16 +448,25 @@ class DataImportService:
             if "customer_number" in v:
                 c.custom_properties = {**(c.custom_properties or {}), NS: {"number": str(v["customer_number"])}}
             await self.session.flush()
-            records.append(self._rec(job, "contact", c.id, "created" if r.action == "create" else "updated",
-                                     r.row_no))
+            records.append(self._rec(job, "contact", c.id, "created" if r.action == "create" else "updated", r.row_no))
 
     _write_customers = _write_party
     _write_suppliers = _write_party
 
     async def _write_items(self, job, rows, _o, by, records) -> None:
         svc = ItemsService(self.session, self.tenant_id)
-        allowed = {"sku", "name", "description", "item_type", "uom", "sales_price", "purchase_cost", "currency",
-                   "tax_code", "barcode"}
+        allowed = {
+            "sku",
+            "name",
+            "description",
+            "item_type",
+            "uom",
+            "sales_price",
+            "purchase_cost",
+            "currency",
+            "tax_code",
+            "barcode",
+        }
         for r in rows:
             if r.action not in ("create", "update"):
                 continue
@@ -432,12 +481,25 @@ class DataImportService:
                 records.append(self._rec(job, "item", item.id, "updated", r.row_no))
 
     async def _write_opening_balances(self, job, rows, options, by, records) -> None:
-        lines = [LineInput(r.values["_account_id"], debit=max(r.values["_amount"], ZERO),
-                           credit=max(-r.values["_amount"], ZERO), description="Opening balance")
-                 for r in rows if r.action == "create"]
+        lines = [
+            LineInput(
+                r.values["_account_id"],
+                debit=max(r.values["_amount"], ZERO),
+                credit=max(-r.values["_amount"], ZERO),
+                description="Opening balance",
+            )
+            for r in rows
+            if r.action == "create"
+        ]
         entry = await GLService(self.session, self.tenant_id).create_entry(
-            entry_date=_opening_date(options), lines=lines, memo=f"Opening balances (import {job.filename})",
-            source_type=f"{SOURCE}:opening", source_id=str(job.id), created_by=by, post=True)
+            entry_date=_opening_date(options),
+            lines=lines,
+            memo=f"Opening balances (import {job.filename})",
+            source_type=f"{SOURCE}:opening",
+            source_id=str(job.id),
+            created_by=by,
+            post=True,
+        )
         records.append(self._rec(job, "gl_entry", entry.id, "created", 0))
 
     async def _write_docs(self, job, rows, by, records, model, kind: str, entity: str) -> None:
@@ -447,12 +509,20 @@ class DataImportService:
             v = r.values
             paid = v.get("amount_paid", ZERO)
             doc = model(
-                tenant_id=self.tenant_id, kind=kind, number=v["number"],
+                tenant_id=self.tenant_id,
+                kind=kind,
+                number=v["number"],
                 status=("partially_paid" if paid > 0 else ("issued" if kind == "invoice" else "posted")),
-                currency=str(v.get("currency") or "EUR").upper()[:3], fx_rate=Decimal(1),
-                doc_date=v["doc_date"], due_date=v.get("due_date"), net_total=v["net_total"],
-                tax_total=v["tax_total"], gross_total=v["gross_total"], amount_paid=paid,
-                notes="Opening balance (imported)", created_by=by,
+                currency=str(v.get("currency") or "EUR").upper()[:3],
+                fx_rate=Decimal(1),
+                doc_date=v["doc_date"],
+                due_date=v.get("due_date"),
+                net_total=v["net_total"],
+                tax_total=v["tax_total"],
+                gross_total=v["gross_total"],
+                amount_paid=paid,
+                notes="Opening balance (imported)",
+                created_by=by,
             )
             if kind == "invoice":
                 doc.customer_id, doc.customer_name = v["_party"], str(v["party_name"])[:255]
@@ -485,7 +555,8 @@ class DataImportService:
                     continue
                 if rec.entity == "gl_entry":
                     await GLService(self.session, self.tenant_id).reverse_entry(
-                        rec.record_id, memo="Undo opening balance import", created_by=created_by)
+                        rec.record_id, memo="Undo opening balance import", created_by=created_by
+                    )
                     removed += 1
                     continue
                 model = models.get(rec.entity)
@@ -501,8 +572,15 @@ class DataImportService:
 
 
 # ── helpers ───────────────────────────────────────────────────────────────
-_KIND_LABEL = {"str": "text", "email": "e-mail address", "vat": "VAT ID", "decimal": "number", "date": "date",
-               "int": "whole number", "bool": "yes/no"}
+_KIND_LABEL = {
+    "str": "text",
+    "email": "e-mail address",
+    "vat": "VAT ID",
+    "decimal": "number",
+    "date": "date",
+    "int": "whole number",
+    "bool": "yes/no",
+}
 
 
 def job_header_offset(job: ImportJob) -> int:

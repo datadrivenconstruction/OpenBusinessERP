@@ -115,7 +115,7 @@ export function SalesListPage() {
     );
   const exportCsv = () => {
     const docs = selectedRows.length ? selectedRows : rows;
-    triggerDownload(new Blob(['﻿' + salesDocsCsv(docs)], { type: 'text/csv;charset=utf-8' }), `sales-${kind}.csv`);
+    triggerDownload(new Blob(['\uFEFF' + salesDocsCsv(docs)], { type: 'text/csv;charset=utf-8' }), `sales-${kind}.csv`);
   };
 
   const actions: RowActionHandlers = {

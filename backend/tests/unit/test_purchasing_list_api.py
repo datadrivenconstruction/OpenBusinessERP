@@ -261,10 +261,15 @@ async def test_http_contract(client, svc):
     assert r.json()[0]["received_pct"] == 0.0
     assert (await client.get(f"{base}/orders/", params={"status_filter": "draft"})).headers["X-Total-Count"] == "1"
 
-    r = await client.post(f"{base}/orders/{o.id}/receive/", json={"lines": [{"order_line_id": str(o.lines[0].id), "qty": "5"}]})
+    r = await client.post(
+        f"{base}/orders/{o.id}/receive/", json={"lines": [{"order_line_id": str(o.lines[0].id), "qty": "5"}]}
+    )
     assert r.status_code == 201
     got = (await client.get(f"{base}/orders/{o.id}/")).json()
-    assert [(Decimal(l["qty_received"]), Decimal(l["remaining_qty"])) for l in got["lines"]] == [(D(5), D(5)), (D(0), D(4))]
+    assert [(Decimal(l["qty_received"]), Decimal(l["remaining_qty"])) for l in got["lines"]] == [
+        (D(5), D(5)),
+        (D(0), D(4)),
+    ]
 
     assert (await client.get(f"{base}/stats/")).json()["open_po_count"] == 1  # static route not shadowed
     r = await client.post(f"{base}/orders/{o.id}/duplicate/")
@@ -279,7 +284,9 @@ async def test_http_contract(client, svc):
     r = await client.get(f"{base}/bills/", params={"overdue": "true", "match": "none"})
     assert r.headers["X-Total-Count"] == "1" and r.json()[0]["is_overdue"] is True
     assert Decimal(r.json()[0]["balance_due"]) == D("119.00")
-    assert (await client.post(f"{base}/bills/bulk/", json={"action": "reminder_drafts", "ids": [str(b.id)]})).json()["processed"] == 0
+    assert (await client.post(f"{base}/bills/bulk/", json={"action": "reminder_drafts", "ids": [str(b.id)]})).json()[
+        "processed"
+    ] == 0
     assert (await client.post(f"{base}/bills/{b.id}/duplicate/")).status_code == 201
     assert (await client.get(f"{base}/bills/{b.id}/related/")).json() == {"source": None, "derived": []}
     assert (await client.get(f"{base}/bills/{b.id}/activity/")).status_code == 200

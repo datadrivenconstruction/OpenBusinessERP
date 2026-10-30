@@ -269,6 +269,17 @@ def main() -> int:
         return selftest()
 
     base = args.base or default_base()
+    if base == "HEAD~1" and args.head == "HEAD" and not args.base:
+        # A full clone whose HEAD has no parent is a root commit: no history to compare.
+        full = git("rev-parse", "--is-shallow-repository").strip() == "false"
+        try:
+            git("rev-parse", "--verify", "-q", "HEAD~1")
+            root = False
+        except RuntimeError:
+            root = True
+        if full and root:
+            print("locale value diacritics: HEAD is a root commit in a full clone, no earlier locale values to compare")
+            return 0
     try:
         losses, commits, read, seen = compare(base, args.head)
     except RuntimeError as error:

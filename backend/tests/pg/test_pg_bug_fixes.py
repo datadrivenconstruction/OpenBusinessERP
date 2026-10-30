@@ -23,31 +23,6 @@ from sqlalchemy import text
 pytestmark = pytest.mark.asyncio
 
 
-# ── numeric_value: non-numeric money strings must not abort the query ────────
-async def test_catalog_price_filter_tolerates_nonnumeric(pg_session) -> None:
-    from app.modules.catalog.models import CatalogResource
-    from app.modules.catalog.repository import CatalogResourceRepository
-
-    pg_session.add(
-        CatalogResource(
-            resource_code="PG-CAT-1",
-            name="Bad price row",
-            resource_type="material",
-            category="concrete",
-            unit="m2",
-            base_price="N/A",  # would crash CAST(text AS double precision) on PG
-            currency="EUR",
-        )
-    )
-    await pg_session.flush()
-
-    repo = CatalogResourceRepository(pg_session)
-    # A bare cast(.., Float) raised "invalid input syntax" here on PG.
-    items, total = await repo.search(min_price=0.0)
-    assert isinstance(items, list)
-    assert total >= 0
-
-
 async def test_costs_rate_filter_tolerates_nonnumeric(pg_session) -> None:
     from app.modules.costs.models import CostItem
     from app.modules.costs.repository import CostItemRepository

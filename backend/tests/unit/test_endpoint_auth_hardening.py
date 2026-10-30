@@ -218,10 +218,6 @@ def test_the_converter_listing_stays_open() -> None:
     assert not named, f"the converter listing picked up a gate: {named}"
 
 
-
-
-
-
 def test_qdrant_install_permission_is_registered_and_refuses_non_admins() -> None:
     """A key nobody registers makes the route silently admin-only and
     undelegatable. Non-admin roles are what discriminate - admin bypasses the

@@ -21,7 +21,6 @@ manifest = ModuleManifest(
         "oe_projects",
         "oe_costs",
         "oe_boq",
-        
         "oe_ai",
         "oe_ai_agents",
     ],

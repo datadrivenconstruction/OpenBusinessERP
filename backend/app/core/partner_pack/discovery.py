@@ -682,9 +682,7 @@ def _fs_package_dir_for_slug(slug: str) -> Path | None:
         src_dir = pack_dir / "src"
         if not src_dir.is_dir():
             return []
-        return [
-            d for d in sorted(src_dir.glob("openbusinesserp_*")) if d.is_dir() and not d.name.endswith(".egg-info")
-        ]
+        return [d for d in sorted(src_dir.glob("openbusinesserp_*")) if d.is_dir() and not d.name.endswith(".egg-info")]
 
     # Fast path: the pack directory name matches the slug (repo convention).
     direct = packs_dir / slug

@@ -31,9 +31,7 @@ file's coverage with it.
 from __future__ import annotations
 
 import importlib.util
-import json
 import re
-import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -303,18 +301,6 @@ def _load_pack_manifest(slug: str) -> Any:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.MANIFEST
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # ── The national pack keeps its own job ────────────────────────────────────────

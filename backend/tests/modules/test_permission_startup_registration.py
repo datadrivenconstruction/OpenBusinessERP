@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 """A real application boot is what has to register these permission keys.
 
-Both modules covered here gate a route on a permission key that only exists
+The module covered here gates a route on a permission key that only exists
 because the package's ``on_startup`` hook put it there. The module loader
 auto-imports ``router``, ``models``, ``hooks``, ``events``, ``validators`` and
 ``pipeline_nodes``; it never imports ``permissions.py``. The single path from a
@@ -21,12 +21,12 @@ Unregistering first is what makes the answer mean anything. Both registration
 functions are importable, and any test process that touched the module has
 almost certainly run them as a side effect. Asserting the keys are present
 after an import proves the function works; it says nothing about whether the
-application calls it. So this empties both modules out of the registry, asserts
+application calls it. So this empties the module out of the registry, asserts
 the emptying actually took, boots the app the way production boots it, and only
 then asks what came back.
 
-One file and one boot for two modules on purpose: the fixture is the expensive
-part, and the assertion is the same mechanism in both cases.
+
+
 """
 
 from __future__ import annotations
@@ -38,9 +38,7 @@ import pytest_asyncio
 
 from app.core.permissions import Role, permission_registry
 
-# The eight keys that exist only if on_startup ran. Seven writes on global
-# reference tables plus the Qdrant install, which writes a service binary to
-# the host.
+# The keys that exist only if on_startup ran: writes on global reference tables.
 I18N_KEYS: tuple[str, ...] = (
     "i18n_foundation.exchange_rates.fetch",
     "i18n_foundation.exchange_rates.create",
@@ -52,14 +50,12 @@ I18N_KEYS: tuple[str, ...] = (
     "i18n_foundation.tax_configs.update",
 )
 
-MATCH_KEYS: tuple[str, ...] = ("match_elements.qdrant.install",)
-
-ALL_KEYS: tuple[str, ...] = I18N_KEYS + MATCH_KEYS
+ALL_KEYS: tuple[str, ...] = I18N_KEYS
 
 
 @pytest_asyncio.fixture(scope="module")
 async def booted_with_the_keys_removed() -> AsyncIterator[None]:
-    """Drop both modules from the registry, boot the real app, hand back.
+    """Drop the module from the registry, boot the real app, hand back.
 
     ``unregister_module_permissions`` removes a key only when no other module
     still claims it, which is the behaviour wanted here: if some other module
@@ -74,7 +70,6 @@ async def booted_with_the_keys_removed() -> AsyncIterator[None]:
     from app.main import create_app
 
     permission_registry.unregister_module_permissions("i18n_foundation")
-    permission_registry.unregister_module_permissions("match_elements")
 
     still_present = [key for key in ALL_KEYS if permission_registry.get_min_role(key) is not None]
     assert not still_present, (

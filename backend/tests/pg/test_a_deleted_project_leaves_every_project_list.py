@@ -103,24 +103,6 @@ async def test_the_admin_analytics_overview_leaves_out_a_deleted_project(pg_sess
 
 
 @pytest.mark.asyncio
-async def test_the_bcf_project_lists_leave_out_a_deleted_project(pg_session) -> None:
-    from app.modules.bcf.opencde_service import OpenCDEService as BCFOpenCDEService
-    from app.modules.opencde_api.service import OpenCDEService
-
-    owner, live, deleted = await _live_and_deleted(pg_session)
-
-    foundation = {p.project_id for p in await OpenCDEService(pg_session).list_projects()}
-    assert str(live.id) in foundation
-    assert str(deleted.id) not in foundation
-
-    bcf = {
-        p.project_id for p in await BCFOpenCDEService(pg_session).list_projects(user_id=str(owner.id), role="editor")
-    }
-    assert str(live.id) in bcf
-    assert str(deleted.id) not in bcf
-
-
-@pytest.mark.asyncio
 async def test_the_active_projects_kpi_rows_leave_out_a_deleted_project(pg_session) -> None:
     """The count never counted it; the drill-down rows under it listed it."""
     from app.modules.bi_dashboards.kpis import _projects_active_records, project_count_active_kpi

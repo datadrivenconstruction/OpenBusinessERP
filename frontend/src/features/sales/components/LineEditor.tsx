@@ -56,17 +56,17 @@ export function LineEditor({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[860px] text-sm">
+      <table className="w-full min-w-[720px] text-sm">
         <thead className="bg-surface-secondary text-left text-xs text-content-tertiary">
           <tr>
             <th className="w-6" />
-            <th className="w-28 px-2 py-2 font-medium">{t('sales.sku', { defaultValue: 'SKU' })}</th>
+            <th className="w-24 px-2 py-2 font-medium">{t('sales.sku', { defaultValue: 'SKU' })}</th>
             <th className="px-2 py-2 font-medium">{t('sales.description', { defaultValue: 'Description' })}</th>
-            <th className="w-20 px-2 py-2 text-right font-medium">{t('sales.qty', { defaultValue: 'Qty' })}</th>
-            <th className="w-28 px-2 py-2 text-right font-medium">{t('sales.unit_price', { defaultValue: 'Unit price' })}</th>
-            <th className="w-20 px-2 py-2 text-right font-medium">{t('sales.discount', { defaultValue: 'Disc. %' })}</th>
-            <th className="w-24 px-2 py-2 text-right font-medium">{t('sales.tax_rate', { defaultValue: 'Tax %' })}</th>
-            <th className="w-28 px-2 py-2 text-right font-medium">{t('sales.net', { defaultValue: 'Net' })}</th>
+            <th className="w-[4.5rem] px-2 py-2 text-right font-medium">{t('sales.qty', { defaultValue: 'Qty' })}</th>
+            <th className="w-24 px-2 py-2 text-right font-medium">{t('sales.unit_price', { defaultValue: 'Unit price' })}</th>
+            <th className="w-[4.5rem] px-2 py-2 text-right font-medium">{t('sales.discount', { defaultValue: 'Disc. %' })}</th>
+            <th className="w-[5.5rem] px-2 py-2 text-right font-medium">{t('sales.tax_rate', { defaultValue: 'Tax %' })}</th>
+            <th className="w-32 whitespace-nowrap px-2 py-2 text-right font-medium">{t('sales.net', { defaultValue: 'Net' })}</th>
             <th className="w-8" />
           </tr>
         </thead>
@@ -146,7 +146,7 @@ export function LineEditor({
                       inputMode="decimal"
                       disabled={!editable}
                       aria-invalid={!!err(i, k)}
-                      value={l[k]}
+                      value={editable ? l[k] : trimDec(l[k])}
                       onChange={(e) => setLine(i, { [k]: e.target.value })}
                       onKeyDown={onKey(i)}
                     />
@@ -166,7 +166,7 @@ export function LineEditor({
                     ))}
                   </select>
                 </td>
-                <td className="px-2 py-1.5 text-right tabular-nums">
+                <td className="whitespace-nowrap px-2 py-1.5 text-right tabular-nums">
                   <MoneyDisplay amount={lineTotals(l).net} currency={currency} />
                 </td>
                 <td className="px-1 py-1.5">
@@ -198,4 +198,9 @@ export function LineEditor({
       )}
     </div>
   );
+}
+
+// Read-only cells: show 51.3 / 3 instead of the API's 51.3000 / 3.0000.
+function trimDec(v: string): string {
+  return /^-?\d+\.\d+$/.test(v) ? v.replace(/(\.\d*?[1-9])0+$|\.0+$/, '$1') : v;
 }

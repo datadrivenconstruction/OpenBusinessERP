@@ -62,5 +62,5 @@ function csvCell(v: string | number): string {
 /** Row errors as a semicolon CSV with BOM, so Excel opens umlauts and Cyrillic correctly. */
 export function errorsToCsv(errors: { row: number; message: string }[], headers = ['Row', 'Error']): string {
   const lines = [headers.map(csvCell).join(';'), ...errors.map((e) => [e.row || '', e.message].map(csvCell).join(';'))];
-  return '﻿' + lines.join('\r\n') + '\r\n';
+  return '\uFEFF' + lines.join('\r\n') + '\r\n';
 }

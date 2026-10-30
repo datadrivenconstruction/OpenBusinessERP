@@ -1662,9 +1662,7 @@ async def _seed_demo_account() -> None:
         _business_preset = business_preset_key()
         if _business_preset is not None:
             if os.environ.get("OE_TEST_FAST_STARTUP", "").lower() not in ("1", "true", "yes"):
-                await seed_business_demo_for_preset(
-                    _business_preset, uuid.UUID(demo_user_id) if demo_user_id else None
-                )
+                await seed_business_demo_for_preset(_business_preset, uuid.UUID(demo_user_id) if demo_user_id else None)
             # A business workspace carries no construction showcase projects; drop ones an
             # earlier (construction) boot seeded, with their tasks, schedules and globals.
             try:
@@ -1674,7 +1672,8 @@ async def _seed_demo_account() -> None:
 
                 async with async_session_factory() as _cs:
                     _legacy = [
-                        p for p in (await _cs.execute(_select(Project))).scalars().all()
+                        p
+                        for p in (await _cs.execute(_select(Project))).scalars().all()
                         if demo_id_of(p.metadata_) and not (p.metadata_ or {}).get("business_demo")
                     ]
                     if _legacy:
@@ -3919,7 +3918,6 @@ def create_app() -> FastAPI:
     async def get_marketplace() -> list[dict[str, Any]]:
         """Return all marketplace modules with runtime installed status."""
         from app.core.marketplace import get_marketplace_catalog
-        from app.database import async_session_factory
 
         loaded_catalog_regions: set[str] = set()
 

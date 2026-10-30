@@ -44,8 +44,13 @@ async def test_sales_documents_invisible_and_unmodifiable_across_tenants(session
     sa, sb = SalesService(session, A), SalesService(session, B)
     q = await sa.create("quote", lines=LINES, doc_date=DAY)
     assert await sb.list_documents("quote") == []
-    for aw in (sb.get(q.id), sb.update(q.id, notes="x"), sb.delete(q.id), sb.set_status(q.id, "sent"),
-               sb.quote_to_order(q.id)):
+    for aw in (
+        sb.get(q.id),
+        sb.update(q.id, notes="x"),
+        sb.delete(q.id),
+        sb.set_status(q.id, "sent"),
+        sb.quote_to_order(q.id),
+    ):
         with pytest.raises(HTTPException) as exc:
             await sales_call(aw)
         assert exc.value.status_code == 404
@@ -79,15 +84,19 @@ async def test_gl_entries_reports_and_summary_scoped(session):
     acc_a = {a.code: a.id for a in await ga.list_accounts()}
     acc_b = {a.code: a.id for a in await gb.list_accounts()}
     assert set(acc_a) == set(acc_b) and not set(acc_a.values()) & set(acc_b.values())
-    e = await ga.create_entry(entry_date=DAY, post=True, lines=[
-        LineInput(acc_a["1200"], debit=D("500")), LineInput(acc_a["8400"], credit=D("500"))])
+    e = await ga.create_entry(
+        entry_date=DAY,
+        post=True,
+        lines=[LineInput(acc_a["1200"], debit=D("500")), LineInput(acc_a["8400"], credit=D("500"))],
+    )
     for aw in (gb.get_entry(e.id), gb.reverse_entry(e.id), gb.delete_draft(e.id), gb.get_account(acc_a["1200"])):
         with pytest.raises(HTTPException) as exc:
             await gl_call(aw)
         assert exc.value.status_code == 404
     with pytest.raises(GLValidationError):  # A's account ids are unknown to B
-        await gb.create_entry(entry_date=DAY, lines=[
-            LineInput(acc_a["1200"], debit=D("1")), LineInput(acc_a["8400"], credit=D("1"))])
+        await gb.create_entry(
+            entry_date=DAY, lines=[LineInput(acc_a["1200"], debit=D("1")), LineInput(acc_a["8400"], credit=D("1"))]
+        )
     assert await gb.list_entries() == []
     assert (await gb.trial_balance(None, None))["rows"] == []
     assert (await ga.trial_balance(None, None))["total_debit"] == D("500.00")
