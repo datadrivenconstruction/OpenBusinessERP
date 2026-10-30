@@ -441,3 +441,8 @@ email-delivery-failures*.jsonl
 
 # Locale bootstrap batches, see scripts/i18n_new_locale.py
 .i18n-work/
+
+# README and app images are part of the repo
+!docs/images/*.png
+!frontend/public/**/*.png
+!desktop/src-tauri/icons/*.png
