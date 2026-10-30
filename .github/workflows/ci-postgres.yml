@@ -2068,7 +2068,7 @@ jobs:
           --timeout=2700 --timeout-method=thread
       - name: Upload the route report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-smoke-report
           path: ${{ runner.temp }}/api-smoke/

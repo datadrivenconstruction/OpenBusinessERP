@@ -1017,7 +1017,7 @@ jobs:
              "desktop/src-tauri/binaries/openbusinesserp-server-${{ matrix.target }}${{ matrix.ext }}"
 
       - name: Upload sidecar artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.build_only_windows && format('sidecar-{0}-{1}-{2}', matrix.target, github.sha, github.run_attempt) || format('sidecar-{0}', matrix.target) }}
           path: desktop/src-tauri/binaries/
@@ -1033,7 +1033,7 @@ jobs:
 
       - name: Upload the tested diagnostic frontend
         if: inputs.build_only_windows
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-windows-${{ github.sha }}-${{ github.run_attempt }}
           path: desktop/frontend-artifact/
@@ -1572,7 +1572,7 @@ jobs:
 
       - name: Upload Windows diagnostic installer
         if: inputs.build_only_windows
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-diagnostic-${{ github.sha }}-${{ github.run_attempt }}
           path: desktop/src-tauri/target/release/bundle/nsis/

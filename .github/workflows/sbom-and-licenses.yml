@@ -450,7 +450,7 @@ jobs:
           wc -l THIRD_PARTY_LICENSES.md
 
       - name: Upload artefacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: licenses-and-sbom
           path: |
