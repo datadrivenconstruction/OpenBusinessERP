@@ -144,7 +144,7 @@ dependencies = [
     # extra, which left vector recognition dead on a plain install and could
     # never be installed at all in the frozen desktop app. The heavy OCR
     # engine (paddleocr) stays optional - it only adds dimension-text reading.
-    "pymupdf>=1.25.0,<2",
+    "pymupdf>=1.25.0,<3",
     "opencv-python-headless>=4.10.0,<6",
     "httpx>=0.28.0,<1",
     "orjson>=3.10.0,<4",
