@@ -1,0 +1,77 @@
+name: Feature Request
+description: Suggest a new feature or improvement for OpenBusinessERP
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe your idea so we can evaluate it.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear description of the problem. Ex. "I'm always frustrated when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear description of what you want to happen.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: module
+    attributes:
+      label: Which module does this relate to?
+      description: Select all that apply.
+      options:
+        - label: Invoicing / Billing
+        - label: Accounting / General Ledger
+        - label: Tax / VAT / E-invoicing
+        - label: Banking / Reconciliation
+        - label: CRM / Contacts
+        - label: Sales / Quotes / Orders
+        - label: Inventory / Items
+        - label: Procurement / Purchasing
+        - label: HR / Payroll / Time
+        - label: Appointments / Booking
+        - label: Projects
+        - label: Documents
+        - label: Reports / Dashboards
+        - label: Data Import
+        - label: AI Features
+        - label: Country / Industry Packs
+        - label: i18n / Translations
+        - label: Authentication / Users
+        - label: Settings / Backup & Restore
+        - label: UI / Frontend
+        - label: API / Backend
+        - label: Docker / Deployment
+        - label: Desktop App
+        - label: Other
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you've thought about?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Important for my workflow
+        - Blocking my adoption of OpenBusinessERP
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context, screenshots, or mockups about the feature request.

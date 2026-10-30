@@ -1,0 +1,182 @@
+# BUG-B06 — Docker build context hardening.
+#
+# Without this file every `docker build` ships gigabytes of irrelevant
+# content (BIM uploads and exports, the marketing site,
+# every test artefact, every .env, every git object) to the build
+# daemon. That makes builds slow, bloats layer caches, and risks
+# leaking secrets and customer data into images.
+#
+# Rule of thumb: only what the Dockerfile explicitly COPYs needs to
+# be present in the build context. When in doubt, exclude — a
+# missing file is loud (build error), an accidentally included one
+# is silent (data leak).
+
+# ── Version control & developer scratch ─────────────────────────────
+.git
+.gitignore
+.gitattributes
+.github
+# Agent tooling scratch, and the largest single thing this file was not
+# excluding. Most of the bulk is the git worktrees under .claude/worktrees,
+# each one a second copy of the whole tree, and it also holds API tokens in
+# plain files that were being handed to the build daemon on every local build.
+#
+# No published image was ever affected and nothing leaked into an artefact.
+# Nothing under .claude is tracked, it is excluded through .git/info/exclude
+# rather than .gitignore, so actions/checkout never materialises it and the
+# release build never saw it. Dockerfile.unified has no wildcard COPY either,
+# every COPY names a path, so the context is as far as this could ever have
+# reached. That also means the repo hygiene gate and the wheel scanner had
+# nothing to say about it, which is why it went unnoticed for so long.
+#
+# Unanchored like the tool directories around it, which also takes
+# backend/.claude and frontend/.claude, the same scratch one level down.
+.claude
+.playwright-mcp
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# ── Python build / cache ────────────────────────────────────────────
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/.tox
+**/.coverage
+**/htmlcov
+**/.venv
+**/venv
+**/env
+**/build
+**/dist
+**/*.egg
+
+# ── Node / frontend build ───────────────────────────────────────────
+**/node_modules
+**/.next
+**/.turbo
+**/.cache
+**/.parcel-cache
+frontend/dist
+frontend/coverage
+frontend/test-results
+frontend/playwright-report
+frontend/.playwright
+frontend/tsconfig.tsbuildinfo
+frontend/.vite
+
+# ── Local databases & storage (NEVER ship these in an image) ────────
+backend/openestimate.db
+backend/openestimate.db-journal
+backend/openestimate.db-shm
+backend/openestimate.db-wal
+backend/openestimate.db.cleanup-backup-*
+backend/storage
+backend/*.db
+backend/*.db-journal
+**/*.sqlite
+**/*.sqlite3
+
+# ── Customer / project data (uploaded models, exports, BIM) ─────────
+# These are user-content directories that grow without bound; the
+# build context must never include them.
+data/bim
+data/exports
+data/uploads
+data/tmp
+
+# ── Catalog seed data ───────────────────────────────────────────────
+# Re-fetched at deploy time; the image bakes only the manifest.
+data/catalog/*.parquet
+data/catalog/*.csv
+data/catalog/*.zip
+data/catalog/raw
+
+# ── Secrets ─────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+**/credentials.json
+**/service-account*.json
+*.pem
+*.key
+
+# ── Logs & test output ──────────────────────────────────────────────
+**/*.log
+**/logs
+**/log
+**/test-results
+**/coverage
+**/playwright-report
+
+# ── Out-of-image directories ────────────────────────────────────────
+# These exist in the repo but are not part of any image we build.
+desktop
+website-marketing
+i18n-audit
+deploy/terraform
+deploy/kubernetes
+
+# ── Docs / non-runtime ──────────────────────────────────────────────
+docs
+*.md
+!README.md
+!backend/README.md
+!frontend/README.md
+# Anchored, and it matters. ``backend/LICENSE`` is the verbatim AGPL-3.0 text
+# the wheel build needs (backend/pyproject.toml names it in license-files), and
+# it has to reach the build context or `pip install ./backend` produces a wheel
+# with no licence in it and the image conveys nothing. Real Docker ignore
+# patterns are anchored at the context root, so a bare ``LICENSE`` would not
+# have hit it - but the gitignore grammar that tests/unit/test_dockerignore.py
+# models it with is not anchored, and under that reading it would. The leading
+# slash makes the two grammars agree, and the negation below says so out loud.
+/LICENSE
+!backend/LICENSE
+# The copyright notice and licensing pointers. ``backend/NOTICE`` is the one
+# exception and it is in exactly the position ``backend/LICENSE`` is above:
+# backend/pyproject.toml names it in license-files, so a context that drops it
+# takes it straight back out of the wheel that Dockerfile.unified installs.
+# That failure is silent. license-files entries are glob patterns, and
+# hatchling 1.32.0 drops one that matches nothing without a word: measured, the
+# build still exits 0 and still writes License-Expression, it just carries one
+# License-File instead of two. Anchored for the same reason the licence is,
+# with the negation saying so out loud, because a bare pattern here is one the
+# two grammars disagree about: real Docker anchors it at the context root and
+# never reaches backend/, the gitignore grammar that
+# tests/unit/test_dockerignore.py models it with does reach. The repo root
+# copies stay out; no Dockerfile COPYs them.
+/COPYRIGHT
+/NOTICE
+!backend/NOTICE
+CHANGELOG.md
+SECURITY.md
+docs/legal/TERMS.md
+docs/legal/PRIVACY.md
+docs/legal/COOKIES.md
+docs/legal/COMMERCIAL-LICENSE.md
+docs/legal/CLA.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+docs/legal/PATENTS.md
+docs/legal/THIRD_PARTY_LICENSES.md
+docs/legal/TRADEMARK.md
+docs/legal/ACCESSIBILITY.md
+
+# ── Misc archives ───────────────────────────────────────────────────
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.rar
+
+# ── OS artefacts ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

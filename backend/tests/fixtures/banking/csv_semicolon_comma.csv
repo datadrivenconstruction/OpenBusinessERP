@@ -1,0 +1,3 @@
+Buchungstag;Wertstellung;Empfänger/Auftraggeber;IBAN;Verwendungszweck;Betrag;Währung
+11.03.2026;11.03.2026;Acme Builders GmbH;DE02 1203 0000 0000 2020 51;RE INV-000001;1.190,00;EUR
+12.03.2026;12.03.2026;Office Supply Store;;Order 7781;-45,90;EUR

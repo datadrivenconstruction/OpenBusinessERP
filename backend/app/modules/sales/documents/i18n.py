@@ -1,0 +1,406 @@
+"""Labels, default texts and number formatting for printed sales documents.
+
+All wording is this project's own. Languages: en, de, ru, fr, es, it, pl;
+anything else falls back to English.
+"""
+
+from __future__ import annotations
+
+from datetime import date
+from decimal import ROUND_HALF_UP, Decimal
+
+LANGUAGES = ("en", "de", "ru", "fr", "es", "it", "pl")
+
+_L: dict[str, dict[str, str]] = {
+    "en": {
+        "quote": "Quotation",
+        "order": "Order confirmation",
+        "invoice": "Invoice",
+        "credit_note": "Credit note",
+        "number": "No.",
+        "date": "Date",
+        "due_date": "Payable by",
+        "delivery_date": "Delivery date",
+        "delivery_period": "Service period",
+        "customer_vat": "Your VAT ID",
+        "pos": "#",
+        "description": "Item",
+        "qty": "Qty",
+        "unit_price": "Unit price",
+        "discount": "Disc. %",
+        "rate": "VAT %",
+        "amount": "Net",
+        "net_total": "Total net",
+        "tax_line": "VAT {rate} % on {net}",
+        "gross_total": "Total due",
+        "credit_total": "Total credited",
+        "payment_terms": "Payment terms",
+        "bank": "Bank details",
+        "account_holder": "Account holder",
+        "vat_id": "VAT ID",
+        "tax_number": "Tax no.",
+        "register": "Register",
+        "directors": "Managing directors",
+        "page": "Page {n} of {m}",
+        "qr": "Scan to pay with your banking app",
+        "relates_to": "Relates to document {ref}",
+        "terms_days": "Please pay within {days} days, by {due}.",
+        "terms_now": "Payable immediately without deduction.",
+        "intro.quote": "Thank you for your enquiry. We are pleased to offer the following:",
+        "intro.order": "Thank you for your order, which we confirm as follows:",
+        "intro.invoice": "For the goods and services listed below we charge:",
+        "intro.credit_note": "We credit you the following amounts:",
+        "closing.quote": "This offer is valid for 30 days. We look forward to hearing from you.",
+        "closing.order": "We will keep you informed about delivery.",
+        "closing.invoice": "Thank you for your business.",
+        "closing.credit_note": "The amount will be settled against open items or refunded.",
+        "email_subject": "{document_title} {document_number} from {company_name}",
+        "email_body": "Hello {customer_name},\n\nplease find {document_title} {document_number} "
+        "dated {document_date} attached as a PDF. Amount: {total}.\n\nKind regards\n{company_name}",
+    },
+    "de": {
+        "quote": "Angebot",
+        "order": "Auftragsbestätigung",
+        "invoice": "Rechnung",
+        "credit_note": "Gutschrift",
+        "number": "Nr.",
+        "date": "Datum",
+        "due_date": "Zahlbar bis",
+        "delivery_date": "Lieferdatum",
+        "delivery_period": "Leistungszeitraum",
+        "customer_vat": "Ihre USt-IdNr.",
+        "pos": "Pos.",
+        "description": "Bezeichnung",
+        "qty": "Menge",
+        "unit_price": "Einzelpreis",
+        "discount": "Rab. %",
+        "rate": "USt. %",
+        "amount": "Netto",
+        "net_total": "Summe netto",
+        "tax_line": "USt. {rate} % auf {net}",
+        "gross_total": "Gesamtbetrag",
+        "credit_total": "Gutschriftsbetrag",
+        "payment_terms": "Zahlungsbedingungen",
+        "bank": "Bankverbindung",
+        "account_holder": "Kontoinhaber",
+        "vat_id": "USt-IdNr.",
+        "tax_number": "Steuernummer",
+        "register": "Handelsregister",
+        "directors": "Geschäftsführung",
+        "page": "Seite {n} von {m}",
+        "qr": "Zum Bezahlen mit der Banking-App scannen",
+        "relates_to": "Bezug: Beleg {ref}",
+        "terms_days": "Bitte zahlen Sie innerhalb von {days} Tagen bis zum {due}.",
+        "terms_now": "Sofort zahlbar ohne Abzug.",
+        "intro.quote": "Vielen Dank für Ihre Anfrage. Gerne bieten wir Ihnen an:",
+        "intro.order": "Vielen Dank für Ihren Auftrag, den wir wie folgt bestätigen:",
+        "intro.invoice": "Für die nachstehend aufgeführten Lieferungen und Leistungen berechnen wir:",
+        "intro.credit_note": "Wir schreiben Ihnen folgende Beträge gut:",
+        "closing.quote": "Dieses Angebot gilt 30 Tage. Wir freuen uns auf Ihre Rückmeldung.",
+        "closing.order": "Über den Liefertermin halten wir Sie auf dem Laufenden.",
+        "closing.invoice": "Vielen Dank für die Zusammenarbeit.",
+        "closing.credit_note": "Der Betrag wird mit offenen Posten verrechnet oder erstattet.",
+        "email_subject": "{document_title} {document_number} von {company_name}",
+        "email_body": "Guten Tag {customer_name},\n\nanbei erhalten Sie {document_title} {document_number} "
+        "vom {document_date} als PDF. Betrag: {total}.\n\nMit freundlichen Grüßen\n{company_name}",
+    },
+    "ru": {
+        "quote": "Коммерческое предложение",
+        "order": "Подтверждение заказа",
+        "invoice": "Счёт",
+        "credit_note": "Кредит-нота",
+        "number": "№",
+        "date": "Дата",
+        "due_date": "Оплатить до",
+        "delivery_date": "Дата поставки",
+        "delivery_period": "Период оказания услуг",
+        "customer_vat": "Ваш налоговый номер",
+        "pos": "№",
+        "description": "Наименование",
+        "qty": "Кол-во",
+        "unit_price": "Цена",
+        "discount": "Скидка %",
+        "rate": "НДС %",
+        "amount": "Нетто",
+        "net_total": "Итого нетто",
+        "tax_line": "НДС {rate} % с {net}",
+        "gross_total": "Итого к оплате",
+        "credit_total": "Итого к зачёту",
+        "payment_terms": "Условия оплаты",
+        "bank": "Банковские реквизиты",
+        "account_holder": "Получатель",
+        "vat_id": "НДС-номер",
+        "tax_number": "ИНН",
+        "register": "Реестр",
+        "directors": "Руководство",
+        "page": "Стр. {n} из {m}",
+        "qr": "Отсканируйте для оплаты в банковском приложении",
+        "relates_to": "Относится к документу {ref}",
+        "terms_days": "Оплата в течение {days} дней, до {due}.",
+        "terms_now": "Оплата сразу, без вычетов.",
+        "intro.quote": "Благодарим за запрос. Предлагаем следующее:",
+        "intro.order": "Благодарим за заказ и подтверждаем его:",
+        "intro.invoice": "За перечисленные ниже товары и услуги выставляем:",
+        "intro.credit_note": "Зачисляем в вашу пользу следующие суммы:",
+        "closing.quote": "Предложение действительно 30 дней. Будем рады вашему ответу.",
+        "closing.order": "О сроках поставки мы сообщим дополнительно.",
+        "closing.invoice": "Благодарим за сотрудничество.",
+        "closing.credit_note": "Сумма будет зачтена в счёт открытых позиций или возвращена.",
+        "email_subject": "{document_title} {document_number} от {company_name}",
+        "email_body": "Здравствуйте, {customer_name}!\n\nВо вложении {document_title} {document_number} "
+        "от {document_date} в формате PDF. Сумма: {total}.\n\nС уважением\n{company_name}",
+    },
+    "fr": {
+        "quote": "Devis",
+        "order": "Confirmation de commande",
+        "invoice": "Facture",
+        "credit_note": "Avoir",
+        "number": "N°",
+        "date": "Date",
+        "due_date": "À payer avant le",
+        "delivery_date": "Date de livraison",
+        "delivery_period": "Période de prestation",
+        "customer_vat": "Votre n° TVA",
+        "pos": "#",
+        "description": "Désignation",
+        "qty": "Qté",
+        "unit_price": "Prix unitaire",
+        "discount": "Rem. %",
+        "rate": "TVA %",
+        "amount": "HT",
+        "net_total": "Total HT",
+        "tax_line": "TVA {rate} % sur {net}",
+        "gross_total": "Total TTC",
+        "credit_total": "Total crédité",
+        "payment_terms": "Conditions de paiement",
+        "bank": "Coordonnées bancaires",
+        "account_holder": "Titulaire",
+        "vat_id": "N° TVA",
+        "tax_number": "N° fiscal",
+        "register": "Registre",
+        "directors": "Direction",
+        "page": "Page {n} sur {m}",
+        "qr": "Scannez pour payer avec votre application bancaire",
+        "relates_to": "Se rapporte au document {ref}",
+        "terms_days": "Paiement sous {days} jours, au plus tard le {due}.",
+        "terms_now": "Payable immédiatement, sans escompte.",
+        "intro.quote": "Merci pour votre demande. Nous avons le plaisir de vous proposer :",
+        "intro.order": "Merci pour votre commande, que nous confirmons ainsi :",
+        "intro.invoice": "Pour les fournitures et prestations ci-dessous, nous facturons :",
+        "intro.credit_note": "Nous portons à votre crédit les montants suivants :",
+        "closing.quote": "Offre valable 30 jours. Dans l'attente de votre retour.",
+        "closing.order": "Nous vous tiendrons informé de la livraison.",
+        "closing.invoice": "Merci de votre confiance.",
+        "closing.credit_note": "Le montant sera imputé sur vos postes ouverts ou remboursé.",
+        "email_subject": "{document_title} {document_number} de {company_name}",
+        "email_body": "Bonjour {customer_name},\n\nveuillez trouver ci-joint {document_title} {document_number} "
+        "du {document_date} au format PDF. Montant : {total}.\n\nCordialement\n{company_name}",
+    },
+    "es": {
+        "quote": "Presupuesto",
+        "order": "Confirmación de pedido",
+        "invoice": "Factura",
+        "credit_note": "Factura rectificativa",
+        "number": "N.º",
+        "date": "Fecha",
+        "due_date": "Pagadero hasta",
+        "delivery_date": "Fecha de entrega",
+        "delivery_period": "Periodo del servicio",
+        "customer_vat": "Su NIF-IVA",
+        "pos": "#",
+        "description": "Concepto",
+        "qty": "Cant.",
+        "unit_price": "Precio unit.",
+        "discount": "Dto. %",
+        "rate": "IVA %",
+        "amount": "Neto",
+        "net_total": "Base imponible",
+        "tax_line": "IVA {rate} % sobre {net}",
+        "gross_total": "Total",
+        "credit_total": "Total abonado",
+        "payment_terms": "Condiciones de pago",
+        "bank": "Datos bancarios",
+        "account_holder": "Titular",
+        "vat_id": "NIF-IVA",
+        "tax_number": "NIF",
+        "register": "Registro",
+        "directors": "Administración",
+        "page": "Página {n} de {m}",
+        "qr": "Escanee para pagar con su app bancaria",
+        "relates_to": "Referido al documento {ref}",
+        "terms_days": "Pague en un plazo de {days} días, antes del {due}.",
+        "terms_now": "Pago inmediato sin descuento.",
+        "intro.quote": "Gracias por su consulta. Le ofrecemos lo siguiente:",
+        "intro.order": "Gracias por su pedido, que confirmamos así:",
+        "intro.invoice": "Por los suministros y servicios indicados facturamos:",
+        "intro.credit_note": "Le abonamos los siguientes importes:",
+        "closing.quote": "Oferta válida durante 30 días. Quedamos a la espera de su respuesta.",
+        "closing.order": "Le informaremos sobre la entrega.",
+        "closing.invoice": "Gracias por su confianza.",
+        "closing.credit_note": "El importe se compensará con partidas abiertas o se reembolsará.",
+        "email_subject": "{document_title} {document_number} de {company_name}",
+        "email_body": "Hola {customer_name}:\n\nadjuntamos {document_title} {document_number} "
+        "del {document_date} en PDF. Importe: {total}.\n\nSaludos cordiales\n{company_name}",
+    },
+    "it": {
+        "quote": "Preventivo",
+        "order": "Conferma d'ordine",
+        "invoice": "Fattura",
+        "credit_note": "Nota di credito",
+        "number": "N.",
+        "date": "Data",
+        "due_date": "Pagabile entro",
+        "delivery_date": "Data di consegna",
+        "delivery_period": "Periodo di prestazione",
+        "customer_vat": "Vostra P. IVA",
+        "pos": "#",
+        "description": "Descrizione",
+        "qty": "Q.tà",
+        "unit_price": "Prezzo unit.",
+        "discount": "Sc. %",
+        "rate": "IVA %",
+        "amount": "Imponibile",
+        "net_total": "Totale imponibile",
+        "tax_line": "IVA {rate} % su {net}",
+        "gross_total": "Totale",
+        "credit_total": "Totale accreditato",
+        "payment_terms": "Condizioni di pagamento",
+        "bank": "Coordinate bancarie",
+        "account_holder": "Intestatario",
+        "vat_id": "P. IVA",
+        "tax_number": "Cod. fiscale",
+        "register": "Registro",
+        "directors": "Amministrazione",
+        "page": "Pagina {n} di {m}",
+        "qr": "Scansiona per pagare con l'app della banca",
+        "relates_to": "Riferito al documento {ref}",
+        "terms_days": "Pagamento entro {days} giorni, entro il {due}.",
+        "terms_now": "Pagabile subito senza sconti.",
+        "intro.quote": "Grazie per la richiesta. Siamo lieti di offrirvi:",
+        "intro.order": "Grazie per l'ordine, che confermiamo come segue:",
+        "intro.invoice": "Per le forniture e i servizi elencati addebitiamo:",
+        "intro.credit_note": "Vi accreditiamo i seguenti importi:",
+        "closing.quote": "Offerta valida 30 giorni. Restiamo in attesa di un vostro riscontro.",
+        "closing.order": "Vi terremo informati sulla consegna.",
+        "closing.invoice": "Grazie per la collaborazione.",
+        "closing.credit_note": "L'importo sarà compensato con partite aperte o rimborsato.",
+        "email_subject": "{document_title} {document_number} da {company_name}",
+        "email_body": "Buongiorno {customer_name},\n\nin allegato {document_title} {document_number} "
+        "del {document_date} in PDF. Importo: {total}.\n\nCordiali saluti\n{company_name}",
+    },
+    "pl": {
+        "quote": "Oferta",
+        "order": "Potwierdzenie zamówienia",
+        "invoice": "Faktura",
+        "credit_note": "Faktura korygująca",
+        "number": "Nr",
+        "date": "Data",
+        "due_date": "Termin płatności",
+        "delivery_date": "Data dostawy",
+        "delivery_period": "Okres świadczenia",
+        "customer_vat": "Państwa NIP UE",
+        "pos": "Lp.",
+        "description": "Nazwa",
+        "qty": "Ilość",
+        "unit_price": "Cena jedn.",
+        "discount": "Rabat %",
+        "rate": "VAT %",
+        "amount": "Netto",
+        "net_total": "Razem netto",
+        "tax_line": "VAT {rate} % od {net}",
+        "gross_total": "Do zapłaty",
+        "credit_total": "Kwota korekty",
+        "payment_terms": "Warunki płatności",
+        "bank": "Dane bankowe",
+        "account_holder": "Właściciel rachunku",
+        "vat_id": "NIP UE",
+        "tax_number": "NIP",
+        "register": "Rejestr",
+        "directors": "Zarząd",
+        "page": "Strona {n} z {m}",
+        "qr": "Zeskanuj, aby zapłacić w aplikacji bankowej",
+        "relates_to": "Dotyczy dokumentu {ref}",
+        "terms_days": "Prosimy o zapłatę w ciągu {days} dni, do {due}.",
+        "terms_now": "Płatne natychmiast bez potrąceń.",
+        "intro.quote": "Dziękujemy za zapytanie. Przedstawiamy ofertę:",
+        "intro.order": "Dziękujemy za zamówienie, które potwierdzamy:",
+        "intro.invoice": "Za poniższe dostawy i usługi naliczamy:",
+        "intro.credit_note": "Uznajemy na Państwa rzecz następujące kwoty:",
+        "closing.quote": "Oferta ważna 30 dni. Czekamy na odpowiedź.",
+        "closing.order": "O terminie dostawy poinformujemy osobno.",
+        "closing.invoice": "Dziękujemy za współpracę.",
+        "closing.credit_note": "Kwota zostanie rozliczona z otwartymi pozycjami lub zwrócona.",
+        "email_subject": "{document_title} {document_number} od {company_name}",
+        "email_body": "Dzień dobry {customer_name},\n\nw załączniku przesyłamy {document_title} {document_number} "
+        "z dnia {document_date} w formacie PDF. Kwota: {total}.\n\nZ poważaniem\n{company_name}",
+    },
+}
+
+# (thousands separator, decimal separator, symbol before amount)
+_NUM = {
+    "en": (",", ".", True),
+    "de": (".", ",", False),
+    "ru": (" ", ",", False),
+    "fr": (" ", ",", False),
+    "es": (".", ",", False),
+    "it": (".", ",", False),
+    "pl": (" ", ",", False),
+}
+_DATE = {
+    "en": "%d %b %Y",
+    "de": "%d.%m.%Y",
+    "ru": "%d.%m.%Y",
+    "fr": "%d/%m/%Y",
+    "es": "%d/%m/%Y",
+    "it": "%d/%m/%Y",
+    "pl": "%d.%m.%Y",
+}
+_SYMBOL = {"EUR": "€", "USD": "$", "GBP": "£", "PLN": "zł", "RUB": "₽", "CHF": "CHF"}
+
+
+def lang(code: str | None) -> str:
+    code = (code or "").lower()[:2]
+    return code if code in LANGUAGES else "en"
+
+
+def t(language: str, key: str, **kw: object) -> str:
+    text = _L[lang(language)].get(key) or _L["en"][key]
+    return text.format(**kw) if kw else text
+
+
+def fmt_number(value: Decimal | int | float, language: str, places: int = 2) -> str:
+    thou, dec, _ = _NUM[lang(language)]
+    q = Decimal(str(value)).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
+    sign = "-" if q < 0 else ""
+    whole, _, frac = f"{abs(q):f}".partition(".")
+    groups = []
+    while whole:
+        groups.insert(0, whole[-3:])
+        whole = whole[:-3]
+    out = thou.join(groups) or "0"
+    return f"{sign}{out}{dec}{frac}" if places else f"{sign}{out}"
+
+
+def fmt_qty(value: Decimal, language: str) -> str:
+    q = Decimal(str(value)).normalize()
+    places = 0 if q == q.to_integral() else min(4, -q.as_tuple().exponent)
+    return fmt_number(value, language, int(places))
+
+
+def fmt_money(value: Decimal | int | float, currency: str, language: str) -> str:
+    _, _, before = _NUM[lang(language)]
+    sym = _SYMBOL.get(currency.upper(), currency.upper())
+    num = fmt_number(value, language)
+    if before:
+        return f"-{sym}{num[1:]}" if num.startswith("-") else f"{sym}{num}"
+    return f"{num} {sym}"
+
+
+def fmt_date(value: date | None, language: str) -> str:
+    return value.strftime(_DATE[lang(language)]) if value else ""
+
+
+def fmt_rate(value: Decimal, language: str) -> str:
+    q = Decimal(str(value)).normalize()
+    places = 0 if q == q.to_integral() else min(2, -q.as_tuple().exponent)
+    return fmt_number(value, language, int(places))

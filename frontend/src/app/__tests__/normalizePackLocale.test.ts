@@ -1,0 +1,82 @@
+// DDC-CWICR-OE: DataDrivenConstruction · OpenBusinessERP
+// Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
+// OpenBusinessERP — DataDrivenConstruction (DDC)
+// Tests for normalizePackLocale: maps a partner pack's BCP-47 default_locale to
+// a supported base UI language, so an active pack forces the right language
+// (example-pack -> fr) and never an unsupported one.
+import { describe, expect, it } from 'vitest';
+
+import { normalizePackLocale } from '../i18n';
+
+describe('normalizePackLocale', () => {
+  it('strips the region subtag when the UI does not ship that region', () => {
+    expect(normalizePackLocale('fr-CA')).toBe('fr'); // example-pack
+  });
+
+  it('gives English of a day-first region the British entry, not the month-first one', () => {
+    // The unqualified entry prints 3/14/2026. An Australian, Irish or Indian
+    // pack stripped to it read 3/4/2026 as the fourth of March.
+    expect(normalizePackLocale('en-AU')).toBe('en-GB'); // aus
+    expect(normalizePackLocale('en-NZ')).toBe('en-GB'); // nzs
+    expect(normalizePackLocale('en-IE')).toBe('en-GB'); // ireland-ie
+    expect(normalizePackLocale('en-IN')).toBe('en-GB'); // india-cpwd
+    expect(normalizePackLocale('en-CA')).toBe('en'); // canada-ca: not day-first
+  });
+
+  it('prints the day first for a day-first pack, which the unqualified entry does not', () => {
+    const fourteenthOfMarch = new Date(2026, 2, 14);
+    const format = (tag: string) =>
+      new Intl.DateTimeFormat(normalizePackLocale(tag), { year: 'numeric', month: '2-digit', day: '2-digit' }).format(
+        fourteenthOfMarch,
+      );
+    expect(format('en-AU')).toBe('14/03/2026');
+    expect(format('en-IE')).toBe('14/03/2026');
+    // The control: what the Australian pack printed before.
+    expect(format('en')).toBe('03/14/2026');
+  });
+
+  it('keeps the region when the UI ships it, because the pack asked for it', () => {
+    // A pack that names a region has named it deliberately. Stripping en-US left
+    // commercial-denver asking for American English and being handed the British
+    // strings, which is the one thing the locale exists to prevent.
+    expect(normalizePackLocale('en-US')).toBe('en-US'); // commercial-denver, us-costdata
+    // uk-jct and commercial-london both declare en-GB. This answered 'en'
+    // until the UI started offering English (UK), and the pack was handed the
+    // unqualified entry that names no region: American dates and prices under
+    // a JCT contract. It moved up here the moment the region became something
+    // the app could actually give it.
+    expect(normalizePackLocale('en-GB')).toBe('en-GB');
+    expect(normalizePackLocale('es-MX')).toBe('es-MX');
+    expect(normalizePackLocale('pt-BR')).toBe('pt-BR'); // brazil-sinapi
+    expect(normalizePackLocale('es-CL')).toBe('es-CL');
+    expect(normalizePackLocale('es-CO')).toBe('es-CO');
+  });
+
+  it('passes through base codes the UI ships', () => {
+    expect(normalizePackLocale('de')).toBe('de'); // example-pack-de, example-formwork
+    expect(normalizePackLocale('pt')).toBe('pt'); // portugal-pt
+    expect(normalizePackLocale('ar')).toBe('ar'); // saudi-vision2030 (RTL)
+    expect(normalizePackLocale('en')).toBe('en'); // modular-prefab
+    // hungary-hu. The pack declared English while no Hungarian interface
+    // shipped; it declares hu now, and hu has to answer with itself or the
+    // pack is back to promising a language it cannot deliver.
+    expect(normalizePackLocale('hu')).toBe('hu');
+  });
+
+  it('is case-insensitive and trims', () => {
+    expect(normalizePackLocale('FR-ca')).toBe('fr');
+    expect(normalizePackLocale(' de ')).toBe('de');
+    // A manifest is free to write the region in any case; i18next writes it in
+    // one, and that is the one the resource bundle is registered under.
+    expect(normalizePackLocale('en-us')).toBe('en-US');
+    expect(normalizePackLocale('EN-US')).toBe('en-US');
+    expect(normalizePackLocale(' en-Us ')).toBe('en-US');
+  });
+
+  it('falls back to English for unsupported or empty locales', () => {
+    expect(normalizePackLocale('xx-YY')).toBe('en');
+    expect(normalizePackLocale('')).toBe('en');
+    expect(normalizePackLocale(null)).toBe('en');
+    expect(normalizePackLocale(undefined)).toBe('en');
+  });
+});

@@ -1,0 +1,443 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+
+# Node
+node_modules/
+frontend/dist/
+# Isolated gate-build output: building straight into dist/ EPERMs against
+frontend/dist-gate/
+# The same output under the other names it has been written to. dist-gate/
+frontend/distgate/
+frontend/distlead/
+frontend/dist_*_backup/
+# Scratch output from one-off measurement runs.
+frontend/esb.err
+slot_census_out.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.production
+# The three lines above name suffixes somebody thought of. Any other one, a
+*.env
+.env.*
+!.env.example
+
+# Two files the running application writes, both holding live secrets: the
+.demo_credentials.json
+.jwt-secret
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+*.sqlite3
+openestimate.db*
+
+# Docker volumes
+pg_data/
+minio_data/
+qdrant_data/
+
+# Testing
+htmlcov/
+.coverage
+coverage.xml
+.pytest_cache/
+frontend/test-results/
+frontend/e2e-results/
+frontend/e2e/v1.9/.auth-token.txt
+frontend/e2e/v1.9/.auth-state.json
+*.trace.zip
+frontend/video-output/
+.tests-artifacts/
+frontend/playwright.video.config.ts
+frontend/e2e/_*.spec.ts
+frontend/e2e/*-diagnostic.spec.ts
+
+# New Playwright E2E harness (tests/e2e/) — generated artefacts only
+frontend/qa-report/
+frontend/qa-screenshots/
+frontend/qa-output/
+frontend/qa-results.json
+frontend/playwright/.auth/
+frontend/test-results/
+qa-report/
+qa-screenshots/
+qa-output/
+playwright/.auth/
+test-results/
+
+# Backend dev/debug artefacts, QA scratch and runtime data are ignored in
+
+# Build
+*.tar.gz
+*.whl
+frontend/stats.html
+
+# Logs
+*.log
+logs/
+
+# Process id files a dev or build script leaves behind. `frontend/build.pid`
+*.pid
+
+# Generated
+i18n-audit/
+translation_keys.txt
+
+# Per-tenant runtime data — uploads, processed BIM blobs, generated
+data/bim/
+data/uploads/
+data/exports/
+data/cwicr/cache/
+data/approvals/
+data/transmittals/
+data/geo_hub/
+data/tilesets/
+data/reports/
+data/takeoff_documents/
+data/dwg_uploads/
+data/dwg_entities/
+data/dwg_thumbnails/
+data/pointcloud/
+frontend/debug-bim/
+
+# MCP artifacts
+.mcp.json
+
+# Local AI-assistant config and working notes.
+.claude/
+CLAUDE-DASHBOARDS.md
+AGENTS.md
+CLAUDE.md
+STATE.md
+memory/
+*.local.*
+.cursor*/
+.cursorrules
+.aider*
+.github/copilot-instructions.md
+frontend/qa-shots/
+
+# Internal-only files: planning, strategy, QA artifacts, audits and runbooks.
+/R[0-9]*_*REPORT.md
+/ISSUE_*_HANDOVER.md
+/_handover_dossiers/
+/docs/strategy/
+/docs/qa/
+/docs/postgres-migration/
+/docs/roadmap/
+/docs/handover/
+/docs/initiative-ai-estimator/
+/docs/RUNBOOK.md
+/docs/MASTER_PLAN*.md
+/docs/SECURITY_AUDIT*.md
+/docs/I18N_AUDIT*.md
+/docs/ROADMAP_v*.md
+/docs/MONEY_FLOAT*.md
+/docs/validation_report.md
+/qa/
+/scripts/*_report.json
+/scripts/i18n_coverage_report.txt
+**/__audit_report.md
+**/*UI_FLOWS.html
+.playwright-mcp/
+
+# TS incremental build cache
+**/tsconfig.tsbuildinfo
+
+# QA / Dev artifacts
+screenshots/
+!docs/screenshots/
+# qa/screenshots/ holds the source for the route-grid screenshot suite
+!qa/screenshots/
+qa/screenshots/_pw_artifacts/
+qa-tests/
+ux-review/
+QA_*.md
+UX_*.md
+# Curated QA docs committed deliberately — opt-in exceptions to the above ignores.
+!docs/qa/UX_WEAKNESSES_AUDIT.md
+!docs/strategy/UX_*.md
+TESTING_PLAN.md
+TAKEOFF_TESTING_PLAN.md
+IMPROVEMENTS_TODO.md
+AUDIT_*.md
+REVIEW_PROGRESS.md
+test-screenshots/
+
+# Dev screenshots & images
+*.png
+*.jpeg
+*.jpg
+# Desktop (Tauri) app icons are real source, not dev screenshots
+!desktop/src-tauri/icons/**/*.png
+!frontend/public/favicon.png
+!frontend/public/logo.png
+# Public brand assets ship in the wheel (About page founder avatar, book
+!frontend/public/brand/*.png
+# Contributor avatars on the About page thank-you wall are shipped assets too
+!frontend/public/contributors/*.png
+!docs/screenshots/*.png
+!docs/screenshots/*.jpg
+!docs/screenshots/*.jpeg
+!docs/qa/**/*.png
+!docs/qa/**/*.jpg
+!docs/qa/**/*.jpeg
+!frontend/public/og-image.png
+!frontend/public/*.jpg
+!frontend/public/*.jpeg
+# Partner-pack company logos are real shipped assets, not dev screenshots
+!packs/**/logo.png
+
+# LanceDB local data
+lancedb_data/
+*.lance
+
+# Cached data
+*.parquet
+.openestimator/
+
+# Desktop build
+desktop/dist/
+desktop/build/
+desktop/src-tauri/target/
+desktop/src-tauri/binaries/
+
+# Backup files
+*.backup.*
+
+# Local-only working state (not for commit)
+tmp/
+
+# How-it-works translation pipeline scratch (regenerable inputs; the
+frontend/scripts/.howto-i18n/
+
+# Smoke-sweep E2E run artefacts (regenerable test output, not source).
+frontend/qa-smoke/
+frontend/qa-smoke-report/
+frontend/qa-routes/
+frontend/*.log.err
+frontend/*.log.out
+qa-tests/v275-probe/shots*/
+i18n_audit_report.md
+qa-report/
+
+# Heavy sample data — fetched on demand, not committed
+data/bim/
+docs/media/*.mp4
+
+# Re-ingest rollback backups (snapshots of a single BIM model's prior
+data/reingest_backup_*.json
+
+# Generated license inventories — attached to GH Releases, not committed
+/NOTICE.backend.json
+/NOTICE.frontend.json
+
+# Deep-QA sweep working artifacts (progress + per-module findings; durable on disk, not committed)
+qa-sweep/
+
+# QA wave working dir: audit reports, walk/crawl probes, one-shot i18n scripts,
+qa-wave/
+
+# Persona testing machine: company/role/region personas, Playwright runner,
+qa-personas/
+
+# Scratch/debug artifacts (never commit)
+__diag.txt
+_ddltest.py
+_verify_out.txt
+/zzqacopy.txt
+/ddl_echo.txt
+/qa_verify_out.txt
+/__qa_snippet.txt
+
+# Embedded-Postgres (pixeltable-pgserver) data dirs — never commit
+.smoke_pgdata/
+**/test_pgdata/
+
+# Ad-hoc QA scratch output (never commit)
+_qa_tmp/
+
+# Local-only artifacts (never commit)
+/oe_*.txt
+/oe_openapi.json
+/d5_*.txt
+/_audit_d3.txt
+/_d3_rawsql.txt
+/_scan_*.txt
+/qa_*.txt
+/qa_*.py
+/qa_out.txt
+/qa_sweep.py
+/_ci_*.txt
+/_ci_checks*.json
+/_fe_ci_log.txt
+/_open_issues.json
+/_tok.json
+/_tok.txt
+/closed_prs.json
+/c_1*.json
+/_i18n_*.mjs
+/_pdf_font_wire.workflow.js
+/_wheel*.sh
+/_ws*.sh
+/_pytest_smoke.sh
+/_wave1_verify.sh
+/HANDOVER_NEW_AGENT.md
+/_deploy642/
+/_dl_build/
+/_i18n_gaps/
+/_pr_review/
+frontend/_*.cjs
+frontend/_*.mjs
+frontend/_qa_b3dm.bin
+frontend/test-results-e2e-clean/
+qa/screenshots/_pw_artifacts_*
+docs/postgres-migration/*.txt
+docs/postgres-migration/*.json
+docs/postgres-migration/*.diff
+docs/strategy/improvement-2026-06/_*.txt
+/_wheelboot_health.json
+data/connectors/
+
+# Local-only artifacts (never commit)
+/_qa_tmp_*
+/_i18n_*.py
+/_i18n_*.js
+/_i18n_*.json
+/_i18n_new_*.txt
+/_qa_tsc_out.txt
+
+frontend/_qa_tmp_*
+frontend/tsc_result.txt
+frontend/tsc_out.txt
+frontend/_final_tsc.txt
+frontend/qa-*.mjs
+
+# Transient i18n debt dumps and one-off translation backfill scripts (mirror kept
+scripts/_mn_*.json
+scripts/_mn_gaps_dump.txt
+scripts/_visible_gap.json
+scripts/_categorize_mixed.py
+scripts/_dump_heavily.py
+scripts/_find_mixed.py
+scripts/_top_leaked_words.py
+scripts/translate_mn_*.py
+
+# Local-only artifacts (never commit)
+/.ci_latest_run
+/.oe_token.txt
+/.oe_projects.txt
+/_projects.json
+/_m_*.json
+/_backend_restart.*
+/tmp_rvt_repro*.py
+frontend/_qa/
+frontend/scripts/_apply_translations.cjs
+frontend/scripts/_dupcheck.cjs
+frontend/scripts/_extract_missing_keys.cjs
+frontend/scripts/_finalize_i18n.sh
+frontend/scripts/_i18n_stage2_state.cjs
+frontend/scripts/_stage2_tx/
+frontend/scripts/_validate_out.cjs
+frontend/scripts/_vite.out
+# Local-only artifacts (never commit)
+frontend/scripts/_walk_*.mjs
+frontend/scripts/_verify-*.mjs
+frontend/scripts/_verify_*.mjs
+frontend/scripts/_debug-*.mjs
+frontend/scripts/_workflow-walk.mjs
+frontend/scripts/_shot-*.mjs
+frontend/scripts/_import-map-*.mjs
+frontend/scripts/_i18n_*.py
+
+# --- Cost-base (CWICR) working artifacts: local only, never publish
+/WORLD_COST_BASES/
+/cn_regional_price_variants/
+/_bug*_data_*/
+# Country cost-base spreadsheets and CSV dumps are experiment outputs.
+/*.xlsx
+/*.csv
+~$*.xlsx
+# Internal country reports, plans, feasibility notes and indexes.
+/*_REPORT.md
+/*_PLAN.md
+/*_INDEX.md
+/*_FEASIBILITY.md
+/TURKEY_*.md
+/turkey_columns_answer.md
+# Probe / debug dumps and one-off scratch scripts left at the repo root.
+/_costs*.json
+/_health.json
+/_openapi.json
+/_tok*.json
+/atoe.bin
+/nul
+/translate_*.py
+# Pre-redesign backups (the existing *.backup.* rule misses the .bak suffix).
+*.pre-redesign.bak
+
+# --- Provenance / watermark tooling: local only, never publish
+/tools/watermark/
+/scripts/integrity_check.py
+
+# Local-only artifacts (never commit)
+**/_*.md
+**/_*.txt
+
+# Local-only artifacts (never commit)
+/marketing-site/
+/website-marketing/
+
+# Documentation build helpers: internal tooling, not for readers of the repo.
+/docs/expand_docs.py
+/docs/expand_docs2.py
+
+# Local-only artifacts (never commit)
+/scratchpad/
+# The same material, written next to the directory rather than into it. A
+/scratchpad_*
+# The same material again, under two names the patterns above do not reach: a
+/_scratchpad_*
+# Local-only artifacts (never commit)
+/modules.json
+# A build script's HEAD marker: one commit SHA, written so a later step can tell
+/build_head.txt
+
+# --- Personal data: never in this repository, which is public
+demo-registrations*.jsonl
+demo-tokens*.json
+newsletter-subscribers*.jsonl
+license-requests*.jsonl
+partner-applications*.jsonl
+contact-requests*.jsonl
+email-delivery-failures*.jsonl
+*subscribers*.csv
+*newsletter*.csv
+*email-export*.csv
+*contacts-export*.csv
+*leads-export*.csv
+*audience*.csv
+
+# Locale bootstrap batches, see scripts/i18n_new_locale.py
+.i18n-work/

@@ -1,0 +1,2075 @@
+name: CI (PostgreSQL)
+
+# Runs the dedicated PostgreSQL dialect suite (tests/pg) against a real
+# PostgreSQL 16 cluster booted in-process from the pixeltable-pgserver wheel
+# (bundled PG binaries, NO Docker service container). This is the gate that
+# stops PostgreSQL-only regressions (jsonb[] / dialect DDL, JSONB @> operators,
+# case-sensitive LIKE vs ILIKE, UUID round-trips) from shipping untested. The
+# comment here used to say SQLite was still the default runtime; it stopped
+# being true in 6.6.0, when SQLite support was removed and PostgreSQL became
+# the only supported database. The legacy per-file engine fixtures the old
+# suite used are still not ported, which is the documented Phase 2 stretch
+# (template-database clone-per-test).
+# The migration plan behind this job is kept in the maintainers' internal notes
+# rather than in the repository.
+#
+# STEP CONDITIONS. A step with no `if:` carries an implicit success(), so the
+# first red step turns every step below it into `skipped`, and skipped reads as
+# "not applicable" when what it means is "never asked". That is not a
+# hypothetical here. Run 33247219691, on 2026-08-29, failed at the first test
+# step of backend-postgres and reported 19 named test steps below it as skipped,
+# while the guarded steps on both sides of that block ran and passed in the same
+# job of the same run. Six consecutive failing runs carry the identical shape.
+# Nineteen verdicts a run were being read as agreement.
+#
+# So every step that returns a verdict about the tree carries
+# `if: ${{ !cancelled() && steps.install.outcome == 'success' }}`, or a bare
+# `!cancelled()` when it needs the checkout but not the install. Not `always()`,
+# which also runs the step when the whole run is cancelled: that is a different
+# behaviour and the difference was corrected once already, in 6a5af0b34.
+#
+# The bare form has one accepted cost, and it is written here so the next reader
+# does not read it as an oversight and remove the condition. There is exactly one
+# bare step, the frontend existence check, and if the CHECKOUT is what failed it
+# runs against a missing tree and reports every named file as absent. That is a
+# screenful naming the wrong cause, the same shape the exemptions below exist to
+# avoid. It is accepted rather than fixed because a failed checkout is already
+# the loudest thing in the log, whereas a failed `npm ci` is the case where that
+# step's verdict is worth having and a step condition naming the install would
+# throw it away.
+#
+# Two places carry no condition on purpose. The environment steps at the top of
+# each job, meaning checkout, interpreter, the dist stub and the install, are
+# not verdicts about anything, and running them after one of them has already
+# failed reports a screenful of errors that all name the wrong cause. And every
+# step of upgrade-from-previous-release is a link in one chain rather than an
+# independent check; the reason is written out on that job.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Same reason as ci.yml: a release candidate branch can be gated by hand.
+  workflow_dispatch:
+
+# Keep an active main verdict running; retain only the newest pending run.
+# GitHub replaces an older pending run even when cancel-in-progress is false,
+# so this deliberately does not promise a verdict for every intermediate commit.
+# Ordering is not guaranteed: read the verdict for the settled head explicitly.
+# The literal prefix keeps this queue separate from ci.yml and other workflows.
+# PR merge refs and manually selected branch/tag refs get separate groups;
+# non-main runs on the same ref supersede active runs. A manual main run shares
+# the main-push queue. The branches-only push trigger never starts a tag run.
+# Runs created from an older workflow without this group do not join it retroactively.
+# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+concurrency:
+  group: ci-postgres-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  backend-postgres:
+    runs-on: ubuntu-latest
+    # This is a merge-blocking gate and it now carries concurrency tests that
+    # take real row locks. Without a ceiling the job inherits the six hour
+    # default, so one deadlock would block every merge for the rest of the day
+    # instead of failing in minutes. The suite finishes in about ten.
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      OE_TEST_DB: pg
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p ../frontend/dist
+          touch ../frontend/dist/.gitkeep
+      - name: Install dependencies
+        # Identified so the steps below can ask whether the environment
+        # actually came up. They run after a red step, so their own result
+        # stays visible, but not after a failed install: pytest missing
+        # from PATH reports a screenful of failures that all name the
+        # wrong cause.
+        id: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,server]"
+      # The desktop sidecar's hidden imports. First thing after the install,
+      # ahead of every step that needs a database: it needs none, it takes
+      # about three seconds, and a step that fails skips every step below it,
+      # so a guard placed last only runs on the days nothing else is broken.
+      #
+      # It is here at all because tests/unit runs in no lane that blocks a
+      # merge, and because what it guards is otherwise observable only on a tag
+      # build, by which point the artefact is published. The sidecar build for
+      # 15.4.0 printed 167 lines of "ERROR: Hidden import
+      # 'app.modules.<name>.<layer>' not found", every one of them a name
+      # desktop/pyinstaller.spec invented for a file that was never on disk. A
+      # dependency genuinely absent from the frozen bundle reports itself on
+      # the same channel in the same words, so the line worth reading would
+      # have arrived as one of 168 and been read by nobody - a broken install
+      # on a user's machine with a build log that could not warn us. The spec
+      # now asks the disk before it names a layer; this holds that open and
+      # fails on the first name it cannot back. It executes the spec with
+      # PyInstaller's symbols stubbed out and stats what the spec declares, so
+      # it runs anywhere the suite is collected and never builds anything.
+      - name: Run the desktop sidecar hidden-import guard
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_desktop_hidden_imports_resolve.py -q -p no:cacheprovider
+      - name: Run dedicated PostgreSQL dialect suite (embedded PG, no Docker)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        # A per-test ceiling so a lock that never gets released names the test
+        # that hung instead of killing the job anonymously at the wall clock.
+        # thread method because signal based timeouts are Unix-only and this
+        # suite is expected to stay runnable on Windows developer machines.
+        run: pytest tests/pg -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # Checks on what the demo seeder writes. Two families so far. Vocabulary:
+      # the places where one list of allowed values is written down in a second
+      # place that can drift from it. The seeder builds ORM rows directly, so
+      # nothing it writes ever meets the Pydantic layer that owns the vocabulary,
+      # and it has twice stored values the API itself would refuse; the contacts
+      # importer had the same gap from the other side and rewrote what it did not
+      # recognise without saying so. Dates: rows whose timestamps have to agree
+      # with the arithmetic a screen does on them, after the RFI register spent
+      # months asserting a deadline that fell before the request. All five need
+      # no database and finish in about a second. They are attached here for the
+      # same reason as the cost base suite below, which is that tests/unit runs
+      # in no lane that blocks a merge.
+      # Two more families joined the list. Scaffolding text: the seed writers
+      # outnumber the twelve seeders the PG suite executes, so most of them have
+      # no runtime coverage at all and a source scan is the only thing that
+      # reads them; it caught rows whose own description said they were seeded.
+      # Insight dimensions: a chart that draws one category called "Not
+      # recorded" is usually the writer and the reader spelling the same field
+      # differently, which no amount of seeded data will fix and no existing
+      # test noticed.
+      # Real firm names: the repo-wide brand gate cannot express a name shorter
+      # than five characters, a name that is also an ordinary English word, or a
+      # name that is two words. Live contractors reached users through all three
+      # holes. The narrow file below can express them because it reads only demo
+      # seed sources, and it is attached here for the reason stated above: a test
+      # that blocks no merge is the same as a test that does not exist, which is
+      # exactly how a name rejected once already shipped in every wheel since.
+      # Safety is the third module caught storing words its own schema refuses,
+      # after contacts and variations, which is what makes this a class rather
+      # than three incidents. It also covers the other half of a demo register
+      # being useful: that it is not seeded entirely closed, and that two
+      # projects do not render the same rows.
+      # Contact domains join for the same reason as the firm names two entries
+      # up, and from the other side of the same data: the German packs name
+      # their firms properly, umlauts and all, and the addresses were written
+      # to match. A domain label cannot carry an umlaut on the wire, so twenty
+      # of them across four files were unreachable as written and read on
+      # screen as typos. The name keeps its umlauts and the domain does not,
+      # which is a distinction only a check that reads the two spans separately
+      # can make, and nothing in the tree was making it.
+      # The file after it stops naming modules one at a time. It reads the
+      # vocabulary out of every module's schemas and checks every seeded record
+      # against the module that owns it, which is how the fourth instance was
+      # found - contracts, where the seed wrote a counterparty type neither the
+      # endpoint nor the picker offers. The four named files above stay because
+      # they check things a source scan cannot: values a generator computes,
+      # dates that have to agree with arithmetic, and text.
+      # The last file is arithmetic of that kind and the reason it is here is
+      # that no source scan could have found it. Every demo position carries a
+      # resource buildup, and a buildup that does not add up to the rate printed
+      # beside it is a shipped estimate that argues with itself. Hourly leaf
+      # quantities were rounded to two places, so the small ones rounded to zero
+      # and priced nothing at all, and 274 of 4174 positions across 34 templates
+      # reconciled. The check runs over all 4174 rather than a sample, and it
+      # asserts a floor on the population it swept, because the failure this
+      # class produces is a smaller population rather than a red test.
+      - name: Run demo seed and import consistency tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_demo_contact_types.py
+          tests/unit/test_demo_variations_vocabulary.py
+          tests/unit/test_demo_correspondence_parties.py
+          tests/unit/test_contacts_import_vocabulary.py
+          tests/unit/test_demo_rfi_dates.py
+          tests/unit/test_demo_party_lookup.py
+          tests/unit/test_demo_seed_text_has_no_scaffolding_words.py
+          tests/unit/test_demo_insight_dimensions.py
+          tests/unit/test_demo_seed_has_no_real_firm_names.py
+          tests/unit/test_demo_contact_domains.py
+          tests/unit/test_demo_bid_line_items.py
+          tests/unit/test_tender_package_scope.py
+          tests/unit/test_demo_safety_vocabulary.py
+          tests/unit/test_demo_seed_speaks_module_vocabularies.py
+          tests/unit/test_demo_progress_periods.py
+          tests/unit/test_demo_resource_leaves_add_up_to_the_position_rate.py
+          -q -p no:cacheprovider
+      # The region to currency table. Attached for the same reason as the suites
+      # around it, which is that tests/unit runs in no lane that blocks a merge.
+      # A CWICR parquet carries no currency column, so the region tag on the row is
+      # the only statement of which money the rate is in, and the importer stamps a
+      # whole file from one lookup in that table. The set of bases the importer
+      # accepts and the table it looks the currency up in were built from two
+      # different registries, and twelve of the thirty-eight loadable regions were
+      # missing from the table: importing one of those resolved to the empty string
+      # and wrote a catalogue of prices with no unit of money on them. That is how
+      # 55 718 rows came to carry no currency. The suite parametrises over every
+      # loadable base so a region that drops out of the table fails by its own
+      # name, and it asserts the read and write paths share one table object rather
+      # than two copies kept in step by a comment. No database, about eight seconds.
+      - name: Run cost region currency table tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/costs/test_region_currency_fallback.py -q -p no:cacheprovider
+      # The streamed cost base import. A country base read into one pandas frame
+      # peaked at 2 to 8 GiB, on a server whose 3 GB floor leaves about 1.8 GiB
+      # for an import, so the loader reads the parquet a few thousand rows at a
+      # time. The unit file holds the stream to a frozen copy of the whole-frame
+      # import row for row and flush for flush, and bounds its traced memory
+      # against the base size, so a convenience read of the whole file fails
+      # here on the commit that brings it back. The integration file compares
+      # what PostgreSQL ends up holding through the real COPY. Attached for the
+      # same reason as the suites around it: tests/unit runs in no lane that
+      # blocks a merge, and the integration file only ran nightly. The real
+      # bases and their resident peak are measured in "Pack cost bases" below.
+      - name: Run streamed cost import tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_cwicr_import_streams_in_batches.py
+          tests/integration/costs/test_cwicr_streamed_import_on_postgres.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # The AI rate limit on the compliance NL builder. Attached for the same
+      # reason as the suites around it, and for a sharper one: the guard it
+      # covers was written on the wrong endpoint. check_ai_rate_limit shipped
+      # on /v1/compliance-ai/from-nl, which the product does not call, while
+      # the NL Rule Builder panel posts to the older /v1/compliance/dsl/from-nl
+      # where use_ai=true reaches a real provider with no ceiling at all. A
+      # cost limit on an endpoint with no caller reads green from every angle:
+      # the dependency exists, a test asserts 429, and none of it stands
+      # between a scripted client and the bill. The suite now asserts the
+      # limit on both routes by overriding the dependency, so dropping the
+      # Depends line on either one turns the override unreachable and the call
+      # returns 200 instead. Needs the conftest database, about twenty seconds.
+      - name: Run compliance NL rate-limit tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_compliance_ai.py -q -p no:cacheprovider
+      # Cases: authored scenarios and the pins that used to live in
+      # localStorage. Three things here fail silently rather than loudly if
+      # they regress. The step target becomes an href, so the schema has to
+      # keep refusing javascript: and protocol-relative URLs. The permission
+      # keys have to stay in the registry, because RequirePermission denies an
+      # unregistered key and the module would go admin-only with every test
+      # that runs as an admin still green. And a pin points at its case across
+      # two id spaces with no foreign key, so deleting a case has to clear its
+      # own pins or the strip renders rows that resolve to nothing.
+      - name: Run cases module tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_cases_module.py -q -p no:cacheprovider
+      # Government clearance for electronic invoices. Three regimes that look
+      # alike from the outside and are not: under clearance the authority's
+      # identifier is what makes the invoice legally valid, under reporting the
+      # invoice was already valid and the filing is late or not, and on a
+      # network there is no authority at all. One shared success state would
+      # record a network delivery as a tax clearance and nothing downstream
+      # could tell. The permission keys have to stay in the registry, because
+      # RequirePermission denies an unregistered key and the module would go
+      # admin-only in production with every admin-authenticated test still
+      # green. The migration guard is the one that earns its place: a fresh
+      # install goes through create_all and an upgrade goes through the
+      # revision, and nothing else in the tree notices when the two stop
+      # building the same table. About thirty seconds, most of it fixtures.
+      - name: Run e-invoice clearance module tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_einvoice_clearance_module.py -q -p no:cacheprovider
+      # Statutory withholding. Two rules here decide real money and neither is
+      # visible from a passing import. The taxable base excludes materials
+      # where the scheme says so and includes them where it does not, and the
+      # UK and Germany differ on exactly that, so hardcoding either one
+      # under-withholds somewhere. And an expired verification has to move the
+      # party up to the higher band rather than quietly keeping the reduced
+      # one. The suite also asserts that the revision builds the same index set
+      # as a fresh create_all install, which nothing else in the tree would
+      # notice. About thirty seconds.
+      - name: Run tax withholding module tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_tax_withholding_module.py -q -p no:cacheprovider
+      # Security-of-payment deadlines. The module is a date engine, and a date
+      # engine tested only against itself proves it is consistent rather than
+      # right, so the arithmetic tests carry worked examples with the dates
+      # written out. Two things here fail quietly. Every shipped regime must
+      # put its final date for payment after its due date, because the
+      # product's own ERROR rule says so and a regime that breaks it would
+      # make that rule unsatisfiable rather than strict. And the permission
+      # keys have to stay registered, because RequirePermission denies an
+      # unregistered key while admin short-circuits above the check, so the
+      # module would go admin-only in production with every
+      # admin-authenticated test still green. About thirty seconds.
+      - name: Run payment clock module tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_payment_clock_module.py -q -p no:cacheprovider
+      # What a bill charges, and which pack a country reaches. Five test files
+      # were written for this and only two of them landed under tests/pg, where
+      # the whole tree runs in this job already. The other three went to
+      # tests/unit, which by this workflow's own account runs in no lane that
+      # blocks anything, so the guards on the arithmetic that decides money were
+      # sitting outside every population that gets read. That is the failure this
+      # repository keeps producing: not an absent gate, a gate whose population
+      # does not include the place the defect lives. Widening the existing lane is
+      # the fix; a second gate beside it would have been the mistake.
+      #
+      # The defect they cover was real and shipped. A bill took its VAT from its
+      # REGION rather than its country, so Austria and Switzerland were billed
+      # Germany's 19, Ireland was billed the United Kingdom's 20, Finland was
+      # billed 25 against a statutory 25.5, and Saudi Arabia, Kuwait and Qatar
+      # were all billed the Gulf template's 5 against 15, 0 and 0. Seven
+      # countries, none of which produced an error anywhere.
+      #
+      # The drift file is the one that earns its place over time. It compares the
+      # effective-dated tax seed against the methodology catalogue, which are two
+      # tables that answer the same question and are edited by different people
+      # for different reasons, and a divergence between them is invisible from
+      # inside either one. The pack files gate the other half: a country resolves
+      # to a compliance pack, and a country that has national rules but no pack
+      # that reaches them is named rather than left to be discovered. One of them
+      # is deliberately built to go red when a pack is added, which is a checklist
+      # and not an obstacle, so a red here means read the docstring, not silence
+      # the test. No database, about six seconds for all three.
+      - name: Run bill pricing and compliance pack coverage tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          pytest tests/unit/test_tax_tables_do_not_drift.py \
+            tests/unit/test_compliance_pack_resolves_from_iso_country.py \
+            tests/unit/test_every_shipped_country_reaches_a_compliance_pack.py \
+            -q -p no:cacheprovider
+      # Documents that declare what language they are written in. The defect
+      # class is a header stating something the bytes contradict, which is worse
+      # than a missing translation because a receiver acts on it: an English
+      # sales contract served to a reader who sent Accept-Language fr-CA arrived
+      # labelled French, and a Brazilian invoice that is Portuguese by
+      # construction arrived labelled with whatever the reader asked for. The
+      # cause is the same in both, a route that declares nothing while the
+      # Accept-Language middleware supplies the request's language as the answer.
+      # Nothing else in the tree reads a response header on a document route.
+      # The integration file is the one that carries the weight. The unit files
+      # gate that each route sets the header; only that file boots the real
+      # application, so it is the only place the middleware is actually in the
+      # path and therefore the only one that can tell "the route said so" from
+      # "something downstream happened to say the same thing". Removing the fix
+      # turns it into assert 'fr' == 'en', the defect verbatim.
+      # These are named one at a time for the reason the steps above are:
+      # tests/unit is classified as running whole, and the job that runs it whole
+      # is the one that is red often enough that a failure there stops nothing.
+      # tests/unit/test_ci_lane_coverage.py says so about itself: what it records
+      # is what a workflow declares, which its classes are now named for, and a
+      # full declaration is not a break anybody acts on. That file also pins the
+      # measurement behind this whole paragraph, which is that main requires no
+      # status checks at all, so nothing here stops a push in the first place.
+      # Naming the files is what makes the split a written decision rather than
+      # an accident of which paths got typed in.
+      # The skip guard is not decoration here either. The integration file opens
+      # with a module-level importorskip for pypdf, so a missing dependency takes
+      # the whole file out rather than one test, and the step would go green
+      # having proved nothing. pypdf is a base dependency today and the guard
+      # does not fire, which is exactly the state worth pinning before it drifts.
+      # Measured at 125 passed, 0 skipped. The five unit files are fifteen
+      # seconds and need no database; the integration file boots the application
+      # against the service container this job already provides, so it costs
+      # less here than the three minutes it takes locally, where most of the
+      # time is a PostgreSQL cluster this job does not have to start.
+      - name: Run document language declaration tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          pytest tests/unit/test_document_locale.py \
+            tests/unit/test_accept_language.py \
+            tests/unit/test_daily_diary_pdf_locale.py \
+            tests/unit/test_einvoice_pdf_locale.py \
+            tests/unit/test_brazil_invoice_pdf.py \
+            tests/integration/test_property_dev_document_templates.py \
+            -q -p no:cacheprovider --timeout=300 --timeout-method=thread | tee doclang.log
+          if grep -qE '[0-9]+ skipped' doclang.log; then
+            echo "::error::A document language test skipped instead of running. This step proved nothing about the headers it is here to gate." >&2
+            exit 1
+          fi
+      # What still points at a document, and what the Issue Hub can see.
+      #
+      # Both files existed before this step and neither was run by a lane
+      # anybody reads, which is the same as not having them: a gate that
+      # nothing executes records a decision instead of enforcing one.
+      #
+      # test_document_reference_integrity holds the twenty-eight unconstrained
+      # document references and checks the runtime registry against them three
+      # ways - coverage, resolution in the ORM, and impact classification
+      # against column nullability. The last one is the reason the endpoint can
+      # tell a user that a row will be "left pointing at nothing" rather than
+      # merely unlinked, so it has to stay true to the schema rather than to
+      # somebody's memory of it. test_issue_hub_sources does the same job for
+      # the defect registers the hub does not read.
+      #
+      # The integration file boots the application against the service
+      # container this job already provides, the same trade the step above
+      # makes: three or four minutes locally, where the cost is a PostgreSQL
+      # cluster this job does not have to start, and far less here.
+      - name: Run document reference and issue hub gates
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          pytest tests/unit/test_document_reference_integrity.py \
+            tests/unit/test_issue_hub_sources.py \
+            tests/integration/test_document_references_endpoint.py \
+            -q -p no:cacheprovider --timeout=600 --timeout-method=thread | tee docrefs.log
+          if grep -qE '[0-9]+ skipped' docrefs.log; then
+            echo "::error::A document reference gate skipped instead of running. This step proved nothing about the references it is here to pin." >&2
+            exit 1
+          fi
+      # The unit vocabulary, attached for the same reason as the suite above it.
+      # units.h is the only time-valued key in backend/locales, and it is the only
+      # key where a mistranslation names a different quantity rather than reading
+      # clumsily: the value beside it is an hourly figure. Three locales shipped a
+      # label for a longer period - zh 工日, ja 人工, ko 인, the worker-day of CJK
+      # estimating - applied to the label and never to the number. No gate saw it,
+      # because every locale file parsed, carried the key and matched no English
+      # string, which is all the other locale gates ask. Two tests, no database,
+      # under fifteen seconds. The second one asserts the check still has a
+      # translated name to compare against, so it cannot go quiet without failing.
+      - name: Run unit vocabulary period tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          pytest tests/unit/test_a_unit_label_must_not_claim_a_period_the_value_does_not_carry.py \
+            -q -p no:cacheprovider --timeout=300 --timeout-method=thread | tee unitperiod.log
+          if grep -qE '[0-9]+ skipped' unitperiod.log; then
+            echo "::error::A unit vocabulary test skipped instead of running. This step proved nothing about the labels it is here to gate." >&2
+            exit 1
+          fi
+      # The DWG parser. Attached for the same reason as the two suites either side
+      # of it: tests/unit is in no lane that blocks a merge, and this is the parser
+      # whose vertex re-scan shipped quadratic in every release from 3.0.2 to 14.1.0
+      # without a gate noticing. Scaling asserts the exact per-row call count rather
+      # than an upper bound, because a bound of 3n is also satisfied by making the
+      # lookups lazy and adding the second pass back. Fidelity covers what the
+      # converted geometry has to preserve. Neither needs a database; together they
+      # take about fifteen seconds.
+      # Converter health belongs here too. The check classifies the exit code a
+      # converter binary leaves behind, and every code it does not recognise is
+      # reported as a working install, so a gap in that set is not a worse
+      # message but a false all-clear. One reached a user: Windows refused to
+      # start the binary and the status card showed no problem.
+      # The two extents files joined them. The parser stores a bounding box and
+      # the service recomputes one from the same entities, and for years the two
+      # disagreed about the same drawing because the parser read a field no
+      # writer emits. Nothing compared them, so both were green. The DXF file
+      # asserts they agree; the units file guards the recompute itself and had
+      # never run in a lane that blocks a merge.
+      # The converter installer joined them for the same reason the health
+      # check did. The install gate read four bytes of one file out of the 251
+      # it downloads and never looked at the machine field, so the one thing it
+      # was accused of shipping - a binary for the wrong word size - would have
+      # passed it. The installer also mirrored in one direction only: a real
+      # install still held a binary upstream had deleted three days before that
+      # install last ran, in the folder our own message told people to fix by
+      # downloading again. Synthetic PE headers and a stubbed transport, no
+      # network and no database, about two seconds.
+      - name: Run DWG parser and CAD converter health tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_ddc_dwg_parser_scaling.py
+          tests/unit/test_ddc_dwg_parser_fidelity.py
+          tests/unit/test_dxf_extents_and_blocks.py
+          tests/unit/test_dwg_units_inference.py
+          tests/unit/test_cad_converter_loader_failures.py
+          tests/unit/test_converter_install_integrity.py
+          -q -p no:cacheprovider
+      # The chat path for providers we call without a tool schema. Attached for
+      # the same reason as the suites above: tests/unit is in no lane that blocks
+      # a merge. Only Anthropic and OpenAI get tool definitions on the wire, so
+      # every other provider was being handed a system prompt advertising twenty
+      # tools it had no way to call, and models answered with their own call
+      # syntax as literal text in the user's chat bubble. The same branch returned
+      # before the shared persistence tail, so the turn was never stored and the
+      # thumbs feedback POST 404'd. One test asserts that a reply which merely
+      # LOOKS like a tool call still arrives byte for byte, because the tempting
+      # repair here is an output scrubber and a scrubber can eat a real answer.
+      # No database, about two seconds.
+      - name: Run erp_chat no-tool provider tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_erp_chat_fallback_provider.py -q -p no:cacheprovider
+      # A cross-tenant read, so it is attached here rather than left to the
+      # sharded Backend CI job. The rating provenance record carries a raw
+      # COUNT(*) over the NCR, safety-incident and schedule tables filtered
+      # only by subcontractor and month, and it was reaching the wire through
+      # an endpoint that asks for the viewer role. This pins the redaction on
+      # the response schema, which is the single point all three rating routes
+      # pass through. It does not close the whole exposure: the counters beside
+      # it are max(accumulated, direct), and narrowing those needs a decision
+      # on whether a rating is per project, per tenant or deliberately shared.
+      - name: Run subcontractor rating disclosure tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_subcontractor_rating_basis_privacy.py -q -p no:cacheprovider
+      # Identifier length across every revision. Attached here for the usual
+      # reason, and this is the suite that would have caught the worst release
+      # bug of the cycle: a 65-character foreign key name in v3280 that
+      # PostgreSQL cannot accept. SQLAlchemy refuses to emit a name it knows
+      # will be truncated, so the revision raised before sending any DDL, and
+      # because PostgreSQL runs DDL in a transaction the whole upgrade rolled
+      # back. A site coming from 14.0.0 therefore received none of the eighteen
+      # pending revisions rather than stopping at the offending one. Every test
+      # we had passed, because they run on SQLite, which has no such limit.
+      # Deliberately a string scan and not a database round trip, so it costs
+      # nothing and does not need the service container beside it. It carries
+      # its own red proof: one case feeds it the exact name that broke the
+      # release and asserts it is flagged, so this is not a guard that has only
+      # ever been observed passing.
+      - name: Run migration identifier length tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_migration_identifier_length.py -q -p no:cacheprovider
+      # The rule that decides whether a contract has anybody who can sign it.
+      # Attached here for the same reason as everything around it, which is that
+      # tests/unit runs in no lane that blocks a merge. The rule used to apply
+      # only to a contract that was already active or completed, while the only
+      # moment its answer matters is the press of "put up for signature", which
+      # happens on a draft: the two conditions were mutually exclusive, so the
+      # rule could not fire at the moment it was written for and what stopped
+      # the press was a refusal hardcoded in the service. Every existing test
+      # around signing built a contract with parties, so nothing ever asked the
+      # rule about a draft.
+      # It also asked for a named employer and a named contractor, which is one
+      # contract's shape. A subcontract is executed by the main contractor and
+      # the firm selling the work, with no employer on it at all, so wiring that
+      # wording to the press would have refused every subcontract in the product
+      # including the draft the demo seeds to make signing demonstrable. The
+      # rule now asks for two distinct signing roles, and the roles come from
+      # the signing bridge rather than a second copy: the suite pins that, and
+      # pins that the rule passing implies the signature block has two names,
+      # which is what allows the hardcoded refusal to stay deleted. No database,
+      # under two seconds.
+      - name: Run contract party rule tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_contracts_party_rule.py -q -p no:cacheprovider
+      # Money that must never hold two currencies at once. Attached here for the
+      # same reason as everything around it, which is that tests/unit runs in no
+      # lane that blocks a merge - and no assemblies test was in this list at
+      # all, so the whole feature's suite blocked nothing. The apply-template
+      # preview converted each component into a target currency and, when no
+      # rate could be found, added the UNCONVERTED amount into that same total:
+      # 100 EUR plus 1000 of an unpriceable currency was reported as 1100 EUR
+      # under a warning. The file's own comment said "NEVER blend currencies"
+      # eight lines above the code that did. The direction assertions matter as
+      # much as the blending ones: a project rate is quoted as base-per-foreign
+      # and a register rate as target-per-source, both applied by
+      # multiplication, so an inverted rate returns a plausible number and
+      # raises nothing - a round-trip assertion would pass on it. The two named
+      # cases from the assemblies suite are the apply-to-BOQ half of the same
+      # contract.
+      #
+      # They used to be taken by node id rather than by file, on the stated
+      # grounds that naming the file would adopt 195 unrelated tests. Measured
+      # 2026-08-04, that file holds 50 tests and runs in 56 seconds, so the
+      # reason no longer holds and it may never have. Two node ids also left the
+      # worst possible shape: the filename appeared in the gate while 48 of its
+      # tests, in a money feature, were covered by nothing. Whole file now.
+      - name: Run assemblies currency blending tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_assemblies_currency_blending.py
+          tests/unit/test_assemblies.py
+          -q -p no:cacheprovider
+      # The readers behind the release version check. Attached here for the same
+      # reason as everything around it, which is that tests/unit runs in no lane
+      # that blocks a merge. The check itself runs whole-tree in Repo hygiene, so
+      # this file deliberately does not repeat that; what it covers is how the
+      # two Cargo files are parsed. Both readers are regexes anchored on a table
+      # rather than a real TOML parse, and the lockfile they read carries 538
+      # package entries with a version literal each, so an unanchored reader
+      # there does not merely risk the wrong answer, it reports a dependency's
+      # version as the release forever and stays green doing it. The cases use
+      # manifest and lockfile shapes that are valid TOML but do not occur in the
+      # tree today, which is exactly what a run against the tree cannot cover.
+      # No database, under a second.
+      - name: Run release version literal reader tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_version_sync_check.py -q -p no:cacheprovider
+      # The guard that pins which test trees this lane actually runs. It was in
+      # no workflow at all, which is the failure it exists to describe, and it
+      # had been red for long enough that nobody could say since when. What it
+      # got wrong is worth stating: it read a step naming nineteen files under
+      # tests/integration as a run of the whole tree, because it only asked
+      # whether the tree's name appeared in the command and whether a -k was
+      # present. So the two trees this file records as thinly gated were being
+      # reported as fully gated, by the one check written to notice that.
+      # Reads workflow files as text. No database, under three seconds.
+      - name: Run CI lane coverage guard
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_ci_lane_coverage.py -q -p no:cacheprovider
+      # Snapshot column integrity. Attached for the reason repeated above, and
+      # with a second one of its own: the check it performs is the kind that
+      # keeps reporting after it has stopped working. pandas 3 gives a text
+      # column the str dtype rather than object, the sniffing that finds a CSV
+      # whose numbers arrived as text was reached only for object, and so every
+      # text column began reading as a plain string. The report still rendered
+      # and still counted nulls. Nothing was red anywhere.
+      # No database, under five seconds.
+      - name: Run snapshot column integrity tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_dashboards_integrity.py -q -p no:cacheprovider
+      # What the sheet register holds after a drawing set is split. Attached here
+      # for the reason stated repeatedly above, which is that tests/unit runs in
+      # no lane that blocks a merge, and this release ships the register's first
+      # real screen, so the split behind it was gated by nothing at all.
+      # It covers two things nothing else could see. A re-uploaded set used to
+      # leave two rows per sheet number, both flagged as the current revision,
+      # which also fed a doubled set into the completeness check because that
+      # reads current sheets only. And the title block reader captured past the
+      # end of a field: the pre-existing scale tests all assert with `in` rather
+      # than equality, so a value carrying an extra line or the neighbouring
+      # column passed every one of them. The assertions here are equalities for
+      # exactly that reason.
+      # The PDFs are rendered with reportlab and read back with pdfplumber, so
+      # the detection runs against text that was genuinely extracted rather than
+      # handed to it. Needs the database, about eighty seconds.
+      # The skip guard is the point of the shell block. Most of this file needs
+      # a PDF, and the helper that renders one calls importorskip, so if
+      # reportlab ever stops being installed here the file goes quiet and the
+      # step still exits zero. reportlab and pdfplumber are base dependencies of
+      # the backend package rather than extras today, so this should never fire;
+      # it exists because a gate that turns itself off without saying so is
+      # worse than no gate, and nothing else in this lane would notice.
+      - name: Run sheet register split tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          pytest tests/unit/test_sheets_split_and_register.py tests/unit/test_sheets_read_path.py -q -p no:cacheprovider | tee sheets.log
+          if grep -qE '[0-9]+ skipped' sheets.log; then
+            echo "::error::A sheet register test skipped instead of running. reportlab or pdfplumber is missing from this lane, so this step proved nothing." >&2
+            exit 1
+          fi
+      # Who may read a sheet, and whose photos the dashboard card asks for. Both
+      # are scope questions, which is the class of bug that looks correct in a
+      # screenshot: a card showing the wrong project's data and a card showing
+      # the right project's data are the same picture until you know which
+      # project was selected. The photos file covers the pair that has to agree,
+      # the request and the cache key, because a key that does not carry the
+      # project serves the previous one's photos without asking the server at
+      # all, which is indistinguishable from a server ignoring the filter.
+      # Needs the database, about four minutes for the two together, which is
+      # most of the cost of adding them and is worth it for an access control
+      # file that ran in no lane before this.
+      # Money and permissions, the two subjects where an ungated test costs the
+      # most. A census on 2026-08-04 found 1298 of the 1370 files under
+      # backend/tests in no blocking lane, about 125 of them money and about 96
+      # permissions, against three money files and one permissions file gated.
+      # Closing that gap wholesale is not a release-day change; these four are
+      # the ones that are both high risk and cheap, measured at 203 tests in 40
+      # seconds together. The rest of the census is written up separately.
+      # Nothing here was failing when it was added, so a failure means a
+      # regression rather than a pre-existing debt being surfaced.
+      # The delete guards join this step rather than getting their own, because
+      # they run against stub repositories and finish in under two seconds.
+      # They decide whether a signed contract or a subcontractor who is on a
+      # job can be removed in one call, taking the claims, certificates and
+      # retention hanging off them, so the rule they hold is worth as much as
+      # the money rules beside it and was enforced by nothing.
+      # The contract-sum double post has a ten-test guard and it was gating
+      # nothing. The file sat inside a lane whose -k chain selected exactly one
+      # of its ten tests, and by an accidental substring: the one test that
+      # deliberately does NOT exercise the double post. So "is this file
+      # covered" answered yes while the three real regression tests, both
+      # arrival orders included, were selected by nothing at all. It gets its
+      # own step because it needs a database and takes about four minutes,
+      # which is why it does not belong in the stub-repository money step below.
+      # The resync guard is named here beside its sibling and for the same
+      # reason. It holds the rule that a mirror posts the amount its variation
+      # order carries now rather than the one it carried when it was created,
+      # and it went red on the commit before this one with a superseded 7200
+      # reaching the project budget against a corrected 6800. A file in this
+      # directory that is named in no step runs only when a person runs it, so
+      # adding the file is the whole difference between a guard and a document.
+      - name: Run the contract-sum double-post guard
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/integration/test_variation_mirror_contract_double_post.py
+          tests/integration/test_the_mirror_follows_its_variation_order.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      - name: Run ungated money, permission and commercial delete guard tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_money_iso4217_minor_units.py
+          tests/unit/test_money_decimal_global.py
+          tests/unit/test_vat_lookup.py
+          tests/unit/test_permissions.py
+          tests/unit/test_commercial_delete_guards.py
+          -q -p no:cacheprovider
+      # Photo categories are stated three times, in the uploader, in the edit
+      # schema and in the gallery's own union, and one of the three disagreed:
+      # a drone shot could be uploaded and shown as "aerial" while setting that
+      # category from the editor came back 422. Each list was locally
+      # consistent, so only a check that reads all three can see it.
+      - name: Run sheet access control and photo scope tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_sheets_access_control.py
+          tests/unit/test_photos_recent_project_scope.py
+          tests/unit/test_documents_photo_categories.py
+          -q -p no:cacheprovider
+      # The module builder writes Python that a server then imports and serves.
+      # A defect in the renderer is not a wrong number on a screen, it is a
+      # module that cannot load, and the failure surfaces on a user's instance
+      # rather than here. These files import every rendered module rather than
+      # only compiling it, which is what caught three imports of names that do
+      # not exist in this codebase. The service suite covers the refusals: a
+      # draft that cannot be built, a key already taken, a module that writes
+      # its files and then fails to load, each of which has to leave the server
+      # as it was found. The registry file gates removal of a module's
+      # permissions, without which an uninstalled module keeps granting what
+      # nothing enforces. No database, a few seconds together. The end-to-end
+      # install lives in tests/pg above, which this lane already runs whole.
+      # The loader file gates taking a module's routes down again. Removal was
+      # written when including a router copied its routes into the application,
+      # and current FastAPI records the include instead and resolves paths per
+      # request, so a sweep that matches on path found nothing, removed nothing
+      # and reported success while every endpoint of the disabled module kept
+      # answering. The tests ask through the door rather than through the route
+      # table, so they hold on either version. The served-routes file is their
+      # complement and deliberately does the opposite: it reads the route table
+      # directly, so it is version-sensitive, which is why it catches what asking
+      # through the door cannot. A websocket-only module came back with an empty
+      # path from FastAPI's own flattening on the version this lane installs, so
+      # the loader read it as not mounted and mounted it again on every enable.
+      # Neither file covers the other. The state file gates the rule
+      # that core modules cannot be switched off, which was being applied in
+      # both directions and refused to switch one on.
+      - name: Run module builder and permission registry tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/test_module_builder_generator.py
+          tests/test_module_builder_service.py
+          tests/unit/test_permission_registry.py
+          tests/unit/test_module_state.py
+          tests/unit/test_module_loader_routes.py
+          tests/unit/test_module_loader_served_routes.py
+          -q -p no:cacheprovider
+      # Every endpoint here spends the operator's money with an LLM provider, so
+      # the rate limit is the only thing between a stolen session and a bill.
+      # The wiring test walks the mounted application to prove the dependency is
+      # still attached, which is the right way to ask and also the reason it
+      # went red on its own when FastAPI changed how a mounted router is
+      # recorded. It was in no lane, so nothing said so.
+      # The isolation file beside it is GHSA-wfpw-cv5v-64j5: the Ollama / vLLM
+      # endpoint a user saved was written into a module-global table, so it
+      # became the endpoint of every user sharing the worker process and their
+      # prompts went to whatever host was saved last. It is bound per
+      # resolution now, and the shape of that bug - shared mutable state that
+      # reads as configuration - returns the moment a second writer appears.
+      - name: Run AI endpoint security tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/modules/test_ai_security.py
+          tests/unit/test_ai_self_hosted_endpoint_isolation.py
+          -q -p no:cacheprovider
+      # A punch list row printed the assigned_to column as it stood, and that
+      # column holds a contact id as often as a name, so a German demo read
+      # "ZUGEWIESEN AN 3f2b8c1e-9a44-..." on every row of the list, on every
+      # kanban card, in the drawer and along the axis of the insights chart.
+      # The names are resolved in two queries per page now, one against the
+      # contacts register and one against the user list, because the seeder
+      # writes a contact id where the assignment control writes a user id.
+      # Three things here are worth a gate rather than a review: that the cost
+      # is fixed per page rather than per row, on the slowest screen the module
+      # has; that free text is
+      # never sent to the database, because a typed-in name is already the
+      # answer; and that an id which resolves to nothing does not come back as
+      # "Unassigned", which would tell a site manager to hand out work that
+      # already has an owner.
+      - name: Run punch list assignee resolution tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_punch_assignee_names.py
+          tests/unit/test_punchlist.py
+          tests/unit/test_punchlist_polish.py
+          -q -p no:cacheprovider
+      # The literal string bim did not appear anywhere in this file, so 30 unit
+      # files and 528 tests, including the ones covering all 28 BIM validation
+      # rules, were enforced by nothing. Those rules are reachable in production:
+      # the validation service pulls them by id from two flat lists that the
+      # bim_hub router imports, so they are not the dormant kind that a rule-set
+      # registration bug would have left unreferenced. Measured at 532 passed and
+      # 0 skipped, about four minutes here where DATABASE_URL already points at
+      # the service container above; two of the files open a real session and
+      # would fail rather than skip without it. The skip guard is not decoration:
+      # one test in test_bimlv_container.py calls pytest.skip from inside an
+      # except clause, which no grep for importorskip or skipif can see, and a
+      # broken import graph would make it vanish silently rather than fail.
+      - name: Run BIM unit tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          pytest tests/unit/test_bim_*.py tests/unit/test_bimlv_container.py -q -p no:cacheprovider | tee bim.log
+          if grep -qE '[0-9]+ skipped' bim.log; then
+            echo "::error::A BIM test skipped instead of running. This step proved nothing about the rules it is here to gate." >&2
+            exit 1
+          fi
+      # The two BIM documents cross-link guards live in tests/modules/bim_hub,
+      # and the string bim_hub appears in no workflow in this repository. The
+      # sharded backend lane runs tests/unit only; tests/modules is named five
+      # times in this file and never for this directory; the tenant isolation
+      # job selects on a marker these files do not carry and on a keyword chain
+      # in which no word matches any of their node ids. So both files passed
+      # nightly and could stop nothing, which is the state that let the defect
+      # they cover be written down as fixed while a second instance of the same
+      # wrong keyword sat 170 lines away in the same router, commemorated in a
+      # comment.
+      #
+      # Not described as blocking, because nothing here is. main is protected by
+      # three rules, deletion, non-fast-forward and linear history, and carries
+      # no required status checks at all, so no job in this workflow stops a
+      # push today and this step does not either. What it buys is that the guard
+      # runs where somebody looks instead of nightly where nobody does, and that
+      # the list is already right on the day required checks are turned on.
+      #
+      # Whole files rather than selected tests, because selecting is
+      # what went wrong here in the first place. Own step because it needs a
+      # database: one file commits through the worker's own session and asserts
+      # what PostgreSQL did with the row, the other reproduces a real refusal
+      # with a 300-character filename. Eight tests, about three minutes here,
+      # nearly all of it cluster boot and per-test template clones.
+      - name: Run the BIM documents cross-link guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/modules/bim_hub/test_cad_upload_cross_link.py
+          tests/modules/bim_hub/test_sheets_pdf_cross_link.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # The funding module's own tests ran in no lane anyone reads, for the same
+      # reason as the BIM guards above: the sharded backend lane runs tests/unit
+      # only and no step here named tests/modules/funding. Only its PG backfill
+      # test was gated, through the tests/pg step. Named file by file like the
+      # other tests/modules steps, so a new file in that directory is ungated
+      # until it is added here. Measured 2026-09-21 on Windows: 185 passed,
+      # 0 skipped, about three minutes, most of it cluster boot and clones.
+      - name: Run funding module tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/modules/funding/test_funding_dates.py
+          tests/modules/funding/test_funding_derived_obligation_keeps_its_wording.py
+          tests/modules/funding/test_funding_list_pages.py
+          tests/modules/funding/test_funding_messages.py
+          tests/modules/funding/test_funding_obligation_is_translatable.py
+          tests/modules/funding/test_funding_obligation_row_predating_columns.py
+          tests/modules/funding/test_funding_service.py
+          tests/modules/funding/test_funding_validator_money_formatting.py
+          tests/modules/funding/test_funding_validators.py
+          tests/modules/funding/test_migration_names_match_the_models.py
+          tests/modules/funding/test_module_registration.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # The cost base pipeline produces the parquet editions people download from us, so it
+      # needs a blocking gate. It needs no database; it is attached here because this is the
+      # only merge-blocking lane that runs pytest, and an ungated test is the situation this
+      # suite exists to end. Its own working-directory keeps the flat sibling imports and the
+      # conftest sys.path entry working exactly as they do locally. Deps are already present:
+      # pandas and pyarrow are base dependencies of the backend package installed above.
+      # A dedicated fast lane would be the better home; that is a new shared workflow and a
+      # separate decision.
+      - name: Run cost base pipeline suite
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        working-directory: tools/costbase_pipeline
+        run: pytest tests -q -p no:cacheprovider
+
+      # Core integration surface: background jobs, chunked uploads, and the
+      # deployment posture the in-product trust panel renders. All four files
+      # were collected by nothing in this workflow before now, which is how a
+      # real regression sat invisible for a month, pre-existing since v10.6.0 and
+      # byte-identical at the 14.8.0 release commit. Eager Celery dispatch, the
+      # documented dev and lightweight-deployment default, drives the job
+      # runner's coroutine on a thread with its own fresh event loop, but that
+      # coroutine drew its database connections from the app's one pooled engine:
+      # a connection checked out on the main loop and later reused on a
+      # dispatch's new loop makes asyncpg refuse it outright with "Task ... got
+      # Future ... attached to a different loop". Severity was worse than
+      # deterministic breakage because it depended on pool warmth. An empty pool
+      # hands the new loop a fresh connection and the job succeeds, so a cold
+      # smoke test passed and the same dispatch failed once request handling had
+      # warmed the pool, which is why it went unnoticed for a month. Every
+      # dispatch now builds its own throwaway engine inside the dedicated
+      # thread's own loop and disposes of it after, so no connection can outlive
+      # the loop that opened it. test_jobs_status_endpoint.py carried a second,
+      # unrelated gap in the same file: the fixture overrode get_current_user_id,
+      # but every route on the router is role-gated through the different
+      # get_current_user_payload dependency, so all four routes 401'd before
+      # reaching a handler and the suite had never actually exercised any of
+      # them.
+      - name: Run core integration tests (jobs, uploads, deployment posture)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/integration/core/test_storage_multipart.py
+          tests/integration/core/test_jobs_celery_redis.py
+          tests/integration/core/test_deployment_posture.py
+          tests/integration/core/test_jobs_status_endpoint.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # The rest of tests/unit/core. Job runner internals not already covered
+      # above: handler registry, progress clamping, idempotency including the
+      # cross-thread key uniqueness case, and the no-Celery fallback. The
+      # Pipeline Builder's Phase-1 spine: Kahn topological order with cycle
+      # rejection, and the side-effecting-node validation rule that backs "AI
+      # proposes, human confirms". The working-days calendar engine's multi-year
+      # holiday computation, and chunked upload streaming's temp-file spooling.
+      # Same gap as the suite above: nothing under tests/unit/core ran in a
+      # blocking lane before now, on files that carry real database and
+      # threading behaviour rather than pure functions.
+      - name: Run core unit tests (jobs, pipelines, calendar, uploads)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/core/test_jobs_handler_registry.py
+          tests/unit/core/test_jobs_progress.py
+          tests/unit/core/test_jobs_idempotency.py
+          tests/unit/core/test_jobs_no_celery_fallback.py
+          tests/unit/core/test_pipeline_executor.py
+          tests/unit/core/test_pipeline_graph_rule.py
+          tests/unit/core/test_calendar.py
+          tests/unit/core/test_upload_streaming.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+
+      # The country coverage instrument. Its own step so the guard is visible in
+      # the step list rather than buried in another step's file list.
+      #
+      # It is here at all because tests/unit runs in no lane that blocks a merge,
+      # so all 36 of these ran nowhere in CI. Among them is the only check that
+      # catches the defect the instrument was repaired for: the probe still
+      # answering when the module it reads will not import. The obvious guard,
+      # that no dimension comes back UNRESOLVED anywhere in the cohort, is green
+      # on the broken tree, because the environment that runs the suite is not
+      # the environment that has the bug and the suite therefore cannot see it.
+      # Only the staged-failure test can, and a test that runs in no lane is the
+      # same decoration as a report nobody is on the hook to act on.
+      #
+      # `!cancelled()`, used by this step and the one below it and by nothing
+      # else in this workflow, because these two sit at the end of the job and a
+      # step that fails skips every step below it. This file already names that
+      # hazard: a guard placed last otherwise only runs on the days nothing else
+      # is broken, which is not when you need it. The condition costs nothing
+      # when the job is green and makes the position harmless when it is not.
+      - name: Run country coverage instrument tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_country_coverage.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+
+      # The contract standard registry and the notice engine that reads it.
+      # Same reason as the step above: none of these ran in a lane that blocks a
+      # merge, and it showed. Seven of them were red on main for days while the
+      # only workflow collecting them was the one treated as advisory, and among
+      # the seven was the guard written for exactly the defect that was in the
+      # tree: a standard added to one table and not the neighbouring one. The
+      # guard fired and there was nobody in the room.
+      #
+      # The picker parity file is here rather than with the frontend tests
+      # because it compares a hand-written mirror in the page against the
+      # backend registry, so it needs the backend importable and the frontend
+      # only as text on disk. It is the one guard that fails when the two layers
+      # disagree, which is how a standard the engine returns ended up absent
+      # from the control that selects it.
+      - name: Run contract standard registry and notice engine guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_contract_standard_registration.py
+          tests/unit/test_contract_standard_matching_hazard.py
+          tests/unit/test_demo_contract_standard.py
+          tests/unit/test_ccdc_notice_periods_are_held_not_guessed.py
+          tests/unit/test_notice_standard_picker_parity.py
+          tests/unit/test_time_bar.py
+          tests/unit/test_time_bar_day_basis.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+
+      # What a partner pack declares against what the validation engine has.
+      # The reachability test that already existed asserted has_rules() for a
+      # few set names, which is a fact about the registry and was true the whole
+      # time; it never opened a manifest, so it could not see that fifteen
+      # declarations across seven packs name a standard the engine implements
+      # under a different identifier, and the rules for those have never run.
+      #
+      # This file also checks the section of the partner-pack README that lists
+      # the rule sets, because that section is where the wrong identifiers came
+      # from: it named 36 and 3 of them existed. Its probes each start a fresh
+      # interpreter, so the step is unaffected by what the rest of the job has
+      # imported, and it needs no database.
+      - name: Run partner pack rule set guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_partner_pack_rule_slugs.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+
+      # A browser announces pt-BR, not pt. The catalogue module and the two
+      # /i18n routes have to agree with the Accept-Language middleware about
+      # what that means, and for a long time they did not: the middleware
+      # resolved the tag to its base language and the routes answered 404 for
+      # the identical tag. Nothing held the layers equal, so the disagreement
+      # was invisible from inside either one. These tests read the UI language
+      # list and both server paths, and they need no database.
+      - name: Run locale resolution guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_backend_locale_falls_back_to_base_language.py
+          tests/unit/test_backend_locale_catalogue.py
+          tests/unit/test_cli_version_matches_the_running_code.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+
+      # The validation message locale ratchet, which watches seven MessageBundle
+      # catalogues under backend/app and fails when one stops answering a locale
+      # it used to answer. It is not unwired today: ci.yml hands pytest the whole
+      # of tests/unit and this file drives the script as a subprocess, so it
+      # already runs there. What naming it here changes is which lane the result
+      # is read in. Naming the test rather than calling the script is deliberate:
+      # the file carries the red proofs and the assertion that the baseline is
+      # not stale, and a bare script call would be a weaker copy of a check that
+      # already exists.
+      #
+      # Read a green from this narrowly. The gate is a ratchet against a
+      # baseline that already records four locales of twenty eight for the core
+      # catalogue. It locks the floor, it does not raise it. Twenty four locales
+      # are still missing there and this step will never say so.
+      # Reads the catalogues and the baseline file. It spawns the script once
+      # per case, so it is 37 tests in about thirteen seconds. No database.
+      - name: Run validation message locale coverage guard
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_validation_message_locale_coverage.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # Two properties of a generated document that only the rendered page can
+      # witness, which is why they are named here rather than left in
+      # tests/unit: that directory runs in no lane that blocks a merge.
+      #
+      # Neither defect is visible to anything else we run. A heading drawn in
+      # the exact colour of the rectangle behind it extracts perfectly, so
+      # every assertion written against extracted text passes on a page whose
+      # heading is not there; the bill of quantities shipped that way. A cell
+      # longer than its column is drawn straight over the column beside it and
+      # extracts in the right order, so the file reads complete while the page
+      # is not. Ruff and the type checker see valid code in both cases.
+      #
+      # Neither needs a database. They carry the same not-cancelled condition
+      # as the locale guards above so that a failure earlier in the job cannot
+      # take the page checks down with it and leave the pages unread.
+      - name: Run the generated document page checks
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/unit/test_pdf_header_text_is_readable_on_its_fill.py
+          tests/unit/test_pdf_table_cells_stay_in_their_column.py
+          -q -p no:cacheprovider
+
+  # Object ownership and cross-tenant access. Of the 32 files in the repo that
+  # test this, exactly one was in a blocking lane; the other 31, all 29 *_idor
+  # files among them, were enforced by nothing. That is the class where a gap
+  # costs a customer their neighbour's data rather than a wrong number on a
+  # screen, and this platform has a live example of the shape: the permissions
+  # column on an API key is stored and displayed but read by no decision.
+  #
+  # Its own job rather than more steps on backend-postgres, because a step that
+  # fails skips every step below it, and one access-control failure should not
+  # take the demo-seed and DWG checks down with it.
+  #
+  # All 32 were measured on 2026-08-04 at 502 tests, 0 failed, 0 skipped,
+  # 0 errors, with no Redis, MinIO, Celery, subprocess or outbound network
+  # anywhere in the set, and the single conditional skip in it does not fire.
+  # The database-free file went in first, on its own, because the 31 that need
+  # PostgreSQL run about a quarter of an hour and their first run on a hosted
+  # runner should not be the release commit: a new lane going red there reads
+  # to everyone as the release being broken. v14.4.0 is tagged and published,
+  # so the rest are wired here, in the groupings that were measured.
+  access-control:
+    name: Object ownership and cross-tenant access
+    runs-on: ubuntu-latest
+    # Measured on the runner rather than guessed from here: 10.3 minutes for
+    # the whole job, 0.8 install, 0.1 router guards, 1.4 module and unit, 3.9
+    # and 3.1 for the two integration halves, 0.8 tenant isolation. The local
+    # numbers said about thirty three minutes, which turned out to be this box
+    # under contention from parallel work rather than anything about the tests.
+    # Thirty is three times the observed run, so an actual hang names itself in
+    # half an hour instead of inheriting the six hour default, and a runner
+    # having a slow day still finishes.
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      OE_TEST_DB: pg
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p ../frontend/dist
+          touch ../frontend/dist/.gitkeep
+      - name: Install dependencies
+        id: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,server]"
+      # 186 tests in 25 seconds and no database at all, so a router that grows
+      # a handler without an ownership guard is reported before anything pays
+      # for a cluster. Nothing in it is timing sensitive, which is why this one
+      # is safe to wire inside a release window and the rest are not.
+      - name: Run router-level ownership guards (no database)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/unit/test_idor_router_guards.py -q -p no:cacheprovider
+      # Grouped into single steps on purpose. Each pytest process boots its own
+      # embedded cluster, and the per-test database clone is what actually
+      # scales, so splitting these into many small steps pays the boot cost
+      # again for nothing. Merging them further is not free either: it changes
+      # the process composition the in-process registration limiter was
+      # measured under.
+      - name: Run module and unit ownership guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/modules/geo_hub/test_overlay_crud_idor.py
+          tests/modules/qms/test_qms_idor.py
+          tests/modules/rfi/test_rfi_cross_tenant_idor.py
+          tests/modules/variations/test_variations_idor.py
+          tests/unit/test_bim_requirements_validate_idor.py
+          tests/unit/test_carbon_idor.py
+          tests/unit/test_clash_idor.py
+          tests/unit/test_coordination_idor.py
+          tests/unit/test_plan_read_idor.py
+          tests/unit/test_takeoff_idor.py
+          tests/unit/teams/test_teams_access_control.py
+          tests/modules/requirements/test_matrix_and_traceability.py
+          -q -p no:cacheprovider
+      # Named one file at a time because no push gate runs them. Measured
+      # 2026-08-29: tests/modules/property_dev holds 254 tests, and the two
+      # selectors that reach tests/modules on a push, the tenant_isolation
+      # marker and the frozen -k chain in ci.yml, select 59 of them between
+      # them. What they select is selected by spelling rather than by subject.
+      # test_admin_tenant_boundary.py is covered 8 of 8 because its filename
+      # contains "tenant", which is a chain term, while test_currency_mixing.py
+      # beside it is covered 0 of 16. The three files below carry the guards for
+      # the property_dev.owner_scoped_delete split and none of them wins that
+      # lottery.
+      #
+      # The other 195 are not unrun. ci-full.yml collects the whole tree nightly
+      # across 32 shards, so they do execute once a day. What they do not have
+      # is a signal anyone can act on: that nightly has come back completed and
+      # red on eight consecutive nights (checked 2026-08-30, latest run 23 of 32
+      # shards green, 9 shards plus the macOS and Windows jobs red). A lane that
+      # is red every night reports a new breakage exactly as loudly as it
+      # reports the eight old ones, which is not at all. Naming these three here
+      # puts them where a push can turn them red on their own.
+      - name: Run property_dev delete-permission guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/modules/property_dev/test_delete_permission_deadlock.py
+          tests/modules/property_dev/test_owner_scoped_delete_invariant.py
+          tests/modules/property_dev/test_service_surface_resolves.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # Named here because the guard existed and no push lane collected it.
+      # Measured 2026-09-23 against an export: the frozen -k chain in ci.yml
+      # selects "no tests collected (7 deselected)" on this file, the
+      # tenant_isolation marker selects the same nothing, and the named
+      # tests/modules list above does not include it. Unfiltered it is 7 tests.
+      # So the only lane that ran it was the nightly, which is not one of the
+      # two we act on, and "pinned" meant "somebody reads it in the morning".
+      #
+      # What it pins is worth the step. A claim's stored gross, retention and
+      # net are asserted together after a create, an update and a delete on a
+      # cost-plus contract, so a net written over a stale gross goes red on the
+      # second assertion rather than shipping as a wrong figure on a payment
+      # application. Its two siblings in the same file cover the engine path, so
+      # the whole file is named rather than the one test.
+      #
+      # test_contracts_mixed_shape_certificate.py rides the same step and is a
+      # different kind of guard: three of its six tests are xfail(strict=True)
+      # because the defect they describe is real and not yet fixed. It is strict
+      # rather than plain so the lane cannot go quietly green when somebody
+      # repairs the branch: the xpass fails the step and the marker has to be
+      # removed with the fix. It is xfail rather than a hard red because this is
+      # a lane we act on, and a lane carrying a permanently red test teaches
+      # everyone to skim past red. To see them fail on demand, add --runxfail.
+      # The three that pass are controls and are not padding: the lump-sum one
+      # localizes the fault to the flat retention branch rather than to the
+      # certificate builder, so a reader does not go and edit the wrong file.
+      - name: Run contract claim line write guards
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/modules/test_contracts_claim_line_writes.py
+          tests/modules/test_contracts_mixed_shape_certificate.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # Two steps rather than one because two halves is how the integration set
+      # was actually measured, and a single process holding all eighteen files
+      # has never been run anywhere. The extra cluster boot is seconds; a first
+      # hosted run is the wrong place to discover what one long-lived process
+      # does to the connection pool.
+      - name: Run integration ownership guards, first half
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/integration/test_assemblies_idor.py
+          tests/integration/test_bim_hub_idor.py
+          tests/integration/test_costs_idor.py
+          tests/integration/test_dashboards_idor.py
+          tests/integration/test_eac_idor.py
+          tests/integration/test_erp_chat_idor.py
+          tests/integration/test_fieldreports_idor.py
+          tests/integration/test_inspections_idor.py
+          tests/integration/test_meetings_idor.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      - name: Run integration ownership guards, second half
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/integration/test_property_dev_idor.py
+          tests/integration/test_reporting_idor.py
+          tests/integration/test_resources_idor.py
+          tests/integration/test_schedule_advanced_idor.py
+          tests/integration/test_schedule_idor.py
+          tests/integration/test_schedule_percent_type_preview.py
+          tests/integration/test_schedule_bim_links_add.py
+          tests/integration/test_service_idor.py
+          tests/integration/test_snag_warranty_idor.py
+          tests/integration/test_subcontractors_idor.py
+          tests/integration/test_takeoff_dwg_idor.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # Tenant isolation belongs with its siblings rather than on
+      # backend-postgres, where it would sit above the BIM and cost base steps
+      # and a failure in it would skip both. That is the same reason this job
+      # exists at all.
+      - name: Run tenant isolation
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest tests/integration/test_tenant_isolation.py -q -p no:cacheprovider
+      # Registers that answer with a page envelope, checked end to end. The
+      # pagination waves moved these endpoints from a bare array to {items,
+      # total, offset, limit} and moved every caller with them, and nothing
+      # that blocks a merge collected any of it. These are integration tests,
+      # and tests/integration is reached by exactly one filtered step, in the
+      # CI workflow, which is red often enough that a failure there stops
+      # nobody. The lane coverage guard still records that tree as
+      # PUSH_FILTERED, because it ranks by continue-on-error rather than by
+      # whether anyone acts on the result, so the classification is true on
+      # paper and buys nothing. Worth knowing before reading this step as
+      # redundant with it, and worth knowing that adding these names cannot
+      # improve that recorded class either: naming files ranks below filtering
+      # a tree, so the guard keeps reporting the number the red lane supplies.
+      #
+      # Here rather than on backend-postgres, which is where it was written
+      # first and where it does not fit. Summing the costs those step comments
+      # state gives about 21 minutes against a 30 minute ceiling, and two of
+      # its steps state no cost at all, so the true figure is higher than that
+      # and unknown. This job was measured at 10.3 minutes against the same
+      # ceiling. That makes the job name narrower than its contents, which is
+      # the price of the move and is cheaper than the alternatives: crowding a
+      # lane already near its ceiling, or paying a fresh install and cluster
+      # boot for three files. One of the three is test_folder_permissions.py,
+      # so the fit is not as poor as the heading suggests.
+      #
+      # The 21 minutes is worth someone's attention on its own. That job's
+      # ceiling comment still reasons from "the suite finishes in about ten",
+      # which was true of tests/pg alone and has not been true of the job for
+      # a while. Nothing tracks that, and the failure mode when it arrives is
+      # an anonymous kill at the wall clock rather than a named test.
+      #
+      # Cost, measured rather than guessed, and measured badly. 29 tests, 0
+      # failed and 0 skipped in 636 seconds under OE_TEST_DB=pg on a Windows
+      # box that had two other sessions running pytest at the same time. Nearly
+      # all of that is fixture setup rather than test bodies: 137 seconds for
+      # the first cluster boot and about 18 for each per-test database clone
+      # after it, which is a property of the conftest every file in this job
+      # shares. So the number describes this box, not these files, and the
+      # runner cost is unmeasured. For shape, this job was observed doing 502
+      # tests in 10.3 minutes, near 1.2 seconds a test against the 18 here.
+      # That ratio belongs to contention and to Windows filesystem behaviour,
+      # so do not divide the local figure by it and record the result as a
+      # measurement.
+      #
+      # test_critical_flows.py was a candidate and was dropped rather than
+      # deferred. It asserts on envelope keys in seven places, which is what put
+      # it on the list, but it is a platform smoke suite rather than a register
+      # test, and it carries 50 of the 79 tests the four would have cost. Worst
+      # fit for the rule and most of the bill is enough to drop it; the rule is
+      # that a file belongs here when it exercises a register this programme
+      # moved to the envelope.
+      #
+      # This is a patch and not the fix. Counted with a glob on 2026-08-17,
+      # tests/integration holds 203 files directly and 221 including its six
+      # subdirectories; 23 were named by a blocking step before this and these
+      # three make 26. Everything else there still runs nowhere that stops a
+      # merge. The fix is a nightly run of the whole tree that is allowed to
+      # finish, together with a status check that fails closed when no result
+      # arrives, and neither exists yet. Naming files one at a time is how this
+      # file already works and it plainly does not scale to the remainder; it
+      # is chosen here because the alternative is waiting for the nightly while
+      # the registers ship uncovered.
+      #
+      # The failing-closed half is the part that is easy to leave for later and
+      # is the reason a nightly on its own would not be enough. A cancelled
+      # shard reports exactly what a shard that ran and had nothing to say
+      # reports: no annotations, no failures, a green summary. So a nightly
+      # cancelled every night of a quiet week reads identically to a week with
+      # no regressions, and which one it was gets settled by the regression
+      # shipping.
+      - name: Run paged register integration tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/integration/test_documents_remediation_backlog.py
+          tests/integration/test_documents_search_and_activity.py
+          tests/integration/test_folder_permissions.py
+          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
+      # The read-only public demo, proved by a row census of every table rather
+      # than by the status codes the API returned. Here because it was added
+      # red and nothing noticed: tests/integration is reached by one filtered
+      # step in the CI workflow, which is red often enough that a failure there
+      # stops nobody, so this file gated nothing at all while the release notes
+      # told operators every write is refused.
+      #
+      # Read the file's own walk_routes() before touching this. The census
+      # inside it enumerated five endpoints out of roughly five thousand on
+      # this lane and three thousand locally, because FastAPI 0.141 stopped
+      # copying included routes into app.routes and this lane installs fresh
+      # against fastapi>=0.116,<1 while the local virtualenvs sit on 0.136.
+      # It passed either way and said nothing. That is why the sweep now
+      # asserts a floor and cross-checks itself against the published schema,
+      # and it is the reason this step is worth having rather than a formality:
+      # a security census that silently returns five is indistinguishable from
+      # one that returns three thousand, and both are green.
+      #
+      # The constraint is not that this runs alone, it is that nothing sharing
+      # the process may leave a collaboration lock behind. The census counts
+      # every table, so a neighbour that leaves one turns this red when the
+      # sweeper reaps it, which is a true observation about a background worker
+      # and a very confusing way to learn it. The socket file was checked
+      # against that before being added here and takes no lock: it connects the
+      # presence socket, which reads the current lock rather than acquiring
+      # one. Anything added to this step has to be checked the same way.
+      #
+      # The socket file carries the half of the guarantee the census cannot
+      # reach. A WebSocket has no method, so no count of mutating routes
+      # includes it, and the database tripwire only speaks once a query is
+      # already on its way, by which point the connection is established. It
+      # asserts the handshake itself is refused for a socket the allowlist does
+      # not name, in both directions: accepted with the flag off, closed 1008
+      # with it on. Named in the same step as the census so that neither can be
+      # dropped while the other keeps reporting green.
+      #
+      # Cost, measured rather than guessed: 25 tests together, 0 failed, 248
+      # seconds on 0.141.1 and 223 on 0.136.3, on a contended local Windows
+      # box. Both versions are measured because the desktop lock pins 0.136.3,
+      # so one figure would describe neither the lane nor what we ship. Nearly
+      # all of it is one application build plus the cluster boot this job
+      # already pays for, which is why the socket file adds about seven seconds
+      # here against sixty-eight when it runs alone. Local seconds do not
+      # convert to runner cost; see the note above the paged register step.
+      - name: Run demo read-only guard tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/integration/test_demo_read_only.py
+          tests/integration/test_demo_read_only_sockets.py
+          -q -p no:cacheprovider --timeout=600 --timeout-method=thread
+
+  frontend-tests:
+    name: Frontend tests that block a merge
+    runs-on: ubuntu-latest
+    # This job needs nothing from PostgreSQL and sits in this workflow anyway,
+    # because this workflow is the gate. The frontend suite does run elsewhere,
+    # in the CI workflow, which is red often enough that a failure there stops
+    # nothing and nobody reads it. Until that is fixed, a frontend test outside
+    # this file gates nothing.
+    #
+    # The reason that workflow is red is not what this comment used to say. It
+    # blamed a type check that exhausts the heap, and that has not been true for
+    # a while: the ceiling was raised to 9216 MB, and on run 31088534634 all
+    # three Frontend CI jobs - ubuntu, windows and macos - passed. What is red
+    # there is the backend, the embedded-PG mac and windows shards, the brand
+    # token check and the IDOR job. The conclusion is unchanged, the cause is
+    # not, and a wrong cause invites somebody to "fix the OOM" and expect this
+    # job to become redundant.
+    # Recounted 2026-09-07 out of the commit: the include in vite.config.ts is
+    # src/**/*.test.{ts,tsx} plus tests/**/*.test.{ts,tsx}, which collects 710
+    # files under src and 4 under frontend/tests, so 714 in all. 40 are named
+    # below, so 674 of them gate nothing. Recount rather than trust that
+    # sentence, and recount against that include rather than against the vitest
+    # default: the default would also sweep up the Playwright specs, which this
+    # job does not run and which were never part of this number.
+    #
+    # The previous recount, 2026-09-05, said 701 collected and 39 named. The
+    # suite grew by thirteen files in two days while the list grew by one, which
+    # is the fourth consecutive recount to find the sentence stale rather than
+    # to confirm it.
+    #
+    # The recount before that, 2026-08-17, said 589 collected and 34 named. Both
+    # halves drifted again in nineteen days, the suite by 112 files and the list
+    # by 5, which is the argument for reading the count off the file rather than
+    # off this paragraph.
+    #
+    # Read the named list out of the job-level FRONTEND_TEST_FILES env value,
+    # parsed as YAML, and count the distinct entries in it. Scanning the whole
+    # workflow text for anything shaped like a test filename happens to agree
+    # today, but only by luck: it would also collect any test named in a comment
+    # anywhere in this file, and comments here do name test files.
+    #
+    # Count it out of the commit rather than out of a checkout. The 592 written
+    # here earlier the same day was measured on a working tree carrying nine
+    # test files that no commit held, and this job checks out a ref: it can run
+    # only what was committed. A number taken off a dirty tree reads as growth
+    # in the suite when it is really uncommitted work sitting on a disk, and it
+    # cannot be reproduced by the next person unless their tree is dirty in the
+    # same way.
+    #
+    # The previous recount said 536 files and 21 named, on 2026-08-07. Both
+    # halves had drifted: the suite grew by 56 files and the list below had
+    # quietly reached 28 without the sentence being touched. A count written
+    # into prose stops being true the moment somebody adds a line and does not
+    # scroll up, which is the argument for recounting rather than for writing a
+    # better sentence.
+    #
+    # That is not a hypothetical. Between writing "30" and writing "31" here,
+    # two parallel sessions each added an entry, and the true figure was 32.
+    # Parse the list and count it, do not add one to the number above. Parse it
+    # as YAML and split the value, rather than matching indented lines with a
+    # regex: the block scalar ends at "steps:", which is itself an indented
+    # non-empty line, so a line-shaped pattern reads it as a thirty-fifth test
+    # file and overstates the list by one. That is how the figure above was
+    # briefly written as 35.
+    #
+    # Named files rather than the whole suite, and that is a measurement rather
+    # than a preference. The whole suite came to somewhere between 55 and 95
+    # minutes when it was last timed, depending on how the workers saturate,
+    # and that does not belong in front of every merge. Twenty-one of the names
+    # below ran 322 tests in 29 seconds against 12 logical cores with a warm
+    # cache, measured 2026-08-07; the list has grown to 32 since and that figure
+    # was not re-timed, so read it as the shape and not as the current cost. An
+    # earlier note in this file recorded 118 seconds
+    # for eleven files and that could not be reproduced, so take neither figure
+    # as the cost on the runner: it has four cores and installs cold. What the
+    # numbers do support is the shape, a named list rather than the suite. This
+    # mirrors how the backend half of this file already works: tests/unit is
+    # not collected wholesale either, it is named.
+    #
+    # The list is the frontend half of the work this release carries, and it is
+    # deliberately short. Adding to it should be a decision each time, not a
+    # habit, because every entry is paid on every merge.
+    #
+    # The three module builder entries are this release's decision. That
+    # feature ships eight test files; five are jsdom component tests covering
+    # wiring that a red build or a refused request already surfaces loudly, and
+    # they are deliberately left out, which is written here so that leaving
+    # them out reads as a choice rather than as coverage. The three named are
+    # pure TypeScript and hold the values nothing else would catch: money and
+    # quantities staying strings the whole way to the wire rather than passing
+    # through a double, a local wall-clock time leaving as a zoned instant so
+    # the module's own validator does not read "now" as the future for everyone
+    # east of UTC, an update sending the fields that changed and no others, and
+    # the module's address being taken from the server rather than rebuilt from
+    # its key on this side.
+    #
+    # The calendar feed entry is here because the defect it covers is one no
+    # other check in this repository can see. The page advertised a URL that no
+    # route has ever served, and every layer agreed with itself: the string
+    # type checked, the build passed, and the request only failed on a user's
+    # calendar client. That test reads the decorated path and the required
+    # query parameter out of the module's router and compares, so neither can
+    # move without it failing. The mount prefix is still written on both sides:
+    # the loader composes it from the module directory rather than declaring it
+    # anywhere the test can read, so a change to that scheme would pass here and
+    # break in the browser. Worth knowing before trusting this entry further
+    # than it goes.
+    #
+    # The Uzbek locale entry is here because nothing else in either workflow
+    # sees the class it covers. A straight ASCII apostrophe where Uzbek Latin
+    # writes the turned comma after o and g, or the modifier letter for the
+    # glottal stop, passes every locale gate in the hygiene workflow: those look
+    # for lost diacritics, mojibake and mixed scripts, and a plain quote is none
+    # of them. The one test that reads for it ran only in the other workflow,
+    # where it was already failing on five older strings, so sixty-one new ones
+    # arrived over two days behind a failure count that did not move.
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # Fourteen of the fifty-three files below are jsdom component tests, which
+      # are the expensive kind, and this runner has four cores rather than the
+      # twelve the local measurement was taken on. Both figures are counted by
+      # parsing this list, never by adding one to what the comment said: it read
+      # "nine of twenty-one" while the list held thirty-four, because parallel
+      # sessions each appended an entry without recounting. It drifted the same
+      # way again and said "twelve of thirty-nine" at fifty entries, so the
+      # habit the previous paragraph warned about survived the warning. Counted
+      # two ways this time and they agree: fourteen entries end in .tsx and
+      # fourteen import the React testing library, and it is the same fourteen,
+      # compared as sets rather than as counts. The whole-program type check
+      # and the build in the other workflow already need this ceiling and are
+      # skipped on macOS because a 9 GB heap does not fit that runner at all.
+      # Running the tests under the default heap would be betting the gate on
+      # jsdom staying below a limit nothing else in this repository stays below.
+      NODE_OPTIONS: --max-old-space-size=9216
+      # One list, read by both steps below. Splitting it would let the guard and
+      # the run disagree about what is covered, which is the failure this guard
+      # exists to prevent in the first place.
+      FRONTEND_TEST_FILES: >-
+        src/app/__tests__/clashTriageVocabulary.test.ts
+        src/app/__tests__/everyTranslationKeepsItsPlaceholders.test.ts
+        src/app/__tests__/pluralFormsAreChosenByI18nextNotByJavaScript.test.ts
+        src/app/__tests__/uzLocaleResolves.test.ts
+        src/app/layout/Header.titleKeys.test.ts
+        src/app/layout/navCatalog.test.ts
+        src/features/assemblies/__tests__/preview-totals-no-blended-scalar.test.tsx
+        src/features/bim/BIMConverterVerifyGate.test.tsx
+        src/features/cases/caseVocabulary.test.ts
+        src/features/cases/cases.test.ts
+        src/features/cases/casesProjectContext.test.tsx
+        src/features/cases/chipConsistency.test.ts
+        src/features/cases/roles.test.ts
+        src/features/contracts/ContractAnalyticsPanels.test.tsx
+        src/features/contracts/ContractDetailDrawerDelete.test.tsx
+        src/features/contracts/ContractSecuritiesPanel.test.tsx
+        src/features/contracts/findingKeys.test.ts
+        src/features/dashboard/__tests__/DashboardWidgetScope.test.tsx
+        src/features/dashboard/__tests__/LatestSitePhotosScope.test.tsx
+        src/features/documents/DocumentDeleteWarning.test.ts
+        src/features/dwg-takeoff/lib/__tests__/blocks.test.ts
+        src/features/dwg-takeoff/lib/__tests__/dxf-renderer.test.ts
+        src/features/dwg-takeoff/lib/__tests__/issue-426-render.test.ts
+        src/features/dwg-takeoff/lib/__tests__/text-display-store.test.ts
+        src/features/dwg-takeoff/lib/__tests__/viewport.test.ts
+        src/features/field-time/workingTime.test.ts
+        src/features/file-manager/SheetsIndexPage.test.tsx
+        src/features/file-manager/sheetsInsights.test.ts
+        src/features/funding/api.test.ts
+        src/features/funding/fundingInsights.test.ts
+        src/features/funding/obligationLabel.test.ts
+        src/features/geo-hub/__tests__/cropPolygonPositionsAreNeverMutatedAfterConstruction.test.tsx
+        src/features/integrations/calendarFeed.test.ts
+        src/features/issues/IssueHubLink.test.ts
+        src/features/module-builder/api.test.ts
+        src/features/module-builder/draft.test.ts
+        src/features/module-builder/fields.test.ts
+        src/features/modules/__tests__/profileSignaturePopulation.test.ts
+        src/features/modules/advancedModeGap.test.ts
+        src/features/modules/profileDifference.test.ts
+        src/features/punchlist/assignee.test.tsx
+        src/features/punchlist/punchlistInsights.test.ts
+        src/features/schedule/ScheduleResourcePanel.test.tsx
+        src/shared/lib/__tests__/formatCompactCurrency.test.ts
+        src/shared/lib/__tests__/formattersReadTheLocalePerCall.test.ts
+        src/shared/lib/__tests__/packsAreOfferedByMarketSize.test.ts
+        src/shared/lib/__tests__/theCallSitesJoinListsInTheReadersLanguage.test.tsx
+        src/shared/lib/apiHelpers.fetchAllPages.test.ts
+        src/shared/lib/i18nInterpolatedKeys.test.ts
+        src/shared/lib/projectFileFormats.test.ts
+        src/shared/ui/ModuleGuide.test.tsx
+        tests/pwa/manifest.test.ts
+        tests/pwa/service-worker.test.ts
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        id: install
+        run: npm ci
+      - name: Confirm every named test file still exists
+        if: ${{ !cancelled() }}
+        # A positional argument to vitest is a filter, not a path. A filter that
+        # matches no file runs zero tests and exits zero, so a rename anywhere in
+        # the list would turn this job green and silent rather than red. pytest
+        # errors on an unresolvable node id; vitest does not, so the check has to
+        # be written by hand. Without this step the job would keep passing while
+        # covering nothing, which is worse than not having it.
+        run: |
+          missing=0
+          for f in $FRONTEND_TEST_FILES; do
+            if [ ! -f "$f" ]; then
+              echo "::error::named test file not found: $f"
+              missing=1
+            fi
+          done
+          exit $missing
+      - name: Build the frontend so the artifact tests have something to read
+        id: build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        # The last two names above assert things about the built output rather
+        # than about source, and without this step they do not go quietly
+        # green: they throw "No build output to inspect", which is why they are
+        # safe to gate on. This step is what makes them answerable at all, and
+        # it is the only reason they belong in this file.
+        #
+        # vite build, not npm run build. That script is
+        # "npm run typecheck && vite build", and all four TypeScript projects
+        # set noEmit, so the type checks produce no file the bundle consumes.
+        # They already have their own step in the CI workflow. Running them
+        # here would repeat those checks without extending coverage.
+        #
+        # "Produces no file" is only half of what that drops, and the other half
+        # should be written down rather than discovered. Type checking is a gate:
+        # today a type error stops the build before vite build is reached. Here
+        # it will not, because esbuild strips types instead of checking them, so
+        # this step will build code that does not type-check. That is the
+        # intended trade, not an oversight. What this job claims is that the PWA
+        # artifacts have the right shape, and the type verdict has its own step
+        # in the CI workflow. Anyone who later asks why this job stays green on
+        # a type error should find the answer here instead of reading it as a
+        # bug in the list above.
+        #
+        # The budget, written down because the number is not obvious from the
+        # step. This job is not on the critical path of this workflow, so the
+        # step spends slack rather than merge time. No job in this file declares
+        # needs, so all four start together and the run lasts as long as its
+        # longest job, which is backend-postgres or object ownership and has
+        # never been this one.
+        #
+        # Re-measured 2026-08-30 once the step had actually run, because the
+        # figures first written here were taken before it existed and were then
+        # quoted elsewhere as if they still held. On runs 33289881033 and
+        # 33292412212 this step took 6m42s and 5m55s, carrying the job from the
+        # 1m09s to 1m27s it took across the six runs before the step to 7m59s
+        # and 7m10s after. The run itself was 17m23s and 17m22s, against a
+        # 16m11s to 19m13s band over those six earlier runs, so merge time did
+        # not move. What shrank is the headroom, from 15.7m to 10m12s and 9m24s,
+        # and it is that smaller figure a later step has left to spend, not the
+        # one this paragraph used to carry.
+        #
+        # Re-measure rather than trust those figures, because they go stale in
+        # both directions: compare this job's own duration against the whole
+        # run's, which is visible on any run of this workflow, or read them out
+        # of "gh run view <id> --json jobs". The day this job's duration
+        # approaches the run's it has become the critical path, and this step
+        # is the first thing to question.
+        #
+        # Shown able to fail rather than assumed able to, on run 33297794309: a
+        # throwaway branch carrying one unresolvable import in src/main.tsx
+        # failed here in a second with "Could not resolve", and the job went
+        # red. Worth repeating after any change to this step, because a build
+        # step that cannot refuse anything is indistinguishable from no build
+        # step at all. That run answers the other half too. "Run the named
+        # frontend tests" gates on the install rather than on this step, so it
+        # still ran rather than being swept into skipped, and the two tests/pwa
+        # files failed 11 assertions with "No build output to inspect" instead
+        # of going quietly green.
+        #
+        # Read that run knowing it predates the Tailwind step now sitting
+        # between the two: the job there had seven steps, this one sixth and
+        # the test step seventh and adjacent. The conflict step is the one that
+        # does chain on this step's outcome, and a red build skips it. That is
+        # correct, since it would have no stylesheet to read, but it means this
+        # run cannot be cited as evidence about that step.
+        run: npx vite build
+      - name: Check Tailwind class conflicts in the stylesheet the build produced
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.build.outcome == 'success' }}
+        # Reads the sheet vite just wrote rather than generating its own, so what
+        # is checked is what ships. Three things this step must not get wrong,
+        # because each of them fails by going GREEN rather than by complaining.
+        #
+        # The path is a glob. Vite writes assets/[name]-[hash].css and
+        # cssCodeSplit is left on, so the name changes with every build and there
+        # is more than one file. A fixed path would go stale in silence.
+        #
+        # Every sheet is concatenated instead of one being chosen. Only the entry
+        # sheet carries the utilities, and a glob that happened to resolve to a
+        # vendor sheet parses perfectly while resolving almost nothing - which
+        # reads as "no conflicts" and passes. Feeding all of them removes the
+        # choice. The coverage line the gate prints beside its verdict is what
+        # proves the input was whole: a good sheet resolves about 80% of the
+        # classes the tree uses, a wrong one measured 1%, and the gate refuses
+        # anything under 5% rather than reporting a clean run from it.
+        #
+        # An absent stylesheet is a failure here, not a skip. The backend jobs in
+        # this same file create an empty frontend/dist deliberately, for
+        # hatchling's force-include, so "the directory is there" says nothing
+        # about whether it holds a stylesheet.
+        #
+        # There is no condition here on a workflow or job name, deliberately. The
+        # step already lives in the job it belongs to; a name comparison written
+        # at this level is the kind that cannot be satisfied and does not say so.
+        run: |
+          set -o pipefail
+          shopt -s nullglob
+          sheets=(dist/assets/*.css)
+          if [ ${#sheets[@]} -eq 0 ]; then
+            echo "::error::vite build wrote no stylesheet under frontend/dist/assets, so this gate would have nothing to read. A conflict gate pointed at an absent sheet finds no conflicts and passes, which is why this is an error rather than a skip."
+            exit 1
+          fi
+          echo "stylesheets fed to the gate: ${#sheets[@]}"
+          cat "${sheets[@]}" > "$RUNNER_TEMP/tw-built.css"
+          node scripts/check_tailwind_conflicts.cjs --css "$RUNNER_TEMP/tw-built.css"
+      - name: Run the named frontend tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        # The positional arguments are FILTERS, not paths. A file that no
+        # filter matches is not a failure to vitest, it is simply not run, and
+        # the summary line then reports fewer files with the job still green.
+        # The existence check above cannot see that: a path can be present on
+        # disk and still be selected by nothing. So the count vitest reports
+        # for itself is compared against the number of names we asked for, and
+        # a disagreement fails the job and says which way it went.
+        run: |
+          set -o pipefail
+          expected=$(echo $FRONTEND_TEST_FILES | wc -w)
+          npx vitest run $FRONTEND_TEST_FILES 2>&1 | tee vitest.log
+          ran=$(sed -e 's/\x1b\[[0-9;]*m//g' vitest.log \
+                | sed -n 's/.*Test Files.*(\([0-9][0-9]*\)).*/\1/p' | tail -1)
+          echo "named=$expected ran=${ran:-none}"
+          if [ "$ran" != "$expected" ]; then
+            echo "::error::vitest ran ${ran:-no} test files but $expected were named. A renamed or mistyped filter matches nothing and would otherwise leave this job green."
+            exit 1
+          fi
+
+
+  # ── The upgrade nobody was testing ─────────────────────────────────────────
+  # Every other lane in this repository, and in every other workflow file,
+  # starts from an empty database. So the only thing any of them has ever
+  # tested is a fresh install, while almost every real user is upgrading.
+  #
+  # That gap is not theoretical. Nothing in this codebase calls
+  # ``alembic upgrade``; the schema moves at boot through a helper that issues
+  # ADD COLUMN and CREATE INDEX IF NOT EXISTS, plus create_all for tables that
+  # are wholly absent. A revision made of nullable columns survives that. A
+  # NOT NULL, a rename, a type change or a backfill does not, and until this
+  # job existed nothing anywhere would have said so.
+  #
+  # The trap this job is written to avoid: an EMPTY database plus
+  # ``alembic upgrade head`` runs NOTHING. ``alembic/env.py`` short-circuits a
+  # blank database to create_all followed by a stamp at head (env.py:285-297),
+  # so a lane that creates an empty database, stamps it and reports success is
+  # a green gate that has tested nothing at all. The only honest shape is to
+  # build the database with the PREVIOUS release's own code first.
+  #
+  # Which is also why the previous release is installed from PyPI into its own
+  # virtualenv and BOOTED rather than migrated. Wheels before 15.4.0 ship no
+  # alembic.ini and no revision tree at all, so there is no migration entry
+  # point in that interpreter to call - and booting is what a real install of
+  # that release does anyway.
+  #
+  # What this job can see, and what it cannot. It compares the tables and
+  # columns the current metadata declares against the ones the aged database
+  # has, plus their nullability - so it catches an absent table, an absent
+  # column, and a NOT NULL that was quietly added nullable. It does NOT
+  # compare types, it cannot tell a rename from an addition (the new name is
+  # added, the old one keeps the data, and the comparison goes green), and a
+  # revision whose work is a data backfill produces no schema signal at all.
+  # Those three shapes still need a test of their own.
+  #
+  # Runs in parallel with the three jobs above, so it adds no wall-clock time
+  # to this workflow as long as it stays inside their runtime.
+  upgrade-from-previous-release:
+    name: Upgrade from the previous release
+    runs-on: ubuntu-latest
+    # Two dependency installs, two application boots and a schema comparison.
+    # The two boots were measured at six to seven minutes each on a developer
+    # Windows machine against an embedded cluster; on a Linux runner with a
+    # postgres service container they are unmeasured and expected to be
+    # faster. The ceiling is deliberately generous, and is there so a database
+    # that never becomes ready fails in minutes instead of inheriting the six
+    # hour default and blocking merges for the rest of the day. If this job
+    # ever does become the slowest in the workflow, the lever is seeding fewer
+    # rows in the aging half, not seeding none: an empty table would let the
+    # one change this job exists to catch pass straight through.
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: backend
+    # A real external PostgreSQL rather than the embedded cluster, because two
+    # different interpreters have to reach the same database in turn, and
+    # because an operator-supplied database is the population where a failed
+    # schema heal does the most damage.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: oe
+          POSTGRES_PASSWORD: oe
+          POSTGRES_DB: openbusinesserp_upgrade
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U oe -d openbusinesserp_upgrade"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # The release the database is aged to. Deliberately the last patch of the
+      # PREVIOUS minor rather than the newest release: a user who upgrades has
+      # almost always skipped patches, and the newest release is frequently
+      # identical in schema to the working tree. Measured, at the time this job
+      # was written: v15.4.0..HEAD adds zero migration revisions and changes
+      # zero model files, so a pin at 15.4.0 would leave this job with nothing
+      # at all to heal. From 15.3.0 there are eight columns across six tables.
+      #
+      # Moving this pin BACKWARDS is always safe; it only widens what is
+      # covered. Moving it FORWARDS has two failure modes, and both are loud
+      # rather than silent:
+      #   * No schema difference left, and the verifier fails on its first
+      #     check rather than passing vacuously.
+      #   * A pin at 15.4.0 or later will make the alembic_head_matches check
+      #     read false, and that is a finding about the product rather than a
+      #     bug in this job. Wheels before 15.4.0 ship no alembic.ini, so a
+      #     real install of one records no revision at all and the current
+      #     code's stamp_head_if_unstamped lands it at head. From 15.4.0 the
+      #     wheel does ship the tree, the database arrives already stamped at
+      #     that older revision, the stamp helper returns early because a
+      #     revision is present, and nothing ever advances it. Read that red as
+      #     "the stamp does not move on upgrade", which is true.
+      #
+      # WHICH COHORT THIS LANE COVERS, stated plainly because the pin decides it
+      # and the pin is easy to read as a version choice rather than a scope
+      # choice. There are three cohorts and this lane exercises exactly one.
+      #   COVERED - arrives with NO revision recorded, because the wheel it came
+      #     from shipped no alembic.ini. The current code stamps it at head on
+      #     boot and alembic_head_matches reads true afterwards. That is the
+      #     15.3.0 cohort, and it is the whole of what this job proves.
+      #   NOT COVERED - arrives already stamped at an OLDER revision, which is
+      #     every install from 15.4.0 onward. Nothing advances that stamp, so
+      #     alembic_head_matches reads false in perpetuity, and the replay an
+      #     operator would run by hand to fix it is the case the migration DDL
+      #     guard exists for. No lane exercises it today.
+      #   NOT COVERED - arrives populated and unstamped. The stamp is refused
+      #     deliberately; see stamp_head_if_unstamped.
+      #
+      # Cost of adding the stamped cohort, measured rather than guessed, so the
+      # decision can be made on a number: a second matrix leg over the same
+      # steps with the pin at the newest release. The schema delta from 15.4.0
+      # to HEAD is empty, so the healer has nothing to do and the leg's value is
+      # entirely in the stamp assertion, which means check 4 of
+      # verify_upgrade_from_previous_release.py has to learn that this cohort
+      # reads false rather than true. Its branch for a database that arrived
+      # carrying a revision asserts head_matches is True, so it would fail the
+      # new leg on a correct product. The cost is therefore one matrix
+      # dimension plus a per-cohort branch in check 4, not a new job. Not done
+      # here: widening the DDL gate was the task, and changing what the
+      # verifier asserts about a shipped behaviour is a separate decision.
+      OE_UPGRADE_FROM_VERSION: "15.3.0"
+      OE_UPGRADE_AGED_STATE: ${{ github.workspace }}/aged-database-state.json
+      DATABASE_URL: postgresql+asyncpg://oe:oe@localhost:5432/openbusinesserp_upgrade
+      DATABASE_SYNC_URL: postgresql+psycopg2://oe:oe@localhost:5432/openbusinesserp_upgrade
+      # github.workspace and not runner.temp: the runner context is not
+      # available in a job-level env block, and naming it there makes the
+      # whole file invalid to GitHub, which then runs NO job from it at all.
+      # That failure is silent in the worst way - the run is named after the
+      # file, carries zero jobs, and a required lane simply stops existing
+      # rather than going red.
+      OE_DATA_DIR: ${{ github.workspace }}/oe-data
+    # No step in this job carries a not-cancelled condition, and that is the
+    # deliberate exception to the rule in the file header. The other three jobs
+    # are lists of independent checks, so one red step there hides the verdicts
+    # of every check below it. This job is a single chain: install the previous
+    # release, install the current code over it, age a database with the old
+    # one, then run the new one against that database. A step whose predecessor
+    # failed has nothing to act on. Running the verifier against a database the
+    # aging step never built would not recover a lost verdict, it would
+    # manufacture a second red that names the wrong cause, and the real failure
+    # would then be the second-most-obvious thing in the log. Skipping here
+    # carries information rather than destroying it.
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p ../frontend/dist
+          touch ../frontend/dist/.gitkeep
+      - name: Install the previous release into a virtualenv of its own
+        # Its own interpreter, with no path into this working tree. The aging
+        # script asserts that ``app`` resolves outside the repository before it
+        # touches the database, because an ``app`` that resolved back here
+        # would build the CURRENT schema and every check below would pass on a
+        # database that was never old.
+        #
+        # Full dependencies on purpose. ``alembic/env.py`` and the boot path
+        # both swallow a per-module import failure, so a thin install produces
+        # FEWER tables rather than an error - and the current code's create_all
+        # would then quietly supply the difference, turning an upgrade test
+        # into a fresh install. The aging script's table floor is the backstop.
+        run: |
+          python -m venv "$RUNNER_TEMP/venv-previous"
+          "$RUNNER_TEMP/venv-previous/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/venv-previous/bin/python" -m pip install "openbusinesserp==$OE_UPGRADE_FROM_VERSION"
+      - name: Install the current code
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,server]"
+      - name: Build the database with the previous release, and put rows in it
+        # The rows are load-bearing. PostgreSQL accepts
+        # ADD COLUMN ... NOT NULL with no default on an EMPTY table and rejects
+        # it only once rows exist, so an unseeded database would let the exact
+        # change the heal cannot perform pass straight through this job.
+        run: |
+          "$RUNNER_TEMP/venv-previous/bin/python" scripts/age_database_to_previous_release.py
+      - name: Run the current code against the aged database
+        # Proves five things, and fails loudly rather than vacuously on each:
+        # the database really was old, it was at an older revision than the
+        # code, the schema moved, /api/health agrees that it moved, and an
+        # authenticated read of the affected register answers 200.
+        run: python scripts/verify_upgrade_from_previous_release.py
+
+  # Every pack installed the way an admin installs it, each on a fresh
+  # database cloned from a booted template. The unit suite checks pack wiring
+  # from the outside and never installs anything, and every layer of the
+  # installer is fail-soft, so this is the only place a pack that installs half
+  # a workspace goes red. About a hundred demo projects in total, so it is split
+  # six ways and kept out of the main job's thirty minutes (the file skips
+  # itself unless OE_PACK_MATRIX is set).
+  pack-installs:
+    name: Pack installs (shard ${{ matrix.shard }}/6)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      OE_TEST_DB: pg
+      OE_PACK_MATRIX: '1'
+      OE_PACK_SHARD: ${{ matrix.shard }}/6
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p ../frontend/dist
+          touch ../frontend/dist/.gitkeep
+      - name: Install dependencies
+        id: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,server]"
+      - name: Install every pack on a fresh database
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/pg/test_every_pack_installs.py -v -rA -p no:cacheprovider
+          --timeout=1800 --timeout-method=thread --durations=0
+
+  # Every cost base a pack resolves to, downloaded from the public CWICR
+  # repository and imported on a fresh database, with the import's own memory
+  # peak printed next to the largest PostgreSQL backend. This is where the
+  # 3 GB floor in CLAUDE.md principle 1 is measured rather than repeated. The
+  # parquet cache is keyed on the loader so a changed file list refetches.
+  cost-bases:
+    name: Pack cost bases (shard ${{ matrix.shard }}/3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      OE_TEST_DB: pg
+      OE_COST_BASE_MATRIX: '1'
+      OE_COST_BASE_SHARD: ${{ matrix.shard }}/3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p ../frontend/dist
+          touch ../frontend/dist/.gitkeep
+      - name: Install dependencies
+        id: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,server]"
+      - name: Restore the downloaded cost bases
+        uses: actions/cache@v4
+        with:
+          path: ~/.openestimator/cache
+          key: cwicr-parquet-${{ matrix.shard }}-${{ hashFiles('backend/app/modules/costs/base_registry.py') }}
+      - name: Load every pack cost base and measure the import
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/pg/test_every_pack_cost_base_loads.py -v -s -rA -p no:cacheprovider
+          --timeout=1800 --timeout-method=thread --durations=0
+
+  # The packs as an installed wheel sees them. The unit gates read the tree and
+  # the publish workflow reads the archive only at tag time, with a floor of
+  # fifteen packs rather than the list. This builds the wheel, installs it into
+  # a clean virtualenv and asks discovery from outside the repository, so a pack
+  # that only a source checkout can see goes red before a tag exists. The
+  # frontend is a stub: the question is about the packs, not the bundle.
+  pack-wheel:
+    name: Packs in the installed wheel
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p frontend/dist
+          touch frontend/dist/.gitkeep
+      - name: Build and install the wheel into a clean virtualenv
+        id: install
+        run: |
+          python -m pip install --upgrade build
+          (cd backend && python -m build --wheel --outdir "$RUNNER_TEMP/dist/")
+          python -m venv "$RUNNER_TEMP/wheel-venv"
+          "$RUNNER_TEMP/wheel-venv/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/wheel-venv/bin/python" -m pip install "$RUNNER_TEMP"/dist/*.whl
+      - name: Ask the installed wheel which packs it lists
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/wheel-venv/bin/python" "$GITHUB_WORKSPACE/scripts/check_wheel_ships_every_pack.py" "$GITHUB_WORKSPACE"
+
+  # Every GET route of a fresh install, called as the demo admin. The boot is
+  # the one a self-hosted user gets: demo seed on, the showcase and flagship
+  # projects installed, every module mounted, so a route that breaks only on
+  # seeded data or only with all modules loaded together goes red here. The
+  # report table (JSON and Markdown) is uploaded whatever the verdict, since
+  # a red run is read from it. The file skips itself unless OE_API_SMOKE is set,
+  # which keeps the full seed out of the main job's thirty minutes.
+  api-smoke:
+    name: API smoke on a fresh install
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      OE_TEST_DB: pg
+      OE_API_SMOKE: '1'
+      SEED_DEMO: 'true'
+      OE_TEST_FAST_STARTUP: '0'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Create empty frontend dist (hatchling force-include)
+        run: |
+          mkdir -p ../frontend/dist
+          touch ../frontend/dist/.gitkeep
+      - name: Install dependencies
+        id: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,server]"
+      - name: Call every GET route as the demo admin
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          OE_DATA_DIR: ${{ runner.temp }}/oe-data
+          OE_API_SMOKE_REPORT_DIR: ${{ runner.temp }}/api-smoke
+        run: >-
+          pytest tests/pg/test_every_get_route_answers_on_a_fresh_install.py -v -rA -p no:cacheprovider
+          --timeout=2700 --timeout-method=thread
+      - name: Upload the route report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-smoke-report
+          path: ${{ runner.temp }}/api-smoke/
+          if-no-files-found: warn

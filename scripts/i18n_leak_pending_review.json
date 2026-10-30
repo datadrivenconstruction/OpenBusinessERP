@@ -1,0 +1,3169 @@
+{
+  "about.changelog_tag_beta": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "ko",
+      "ky"
+    ],
+    "en_value": "BETA",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "about.founder_name": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ky"
+    ],
+    "en_value": "Artem Boiko",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "accommodation.booking.source.propdev_import": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "PropDev import",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "admin.permissions.toggle_success_message": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "nl",
+      "no",
+      "tr"
+    ],
+    "en_value": "{{key}} → {{role}}",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "agents.feedback.surface_ai_estimator": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "AI Estimator",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "agents.feedback.surface_match_elements": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "Match elements",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "aiest.method.llm": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "AI agent",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "approvalRoutes.analytics_col_sla": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ky",
+      "mn"
+    ],
+    "en_value": "SLA",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "approvalRoutes.kind_rfi": {
+    "added_by": "ci(i18n): classify the three initialisms the leak scan flagged (2026-09-08)",
+    "differs_in": [
+      "he"
+    ],
+    "en_value": "RFI",
+    "n": 36,
+    "reason": "Flagged by the threshold scan at n=36 of 42 non-en locales on 2026-09-08, after the 282-key backfill pushed the family over the bar. Not allowlisted, because the tell that list requires is failed: he renders it in Hebrew words, so the value is not identical in every locale. Not baselined either, because the leak shape this guard describes is the reverse of what is here - ru keeps RFI and a single locale translated it, rather than ru translating while the rest keep English. Evidence read at filing: the siblings in this family are translated nearly everywhere, kind_change_order and kind_variation matching en in 0 locales and kind_submittal in 1, against 36 here, so the translation passes reached this block and left the initialism rather than never arriving; and two sibling keys whose value is also the bare string RFI, governance.mod_rfi and rfi.insights.f_subject, are already on the allowlist even though he translates those two as well, so the repo has not answered this question consistently. Five locales do not carry the key at all: the regional overlays en-US, es-CL, es-CO, es-MX, pt-BR. What is open: whether RFI travels as an initialism in every market, in which case the three keys belong together on the allowlist and the Hebrew is the outlier, or whether the Hebrew reading is right and the other 36 locales owe a translation. Left unresolved rather than decided by whoever was clearing the lane. added_by names the commit by subject because a commit cannot cite its own hash."
+  },
+  "architecture.legend": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Legend",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "assemblies.library.category_mep": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "de",
+      "fi",
+      "ja",
+      "ru",
+      "sv"
+    ],
+    "en_value": "MEP",
+    "n": 24,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bid_management.mod_crm": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "CRM",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.color_legend": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Legend",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.converter_panel_size": {
+    "added_by": "e44f70df3 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "fr",
+      "ky",
+      "mn",
+      "ru"
+    ],
+    "en_value": "{{size}} MB",
+    "n": 22,
+    "reason": "Explicitly reclassified out of i18n_leak_baseline.json (chore(i18n): reclassify bim.converter_panel_size / takeoff_viewer.width_unit_px as pending review, #182): the observed leaked-locale set did not fit baseline's shrink-only debt model, filed here as ambiguous instead. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.federation.disc_mep": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "MEP",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.federation.tab_3d": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "3D",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.upload_advanced_element_data_hint": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja",
+      "mn"
+    ],
+    "en_value": "CSV / Excel",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.upload_panel_subtitle": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ja",
+      "mn",
+      "zh"
+    ],
+    "en_value": "IFC, RVT, CSV, Excel",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim.upload_size_hint": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ja",
+      "mn",
+      "zh"
+    ],
+    "en_value": "RVT (.rvt), IFC (.ifc)",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "bim_rules.field_element_type_placeholder": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "zh"
+    ],
+    "en_value": "Wall*, IfcWall, Curtainwall*",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.ai_running_short": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "de",
+      "es",
+      "es-MX",
+      "fa",
+      "fr",
+      "it",
+      "kk",
+      "ky",
+      "pt",
+      "sv"
+    ],
+    "en_value": "AI...",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ko",
+      "mn"
+    ],
+    "en_value": "BOQ",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.boq_abbr": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ko",
+      "mn"
+    ],
+    "en_value": "BOQ",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.column_type_number": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Number",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.desc_density_tall": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "es",
+      "es-CL",
+      "es-CO",
+      "es-MX",
+      "fa",
+      "fr",
+      "he",
+      "hi",
+      "ja",
+      "kk",
+      "mn",
+      "tr",
+      "zh"
+    ],
+    "en_value": "Langtext",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.export_format_csv": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "CSV (.csv)",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.export_format_excel": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "Excel (.xlsx)",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.export_format_gaeb": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "GAEB XML (.x83)",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.export_format_pdf": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "PDF",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.resource_total_in_base": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja",
+      "mn",
+      "zh"
+    ],
+    "en_value": "{{foreign}} ≈ {{base}} (1 {{code}} = {{rate}} {{baseCode}})",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.resource_variant_pill": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "▾ {{count}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.rs_col_abc": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "mn"
+    ],
+    "en_value": "ABC %",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.sensitivity_montecarlo": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "el",
+      "fa",
+      "he",
+      "hi",
+      "ja",
+      "kk",
+      "ko",
+      "ky",
+      "mn",
+      "ru",
+      "ur",
+      "zh"
+    ],
+    "en_value": "Monte Carlo",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_d": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+D",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_e": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+E",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_i": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+I",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_l": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+L",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_shift_v": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de",
+      "fr",
+      "it"
+    ],
+    "en_value": "Ctrl+Shift+V",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_slash": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+/",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_y": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+Y",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_ctrl_z": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "Ctrl+Z",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "boq.shortcut_del": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fr",
+      "it",
+      "ja",
+      "no",
+      "sv"
+    ],
+    "en_value": "Del",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "branding.name_placeholder": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "cs",
+      "mn",
+      "tr",
+      "vi"
+    ],
+    "en_value": "Acme Construction GmbH",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "buyer_portal.na": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "—",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "capacity.legend_high": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "cs",
+      "fi",
+      "fr",
+      "tr"
+    ],
+    "en_value": "81-100%",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "capacity.legend_mid": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "cs",
+      "fi",
+      "fr",
+      "tr"
+    ],
+    "en_value": "51-80%",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "carbon.framework_ghg_protocol": {
+    "added_by": "29d22f3ae (2026-08-05)",
+    "differs_in": [
+      "ja",
+      "ko",
+      "ky",
+      "tr"
+    ],
+    "en_value": "GHG Protocol",
+    "n": 24,
+    "reason": "Added alongside a batch translation commit for new surfaces (i18n: translate the new surfaces into all 28 languages). This entry's n is >=24/28, the shape the threshold scan actually flags; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "catalog.source_cad_import": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "CAD import",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "catalog.source_gaeb_import": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "GAEB import",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "changeorders.linked_rfi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "RFI {{n}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "clash.kbd_open3d": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "hi",
+      "th",
+      "tr"
+    ],
+    "en_value": "3D",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "common.beta": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "et",
+      "fa",
+      "fr",
+      "he",
+      "hi",
+      "ja",
+      "kk",
+      "mn",
+      "th"
+    ],
+    "en_value": "BETA",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "common.boq": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bn",
+      "de",
+      "el",
+      "et",
+      "fa",
+      "fil",
+      "fr",
+      "he",
+      "ja",
+      "kk",
+      "ky",
+      "ru",
+      "ur",
+      "zh"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "confidence_badge.score": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hr",
+      "no",
+      "sv",
+      "tr"
+    ],
+    "en_value": "{{pct}}%",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "construction_control.col.number": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Number",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "construction_control.ncr_linked": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fi",
+      "fr",
+      "zh"
+    ],
+    "en_value": "NCR",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "construction_control.none": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "hr",
+      "ky",
+      "mn"
+    ],
+    "en_value": "-",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "contacts.file_types": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": ".xlsx, .csv",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "coordination.threshold_level_ok": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "ar",
+      "bn",
+      "el",
+      "fa",
+      "fil",
+      "he",
+      "hi",
+      "hr",
+      "kk",
+      "ko",
+      "ky",
+      "ru",
+      "tr",
+      "ur",
+      "zh"
+    ],
+    "en_value": "OK",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "correspondence.connector_webhook": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "bn",
+      "da",
+      "et",
+      "fa",
+      "fr",
+      "he",
+      "id",
+      "kk",
+      "pl",
+      "pt",
+      "vi"
+    ],
+    "en_value": "API Webhook",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "correspondence.field_link_rfi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "fi"
+    ],
+    "en_value": "RFI",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "correspondence.how_mod_rfi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "zh"
+    ],
+    "en_value": "RFI",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costExplorer.title": {
+    "added_by": "a959ccb4f (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "es",
+      "es-MX",
+      "fr",
+      "hr",
+      "it",
+      "ky",
+      "pl",
+      "pt",
+      "ro",
+      "ru"
+    ],
+    "en_value": "Cost Explorer",
+    "n": 15,
+    "reason": "Added alongside the costExplorer cluster fix (fix(i18n): contain the costExplorer leak cluster found below threshold). This entry's n sits at 15-16, below the 24/28 threshold - the same below-threshold band the commit's own title names for the costExplorer cluster - so it was not caught by the general threshold scan; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.benchmark_area_value": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "mn",
+      "ru",
+      "th"
+    ],
+    "en_value": "{{area}} m²",
+    "n": 24,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_cpi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "CPI",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_cv_label": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "CV",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_eac_label": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "EAC",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_etc_label": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "ETC",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_spi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "SPI",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_sv_label": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "SV",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.evm_vac_label": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "VAC",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.feat_evm": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja",
+      "zh"
+    ],
+    "en_value": "EVM (SPI / CPI / EAC)",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.snapshot_ac": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "AC",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.snapshot_ev": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "EV",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costmodel.spine.noun_rfq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "es",
+      "es-MX",
+      "zh"
+    ],
+    "en_value": "RFQ",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "costs_import.field_currency_hint": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ja",
+      "ko",
+      "zh"
+    ],
+    "en_value": "EUR, USD, GBP ...",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dashboards.integrity_dtype": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "mn"
+    ],
+    "en_value": "dtype",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dashboards.integrity_no_issues": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "—",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "deadlines.mod_ncr": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "NCR register",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.format_support": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "DWG 2000-2025 · DXF R12-R2025",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.format_support_dwg": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "DWG 2000-2025 · DXF R12-R2025",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.hero_title": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bg",
+      "bn",
+      "el",
+      "es-MX",
+      "et",
+      "he",
+      "hr",
+      "ja",
+      "kk",
+      "ko",
+      "ky",
+      "no",
+      "pl",
+      "ur",
+      "zh"
+    ],
+    "en_value": "DWG Takeoff",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.pick_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "es",
+      "es-MX"
+    ],
+    "en_value": "- BOQ -",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.prop_id": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "ID",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.scale_calibrate_none": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "—",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "dwg_takeoff.text_size_percent": {
+    "added_by": "29d22f3ae (2026-08-05)",
+    "differs_in": [
+      "de",
+      "fr",
+      "tr"
+    ],
+    "en_value": "{{percent}}%",
+    "n": 25,
+    "reason": "Added alongside a batch translation commit for new surfaces (i18n: translate the new surfaces into all 28 languages). This entry's n is >=24/28, the shape the threshold scan actually flags; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "equipment.km": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "el",
+      "fa",
+      "he",
+      "hi",
+      "kk",
+      "ky",
+      "mn",
+      "ru",
+      "th",
+      "ur",
+      "zh"
+    ],
+    "en_value": "km",
+    "n": 26,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "estimate_basis.mod_boq": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bn",
+      "de",
+      "el",
+      "et",
+      "fa",
+      "fi",
+      "fil",
+      "he",
+      "it",
+      "kk",
+      "nl",
+      "no",
+      "ru",
+      "ur"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "field.auth_pin": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "da",
+      "zh"
+    ],
+    "en_value": "PIN",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "files.transmittals.col_number": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Number",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "finance.wbs": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de",
+      "es",
+      "es-MX",
+      "mn"
+    ],
+    "en_value": "WBS",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "geoHub.sceneColumbus": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "el",
+      "fa",
+      "he",
+      "hi",
+      "ja",
+      "kk",
+      "ko",
+      "ky",
+      "mn",
+      "ru",
+      "ur",
+      "zh"
+    ],
+    "en_value": "Columbus",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "geo_hub.hud.altitude": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky",
+      "tr"
+    ],
+    "en_value": "ALT",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "geo_hub.hud.lat": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "LAT",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "geo_hub.hud.lon": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "LON",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "geo_hub.title": {
+    "added_by": "a959ccb4f (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "fi",
+      "hr",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "pl",
+      "ro",
+      "tr",
+      "zh"
+    ],
+    "en_value": "Geo Hub",
+    "n": 16,
+    "reason": "Added alongside the costExplorer cluster fix (fix(i18n): contain the costExplorer leak cluster found below threshold). This entry's n sits at 15-16, below the 24/28 threshold - the same below-threshold band the commit's own title names for the costExplorer cluster - so it was not caught by the general threshold scan; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "global_search.collection.rfi": {
+    "added_by": "1208ceda9 (2026-08-29)",
+    "differs_in": [
+      "ar",
+      "he"
+    ],
+    "en_value": "RFI",
+    "n": 35,
+    "reason": "The name of the RFI collection in the global search results, added when that label stopped being hardcoded English. Reviewed when it was added rather than seeded: 35 locales keep the acronym, ar and he render it in their own script, which is the same shape and the same two-script split as nav.rfi already recorded here. Not the allowlist, because the allowlist's tell is a value identical in every locale including ru, and these two differ; not the baseline either, because the 35 are a decision each of those locales already made for this term elsewhere, not untranslated debt. It resolves whenever nav.rfi does, and the same way."
+  },
+  "howto.crm.title": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "zh"
+    ],
+    "en_value": "CRM",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "hse_advanced.jsa": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr",
+      "sv"
+    ],
+    "en_value": "JSA",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "hse_advanced.source_type_jsa": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr",
+      "sv"
+    ],
+    "en_value": "JSA",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "hse_advanced.tab_capa": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "CAPA",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "insights.chart_kpi": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Number",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "integrations.slack": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja",
+      "mn"
+    ],
+    "en_value": "Slack",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "integrations.telegram": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "Telegram",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "iso.number": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Number",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "leveling.legend_high": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "cs",
+      "fi",
+      "fr",
+      "tr"
+    ],
+    "en_value": "81-100%",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "leveling.legend_mid": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "cs",
+      "fi",
+      "fr",
+      "tr"
+    ],
+    "en_value": "51-80%",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "login.mod.ai": {
+    "added_by": "feat(i18n): Hungarian had a locale file but was never offered (2026-09-08)",
+    "differs_in": [
+      "ar",
+      "bn",
+      "de",
+      "el",
+      "es",
+      "es-CL",
+      "es-CO",
+      "es-MX",
+      "fa",
+      "fr",
+      "he",
+      "it",
+      "kk",
+      "pt",
+      "pt-BR",
+      "ru",
+      "uk",
+      "ur"
+    ],
+    "en_value": "AI",
+    "n": 24,
+    "reason": "Flagged by the threshold scan at n=24 of 42 non-en locales on 2026-09-08, the day hu.ts joined the offered languages: the key stood at 23 before, one under the bar, and Hungarian keeping AI lifted it over. Not allowlisted, because the tell that list requires is failed: 18 locales render the initialism in their own letters (KI in de, IA in fr, es, it and pt, ИИ in ru, ШІ in uk, and the Arabic, Persian, Hebrew, Urdu, Bengali, Kazakh and Greek scripts), so the value is not identical everywhere and ru in particular translates it. Not baselined either, because the 24 locales that keep AI are not a leak shape but a usage: cs, pl, nl, sv, da, no, fi, ja, ko, zh, vi, th, id, tr, hi, ro, hr, bg, et, fil, ky, mn, uz and hu all write AI as the everyday initialism in software, and the Hungarian file is internally consistent about it - 384 of its values carry AI and none carry the domestic MI, so translating these two keys alone to dodge the threshold would have split the glossary inside one file. Two locales do not carry the key at all: the overlays en-GB and en-US. What is open: whether AI travels as an initialism in every market, in which case the key belongs on the allowlist once the 18 translating locales are read as the outliers, or whether the 24 owe a domestic form. Left unresolved rather than decided by the locale that happened to tip the count. added_by names the commit by subject because a commit cannot cite its own hash."
+  },
+  "login.mod.cad": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "CAD",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "login.zero_ai_hint": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr",
+      "ja",
+      "nl",
+      "th"
+    ],
+    "en_value": "BETA",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "match_elements.analytics_tile_score_hint": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "p95 {{p}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "match_elements.hero_eyebrow": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ko",
+      "mn",
+      "zh"
+    ],
+    "en_value": "BIM → BOQ",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "match_elements.trade.mep": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "de",
+      "ja",
+      "mn",
+      "ru",
+      "zh"
+    ],
+    "en_value": "MEP",
+    "n": 24,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "meetings.external_name_placeholder": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ky"
+    ],
+    "en_value": "Jane Walker",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "modules.toggle_module": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de",
+      "ja",
+      "ko"
+    ],
+    "en_value": "{{action}} {{name}}",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "nav.cost_explorer": {
+    "added_by": "a959ccb4f (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "es",
+      "es-MX",
+      "fr",
+      "hr",
+      "it",
+      "ky",
+      "pl",
+      "pt",
+      "ro",
+      "ru"
+    ],
+    "en_value": "Cost Explorer",
+    "n": 15,
+    "reason": "Added alongside the costExplorer cluster fix (fix(i18n): contain the costExplorer leak cluster found below threshold). This entry's n sits at 15-16, below the 24/28 threshold - the same below-threshold band the commit's own title names for the costExplorer cluster - so it was not caught by the general threshold scan; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "nav.mode_pro_badge": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "zh"
+    ],
+    "en_value": "PRO",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "nav.mode_std_badge": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "zh"
+    ],
+    "en_value": "STD",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "nav.rfi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "RFI",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "normExpansion.boq_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "BOQ",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "notification.document_uploaded_body": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "{{document_name}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "notification.task_assigned_body": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "{{task_title}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "notifications.preferences.channel_webhook": {
+    "added_by": "ci(i18n): classify the three initialisms the leak scan flagged (2026-09-08)",
+    "differs_in": [
+      "ru",
+      "uk"
+    ],
+    "en_value": "Webhook",
+    "n": 35,
+    "reason": "Flagged by the threshold scan at n=35 of 42 non-en locales on 2026-09-08. Fails the allowlist tell outright: ru and uk both write the term transliterated into Cyrillic. Evidence read at filing that points the other way: the two sibling channels in the same block match en in 3 locales (channel_email) and 0 (channel_inapp) against 35 here, so the translation passes worked this family and left Webhook standing rather than never reaching it. That makes this neither a clean leak nor a clean allowlist entry. Five locales do not carry the key at all: the regional overlays en-US, es-CL, es-CO, es-MX, pt-BR. What is open: whether the transliteration should spread to the other locales or be dropped in favour of the term of art. Left unresolved rather than decided by whoever was clearing the lane. added_by names the commit by subject because a commit cannot cite its own hash."
+  },
+  "onboarding.mod_crm": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "CRM",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pdf_compare.legend": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Legend",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "photos.gps_auto": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "GPS",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "photos.raise_ncr": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "es",
+      "es-MX"
+    ],
+    "en_value": "NCR",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "photos.suggested_with_conf": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "de",
+      "es",
+      "es-MX",
+      "fr",
+      "ja",
+      "ko",
+      "pt",
+      "zh"
+    ],
+    "en_value": "AI: {{cat}} ({{pct}}%)",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "photos.supported_formats": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "hi",
+      "ja",
+      "th",
+      "zh"
+    ],
+    "en_value": "JPEG, PNG, WebP, HEIC.",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pipeline.explain.flow_line": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "• {{from}} → {{to}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pipeline.explain.step_line": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja",
+      "zh"
+    ],
+    "en_value": "• {{label}} ({{type}})",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pipeline.node.ai_badge": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "bn",
+      "de",
+      "es",
+      "es-MX",
+      "fr",
+      "it",
+      "kk",
+      "pt",
+      "ru"
+    ],
+    "en_value": "AI",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pipeline.node.took_ms": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "fa",
+      "he",
+      "id",
+      "ja",
+      "kk",
+      "ky",
+      "mn",
+      "ru",
+      "th",
+      "ur",
+      "zh"
+    ],
+    "en_value": "{{ms}} ms",
+    "n": 26,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pipeline.palette.cat_ai": {
+    "added_by": "feat(i18n): Hungarian had a locale file but was never offered (2026-09-08)",
+    "differs_in": [
+      "ar",
+      "bn",
+      "de",
+      "el",
+      "es",
+      "es-CL",
+      "es-CO",
+      "es-MX",
+      "fa",
+      "fr",
+      "he",
+      "it",
+      "kk",
+      "pt",
+      "pt-BR",
+      "ru",
+      "uk",
+      "ur"
+    ],
+    "en_value": "AI",
+    "n": 24,
+    "reason": "Flagged by the threshold scan at n=24 of 42 non-en locales on 2026-09-08, the day hu.ts joined the offered languages: the key stood at 23 before, one under the bar, and Hungarian keeping AI lifted it over. Not allowlisted, because the tell that list requires is failed: 18 locales render the initialism in their own letters (KI in de, IA in fr, es, it and pt, ИИ in ru, ШІ in uk, and the Arabic, Persian, Hebrew, Urdu, Bengali, Kazakh and Greek scripts), so the value is not identical everywhere and ru in particular translates it. Not baselined either, because the 24 locales that keep AI are not a leak shape but a usage: cs, pl, nl, sv, da, no, fi, ja, ko, zh, vi, th, id, tr, hi, ro, hr, bg, et, fil, ky, mn, uz and hu all write AI as the everyday initialism in software, and the Hungarian file is internally consistent about it - 384 of its values carry AI and none carry the domestic MI, so translating these two keys alone to dodge the threshold would have split the glossary inside one file. Two locales do not carry the key at all: the overlays en-GB and en-US. What is open: whether AI travels as an initialism in every market, in which case the key belongs on the allowlist once the 18 translating locales are read as the outliers, or whether the 24 owe a domestic form. Left unresolved rather than decided by the locale that happened to tip the count. added_by names the commit by subject because a commit cannot cite its own hash."
+  },
+  "pipeline.palette.item_title": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "{{label}} — {{description}}",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "pointcloud.source_lidar": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "LiDAR",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "portal.ip": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "IP",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "project_intelligence.forecast.col_eac": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "EAC",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "projects.photos.position_label": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "{{current}} / {{total}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "property_dev.house_type.preview_ba": {
+    "added_by": "b6a05a2db (2026-08-17)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "el",
+      "et",
+      "fa",
+      "fil",
+      "fr",
+      "he",
+      "id",
+      "kk",
+      "ko",
+      "ky",
+      "ru",
+      "uk",
+      "ur",
+      "zh"
+    ],
+    "en_value": "Ba",
+    "n": 24,
+    "reason": "Added while classifying leak-guard hits and closing the review_authority.move_to orphan gap (fix(i18n): close the review_authority.move_to orphan gap and classify eight leak-guard hits). This entry's n is 24/28, the shape the threshold scan actually flags. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "property_dev.house_type.preview_bd": {
+    "added_by": "b6a05a2db (2026-08-17)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "el",
+      "et",
+      "fa",
+      "fil",
+      "fr",
+      "he",
+      "id",
+      "kk",
+      "ko",
+      "ky",
+      "ru",
+      "uk",
+      "ur",
+      "zh"
+    ],
+    "en_value": "Bd",
+    "n": 24,
+    "reason": "Added while classifying leak-guard hits and closing the review_authority.move_to orphan gap (fix(i18n): close the review_authority.move_to orphan gap and classify eight leak-guard hits). This entry's n is 24/28, the shape the threshold scan actually flags. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "property_dev.house_type.preview_energy": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "bn",
+      "fil",
+      "fr",
+      "kk",
+      "ko",
+      "ky",
+      "ru",
+      "zh"
+    ],
+    "en_value": "EE",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "qms.wbs": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "es",
+      "zh"
+    ],
+    "en_value": "WBS",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "quantities.source_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "BOQ",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "rebar_schedule.unit_kilograms": {
+    "added_by": "wip/listshape (2026-09-30)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "fa",
+      "he",
+      "hi",
+      "ru",
+      "uk"
+    ],
+    "en_value": "{{value}} kg",
+    "n": 34,
+    "reason": "A unit symbol template, '{{value}} kg' / '{{value}} t', kept as the SI symbol in most scripts and written with the native abbreviation where the locale writes it in its own script (ar, bg, bn, fa, he, hi, ru, uk). Not identical in every locale, so it cannot go on the allowlist, and it is not a leak to translate away; filed here unresolved on purpose. Added with the rebar schedule validation and error states (fix(rebar-schedule): show validation, errors and duplicates, and preview on the import decoder)."
+  },
+  "rebar_schedule.unit_tonnes": {
+    "added_by": "wip/listshape (2026-09-30)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "bn",
+      "fa",
+      "he",
+      "hi",
+      "ru",
+      "uk"
+    ],
+    "en_value": "{{value}} t",
+    "n": 34,
+    "reason": "A unit symbol template, '{{value}} kg' / '{{value}} t', kept as the SI symbol in most scripts and written with the native abbreviation where the locale writes it in its own script (ar, bg, bn, fa, he, hi, ru, uk). Not identical in every locale, so it cannot go on the allowlist, and it is not a leak to translate away; filed here unresolved on purpose. Added with the rebar schedule validation and error states (fix(rebar-schedule): show validation, errors and duplicates, and preview on the import decoder)."
+  },
+  "reporting.schedule_none": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "—",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "reports.csv_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de"
+    ],
+    "en_value": "BOQ",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "reports.gaeb_xml": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "mn"
+    ],
+    "en_value": "GAEB XML",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "reports.html_col_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "de",
+      "ky"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "reports.txt_col_wbs": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "WBS",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "requirements.matrix.legend": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Legend",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "requirements.matrix.linked_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "romEstimate.quality_region": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar"
+    ],
+    "en_value": "{{quality}}, {{region}}",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "rulePacks.category_mep": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "MEP",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.codes.type_number": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Number",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.compare.cp": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "nl",
+      "no"
+    ],
+    "en_value": "CP",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.delay.has_fragnet": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Fragnet",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.export_wbs": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "pt"
+    ],
+    "en_value": "WBS",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.interchange.export_msp": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "es",
+      "ro",
+      "vi"
+    ],
+    "en_value": "Microsoft Project XML",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.mod_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky",
+      "no"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.risk.jcl_value": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "JCL",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.view_4d": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "tr"
+    ],
+    "en_value": "4D",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.view_evm": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "EVM",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.view_gantt": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "ja",
+      "ru",
+      "zh"
+    ],
+    "en_value": "Gantt",
+    "n": 24,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "schedule.view_in_boq_short": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "service.asset_type_hvac": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "HVAC",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "service.recurring.field_rrule": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ko"
+    ],
+    "en_value": "RRULE (RFC 5545)",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "settings.tm_col_actions": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "site_prep.value_na": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ky"
+    ],
+    "en_value": "n/a",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "smartViews.value_disabled": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "n/a",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "supplier_catalogs.moq": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bn",
+      "el",
+      "es-MX",
+      "et",
+      "fa",
+      "fil",
+      "fr",
+      "he",
+      "ja",
+      "kk",
+      "ko",
+      "ru",
+      "ur",
+      "zh"
+    ],
+    "en_value": "MOQ",
+    "n": 26,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "supplier_catalogs.sku": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "fr"
+    ],
+    "en_value": "SKU",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "takeoff.pick_boq": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs"
+    ],
+    "en_value": "- BOQ -",
+    "n": 26,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "takeoff_viewer.legend": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Legend",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "takeoff_viewer.width_unit_ft": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "bn",
+      "et",
+      "fr",
+      "ja",
+      "kk",
+      "ky",
+      "mn",
+      "ru",
+      "zh"
+    ],
+    "en_value": "ft",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "takeoff_viewer.width_unit_m": {
+    "added_by": "15ff0a2c9 (2026-08-09)",
+    "differs_in": [
+      "ar",
+      "bn",
+      "hi",
+      "kk",
+      "ky",
+      "mn",
+      "ru",
+      "th",
+      "zh"
+    ],
+    "en_value": "m",
+    "n": 24,
+    "reason": "Added in the commit that closed Greek (el) leak-guard gaps (fix(i18n): translate 112 leak-guard gaps left over in el.ts). This entry's n is 24/28, the shape the threshold scan actually flags. Checked: its differs_in set does not name 'el' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "takeoff_viewer.width_unit_px": {
+    "added_by": "e44f70df3 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "hi",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "ru",
+      "th",
+      "zh"
+    ],
+    "en_value": "px",
+    "n": 18,
+    "reason": "Explicitly reclassified out of i18n_leak_baseline.json (chore(i18n): reclassify bim.converter_panel_size / takeoff_viewer.width_unit_px as pending review, #182): the observed leaked-locale set did not fit baseline's shrink-only debt model, filed here as ambiguous instead. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "tasks.from_rfi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "zh"
+    ],
+    "en_value": "RFI",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "tasks.from_source_rfi": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "fr",
+      "pl"
+    ],
+    "en_value": "RFI",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "teams.badge_admin": {
+    "added_by": "03cc10968 (2026-08-08)",
+    "differs_in": [
+      "ar",
+      "bg",
+      "cs",
+      "da",
+      "de",
+      "es",
+      "es-MX",
+      "fi",
+      "fr",
+      "hi",
+      "hr",
+      "id",
+      "it",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "nl",
+      "no",
+      "pl",
+      "pt",
+      "ro",
+      "ru",
+      "sv",
+      "th",
+      "tr",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Admin",
+    "n": 1,
+    "reason": "Added in the commit that finished registering Estonian as a gated locale (i18n: finish registering Estonian where the gates look for it). Checked: this entry's differs_in set does not name 'et' specifically, so the commit's own framing is the only link to that locale, not something confirmed at the entry level. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "tendering.addendum.revision": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bn",
+      "de",
+      "el",
+      "et",
+      "fa",
+      "fi",
+      "fil",
+      "fr",
+      "he",
+      "kk",
+      "ky",
+      "pl",
+      "ru",
+      "ur",
+      "zh"
+    ],
+    "en_value": "Rev {{n}}",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "tendering.how_mod_boq": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bn",
+      "el",
+      "es-MX",
+      "et",
+      "fa",
+      "fil",
+      "fr",
+      "he",
+      "kk",
+      "pl",
+      "ro",
+      "ru",
+      "ur",
+      "vi"
+    ],
+    "en_value": "BOQ",
+    "n": 26,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "tour.step.4.title": {
+    "added_by": "a959ccb4f (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "fi",
+      "hr",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "pl",
+      "ro",
+      "tr",
+      "zh"
+    ],
+    "en_value": "BIM Hub",
+    "n": 16,
+    "reason": "Added alongside the costExplorer cluster fix (fix(i18n): contain the costExplorer leak cluster found below threshold). This entry's n sits at 15-16, below the 24/28 threshold - the same below-threshold band the commit's own title names for the costExplorer cluster - so it was not caught by the general threshold scan; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "tour.step.6.title": {
+    "added_by": "a959ccb4f (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "fi",
+      "hr",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "pl",
+      "ro",
+      "tr",
+      "zh"
+    ],
+    "en_value": "Geo Hub",
+    "n": 16,
+    "reason": "Added alongside the costExplorer cluster fix (fix(i18n): contain the costExplorer leak cluster found below threshold). This entry's n sits at 15-16, below the 24/28 threshold - the same below-threshold band the commit's own title names for the costExplorer cluster - so it was not caught by the general threshold scan; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "translation.iate.local_placeholder": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "da"
+    ],
+    "en_value": "/home/me/Downloads/IATE_export.tbx",
+    "n": 27,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "users.modules.cde": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ja",
+      "tr",
+      "zh"
+    ],
+    "en_value": "CDE (ISO 19650)",
+    "n": 24,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "variations.mod_boq": {
+    "added_by": "15aa69993 (2026-08-11)",
+    "differs_in": [
+      "bn",
+      "el",
+      "es-MX",
+      "et",
+      "fa",
+      "fil",
+      "fr",
+      "he",
+      "kk",
+      "ky",
+      "pl",
+      "ro",
+      "ru",
+      "ur",
+      "vi"
+    ],
+    "en_value": "BOQ",
+    "n": 25,
+    "reason": "Added in the commit that split Chile, Colombia and Brazil into their own locales (feat(i18n): give Chile, Colombia and Brazil a locale of their own). This entry's n is >=25/28, the shape the threshold scan actually flags. Checked: only one of the thirteen keys from this commit names es-CL or es-CO in its differs_in set (this one may or may not be that key), so a link to those new locales is not established for most of them. Not individually triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "videos.matrix_cell": {
+    "added_by": "wip/learn-menu (2026-09-25)",
+    "differs_in": [
+      "ar",
+      "fa"
+    ],
+    "en_value": "{{row}}, {{stage}}: {{n}}",
+    "n": 40,
+    "reason": "Screen-reader label of one cell in the Videos coverage map: a role or country, a stage and a count, joined by punctuation only. There is no word to translate; the Arabic-script locales write their own comma, so it is not identical everywhere and does not qualify for the allowlist."
+  },
+  "whatsnew.v450.geo.chip": {
+    "added_by": "a959ccb4f (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "cs",
+      "fi",
+      "hr",
+      "ja",
+      "ko",
+      "ky",
+      "mn",
+      "pl",
+      "ro",
+      "tr",
+      "zh"
+    ],
+    "en_value": "Geo Hub",
+    "n": 16,
+    "reason": "Added alongside the costExplorer cluster fix (fix(i18n): contain the costExplorer leak cluster found below threshold). This entry's n sits at 15-16, below the 24/28 threshold - the same below-threshold band the commit's own title names for the costExplorer cluster - so it was not caught by the general threshold scan; filed without individual triage. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "whatsnew.v450.propdev.chip": {
+    "added_by": "adb78c983 (2026-08-02)",
+    "differs_in": [
+      "ar",
+      "ja",
+      "zh"
+    ],
+    "en_value": "PropDev",
+    "n": 25,
+    "reason": "Seeded when the leak guard was first split into three lists (ci(i18n): rebuild the leak guard as two separate lists plus a general scan). This entry's n is >=24/28, the shape the threshold scan actually flags; filed as ambiguous at guard rollout rather than triaged key by key. Backfilled 2026-08-25 when reason/added_by became mandatory fields on this list; this is commit-level and group-level context recovered from git history and this file's own n/differs_in fields, not a fresh per-key content review."
+  },
+  "contracts.sov_link_boq": {
+    "added_by": "i18n sweep (2026-09-25)",
+    "differs_in": [
+      "de",
+      "et",
+      "fa",
+      "fi",
+      "fr",
+      "he",
+      "hu",
+      "it",
+      "ja",
+      "ko",
+      "uk",
+      "zh"
+    ],
+    "en_value": "BOQ",
+    "n": 30,
+    "reason": "New key for the SOV-to-BOQ link picker. BOQ is kept literal (CLAUDE.md: not translated) in most locales, but de/fr/it/ja/ko/uk/et/fi/hu/zh/fa/he already use their own established term for the bill of quantities elsewhere in the app (e.g. tendering.export_gaeb_title), so this key follows that per-locale precedent instead of the acronym."
+  },
+  "contracts.sov_link_linked": {
+    "added_by": "i18n sweep (2026-09-25)",
+    "differs_in": [
+      "de",
+      "et",
+      "fa",
+      "fi",
+      "fr",
+      "he",
+      "hu",
+      "it",
+      "ja",
+      "ko",
+      "uk",
+      "zh"
+    ],
+    "en_value": "BOQ {{position}}",
+    "n": 30,
+    "reason": "Sibling of contracts.sov_link_boq (same key family, same picker): the BOQ label is substituted with each locale established term where one exists, kept literal elsewhere."
+  },
+  "validation.rs_label_gesn": {
+    "added_by": "18.1.0 release (2026-09-28)",
+    "differs_in": [
+      "ru",
+      "uk"
+    ],
+    "en_value": "GESN",
+    "n": 40,
+    "reason": "Validation rule set label added in 18.1.0. It names a standard or a workflow, so most locales keep the English form on purpose, while the locales in differs_in write it natively; filed for review rather than allowlisted because it is not identical everywhere."
+  },
+  "validation.rs_label_pipeline": {
+    "added_by": "18.1.0 release (2026-09-28)",
+    "differs_in": [
+      "bg",
+      "bn",
+      "ja",
+      "kk",
+      "ko",
+      "ky",
+      "mn",
+      "ru",
+      "th",
+      "tr",
+      "uk",
+      "ur",
+      "vi",
+      "zh"
+    ],
+    "en_value": "Pipeline",
+    "n": 28,
+    "reason": "Validation rule set label added in 18.1.0. It names a standard or a workflow, so most locales keep the English form on purpose, while the locales in differs_in write it natively; filed for review rather than allowlisted because it is not identical everywhere."
+  },
+  "validation.rs_label_sekisan": {
+    "added_by": "18.1.0 release (2026-09-28)",
+    "differs_in": [
+      "ja"
+    ],
+    "en_value": "Sekisan",
+    "n": 41,
+    "reason": "Validation rule set label added in 18.1.0. It names a standard or a workflow, so most locales keep the English form on purpose, while the locales in differs_in write it natively; filed for review rather than allowlisted because it is not identical everywhere."
+  },
+  "changeorders.source_kind_ncr": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "es",
+      "es-CL",
+      "es-CO",
+      "es-MX"
+    ],
+    "en_value": "NCR",
+    "n": 38,
+    "reason": "Short pill label naming the source record type of an automatically drafted change order. NCR is kept as the acronym in most locales, the way each file already labels the QMS records; the locales that differ write a local acronym. Filed for a native review of which reads better on the pill, not a prose leak."
+  },
+  "changeorders.source_kind_rfi": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [],
+    "en_value": "RFI",
+    "n": 42,
+    "reason": "Short pill label naming the source record type of an automatically drafted change order. RFI is the acronym the locale files already use for the RFI module; filed for review rather than allowlisted because a few locales spell it differently."
+  },
+  "risk.cont_p80_exact": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "hu"
+    ],
+    "en_value": "P80 {{amount}}",
+    "n": 41,
+    "reason": "Value cell for the 80th percentile of the contingency simulation, P80 followed by an amount. P80 is the risk notation used across markets; the locales that differ write a local form. Filed for a native review of the notation, not a prose leak."
+  },
+  "procurement.from_rfq_unnamed": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "ar",
+      "he"
+    ],
+    "en_value": "RFQ",
+    "n": 40,
+    "reason": "Fallback label for a purchase order drafted from an RFQ that has no title, so the order names its source by the record type alone. RFQ is the acronym each locale already uses for the RFQ module; ar and he spell the request out, so it is filed for a native review rather than allowlisted."
+  },
+  "price_index.ri.fot_short": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "bg",
+      "ru",
+      "uk"
+    ],
+    "en_value": "FOT",
+    "n": 39,
+    "reason": "Short column label of the Russian resource-index method for the payroll fund (FOT). Cyrillic locales write the native abbreviation; the others keep the transliterated code of the method. Filed for a native review of whether each market reads the code or wants a local abbreviation."
+  },
+  "price_index.ri.nr_short": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "bg",
+      "ru",
+      "uk"
+    ],
+    "en_value": "NR",
+    "n": 39,
+    "reason": "Short column label of the Russian resource-index method for overheads (NR). Cyrillic locales write the native abbreviation; the others keep the method's code. Filed for native review, not a prose leak."
+  },
+  "price_index.ri.sp_short": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "bg",
+      "ru",
+      "uk"
+    ],
+    "en_value": "SP",
+    "n": 39,
+    "reason": "Short column label of the Russian resource-index method for estimated profit (SP). Cyrillic locales write the native abbreviation; the others keep the method's code. Filed for native review, not a prose leak."
+  },
+  "price_index.ri.nr_pct": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "bg",
+      "cs",
+      "da",
+      "et",
+      "fi",
+      "hr",
+      "hu",
+      "no",
+      "pl",
+      "ru",
+      "sv",
+      "uk"
+    ],
+    "en_value": "NR %",
+    "n": 30,
+    "reason": "Column label NR % of the Russian resource-index method (overheads as a percent of the payroll fund). Kept as the method code in most locales, native abbreviation where the script allows. Filed for native review."
+  },
+  "price_index.ri.sp_pct": {
+    "added_by": "batch 18.4 integration (2026-10-04)",
+    "differs_in": [
+      "bg",
+      "cs",
+      "da",
+      "et",
+      "fi",
+      "hr",
+      "hu",
+      "no",
+      "pl",
+      "ru",
+      "sv",
+      "uk"
+    ],
+    "en_value": "SP %",
+    "n": 30,
+    "reason": "Column label SP % of the Russian resource-index method (estimated profit as a percent of the payroll fund). Kept as the method code in most locales, native abbreviation where the script allows. Filed for native review."
+  }
+}

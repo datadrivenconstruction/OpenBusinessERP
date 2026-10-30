@@ -1,0 +1,690 @@
+name: Release Signing (Sigstore / cosign)
+
+on:
+  # The release event is kept because it is the correct one, but on its own it
+  # never arrives. release.yml creates the release with softprops/action-gh-release
+  # authenticated by secrets.GITHUB_TOKEN, and GitHub does not start a workflow
+  # from an event that a GITHUB_TOKEN produced. This workflow last ran on v8.0.0
+  # for that reason, and everything released since then is unsigned.
+  #
+  # Desktop Release is the run that finishes last with assets attached, so its
+  # completion is the point at which there is something to sign.
+  release:
+    types: [published]
+  workflow_run:
+    workflows: ["Desktop Release"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to sign"
+        required: true
+      backfill:
+        description: "Signing an older release. Skips the SBOM, see below."
+        type: boolean
+        default: false
+        required: false
+
+# Two runs of this workflow are expected per release and they must not overlap.
+# `request-signing` in Desktop Release dispatches one as soon as the installers
+# exist, and the `workflow_run` trigger above starts another when Desktop
+# Release completes. That is deliberate: it is what gets a signature onto the
+# release in minutes rather than after `build-linux-rpm`, which can run for
+# hours.
+#
+# What was missing is that both runs write to the same release. The `sbom` job
+# attaches three files by name with `gh release upload --clobber`, and --clobber
+# deletes the existing asset before uploading, so the asset id changes. On
+# v15.6.0 both runs reached that point together: the dispatched run listed the
+# release, the workflow_run run clobbered the licence inventory underneath it,
+# and `gh release download` in the dispatched run died on HTTP 404 for an id
+# that had existed a second earlier.
+#
+# Failing fast happened to be the harmless outcome that time, and it is not the
+# one to rely on. The same race with the winner reversed leaves the dispatched
+# run's manifest standing as the release's signature, and that run is the one
+# that does not wait for the rpm - so the release would keep a signed SHA256SUMS
+# that does not mention an installer it carries. Every refusal in this file
+# exists to prevent exactly that, because a manifest over part of a release
+# verifies cleanly and therefore reads as a complete one.
+#
+# Serialising on the tag settles both. The runs queue instead of colliding, and
+# the order falls out right: the dispatched run goes first because it is
+# dispatched first, and the `workflow_run` run - the one that has seen the whole
+# release, rpm included - is the one that writes last.
+#
+# cancel-in-progress is false and that is the whole point. Cancelling the run in
+# flight is what produces the half-written release this block exists to prevent.
+concurrency:
+  group: release-signing-${{ inputs.tag || github.event.workflow_run.head_branch || github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  resolve:
+    name: Resolve the tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # A Desktop Release completion is not automatically something to sign: it
+    # also runs from workflow_dispatch against a branch, where head_branch is a
+    # branch name and there is no release behind it. That is what the tag test
+    # below is for, and it stays.
+    #
+    # What was here as well, and is now gone, is a test on the run's
+    # conclusion. The reasoning behind it was sound and the instrument was not:
+    # `types: [completed]` includes a run that failed or was cancelled, such a
+    # run may leave the release short an installer, and signing an incomplete
+    # release produces a manifest that verifies cleanly over it and therefore
+    # reads as a complete one. All true. But a conclusion is a fact about the
+    # run, and the thing that has to be judged is the release. The two come
+    # apart in both directions: a green run can be short an asset (a bundler
+    # that failed inside a `fail-fast: false` matrix), and a cancelled one can
+    # carry every installer that matters.
+    #
+    # v15.0.0 is the second case. The rpm bundler, which desktop-release.yml
+    # already isolates because it can run for hours where the .deb takes
+    # seconds, was still going when the run ended `cancelled`. Every job in this
+    # workflow was skipped by a condition that had never looked at the release,
+    # and the tag was published with no signature, no certificate, no SHA256SUMS
+    # and no SBOM - none of which the rpm has anything to do with.
+    #
+    # So the completeness question moves to the `inventory` job below, which
+    # reads the assets off the release. A failed or cancelled Desktop Release
+    # now reaches it and gets an answer about what is actually published.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (startsWith(github.event.workflow_run.head_branch, 'v') &&
+       !startsWith(github.event.workflow_run.display_title, 'Windows diagnostic '))
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "tag=${{ github.event.workflow_run.head_branch }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Does the release carry an installer for every platform Desktop Release
+  # builds? This is the question `resolve` used to answer by proxy, and it is
+  # the only one that decides whether a manifest over this release would be
+  # honest. It is a separate job rather than a step inside `resolve` on purpose:
+  # `confirm` at the bottom gates on `needs.resolve.result == 'success'`, so
+  # failing resolve would take the reporting down with the signing and nobody
+  # would be told why the release is unsigned.
+  #
+  # The rpm is deliberately not required. desktop-release.yml builds it in a job
+  # of its own precisely because it can run for hours where the .deb takes
+  # seconds, and that job already declares its own absence survivable: "The
+  # release keeps its .deb and .AppImage; Fedora and openSUSE users have no
+  # package for this version." Requiring it here would overrule a decision made
+  # there, and would withhold the signature from five installers over a sixth
+  # that is documented as optional. That is precisely the trade v15.0.0 lost.
+  #
+  # Skipped on a backfill. A backfill is a deliberate manual act against an
+  # older release, whose platform set is whatever was being built at the time,
+  # and refusing it because a years-old tag predates a platform would be this
+  # job overreaching. `sign` accepts a skipped inventory for that reason and
+  # only that reason.
+  inventory:
+    name: Check the release carries its installers
+    needs: resolve
+    if: ${{ !inputs.backfill }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Account for every platform on the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+        run: |
+          # Failing to read the release is not a verdict on the release. Left to
+          # `set -e` this step would die here with no output at all, and the
+          # confirmation downstream would read the bare failure as "short a
+          # platform" - an API flake reported as a fact about the artefacts.
+          if ! assets=$(gh release view "$TAG" --repo "${{ github.repository }}" \
+               --json assets --jq '.assets[].name' 2>view.err); then
+            reason=$(tr '\n' ' ' < view.err)
+            echo "::error::Could not read the assets on ${TAG}, so this run never judged it: ${reason}"
+            {
+              echo "### \`${TAG}\`: not measured, so not signed"
+              echo
+              echo "\`gh release view\` failed, so nothing here knows what the release carries."
+              echo "This is not a finding about the installers and Desktop Release is not the"
+              echo "repair. Re-run this workflow; if it keeps failing, check that the tag has a"
+              echo "release behind it at all."
+              echo
+              echo "\`\`\`"
+              echo "${reason}"
+              echo "\`\`\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          count=$(printf '%s\n' "$assets" | grep -c . || true)
+          echo "${TAG} lists ${count} assets:"
+          printf '%s\n' "$assets"
+
+          # One artefact per platform family, not one per format. What must
+          # never pass unnoticed is a whole platform missing, because that is
+          # the release a signature would misrepresent.
+          #
+          # Windows used to be written '\.(exe|msi)$' so that dropping a format
+          # would not have to be mirrored here. The mirroring is not optional in
+          # practice: test_release_signing_trigger.py asserts this list equals
+          # the formats we build, so the alternative to editing it was a test
+          # that requires an installer nobody produces. The .msi went in 15.2.0
+          # and both moved together.
+          missing=""
+          printf '%s\n' "$assets" | grep -qE '\.exe$' || missing="${missing} Windows (.exe)"
+          printf '%s\n' "$assets" | grep -qE '\.dmg$' || missing="${missing} macOS (.dmg)"
+          printf '%s\n' "$assets" | grep -qE '\.deb$' || missing="${missing} Linux (.deb)"
+          printf '%s\n' "$assets" | grep -qE '\.AppImage$' || missing="${missing} Linux (.AppImage)"
+
+          if [ -n "$missing" ]; then
+            echo "::error::${TAG} has no installer for:${missing}. Not signing an incomplete release."
+            {
+              echo "### \`${TAG}\` is short a platform, so it was not signed"
+              echo
+              echo "Nothing on the release covers:${missing}"
+              echo
+              echo "Signing is not the repair. A manifest over part of a release verifies cleanly"
+              echo "and reads as a complete one, which is worse than an unsigned release. Re-run"
+              echo "**Desktop Release** for \`${TAG}\` until the platform is there, then re-run"
+              echo "this workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if printf '%s\n' "$assets" | grep -qE '\.rpm$'; then
+            echo "Every platform is represented, rpm included."
+          else
+            echo "::warning title=No rpm on this release::${TAG} carries no .rpm. Desktop Release treats that as survivable - Fedora and openSUSE users have no package for this version - so signing proceeds over what is published."
+            {
+              echo "### \`${TAG}\` carries no \`.rpm\`"
+              echo
+              echo "Signing proceeds over the platforms that are there. Fedora and openSUSE users"
+              echo "have no package for this version; the repair is a Desktop Release run for the"
+              echo "rpm followed by a re-run of this workflow, which regenerates the manifest over"
+              echo "everything then published."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  # The licence inventory used to hang off the same dead release event as this
+  # workflow and stopped publishing on the same day. It is a job here rather
+  # than a workflow of its own so the order is decided by the graph: it attaches
+  # its three files first, then they get checksummed with everything else. Two
+  # workflows racing on one trigger would have produced a manifest describing
+  # some of the release, which reads exactly like a manifest describing all of it.
+  # Skipped on a backfill, and the reason is not cost. A backfill signs a release
+  # that was published weeks ago, and the SBOM is generated now, from whatever
+  # the dependency ranges resolve to today. Attaching it would put a component
+  # list on an old release page describing software that release never
+  # contained, and then the manifest would cover that list, so the signature
+  # would attest to it. The failure is not that the SBOM is missing; it is that
+  # a signed one would be wrong, and wrong under a signature is the worst
+  # version. A backfill therefore covers exactly the bytes that were published
+  # at the time and nothing minted on the day it runs.
+  #
+  # This is deliberately a skip rather than a job left to fail. Both leave the
+  # release without an SBOM, but only one of them says that was the intention.
+  sbom:
+    name: SBOM and licences
+    needs: resolve
+    if: ${{ !inputs.backfill }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/sbom-and-licenses.yml
+    with:
+      tag: ${{ needs.resolve.outputs.tag }}
+
+  sign:
+    name: Sign release artefacts
+    needs: [resolve, sbom, inventory]
+    # Signing proceeds even when the inventory job fails. A manifest over the
+    # installers alone is what every release since v8.0.0 would have had, and
+    # withholding signatures because a licence list broke helps nobody. The run
+    # still goes red, so the failure is not hidden.
+    #
+    # It has to survive `sbom` being skipped as well as failing, which is the
+    # backfill path and is a different upstream state reaching the same
+    # condition. A dependant of a skipped job is skipped too, unless its own
+    # `if` is a status expression, which this is. That is the documented
+    # behaviour and it is not restated here as a fact, because if it is ever
+    # wrong this job silently does not run. The `confirm` job below settles it
+    # by observation instead.
+    #
+    # `inventory` is required rather than merely survived: a release short a
+    # platform is the one case where not signing is the correct outcome, and it
+    # is spelled out as the two states that are allowed rather than as "not
+    # failed", so a cancelled or otherwise unfinished inventory does not read as
+    # permission. `skipped` is allowed for exactly one reason, the backfill path
+    # documented on that job.
+    if: >-
+      ${{ !cancelled()
+      && needs.resolve.result == 'success'
+      && (needs.inventory.result == 'success' || needs.inventory.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    # Observed at 2.8 and 0.6 minutes, the difference being how much of the
+    # 2.6 GB of installers the runner had to pull. This is a backstop against
+    # inheriting the six hour default, not a ceiling sized from a distribution:
+    # two samples do not make one, and the download only grows as platforms are
+    # added. It is far enough above both readings that it cannot fire on a
+    # healthy run.
+    timeout-minutes: 60
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: "v2.4.1"
+
+      - name: Download release artefacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+        run: |
+          mkdir -p release-assets
+          cd release-assets
+          gh release download "$TAG" --repo "${{ github.repository }}" --skip-existing
+          # A manifest built from some of the assets is worse than none, because
+          # it reads as a complete one. Count what the release says it holds.
+          expected=$(gh release view "$TAG" --repo "${{ github.repository }}" --json assets --jq '.assets | length')
+          actual=$(ls -1 | wc -l)
+          echo "release lists $expected assets, downloaded $actual"
+          if [ "$expected" -ne "$actual" ]; then
+            echo "Downloaded $actual of $expected assets, refusing to checksum a partial set." >&2
+            exit 1
+          fi
+          ls -la
+
+      - name: Produce SHA-256 checksums
+        working-directory: release-assets
+        run: |
+          # A second run downloads the previous manifest and its signature along
+          # with the real assets, and the glob below would hash those into the
+          # new manifest, which would then describe its own history rather than
+          # the release.
+          rm -f SHA256SUMS SHA256SUMS.sig SHA256SUMS.pem
+          if [ -z "$(ls -A . 2>/dev/null)" ]; then
+            echo "No release assets to checksum, so nothing would be signed." >&2
+            exit 1
+          fi
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Sign the checksums file (keyless, OIDC)
+        working-directory: release-assets
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+        run: |
+          if [ ! -f SHA256SUMS ]; then
+            echo "No SHA256SUMS to sign." >&2
+            exit 1
+          fi
+          cosign sign-blob --yes \
+            --output-signature SHA256SUMS.sig \
+            --output-certificate SHA256SUMS.pem \
+            SHA256SUMS
+
+      # No event filter here. This step used to run only for the release event,
+      # which is the one event that cannot reach this workflow, so every other
+      # path produced a signature and then discarded it: a green run that
+      # published nothing.
+      - name: Upload checksums and signature to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+        working-directory: release-assets
+        run: |
+          # All three or none. Uploading two of them and staying green is the
+          # same failure this workflow already had once, wearing a smaller hat:
+          # a signature without its certificate verifies for nobody.
+          for f in SHA256SUMS SHA256SUMS.sig SHA256SUMS.pem; do
+            if [ ! -f "$f" ]; then
+              echo "$f is missing, refusing to publish a partial signature." >&2
+              exit 1
+            fi
+          done
+          for f in SHA256SUMS SHA256SUMS.sig SHA256SUMS.pem; do
+            gh release upload "$TAG" "$f" --repo "${{ github.repository }}" --clobber
+          done
+
+      # A backfilled release ends up looking odd on purpose: signed, but with no
+      # SBOM beside the signature, while its neighbours have both. Without a
+      # record of why, that reads as a broken run rather than a decision, and
+      # the obvious repair is to attach an SBOM generated today, which is
+      # exactly the thing the skip exists to prevent. So the run says what it
+      # was, on the page where someone checking would look.
+      - name: State what this run signed
+        env:
+          TAG: ${{ needs.resolve.outputs.tag }}
+          BACKFILL: ${{ inputs.backfill }}
+          SBOM_RESULT: ${{ needs.sbom.result }}
+        run: |
+          {
+            if [ "${BACKFILL}" = "true" ]; then
+              echo "### Backfilled the signature on \`${TAG}\`"
+              echo
+              echo "The manifest covers the assets already published on that release, which are"
+              echo "the bytes people have been downloading. Nothing was rebuilt: this job has no"
+              echo "\`actions/checkout\`, so it has no source tree to rebuild from."
+              echo
+              echo "**No SBOM was attached, and that is deliberate.** Generating one now would"
+              echo "describe today's dependency resolution, not what this release shipped with,"
+              echo "and the manifest would then cover that description and sign it. An absent"
+              echo "component list is better than a signed and wrong one. Do not repair this by"
+              echo "running the SBOM job against this tag."
+            else
+              echo "### Signed \`${TAG}\`"
+              echo
+              echo "SBOM job: ${SBOM_RESULT:-not run}."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verification snippet (for the release notes)
+        working-directory: release-assets
+        run: |
+          cat <<'EOF'
+          To verify this release:
+
+            cosign verify-blob \
+              --certificate SHA256SUMS.pem \
+              --signature SHA256SUMS.sig \
+              --certificate-identity-regexp 'https://github.com/datadrivenconstruction/OpenBusinessERP/.*' \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+              SHA256SUMS
+
+            sha256sum -c SHA256SUMS
+
+          EOF
+
+  # Whether a signature reached the release is a fact about the release, not
+  # about this run, so it is read back off the release rather than inferred
+  # from the jobs above. Every guard before this one is an argument about what
+  # should happen; this is the only one that looks.
+  #
+  # The failure it exists for is the one this workflow has already had once, in
+  # the form described above the upload step: a run where every job is green
+  # and nothing was published. It can be reached again from any wiring change
+  # that stops `sign` from starting, because a job that never starts reports no
+  # failure. Skip propagation from `sbom` on a backfill is the specific way in,
+  # and the reasoning that says it cannot happen is exactly the reasoning that
+  # would be wrong. Reading the assets does not depend on that reasoning being
+  # right.
+  confirm:
+    name: Confirm the release carries a signature
+    needs: [resolve, inventory, sign]
+    if: ${{ always() && needs.resolve.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Read the three files back off the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+          SIGN_RESULT: ${{ needs.sign.result }}
+          INVENTORY_RESULT: ${{ needs.inventory.result }}
+        run: |
+          # Bounded retry against read-after-write lag on the assets API, not
+          # against a missing upload. Three misses over twenty seconds is not a
+          # slow API, it is an absent file.
+          for attempt in 1 2 3; do
+            if assets=$(gh release view "$TAG" --repo "${{ github.repository }}" \
+                 --json assets --jq '.assets[].name' 2>fetch.err); then
+              fetch_error=""
+            else
+              fetch_error=$(tr '\n' ' ' < fetch.err)
+              assets=""
+            fi
+            missing=""
+            for f in SHA256SUMS SHA256SUMS.sig SHA256SUMS.pem; do
+              if ! printf '%s\n' "$assets" | grep -qxF "$f"; then
+                missing="$missing $f"
+              fi
+            done
+            if [ -z "$missing" ]; then break; fi
+            if [ "$attempt" != 3 ]; then sleep 10; fi
+          done
+
+          # A release that could not be read is not a release without a
+          # signature. Both end this job red, because neither confirms
+          # anything, but they are different problems and saying "unsigned"
+          # for the first one would be a guess wearing the clothes of a
+          # measurement.
+          if [ -n "$fetch_error" ]; then
+            echo "::error::Could not read the assets on ${TAG}, so this run cannot say whether it is signed: ${fetch_error}"
+            {
+              echo "### \`${TAG}\`: not measured"
+              echo
+              echo "Reading the release failed, so this run makes no claim either way."
+              echo "It is not evidence the release is unsigned."
+              echo
+              echo "\`\`\`"
+              echo "${fetch_error}"
+              echo "\`\`\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          # An unsigned release has two quite different causes and one symptom,
+          # so they are told apart here rather than left to whoever reads this
+          # to work out. "The release is short a platform" is this workflow
+          # doing its job and the repair is in Desktop Release; anything else is
+          # a wiring failure and the repair is here. Printing one message for
+          # both is how the first gets diagnosed as the second.
+          #
+          # A red inventory is not on its own evidence of which one it was: that
+          # job also goes red when it cannot read the release. So the platform
+          # question is asked again here, off the asset list already in hand,
+          # and the answer rather than the neighbouring job's colour is what
+          # decides the message. The two lists have to stay identical, which is
+          # not left to care - tests/unit/test_release_signing_trigger.py reads
+          # both out of this file and fails when they diverge.
+          absent_platforms=""
+          printf '%s\n' "$assets" | grep -qE '\.exe$' || absent_platforms="${absent_platforms} Windows (.exe)"
+          printf '%s\n' "$assets" | grep -qE '\.dmg$' || absent_platforms="${absent_platforms} macOS (.dmg)"
+          printf '%s\n' "$assets" | grep -qE '\.deb$' || absent_platforms="${absent_platforms} Linux (.deb)"
+          printf '%s\n' "$assets" | grep -qE '\.AppImage$' || absent_platforms="${absent_platforms} Linux (.AppImage)"
+
+          if [ -n "$missing" ] && [ "${INVENTORY_RESULT}" = "failure" ] && [ -n "$absent_platforms" ]; then
+            echo "::error::${TAG} is missing:${missing}, because the release does not carry an installer for:${absent_platforms}. That is a deliberate refusal, not a signing failure."
+            {
+              echo "### \`${TAG}\` was not signed, and that was the right outcome"
+              echo
+              echo "Missing from the release:${missing}"
+              echo
+              echo "No installer on the release covers:${absent_platforms}"
+              echo
+              echo "The inventory job refused: the release is short a platform, and its summary"
+              echo "above says which. A signature over part of a release verifies cleanly and"
+              echo "reads as a complete one. Re-run **Desktop Release** for \`${TAG}\`, then"
+              echo "re-run this workflow. Do not reach for the signing job."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [ -n "$missing" ]; then
+            echo "::error::${TAG} is missing:${missing}. The signing job reported '${SIGN_RESULT}' and the inventory '${INVENTORY_RESULT}'."
+            {
+              echo "### \`${TAG}\` was not signed by this run"
+              echo
+              echo "Missing from the release:${missing}"
+              echo
+              echo "The signing job reported \`${SIGN_RESULT}\`, the inventory"
+              echo "\`${INVENTORY_RESULT}\`. Every platform is present on the release, so a red"
+              echo "inventory here means it could not read the release rather than that it judged"
+              echo "one - its own summary says which, and re-running this workflow is the repair."
+              echo "If \`sign\` reads \`skipped\` while the rest of the"
+              echo "run is green, look at the job graph before looking at cosign: \`sign\` needs"
+              echo "\`sbom\` and \`inventory\`, a backfill skips both, and a skipped dependency"
+              echo "skips its dependants unless the \`if\` on \`sign\` overrides it."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          echo "${TAG} carries SHA256SUMS, SHA256SUMS.sig and SHA256SUMS.pem."
+
+          # Present is not the same as current. The three files above can sit on
+          # a release that has since grown assets they say nothing about: a
+          # Desktop Release repair run attaches installers to an already signed
+          # tag, and it cannot trigger this workflow, because it is a dispatch
+          # and this workflow reads a tag out of head_branch. The manifest then
+          # covers a subset and verifies cleanly over it, which is the exact
+          # failure the sign job guards against on the way in ("a manifest built
+          # from some of the assets is worse than none") and which nothing
+          # guarded against afterwards.
+          #
+          # So compare the manifest against the release rather than against the
+          # download that produced it. This is the only reading in either
+          # workflow that can tell a complete signature from a stale one.
+          if ! gh release download "$TAG" --repo "${{ github.repository }}" \
+                 --pattern SHA256SUMS --dir manifest; then
+            echo "::error::${TAG} lists a SHA256SUMS asset that could not be downloaded, so this run cannot say what the signature covers."
+            exit 1
+          fi
+          # sha256sum writes "<hash>  <name>" and marks binary reads with a
+          # star, so strip the hash and either separator rather than splitting
+          # on whitespace, which would truncate any name containing a space.
+          covered=$(sed -E 's/^[0-9a-f]+[ ]+[* ]?//' manifest/SHA256SUMS)
+          echo "The manifest covers $(printf '%s\n' "$covered" | grep -c . || true) files."
+
+          # read rather than word splitting, so a name with a space in it is
+          # compared as one name instead of two that both look missing.
+          uncovered=""
+          while IFS= read -r name; do
+            [ -n "$name" ] || continue
+            case "$name" in
+              SHA256SUMS|SHA256SUMS.sig|SHA256SUMS.pem) continue ;;
+            esac
+            printf '%s\n' "$covered" | grep -qxF "$name" || uncovered="${uncovered} ${name}"
+          done <<EOF
+          $assets
+          EOF
+
+          if [ -n "$uncovered" ]; then
+            echo "::error::The signature on ${TAG} does not cover:${uncovered}"
+            {
+              echo "### \`${TAG}\` carries a signature that does not cover the whole release"
+              echo
+              echo "On the release but absent from \`SHA256SUMS\`:${uncovered}"
+              echo
+              echo "A manifest over part of a release verifies cleanly and reads as a complete one."
+              echo "The usual cause is a Desktop Release repair run, which attaches installers to a"
+              echo "tag that was already signed and cannot trigger this workflow. Re-run this"
+              echo "workflow against \`${TAG}\` to regenerate the manifest over everything now"
+              echo "published."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          echo "The manifest covers every asset on ${TAG}."
+
+          # Coverage is not correctness. Everything above asks whether each
+          # asset is named in the manifest. None of it asks whether the hash
+          # written beside the name is the hash of the bytes the release now
+          # serves, and those two come apart whenever an asset is replaced
+          # after the manifest was written.
+          #
+          # That is not a hypothetical here, it is the normal shape of a
+          # release. Two runs of this workflow share one release on purpose,
+          # and `gh release upload --clobber` replaces an asset in place, so
+          # the name survives and the bytes do not. On v17.0.2 the dispatched
+          # run wrote a manifest naming the SBOM it had just attached, the
+          # workflow_run run regenerated that SBOM and clobbered it, and for
+          # the 63 seconds until the second manifest landed the release served
+          # a SHA256SUMS that misdescribed two of its own assets. Every check
+          # above was green throughout, because the file was still named.
+          #
+          # The window closes on its own only when the second run finishes. A
+          # run that dies between the two uploads leaves the release wrong
+          # permanently, and this job - which runs on `always()` - would have
+          # reported a manifest with full coverage and gone green over it.
+          #
+          # No download. GitHub reports its own sha256 for every asset, so the
+          # comparison is against what the release serves rather than against
+          # anything this run happens to hold.
+          if ! gh api "repos/${{ github.repository }}/releases/tags/${TAG}" \
+                 --jq '.assets[] | "\(.digest)\t\(.name)"' > digests.tsv 2>digests.err; then
+            reason=$(tr '\n' ' ' < digests.err)
+            echo "::error::Could not read the asset digests on ${TAG}, so this run cannot say whether the manifest describes them: ${reason}"
+            exit 1
+          fi
+
+          # Counted rather than assumed, and printed next to the verdict. An
+          # asset whose digest GitHub does not report cannot be compared, and a
+          # gate that quietly compares nothing reads exactly like a gate that
+          # compared everything and was satisfied.
+          compared=0
+          unmeasured=""
+          wrong=""
+          while IFS="$(printf '\t')" read -r digest name; do
+            [ -n "$name" ] || continue
+            case "$name" in
+              SHA256SUMS|SHA256SUMS.sig|SHA256SUMS.pem) continue ;;
+            esac
+            published=${digest#sha256:}
+            if [ -z "$published" ] || [ "$published" = "null" ]; then
+              unmeasured="${unmeasured} ${name}"
+              continue
+            fi
+            stated=$(sed -E 's/^([0-9a-f]+)[ ]+[* ]?(.*)$/\1\t\2/' manifest/SHA256SUMS \
+                     | awk -F'\t' -v n="$name" '$2 == n { print $1; exit }')
+            if [ -z "$stated" ]; then
+              # Already reported as uncovered above; nothing to add here.
+              continue
+            fi
+            compared=$((compared + 1))
+            if [ "$stated" != "$published" ]; then
+              wrong="${wrong}
+          ${name}
+            SHA256SUMS says  ${stated}
+            release serves   ${published}"
+            fi
+          done < digests.tsv
+
+          echo "Compared ${compared} of the manifest's entries against the digests the release reports."
+
+          if [ -n "$unmeasured" ]; then
+            echo "::warning title=Some assets report no digest::Could not compare:${unmeasured}"
+          fi
+
+          if [ "$compared" -eq 0 ]; then
+            echo "::error::Not one asset on ${TAG} could be compared against the manifest, so this job confirmed nothing about what the signature covers."
+            {
+              echo "### \`${TAG}\`: the manifest was not checked against the release"
+              echo
+              echo "No asset reported a digest, so every hash in \`SHA256SUMS\` went uncompared."
+              echo "This is not evidence that the manifest is correct. It is the absence of the"
+              echo "measurement, and it is red for that reason rather than for a finding."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [ -n "$wrong" ]; then
+            echo "::error::The signature on ${TAG} covers hashes that do not match the published bytes."
+            printf '%s\n' "$wrong"
+            {
+              echo "### \`${TAG}\` carries a signed manifest that misdescribes its own assets"
+              echo
+              echo "These assets are named in \`SHA256SUMS\` with a hash that is not the hash of"
+              echo "what the release serves, so \`sha256sum -c SHA256SUMS\` fails for anyone who"
+              echo "downloads them:"
+              echo
+              echo '```'
+              printf '%s\n' "$wrong"
+              echo '```'
+              echo
+              echo "This is worse than an unsigned release: the signature verifies, so the manifest"
+              echo "reads as authoritative while it is wrong. The cause is an asset replaced after"
+              echo "the manifest was written. Re-run this workflow against \`${TAG}\` to rebuild the"
+              echo "manifest over the bytes now published."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          echo "Every hash in the manifest matches the bytes ${TAG} serves."
