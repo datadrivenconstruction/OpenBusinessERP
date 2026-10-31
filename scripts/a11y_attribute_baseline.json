@@ -3,6 +3,7 @@
  "allowlist": {
   "untranslated_attributes": {
    "app/layout/CustomBranding.tsx::title::OpenBusinessERP": "product name - identical in every language; a translator meeting it cold would render it",
+   "features/appointments/api.ts::title::Online booking": "iframe markup the owner pastes into another site; the app never renders it and the host page sets its own language",
    "features/dashboard/DashboardPage.tsx::alt::DataDrivenConstruction": "company name - identical in every language",
    "features/modules/RequestCustomModuleDialog.tsx::alt::DataDrivenConstruction": "company name - identical in every language"
   }
@@ -27,7 +28,6 @@
    "features/carbon/CarbonPage.tsx::placeholder::concrete, steel…",
    "features/carbon/CarbonPage.tsx::placeholder::e.g. Net-zero by 2030",
    "features/carbon/WholeLifePanel.tsx::placeholder::DE, GB, US...",
-   "features/cde/CDESetupWizard.tsx::placeholder::Project-Originator-Functional-Spatial-Form-Discipline-Number",
    "features/daily-diary/DailyDiaryPage.tsx::placeholder::e.g. DJI Mavic 3 Enterprise",
    "features/equipment/EquipmentPage.tsx::placeholder::320 GC",
    "features/equipment/EquipmentPage.tsx::placeholder::Caterpillar",
@@ -37,7 +37,6 @@
    "features/equipment/modals/TypeFormModal.tsx::placeholder::earthworks, lifting, hauling…",
    "features/file-approvals/StampTemplateEditor.tsx::placeholder::Project Hold",
    "features/forms/TemplateBuilder.tsx::placeholder::safety, induction",
-   "features/match-elements/StageAdjustSheet.tsx::placeholder::ifc_class, predefined_type",
    "features/property-dev/BulkOperationsPage.tsx::placeholder::e.g. duplicate buyer rows from web form double-submission",
    "features/property-dev/BulkOperationsPage.tsx::placeholder::e.g. marketing push extends Q4 deadline",
    "features/property-dev/BulkOperationsPage.tsx::placeholder::e.g. milestone X cleared deposits",

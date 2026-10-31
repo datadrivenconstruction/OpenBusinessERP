@@ -56,7 +56,6 @@ export const PERMISSION_MIN_ROLE = {
   'contracts.submit_claim': 'editor',
   'documents.update': 'editor',
   'boq.delete': 'editor',
-  'bim.create': 'editor',
 } as const satisfies Record<string, RankedRole>;
 
 export type GatedPermission = keyof typeof PERMISSION_MIN_ROLE;

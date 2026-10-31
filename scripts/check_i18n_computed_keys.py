@@ -195,6 +195,7 @@ DEFAULT_BASELINE_PATH = "scripts/i18n_computed_key_baseline.json"
 DEFAULT_LOCALE_GLOB = "frontend/src/app/locales/*.ts"
 DEFAULT_MEMBER_BASELINE_PATH = "scripts/i18n_computed_member_baseline.json"
 DEFAULT_SUFFIX_BASELINE_PATH = "scripts/i18n_suffix_pair_baseline.json"
+DEFAULT_SUFFIX_GAP_BASELINE_PATH = "scripts/i18n_suffix_locale_gap_baseline.json"
 DEFAULT_I18N_TS_PATH = "frontend/src/app/i18n.ts"
 
 _CLDR_SUFFIXES = ("_zero", "_one", "_two", "_few", "_many", "_other")
@@ -615,6 +616,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--locales", default=DEFAULT_LOCALE_GLOB)
     parser.add_argument("--member-baseline", default=DEFAULT_MEMBER_BASELINE_PATH)
     parser.add_argument("--suffix-baseline", default=DEFAULT_SUFFIX_BASELINE_PATH)
+    parser.add_argument("--suffix-gap-baseline", default=DEFAULT_SUFFIX_GAP_BASELINE_PATH)
     parser.add_argument("--i18n-ts", default=DEFAULT_I18N_TS_PATH)
     args = parser.parse_args(argv)
 
@@ -812,6 +814,23 @@ def main(argv: list[str] | None = None) -> int:
         if gap:
             suffix_locale_gaps[key] = gap
 
+    # Recorded debt only (English-first guides shipped with de/ru), and it may only shrink:
+    # a new key or locale still fails on arrival, an answered one must leave the file.
+    try:
+        with open(args.suffix_gap_baseline, encoding="utf-8") as fh:
+            suffix_gap_baseline: dict[str, list[str]] = json.load(fh)
+    except FileNotFoundError:
+        suffix_gap_baseline = {}
+    stale_suffix_gaps = sorted(
+        k for k, locs in suffix_gap_baseline.items()
+        if set(locs) - set(suffix_locale_gaps.get(k, ()))
+    )
+    suffix_locale_gaps = {
+        k: [s for s in gap if s not in set(suffix_gap_baseline.get(k, ()))]
+        for k, gap in suffix_locale_gaps.items()
+    }
+    suffix_locale_gaps = {k: gap for k, gap in suffix_locale_gaps.items() if gap}
+
     # ---- what could not be decided, printed rather than dropped ----
     print(
         f"computed-key scan: {len(sites.template)} template call site(s) over "
@@ -911,6 +930,7 @@ def main(argv: list[str] | None = None) -> int:
         and not new_suffix_families
         and not stale_suffix_families
         and not suffix_locale_gaps
+        and not stale_suffix_gaps
     ):
         # Say how much was compared, not just that it passed. A gate that prints
         # OK without a count reads the same whether it checked everything or
@@ -996,6 +1016,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(f"  declared at {posix}:{ln}", file=sys.stderr)
 
+    for key in stale_suffix_gaps:
+        print(
+            f"ERROR: {key} is now answered by a locale {args.suffix_gap_baseline} records as "
+            "missing it, or is gone; shrink its entry there.",
+            file=sys.stderr,
+        )
     if new_suffix_families or stale_suffix_families or suffix_locale_gaps:
         print(
             "\nThese keys are read through a variable at the call site, "

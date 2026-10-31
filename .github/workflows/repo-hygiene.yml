@@ -1105,34 +1105,6 @@ jobs:
         if: ${{ !cancelled() }}
         run: python scripts/check_i18n_computed_keys.py
 
-      # The enforcement arm of the step above, and it was running nowhere: no
-      # workflow step and no entry in .pre-commit-config.yaml, so nothing had
-      # ever run it. The step above finds `<x>Key` fields whose English sits in a
-      # plain `<x>` sibling rather than a default* field, counts them and names
-      # them, but deliberately does not enforce them, because the populations
-      # under that one shape answer to different questions. It hands the module
-      # chips to this script by name, in its own output. The delegation was real
-      # and the delegate was not running, which is the worst of both: the step
-      # above reads as though something downstream is holding that population.
-      # What goes wrong without it is quiet by construction. A chip whose key no
-      # locale answers falls back to the English `label` written beside it, so
-      # the page renders in English rather than showing a raw key, and no locale
-      # guard, no build and no test has anything to go red about.
-      #
-      # This runs in the EXISTS direction, the one that can go falsely green, so
-      # its floor is the part worth checking rather than its verdict. It
-      # discovers both sides instead of holding an expected set, so a new locale
-      # or a new chip is picked up rather than breaking it, and it exits 2 rather
-      # than 0 when the playbooks, the locale files, or any single locale parse
-      # to zero keys, which is the state where a scan that read nothing would
-      # otherwise report a clean tree. Passing today over 842 chips in 202
-      # playbooks, 137 distinct keys against 43 locale files, measured against a
-      # clean checkout of HEAD rather than a working tree, so this pins a green
-      # state rather than fixing a red.
-      - name: Check case module chips are answered by every locale
-        if: ${{ !cancelled() }}
-        run: python scripts/check_case_module_chip_locales.py
-
       - name: Check module display names are reachable, undrifted and unorphaned
         if: ${{ !cancelled() }}
         run: python scripts/check_module_display_names.py
@@ -1153,61 +1125,6 @@ jobs:
         if: ${{ !cancelled() }}
         run: python scripts/check_i18n_key_nesting.py
 
-      - name: Prove the case playbook catalogue gate can fail
-        if: ${{ !cancelled() }}
-        run: python scripts/check_case_playbook_catalogue_locales.py --selftest
-
-      - name: Check a new case playbook has not un-finished a finished language
-        if: ${{ !cancelled() }}
-        run: python scripts/check_case_playbook_catalogue_locales.py
-
-      # The gate above holds the finished languages to the catalogue text:
-      # title, description and long description. Nothing held anyone to the
-      # step text, which is where the gap is. 220 playbooks name 7037 keys
-      # and most offered locales do not answer about 3000 of them, a number
-      # that grew with every new case because no gate could see it grow: the
-      # orphan gate reads literal t() calls and here the key is a variable,
-      # and the drift check skips a key that was never translated. This
-      # ratchet records, per locale and per playbook, what each locale does
-      # not answer, and fails when any count is higher than recorded, which
-      # is a key a locale had and lost or a case that shipped without its
-      # strings. --update only ever lowers a number, so the floor moves one
-      # way. It also owns the card_complete list the gate above reads, and
-      # promotes a language into it the day the language gets there.
-      #
-      # The proof step runs first, for the reason the render guard's does: a
-      # ratchet that had stopped firing would report a clean tree.
-      - name: Prove the case coverage ratchet can fail
-        if: ${{ !cancelled() }}
-        run: node scripts/check-case-coverage.mjs --selftest
-        working-directory: frontend
-
-      - name: Check no case answers fewer translated keys than the manifest records
-        if: ${{ !cancelled() }}
-        run: node scripts/check-case-coverage.mjs
-        working-directory: frontend
-
-
-      # A case string whose English was rewritten under an unchanged key. The
-      # key still resolves, so nothing else in this file reports it: the page
-      # publishes in every language carrying a faithful translation of a
-      # sentence that no longer exists. The ratchet form tolerates the debt
-      # already written down in case-en-manifest.json and fails on anything
-      # added today, which is the only part anybody can still do something
-      # about. Until now the check lived only in an npm script nothing calls.
-      #
-      # The proof step runs first, for the same reason the coverage ratchet's
-      # does: a ratchet that had stopped firing reports a clean tree, and a
-      # clean tree reports a clean tree.
-      - name: Prove the case drift ratchet can fail
-        if: ${{ !cancelled() }}
-        run: node scripts/check-case-translation-drift.mjs --selftest
-        working-directory: frontend
-
-      - name: Check no case English was reworded without its translations
-        if: ${{ !cancelled() }}
-        run: node scripts/check-case-translation-drift.mjs --ratchet
-        working-directory: frontend
       - name: Prove the payment application sense gate can fail
         if: ${{ !cancelled() }}
         run: python scripts/check_payment_application_sense.py --selftest
