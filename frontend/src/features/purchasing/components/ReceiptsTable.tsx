@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { FileText } from 'lucide-react';
+import { FileText, Undo2 } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { DateDisplay } from '@/shared/ui/DateDisplay';
@@ -10,7 +10,7 @@ import { StatusBadge, SupplierAvatar } from './common';
 const th = 'px-3 py-2.5 text-left font-medium';
 const td = 'px-3 py-2';
 
-export function ReceiptsTable({ rows, busy, onBill }: { rows: Receipt[]; busy?: boolean; onBill: (id: string) => void }) {
+export function ReceiptsTable({ rows, busy, onBill, onCancel }: { rows: Receipt[]; busy?: boolean; onBill: (id: string) => void; onCancel?: (r: Receipt) => void }) {
   const { t } = useTranslation();
   return (
     <div className="overflow-x-auto">
@@ -24,7 +24,7 @@ export function ReceiptsTable({ rows, busy, onBill }: { rows: Receipt[]; busy?: 
             <th className={th}>{t('purchasing.col_status', { defaultValue: 'Status' })}</th>
             <th className={`${th} text-right`}>{t('purchasing.col_lines', { defaultValue: 'Lines' })}</th>
             <th className={`${th} text-right`}>{t('purchasing.col_value', { defaultValue: 'Value' })}</th>
-            <th className="w-32" />
+            <th className="w-44" />
           </tr>
         </thead>
         <tbody>
@@ -44,10 +44,15 @@ export function ReceiptsTable({ rows, busy, onBill }: { rows: Receipt[]; busy?: 
               <td className={td}><StatusBadge status={r.status} size="sm" /></td>
               <td className={`${td} text-right tabular-nums text-content-secondary`}>{r.lines?.length ?? 0}</td>
               <td className={`${td} text-right tabular-nums`}><MoneyDisplay amount={r.value_total} currency={r.currency} /></td>
-              <td className={`${td} text-right`}>
-                <Button size="sm" variant="ghost" icon={<FileText size={14} />} disabled={busy} onClick={() => onBill(r.id)}>
-                  {t('purchasing.action_bill', { defaultValue: 'Create bill' })}
-                </Button>
+              <td className={`${td} whitespace-nowrap text-right`}>
+                {r.status !== 'cancelled' && (
+                  <Button size="sm" variant="ghost" icon={<FileText size={14} />} disabled={busy} onClick={() => onBill(r.id)}>
+                    {t('purchasing.action_bill', { defaultValue: 'Create bill' })}
+                  </Button>
+                )}
+                {onCancel && r.status !== 'cancelled' && (
+                  <Button size="sm" variant="ghost" icon={<Undo2 size={14} />} disabled={busy} onClick={() => onCancel(r)} aria-label={t('purchasing.cancel_receipt', { defaultValue: 'Cancel receipt' })} title={t('purchasing.cancel_receipt', { defaultValue: 'Cancel receipt' })} />
+                )}
               </td>
             </tr>
           ))}

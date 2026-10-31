@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
@@ -37,6 +37,7 @@ export function PurchasingListPage() {
   const navigate = useNavigate();
   const addToast = useToastStore((s) => s.addToast);
   const invalidate = useInvalidatePurchasing();
+  const qcInv = useQueryClient();
   const [params, setParams] = useSearchParams();
   const tab = (PURCHASING_TABS.includes(params.get('tab') as PurchasingTab) ? params.get('tab') : 'orders') as PurchasingTab;
   const isOrder = tab === 'orders';
@@ -119,6 +120,15 @@ export function PurchasingListPage() {
     },
     onError: fail,
   });
+  const cancelReceipt = useMutation({
+    mutationFn: (id: string) => purchasingApi.cancelReceipt(id),
+    onSuccess: () => {
+      void invalidate();
+      void qcInv.invalidateQueries({ queryKey: ['inventory'] });
+    },
+    onError: fail,
+  });
+  const [receiptToCancel, setReceiptToCancel] = useState<{ id: string; number: string } | null>(null);
   const toBill = useMutation({
     mutationFn: (fn: () => Promise<{ id: string }>) => fn(),
     onSuccess: (d) => {
@@ -287,7 +297,7 @@ export function PurchasingListPage() {
             />
           )
         ) : tab === 'receipts' ? (
-          <ReceiptsTable rows={receiptRows} busy={toBill.isPending} onBill={(id) => toBill.mutate(() => purchasingApi.billFromReceipt(id))} />
+          <ReceiptsTable rows={receiptRows} busy={toBill.isPending || cancelReceipt.isPending} onBill={(id) => toBill.mutate(() => purchasingApi.billFromReceipt(id))} onCancel={(r) => setReceiptToCancel(r)} />
         ) : (
           <>
             <PurchasingTable
@@ -312,6 +322,21 @@ export function PurchasingListPage() {
         )}
       </Card>
 
+      <ConfirmDialog
+        open={receiptToCancel !== null}
+        variant="danger"
+        loading={cancelReceipt.isPending}
+        title={t('purchasing.cancel_receipt', { defaultValue: 'Cancel receipt' })}
+        message={t('purchasing.cancel_receipt_msg', {
+          defaultValue: 'Receipt {{number}} will be reversed: the journal entry, the received quantities and the stock it added.',
+          number: receiptToCancel?.number ?? '',
+        })}
+        onCancel={() => setReceiptToCancel(null)}
+        onConfirm={() => {
+          if (receiptToCancel) cancelReceipt.mutate(receiptToCancel.id);
+          setReceiptToCancel(null);
+        }}
+      />
       <ConfirmDialog
         open={confirmDelete}
         variant="danger"

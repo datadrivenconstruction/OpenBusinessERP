@@ -143,15 +143,15 @@ class ItemsService:
             data["currency"] = data["currency"].upper()
 
     def _stock_subq(self):  # noqa: ANN202
-        from app.modules.purchasing.models import PurchasingStock
+        from app.modules.inventory.models import StockMovement
 
-        stmt = select(PurchasingStock.item_id.label("item_id"), func.sum(PurchasingStock.qty).label("qty"))
+        stmt = select(StockMovement.item_id.label("item_id"), func.sum(StockMovement.qty).label("qty"))
         if self.tenant_id is not None:
-            stmt = stmt.where(PurchasingStock.tenant_id == self.tenant_id)
-        return stmt.group_by(PurchasingStock.item_id).subquery()
+            stmt = stmt.where(StockMovement.tenant_id == self.tenant_id)
+        return stmt.group_by(StockMovement.item_id).subquery()
 
     async def on_hand(self, item_ids: list[uuid.UUID]) -> dict[str, Decimal]:
-        """On-hand quantity from purchasing stock for the given items (missing = 0)."""
+        """On-hand quantity from the inventory movement ledger, all warehouses (missing = 0)."""
         if not item_ids:
             return {}
         sq = self._stock_subq()

@@ -9,8 +9,9 @@ from decimal import Decimal
 import pytest
 import pytest_asyncio
 
+from app.modules.inventory.models import StockMovement, Warehouse
 from app.modules.items.service import ItemsService, ItemsValidationError
-from app.modules.purchasing.models import PurchasingOrder, PurchasingOrderLine, PurchasingStock
+from app.modules.purchasing.models import PurchasingOrder, PurchasingOrderLine
 from app.modules.sales.models import SalesDocument, SalesLine
 from tests._pg import transactional_session
 
@@ -48,8 +49,15 @@ async def _seed(svc):
 
 async def test_stats_and_alerts(session, svc):
     a, b, _c = await _seed(svc)
-    session.add(PurchasingStock(tenant_id=T1, item_id=a.id, sku="A", qty=D("2")))
-    session.add(PurchasingStock(tenant_id=T2, item_id=a.id, sku="A", qty=D("50")))  # other tenant ignored
+    for tenant, qty in ((T1, "2"), (T2, "50")):  # other tenant ignored
+        wh = Warehouse(tenant_id=tenant, code="MAIN", name="Main", is_default=True)
+        session.add(wh)
+        await session.flush()
+        session.add(
+            StockMovement(
+                tenant_id=tenant, item_id=a.id, warehouse_id=wh.id, kind="opening", move_date=date.today(), qty=D(qty)
+            )
+        )
     await session.flush()
     st = await svc.stats()
     assert (st["active"], st["goods"], st["services"]) == (3, 2, 1)

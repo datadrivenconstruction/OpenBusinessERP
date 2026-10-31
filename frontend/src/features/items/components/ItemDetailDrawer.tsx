@@ -10,8 +10,10 @@ import { TYPE_VARIANT, itemsApi, marginPct, type Item } from '../api';
 import { stockLevel } from '../itemsLogic';
 import { ItemThumb, MarginText, TYPE_LABEL } from './ItemBits';
 import { fmtUpTo } from '@/shared/lib/formatters';
+import { inventoryApi } from '@/features/inventory/api';
+import { MovementTable } from '@/features/inventory/InventoryPage';
 
-type TabId = 'overview' | 'prices' | 'sales' | 'purchases' | 'activity';
+type TabId = 'overview' | 'stock' | 'prices' | 'sales' | 'purchases' | 'activity';
 
 interface Props {
   item: Item | null;
@@ -57,6 +59,7 @@ export function ItemDetailDrawer({ item, onHand, categoryName, onClose, onEdit, 
   const breaks = useQuery({ queryKey: ['items', 'breaks', id], queryFn: () => itemsApi.priceBreaks(id), enabled: !!item && (tab === 'prices' || tab === 'overview'), retry: false });
   const sales = useQuery({ queryKey: ['items', 'sales', id], queryFn: () => itemsApi.salesHistory(id), enabled: !!item && tab !== 'prices', retry: false });
   const buys = useQuery({ queryKey: ['items', 'purchases', id], queryFn: () => itemsApi.purchases(id), enabled: !!item && tab !== 'prices', retry: false });
+  const stock = useQuery({ queryKey: ['inventory', 'item', id], queryFn: () => inventoryApi.item(id), enabled: !!item?.stock_tracked && tab === 'stock', retry: false });
 
   if (!item) return null;
   const margin = marginPct(item.sales_price, item.purchase_cost);
@@ -79,6 +82,7 @@ export function ItemDetailDrawer({ item, onHand, categoryName, onClose, onEdit, 
 
   const tabs = [
     { id: 'overview' as const, label: t('items.tab_overview', { defaultValue: 'Overview' }) },
+    ...(item.stock_tracked ? [{ id: 'stock' as const, label: t('items.tab_stock', { defaultValue: 'Stock' }) }] : []),
     { id: 'prices' as const, label: t('items.tab_prices', { defaultValue: 'Price lists' }), badge: breaks.data?.length || undefined },
     { id: 'sales' as const, label: t('items.tab_sales', { defaultValue: 'Sales' }), badge: sales.data?.length || undefined },
     { id: 'purchases' as const, label: t('items.tab_purchases', { defaultValue: 'Purchases' }), badge: buys.data?.length || undefined },
@@ -166,6 +170,36 @@ export function ItemDetailDrawer({ item, onHand, categoryName, onClose, onEdit, 
                 <div className="mb-1 text-xs font-medium text-content-tertiary">{t('items.section_notes', { defaultValue: 'Notes' })}</div>
                 <p className="whitespace-pre-line">{item.notes}</p>
               </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'stock' && (
+          <div role="tabpanel" className="space-y-4">
+            {stock.data ? (
+              <>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <Stat label={t('inventory.on_hand', { defaultValue: 'On hand' })}>{qtyFmt(stock.data.on_hand)} <span className="text-xs font-normal text-content-tertiary">{item.uom}</span></Stat>
+                  <Stat label={t('inventory.reserved', { defaultValue: 'Reserved' })}>{qtyFmt(stock.data.reserved)}</Stat>
+                  <Stat label={t('inventory.available', { defaultValue: 'Available' })}>{qtyFmt(stock.data.available)}</Stat>
+                  <Stat label={t('inventory.avg_cost', { defaultValue: 'Avg. cost' })}><MoneyDisplay amount={stock.data.avg_cost} /></Stat>
+                </div>
+                <div className="rounded-lg border border-border-light px-3">
+                  {stock.data.warehouses.map((w) => (
+                    <Row key={w.warehouse_id} label={`${w.code} · ${w.name}`}>{`${qtyFmt(w.qty)} ${item.uom}`}</Row>
+                  ))}
+                </div>
+                {stock.data.movements.length ? (
+                  <div className="rounded-lg border border-border-light">
+                    <MovementTable rows={stock.data.movements} showItem={false} />
+                  </div>
+                ) : (
+                  <Empty>{t('inventory.no_item_moves', { defaultValue: 'No stock movements yet. Goods receipts, deliveries and adjustments appear here.' })}</Empty>
+                )}
+                <Link to="/inventory" className="text-sm text-oe-blue hover:underline">{t('inventory.open_inventory', { defaultValue: 'Open inventory' })} →</Link>
+              </>
+            ) : (
+              <Empty>{stock.isError ? t('inventory.load_error', { defaultValue: 'Stock could not be loaded.' }) : t('common.loading', { defaultValue: 'Loading…' })}</Empty>
             )}
           </div>
         )}

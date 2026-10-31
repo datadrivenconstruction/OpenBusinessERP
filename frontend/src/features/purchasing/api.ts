@@ -207,6 +207,7 @@ export const purchasingApi = {
     apiPost<Receipt>(`${B}/orders/${id}/receive/`, { lines: lines ?? null }),
   billFromOrder: (id: string) => apiPost<PurchasingDoc>(`${B}/orders/${id}/bill/`, {}),
   billFromReceipt: (id: string) => apiPost<PurchasingDoc>(`${B}/receipts/${id}/bill/`, {}),
+  cancelReceipt: (id: string) => apiPost<Receipt>(`${B}/receipts/${id}/cancel/`, {}),
   post: (kind: PurchasingKind, id: string) => apiPost<PurchasingDoc>(`${base(kind)}${id}/post/`, {}),
   cancel: (kind: PurchasingKind, id: string) => apiPost<PurchasingDoc>(`${base(kind)}${id}/cancel/`, {}),
   query: (kind: PurchasingKind, f: ListQuery) => getWithTotal<PurchasingDocSummary>(`${base(kind)}${listQueryString(f)}`),
