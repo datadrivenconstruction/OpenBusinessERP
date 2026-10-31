@@ -170088,7 +170088,9 @@
               "name": "last_document_id",
               "annotation": "Mapped[uuid.UUID | None]",
               "sql_type": "GUID",
-              "nullable": true
+              "nullable": true,
+              "is_fk": true,
+              "fk_target": "oe_sales_document.id"
             },
             {
               "name": "last_run_at",
@@ -170146,7 +170148,9 @@
               "name": "document_id",
               "annotation": "Mapped[uuid.UUID | None]",
               "sql_type": "GUID",
-              "nullable": true
+              "nullable": true,
+              "is_fk": true,
+              "fk_target": "oe_sales_document.id"
             },
             {
               "name": "document_number",
