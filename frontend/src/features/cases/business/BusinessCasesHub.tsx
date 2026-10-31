@@ -134,9 +134,9 @@ export function BusinessCasesHub({ caseId }: { caseId?: string }) {
           ))}
         </select>
         <div className="relative ml-auto min-w-[200px] max-w-md flex-1">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-content-tertiary" />
+          <Search size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-content-tertiary" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('bizcases.search', { defaultValue: 'Search cases' })}
-            className="h-9 w-full rounded-lg border border-border bg-surface-primary pl-8 pr-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue" />
+            className="h-9 w-full rounded-lg border border-border bg-surface-primary ps-8 pe-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue" />
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
