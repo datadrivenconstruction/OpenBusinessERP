@@ -13556,6 +13556,10 @@
             {
               "name": "amount",
               "type": "Decimal"
+            },
+            {
+              "name": "doc_amount",
+              "type": "Decimal | None"
             }
           ]
         },
@@ -108829,9 +108833,12 @@
       "module_category": "core",
       "files": [
         "__init__.py",
+        "exports.py",
+        "fx_posting.py",
         "manifest.py",
         "models.py",
         "permissions.py",
+        "repairs.py",
         "router.py",
         "schemas.py",
         "service.py",
@@ -109443,6 +109450,24 @@
           "path": "/attachments/{attachment_id}/",
           "handler": "delete_attachment",
           "request_schema": "GLService"
+        },
+        {
+          "method": "GET",
+          "path": "/export/settings/",
+          "handler": "get_export_settings",
+          "request_schema": "None"
+        },
+        {
+          "method": "PUT",
+          "path": "/export/settings/",
+          "handler": "put_export_settings",
+          "request_schema": "None"
+        },
+        {
+          "method": "GET",
+          "path": "/export/{fmt}/",
+          "handler": "export_file",
+          "request_schema": "date"
         }
       ],
       "schemas": [
@@ -109949,6 +109974,8 @@
         }
       ],
       "import_dependencies": [
+        "contacts",
+        "fx",
         "purchasing",
         "sales"
       ]
@@ -117849,6 +117876,1320 @@
       ]
     },
     {
+      "module_id": "inventory",
+      "module_label": "Inventory",
+      "module_category": "core",
+      "files": [
+        "__init__.py",
+        "manifest.py",
+        "models.py",
+        "permissions.py",
+        "router.py",
+        "schemas.py",
+        "service.py"
+      ],
+      "manifest": {
+        "name": "oe_inventory",
+        "version": "0.1.0",
+        "display_name": "Inventory",
+        "description": "Warehouses, stock movement ledger, moving-average valuation, transfers and stocktakes",
+        "author": "OpenBusinessERP Core Team",
+        "category": "core",
+        "depends": [
+          "oe_items"
+        ],
+        "auto_install": true,
+        "enabled": true
+      },
+      "models": [
+        {
+          "class_name": "Warehouse",
+          "tablename": "oe_inventory_warehouse",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "code",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "name",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "address",
+              "annotation": "Mapped[str]",
+              "sql_type": "Text",
+              "nullable": false
+            },
+            {
+              "name": "is_default",
+              "annotation": "Mapped[bool]",
+              "sql_type": "Boolean",
+              "nullable": false
+            },
+            {
+              "name": "active",
+              "annotation": "Mapped[bool]",
+              "sql_type": "Boolean",
+              "nullable": false
+            }
+          ],
+          "relationships": []
+        },
+        {
+          "class_name": "StockMovement",
+          "tablename": "oe_inventory_movement",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "item_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false
+            },
+            {
+              "name": "warehouse_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false,
+              "is_fk": true,
+              "fk_target": "oe_inventory_warehouse.id"
+            },
+            {
+              "name": "kind",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "move_date",
+              "annotation": "Mapped[date]",
+              "sql_type": "Date",
+              "nullable": false
+            },
+            {
+              "name": "qty",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "QTY",
+              "nullable": false
+            },
+            {
+              "name": "unit_cost",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "COST",
+              "nullable": false
+            },
+            {
+              "name": "value",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "MONEY",
+              "nullable": false
+            },
+            {
+              "name": "source_type",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "source_id",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "source_number",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "reversal_of_id",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "reversed",
+              "annotation": "Mapped[bool]",
+              "sql_type": "Boolean",
+              "nullable": false
+            },
+            {
+              "name": "transfer_group",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "gl_entry_id",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "notes",
+              "annotation": "Mapped[str]",
+              "sql_type": "Text",
+              "nullable": false
+            },
+            {
+              "name": "created_by",
+              "annotation": "Mapped[str | None]",
+              "sql_type": "String",
+              "nullable": true
+            }
+          ],
+          "relationships": []
+        },
+        {
+          "class_name": "ItemCost",
+          "tablename": "oe_inventory_item_cost",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "item_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false
+            },
+            {
+              "name": "qty",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "QTY",
+              "nullable": false
+            },
+            {
+              "name": "value",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "MONEY",
+              "nullable": false
+            },
+            {
+              "name": "avg_cost",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "COST",
+              "nullable": false
+            }
+          ],
+          "relationships": []
+        },
+        {
+          "class_name": "Stocktake",
+          "tablename": "oe_inventory_stocktake",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "number",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "warehouse_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false,
+              "is_fk": true,
+              "fk_target": "oe_inventory_warehouse.id"
+            },
+            {
+              "name": "status",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "count_date",
+              "annotation": "Mapped[date]",
+              "sql_type": "Date",
+              "nullable": false
+            },
+            {
+              "name": "notes",
+              "annotation": "Mapped[str]",
+              "sql_type": "Text",
+              "nullable": false
+            },
+            {
+              "name": "diff_value",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "MONEY",
+              "nullable": false
+            },
+            {
+              "name": "gl_entry_id",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "created_by",
+              "annotation": "Mapped[str | None]",
+              "sql_type": "String",
+              "nullable": true
+            }
+          ],
+          "relationships": [
+            {
+              "name": "lines",
+              "type": "one-to-many",
+              "annotation": "Mapped[list[StocktakeLine]]",
+              "back_populates": "stocktake"
+            }
+          ]
+        },
+        {
+          "class_name": "StocktakeLine",
+          "tablename": "oe_inventory_stocktake_line",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "stocktake_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false,
+              "is_fk": true,
+              "fk_target": "oe_inventory_stocktake.id"
+            },
+            {
+              "name": "line_no",
+              "annotation": "Mapped[int]",
+              "sql_type": "Integer",
+              "nullable": false
+            },
+            {
+              "name": "item_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false
+            },
+            {
+              "name": "sku",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "name",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "uom",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "expected_qty",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "QTY",
+              "nullable": false
+            },
+            {
+              "name": "counted_qty",
+              "annotation": "Mapped[Decimal | None]",
+              "sql_type": "QTY",
+              "nullable": true
+            },
+            {
+              "name": "unit_cost",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "COST",
+              "nullable": false
+            },
+            {
+              "name": "diff_qty",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "QTY",
+              "nullable": false
+            },
+            {
+              "name": "diff_value",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "MONEY",
+              "nullable": false
+            }
+          ],
+          "relationships": [
+            {
+              "name": "stocktake",
+              "type": "many-to-one",
+              "annotation": "Mapped[Stocktake]",
+              "target_model": "Stocktake",
+              "back_populates": "lines"
+            }
+          ]
+        },
+        {
+          "class_name": "InventorySettings",
+          "tablename": "oe_inventory_settings",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "allow_negative",
+              "annotation": "Mapped[bool]",
+              "sql_type": "Boolean",
+              "nullable": false
+            },
+            {
+              "name": "inventory_account",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "cogs_account",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "diff_account",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            }
+          ],
+          "relationships": []
+        }
+      ],
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/warehouses/",
+          "handler": "list_warehouses",
+          "response_model": "WarehouseListResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "POST",
+          "path": "/warehouses/",
+          "handler": "create_warehouse",
+          "response_model": "WarehouseResponse",
+          "request_schema": "WarehouseIn"
+        },
+        {
+          "method": "PATCH",
+          "path": "/warehouses/{wh_id}/",
+          "handler": "update_warehouse",
+          "response_model": "WarehouseResponse",
+          "request_schema": "WarehouseUpdate"
+        },
+        {
+          "method": "GET",
+          "path": "/summary/",
+          "handler": "summary",
+          "response_model": "InventorySummary",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "GET",
+          "path": "/stock/",
+          "handler": "stock_levels",
+          "response_model": "StockLevelListResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "GET",
+          "path": "/items/{item_id}/",
+          "handler": "item_stock",
+          "response_model": "ItemStock",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "GET",
+          "path": "/movements/",
+          "handler": "list_movements",
+          "response_model": "MovementPage",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "POST",
+          "path": "/transfers/",
+          "handler": "transfer",
+          "response_model": "list[MovementResponse]",
+          "request_schema": "TransferIn"
+        },
+        {
+          "method": "POST",
+          "path": "/adjustments/",
+          "handler": "adjust",
+          "response_model": "MovementResponse",
+          "request_schema": "AdjustmentIn"
+        },
+        {
+          "method": "GET",
+          "path": "/stocktakes/",
+          "handler": "list_stocktakes",
+          "response_model": "StocktakeListResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "POST",
+          "path": "/stocktakes/",
+          "handler": "create_stocktake",
+          "response_model": "StocktakeResponse",
+          "request_schema": "StocktakeCreate"
+        },
+        {
+          "method": "GET",
+          "path": "/stocktakes/{st_id}/",
+          "handler": "get_stocktake",
+          "response_model": "StocktakeResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "PUT",
+          "path": "/stocktakes/{st_id}/counts/",
+          "handler": "update_counts",
+          "response_model": "StocktakeResponse",
+          "request_schema": "CountsIn"
+        },
+        {
+          "method": "POST",
+          "path": "/stocktakes/{st_id}/post/",
+          "handler": "post_stocktake",
+          "response_model": "StocktakeResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "POST",
+          "path": "/stocktakes/{st_id}/cancel/",
+          "handler": "cancel_stocktake",
+          "response_model": "StocktakeResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "DELETE",
+          "path": "/stocktakes/{st_id}/",
+          "handler": "delete_stocktake",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "GET",
+          "path": "/settings/",
+          "handler": "get_settings",
+          "response_model": "SettingsResponse",
+          "request_schema": "Svc"
+        },
+        {
+          "method": "PUT",
+          "path": "/settings/",
+          "handler": "put_settings",
+          "response_model": "SettingsResponse",
+          "request_schema": "SettingsIO"
+        }
+      ],
+      "schemas": [
+        {
+          "class_name": "WarehouseIn",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "code",
+              "type": "str"
+            },
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "address",
+              "type": "str",
+              "default": "''"
+            },
+            {
+              "name": "is_default",
+              "type": "bool",
+              "default": "False"
+            }
+          ]
+        },
+        {
+          "class_name": "WarehouseUpdate",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "code",
+              "type": "str | None"
+            },
+            {
+              "name": "name",
+              "type": "str | None"
+            },
+            {
+              "name": "address",
+              "type": "str | None",
+              "default": "None"
+            },
+            {
+              "name": "is_default",
+              "type": "bool | None",
+              "default": "None"
+            },
+            {
+              "name": "active",
+              "type": "bool | None",
+              "default": "None"
+            }
+          ]
+        },
+        {
+          "class_name": "WarehouseResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "code",
+              "type": "str"
+            },
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "address",
+              "type": "str"
+            },
+            {
+              "name": "is_default",
+              "type": "bool"
+            },
+            {
+              "name": "active",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "class_name": "MovementRow",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "sku",
+              "type": "str"
+            },
+            {
+              "name": "item_name",
+              "type": "str"
+            },
+            {
+              "name": "uom",
+              "type": "str"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "warehouse_code",
+              "type": "str"
+            },
+            {
+              "name": "kind",
+              "type": "str"
+            },
+            {
+              "name": "move_date",
+              "type": "date"
+            },
+            {
+              "name": "qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "unit_cost",
+              "type": "Decimal"
+            },
+            {
+              "name": "value",
+              "type": "Decimal"
+            },
+            {
+              "name": "source_type",
+              "type": "str"
+            },
+            {
+              "name": "source_id",
+              "type": "str"
+            },
+            {
+              "name": "source_number",
+              "type": "str"
+            },
+            {
+              "name": "reversal_of_id",
+              "type": "uuid.UUID | None"
+            },
+            {
+              "name": "reversed",
+              "type": "bool"
+            },
+            {
+              "name": "gl_entry_id",
+              "type": "uuid.UUID | None"
+            },
+            {
+              "name": "notes",
+              "type": "str"
+            },
+            {
+              "name": "created_at",
+              "type": "datetime"
+            }
+          ]
+        },
+        {
+          "class_name": "MovementPage",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "list[MovementRow]"
+            },
+            {
+              "name": "total",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "class_name": "MovementResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "kind",
+              "type": "str"
+            },
+            {
+              "name": "move_date",
+              "type": "date"
+            },
+            {
+              "name": "qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "unit_cost",
+              "type": "Decimal"
+            },
+            {
+              "name": "value",
+              "type": "Decimal"
+            },
+            {
+              "name": "gl_entry_id",
+              "type": "uuid.UUID | None"
+            }
+          ]
+        },
+        {
+          "class_name": "TransferIn",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "from_warehouse_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "to_warehouse_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "move_date",
+              "type": "date | None",
+              "default": "None"
+            },
+            {
+              "name": "notes",
+              "type": "str",
+              "default": "''"
+            }
+          ]
+        },
+        {
+          "class_name": "AdjustmentIn",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID | None",
+              "default": "None"
+            },
+            {
+              "name": "kind",
+              "type": "Literal['adjustment', 'opening']",
+              "default": "'adjustment'"
+            },
+            {
+              "name": "qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "unit_cost",
+              "type": "Decimal | None"
+            },
+            {
+              "name": "move_date",
+              "type": "date | None",
+              "default": "None"
+            },
+            {
+              "name": "notes",
+              "type": "str",
+              "default": "''"
+            }
+          ]
+        },
+        {
+          "class_name": "StockLevel",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "sku",
+              "type": "str"
+            },
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "uom",
+              "type": "str"
+            },
+            {
+              "name": "active",
+              "type": "bool"
+            },
+            {
+              "name": "on_hand",
+              "type": "Decimal"
+            },
+            {
+              "name": "by_warehouse",
+              "type": "dict[str, Decimal]"
+            },
+            {
+              "name": "reserved",
+              "type": "Decimal"
+            },
+            {
+              "name": "available",
+              "type": "Decimal"
+            },
+            {
+              "name": "avg_cost",
+              "type": "Decimal"
+            },
+            {
+              "name": "value",
+              "type": "Decimal"
+            },
+            {
+              "name": "min_stock",
+              "type": "Decimal"
+            },
+            {
+              "name": "reorder_qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "below_min",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "class_name": "ItemWarehouseQty",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "code",
+              "type": "str"
+            },
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "qty",
+              "type": "Decimal"
+            }
+          ]
+        },
+        {
+          "class_name": "ItemStock",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "stock_tracked",
+              "type": "bool"
+            },
+            {
+              "name": "on_hand",
+              "type": "Decimal"
+            },
+            {
+              "name": "reserved",
+              "type": "Decimal"
+            },
+            {
+              "name": "available",
+              "type": "Decimal"
+            },
+            {
+              "name": "avg_cost",
+              "type": "Decimal"
+            },
+            {
+              "name": "value",
+              "type": "Decimal"
+            },
+            {
+              "name": "warehouses",
+              "type": "list[ItemWarehouseQty]"
+            },
+            {
+              "name": "movements",
+              "type": "list[MovementRow]"
+            },
+            {
+              "name": "movement_count",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "class_name": "StocktakeCreate",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID | None",
+              "default": "None"
+            },
+            {
+              "name": "count_date",
+              "type": "date | None",
+              "default": "None"
+            },
+            {
+              "name": "item_ids",
+              "type": "list[uuid.UUID] | None",
+              "default": "None"
+            },
+            {
+              "name": "notes",
+              "type": "str",
+              "default": "''"
+            }
+          ]
+        },
+        {
+          "class_name": "CountIn",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "line_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "counted_qty",
+              "type": "Decimal | None"
+            }
+          ]
+        },
+        {
+          "class_name": "CountsIn",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "counts",
+              "type": "list[CountIn]"
+            },
+            {
+              "name": "notes",
+              "type": "str | None",
+              "default": "None"
+            }
+          ]
+        },
+        {
+          "class_name": "StocktakeLineResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "line_no",
+              "type": "int"
+            },
+            {
+              "name": "item_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "sku",
+              "type": "str"
+            },
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "uom",
+              "type": "str"
+            },
+            {
+              "name": "expected_qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "counted_qty",
+              "type": "Decimal | None"
+            },
+            {
+              "name": "unit_cost",
+              "type": "Decimal"
+            },
+            {
+              "name": "diff_qty",
+              "type": "Decimal"
+            },
+            {
+              "name": "diff_value",
+              "type": "Decimal"
+            }
+          ]
+        },
+        {
+          "class_name": "StocktakeResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "number",
+              "type": "str"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "status",
+              "type": "str"
+            },
+            {
+              "name": "count_date",
+              "type": "date"
+            },
+            {
+              "name": "notes",
+              "type": "str"
+            },
+            {
+              "name": "diff_value",
+              "type": "Decimal"
+            },
+            {
+              "name": "gl_entry_id",
+              "type": "uuid.UUID | None"
+            },
+            {
+              "name": "created_at",
+              "type": "datetime"
+            },
+            {
+              "name": "lines",
+              "type": "list[StocktakeLineResponse]"
+            }
+          ]
+        },
+        {
+          "class_name": "SettingsIO",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "allow_negative",
+              "type": "bool | None",
+              "default": "None"
+            },
+            {
+              "name": "inventory_account",
+              "type": "str | None"
+            },
+            {
+              "name": "cogs_account",
+              "type": "str | None"
+            },
+            {
+              "name": "diff_account",
+              "type": "str | None"
+            }
+          ]
+        },
+        {
+          "class_name": "SettingsResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "allow_negative",
+              "type": "bool"
+            },
+            {
+              "name": "inventory_account",
+              "type": "str"
+            },
+            {
+              "name": "cogs_account",
+              "type": "str"
+            },
+            {
+              "name": "diff_account",
+              "type": "str"
+            },
+            {
+              "name": "effective",
+              "type": "dict[str, str | None]"
+            }
+          ]
+        },
+        {
+          "class_name": "InventorySummary",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "int"
+            },
+            {
+              "name": "total_value",
+              "type": "Decimal"
+            },
+            {
+              "name": "below_min",
+              "type": "int"
+            },
+            {
+              "name": "out_of_stock",
+              "type": "int"
+            },
+            {
+              "name": "reserved_items",
+              "type": "int"
+            },
+            {
+              "name": "warehouses",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "class_name": "WarehouseListResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "list[WarehouseResponse]"
+            },
+            {
+              "name": "total",
+              "type": "int"
+            },
+            {
+              "name": "offset",
+              "type": "int",
+              "default": "0"
+            },
+            {
+              "name": "limit",
+              "type": "int",
+              "default": "50"
+            }
+          ]
+        },
+        {
+          "class_name": "StockLevelListResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "list[StockLevel]"
+            },
+            {
+              "name": "total",
+              "type": "int"
+            },
+            {
+              "name": "offset",
+              "type": "int",
+              "default": "0"
+            },
+            {
+              "name": "limit",
+              "type": "int",
+              "default": "50"
+            }
+          ]
+        },
+        {
+          "class_name": "StocktakeListResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "list[StocktakeResponse]"
+            },
+            {
+              "name": "total",
+              "type": "int"
+            },
+            {
+              "name": "offset",
+              "type": "int",
+              "default": "0"
+            },
+            {
+              "name": "limit",
+              "type": "int",
+              "default": "50"
+            }
+          ]
+        }
+      ],
+      "import_dependencies": [
+        "gl",
+        "items",
+        "purchasing",
+        "sales"
+      ]
+    },
+    {
       "module_id": "items",
       "module_label": "Products & services",
       "module_category": "core",
@@ -119334,6 +120675,7 @@
         }
       ],
       "import_dependencies": [
+        "inventory",
         "purchasing",
         "sales"
       ]
@@ -161234,6 +162576,13 @@
         },
         {
           "method": "POST",
+          "path": "/receipts/{receipt_id}/cancel/",
+          "handler": "cancel_receipt",
+          "response_model": "ReceiptResponse",
+          "request_schema": "PurchasingService"
+        },
+        {
+          "method": "POST",
           "path": "/receipts/{receipt_id}/bill/",
           "handler": "bill_from_receipt",
           "response_model": "BillResponse",
@@ -161531,6 +162880,11 @@
               "name": "notes",
               "type": "str",
               "default": "''"
+            },
+            {
+              "name": "warehouse_id",
+              "type": "uuid.UUID | None",
+              "default": "None"
             }
           ]
         },
@@ -161557,6 +162911,14 @@
             {
               "name": "reference",
               "type": "str"
+            },
+            {
+              "name": "fx_rate",
+              "type": "Decimal | None"
+            },
+            {
+              "name": "base_amount",
+              "type": "Decimal | None"
             }
           ]
         },
@@ -162279,6 +163641,7 @@
       ],
       "import_dependencies": [
         "gl",
+        "inventory",
         "items",
         "sales"
       ]
@@ -167356,6 +168719,18 @@
               "annotation": "Mapped[datetime | None]",
               "sql_type": "DateTime",
               "nullable": true
+            },
+            {
+              "name": "sent_at",
+              "annotation": "Mapped[datetime | None]",
+              "sql_type": "DateTime",
+              "nullable": true
+            },
+            {
+              "name": "sent_to",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
             }
           ],
           "relationships": [
@@ -167543,6 +168918,13 @@
           "handler": "decide",
           "response_model": "S.LetterOut",
           "request_schema": "S.DecisionIn"
+        },
+        {
+          "method": "POST",
+          "path": "/letters/{letter_id}/send/",
+          "handler": "send_letter",
+          "response_model": "S.LetterSendOut",
+          "request_schema": "S.LetterSendIn"
         },
         {
           "method": "GET",
@@ -167768,6 +169150,16 @@
             {
               "name": "decided_at",
               "type": "datetime | None"
+            },
+            {
+              "name": "sent_at",
+              "type": "datetime | None",
+              "default": "None"
+            },
+            {
+              "name": "sent_to",
+              "type": "str",
+              "default": "''"
             }
           ]
         },
@@ -167790,6 +169182,44 @@
             {
               "name": "channel",
               "type": "str | None"
+            }
+          ]
+        },
+        {
+          "class_name": "LetterSendIn",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "to",
+              "type": "str | None"
+            },
+            {
+              "name": "cc",
+              "type": "list[str]"
+            }
+          ]
+        },
+        {
+          "class_name": "LetterSendOut",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "letter",
+              "type": "LetterOut"
+            },
+            {
+              "name": "ok",
+              "type": "bool"
+            },
+            {
+              "name": "reason",
+              "type": "str"
             }
           ]
         },
@@ -168476,6 +169906,753 @@
         "file_transmittals",
         "meetings",
         "projects"
+      ]
+    },
+    {
+      "module_id": "recurring",
+      "module_label": "Recurring invoices",
+      "module_category": "core",
+      "files": [
+        "__init__.py",
+        "manifest.py",
+        "models.py",
+        "router.py",
+        "scheduler.py",
+        "schemas.py",
+        "service.py"
+      ],
+      "manifest": {
+        "name": "oe_recurring",
+        "version": "0.1.0",
+        "display_name": "Recurring invoices",
+        "description": "Subscription and contract templates that generate sales invoices on a schedule",
+        "author": "OpenBusinessERP Core Team",
+        "category": "core",
+        "depends": [
+          "oe_sales"
+        ],
+        "auto_install": true,
+        "enabled": true
+      },
+      "models": [
+        {
+          "class_name": "RecurringInvoice",
+          "tablename": "oe_recurring_invoice",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "tenant_id",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "name",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "status",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "customer_id",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "customer_name",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "customer_email",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "customer_address",
+              "annotation": "Mapped[str]",
+              "sql_type": "Text",
+              "nullable": false
+            },
+            {
+              "name": "currency",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "lines",
+              "annotation": "Mapped[list]",
+              "sql_type": "JSON",
+              "nullable": false
+            },
+            {
+              "name": "net_total",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "Numeric",
+              "nullable": false
+            },
+            {
+              "name": "gross_total",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "Numeric",
+              "nullable": false
+            },
+            {
+              "name": "notes",
+              "annotation": "Mapped[str]",
+              "sql_type": "Text",
+              "nullable": false
+            },
+            {
+              "name": "interval",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "interval_count",
+              "annotation": "Mapped[int]",
+              "sql_type": "Integer",
+              "nullable": false
+            },
+            {
+              "name": "start_date",
+              "annotation": "Mapped[date]",
+              "sql_type": "Date",
+              "nullable": false
+            },
+            {
+              "name": "end_date",
+              "annotation": "Mapped[date | None]",
+              "sql_type": "Date",
+              "nullable": true
+            },
+            {
+              "name": "max_count",
+              "annotation": "Mapped[int | None]",
+              "sql_type": "Integer",
+              "nullable": true
+            },
+            {
+              "name": "day_of_month",
+              "annotation": "Mapped[int | None]",
+              "sql_type": "Integer",
+              "nullable": true
+            },
+            {
+              "name": "payment_terms_days",
+              "annotation": "Mapped[int]",
+              "sql_type": "Integer",
+              "nullable": false
+            },
+            {
+              "name": "period_index",
+              "annotation": "Mapped[int]",
+              "sql_type": "Integer",
+              "nullable": false
+            },
+            {
+              "name": "generated_count",
+              "annotation": "Mapped[int]",
+              "sql_type": "Integer",
+              "nullable": false
+            },
+            {
+              "name": "next_run_date",
+              "annotation": "Mapped[date | None]",
+              "sql_type": "Date",
+              "nullable": true
+            },
+            {
+              "name": "auto_issue",
+              "annotation": "Mapped[bool]",
+              "sql_type": "Boolean",
+              "nullable": false
+            },
+            {
+              "name": "auto_send",
+              "annotation": "Mapped[bool]",
+              "sql_type": "Boolean",
+              "nullable": false
+            },
+            {
+              "name": "last_document_id",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "last_run_at",
+              "annotation": "Mapped[datetime | None]",
+              "sql_type": "DateTime",
+              "nullable": true
+            },
+            {
+              "name": "last_error",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "tag",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "created_by",
+              "annotation": "Mapped[str | None]",
+              "sql_type": "String",
+              "nullable": true
+            }
+          ],
+          "relationships": []
+        },
+        {
+          "class_name": "RecurringRun",
+          "tablename": "oe_recurring_run",
+          "docstring": "",
+          "columns": [
+            {
+              "name": "tenant_id",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "template_id",
+              "annotation": "Mapped[uuid.UUID]",
+              "sql_type": "GUID",
+              "nullable": false,
+              "is_fk": true,
+              "fk_target": "oe_recurring_invoice.id"
+            },
+            {
+              "name": "period_date",
+              "annotation": "Mapped[date]",
+              "sql_type": "Date",
+              "nullable": false
+            },
+            {
+              "name": "document_id",
+              "annotation": "Mapped[uuid.UUID | None]",
+              "sql_type": "GUID",
+              "nullable": true
+            },
+            {
+              "name": "document_number",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "gross_total",
+              "annotation": "Mapped[Decimal]",
+              "sql_type": "Numeric",
+              "nullable": false
+            },
+            {
+              "name": "status",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "detail",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            },
+            {
+              "name": "trigger",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
+            }
+          ],
+          "relationships": []
+        }
+      ],
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/",
+          "handler": "list_templates",
+          "response_model": "RecurringPage",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "POST",
+          "path": "/",
+          "handler": "create_template",
+          "response_model": "RecurringResponse",
+          "request_schema": "RecurringCreate"
+        },
+        {
+          "method": "GET",
+          "path": "/summary/",
+          "handler": "summary",
+          "response_model": "RecurringSummary",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "POST",
+          "path": "/run-due/",
+          "handler": "run_due",
+          "response_model": "list[GenerateResponse]",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "GET",
+          "path": "/{template_id}/",
+          "handler": "get_template",
+          "response_model": "RecurringResponse",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "PATCH",
+          "path": "/{template_id}/",
+          "handler": "update_template",
+          "response_model": "RecurringResponse",
+          "request_schema": "RecurringUpdate"
+        },
+        {
+          "method": "DELETE",
+          "path": "/{template_id}/",
+          "handler": "delete_template",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "POST",
+          "path": "/{template_id}/pause/",
+          "handler": "pause_template",
+          "response_model": "RecurringResponse",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "POST",
+          "path": "/{template_id}/resume/",
+          "handler": "resume_template",
+          "response_model": "RecurringResponse",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "POST",
+          "path": "/{template_id}/generate/",
+          "handler": "generate_now",
+          "response_model": "GenerateResponse",
+          "request_schema": "RecurringService"
+        },
+        {
+          "method": "GET",
+          "path": "/{template_id}/runs/",
+          "handler": "list_runs",
+          "response_model": "RecurringRunPage",
+          "request_schema": "RecurringService"
+        }
+      ],
+      "schemas": [
+        {
+          "class_name": "RecurringBase",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "customer_id",
+              "type": "uuid.UUID | None",
+              "default": "None"
+            },
+            {
+              "name": "customer_name",
+              "type": "str"
+            },
+            {
+              "name": "customer_email",
+              "type": "str"
+            },
+            {
+              "name": "customer_address",
+              "type": "str"
+            },
+            {
+              "name": "currency",
+              "type": "str"
+            },
+            {
+              "name": "notes",
+              "type": "str",
+              "default": "''"
+            },
+            {
+              "name": "interval",
+              "type": "Interval",
+              "default": "'monthly'"
+            },
+            {
+              "name": "interval_count",
+              "type": "int"
+            },
+            {
+              "name": "start_date",
+              "type": "date"
+            },
+            {
+              "name": "end_date",
+              "type": "date | None",
+              "default": "None"
+            },
+            {
+              "name": "max_count",
+              "type": "int | None"
+            },
+            {
+              "name": "day_of_month",
+              "type": "int | None"
+            },
+            {
+              "name": "payment_terms_days",
+              "type": "int"
+            },
+            {
+              "name": "auto_issue",
+              "type": "bool",
+              "default": "True"
+            },
+            {
+              "name": "auto_send",
+              "type": "bool",
+              "default": "False"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringCreate",
+          "bases": [
+            "RecurringBase"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "lines",
+              "type": "list[LineIn]"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringUpdate",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "name",
+              "type": "str | None"
+            },
+            {
+              "name": "customer_id",
+              "type": "uuid.UUID | None",
+              "default": "None"
+            },
+            {
+              "name": "customer_name",
+              "type": "str | None"
+            },
+            {
+              "name": "customer_email",
+              "type": "str | None"
+            },
+            {
+              "name": "customer_address",
+              "type": "str | None"
+            },
+            {
+              "name": "currency",
+              "type": "str | None"
+            },
+            {
+              "name": "notes",
+              "type": "str | None",
+              "default": "None"
+            },
+            {
+              "name": "interval",
+              "type": "Interval | None",
+              "default": "None"
+            },
+            {
+              "name": "interval_count",
+              "type": "int | None"
+            },
+            {
+              "name": "start_date",
+              "type": "date | None",
+              "default": "None"
+            },
+            {
+              "name": "end_date",
+              "type": "date | None",
+              "default": "None"
+            },
+            {
+              "name": "max_count",
+              "type": "int | None"
+            },
+            {
+              "name": "day_of_month",
+              "type": "int | None"
+            },
+            {
+              "name": "payment_terms_days",
+              "type": "int | None"
+            },
+            {
+              "name": "auto_issue",
+              "type": "bool | None",
+              "default": "None"
+            },
+            {
+              "name": "auto_send",
+              "type": "bool | None",
+              "default": "None"
+            },
+            {
+              "name": "lines",
+              "type": "list[LineIn] | None",
+              "default": "None"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringResponse",
+          "bases": [
+            "RecurringBase"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "status",
+              "type": "str"
+            },
+            {
+              "name": "lines",
+              "type": "list[dict[str, Any]]"
+            },
+            {
+              "name": "net_total",
+              "type": "Decimal"
+            },
+            {
+              "name": "gross_total",
+              "type": "Decimal"
+            },
+            {
+              "name": "next_run_date",
+              "type": "date | None"
+            },
+            {
+              "name": "generated_count",
+              "type": "int"
+            },
+            {
+              "name": "last_document_id",
+              "type": "uuid.UUID | None"
+            },
+            {
+              "name": "last_run_at",
+              "type": "datetime | None"
+            },
+            {
+              "name": "last_error",
+              "type": "str"
+            },
+            {
+              "name": "created_at",
+              "type": "datetime"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringRunResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "period_date",
+              "type": "date"
+            },
+            {
+              "name": "document_id",
+              "type": "uuid.UUID | None"
+            },
+            {
+              "name": "document_number",
+              "type": "str"
+            },
+            {
+              "name": "gross_total",
+              "type": "Decimal"
+            },
+            {
+              "name": "status",
+              "type": "str"
+            },
+            {
+              "name": "detail",
+              "type": "str"
+            },
+            {
+              "name": "trigger",
+              "type": "str"
+            },
+            {
+              "name": "created_at",
+              "type": "datetime"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringPage",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "list[RecurringResponse]"
+            },
+            {
+              "name": "total",
+              "type": "int"
+            },
+            {
+              "name": "offset",
+              "type": "int"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringRunPage",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "items",
+              "type": "list[RecurringRunResponse]"
+            },
+            {
+              "name": "total",
+              "type": "int"
+            },
+            {
+              "name": "offset",
+              "type": "int"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "class_name": "GenerateResponse",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "template_id",
+              "type": "uuid.UUID"
+            },
+            {
+              "name": "period_date",
+              "type": "date | None"
+            },
+            {
+              "name": "document_id",
+              "type": "uuid.UUID | None"
+            },
+            {
+              "name": "status",
+              "type": "str"
+            },
+            {
+              "name": "detail",
+              "type": "str",
+              "default": "''"
+            }
+          ]
+        },
+        {
+          "class_name": "RecurringSummary",
+          "bases": [
+            "BaseModel"
+          ],
+          "docstring": "",
+          "fields": [
+            {
+              "name": "active",
+              "type": "int"
+            },
+            {
+              "name": "paused",
+              "type": "int"
+            },
+            {
+              "name": "ended",
+              "type": "int"
+            },
+            {
+              "name": "due_next_7_days",
+              "type": "int"
+            },
+            {
+              "name": "mrr",
+              "type": "dict[str, str]"
+            },
+            {
+              "name": "arr",
+              "type": "dict[str, str]"
+            }
+          ]
+        }
+      ],
+      "import_dependencies": [
+        "gl",
+        "sales"
       ]
     },
     {
@@ -182266,6 +184443,18 @@
               "annotation": "Mapped[str | None]",
               "sql_type": "String",
               "nullable": true
+            },
+            {
+              "name": "sent_at",
+              "annotation": "Mapped[datetime | None]",
+              "sql_type": "DateTime",
+              "nullable": true
+            },
+            {
+              "name": "sent_to",
+              "annotation": "Mapped[str]",
+              "sql_type": "String",
+              "nullable": false
             }
           ],
           "relationships": [
@@ -182970,6 +185159,14 @@
             {
               "name": "reference",
               "type": "str"
+            },
+            {
+              "name": "fx_rate",
+              "type": "Decimal | None"
+            },
+            {
+              "name": "base_amount",
+              "type": "Decimal | None"
             }
           ]
         },
@@ -183169,6 +185366,16 @@
               "type": "str"
             },
             {
+              "name": "sent_at",
+              "type": "datetime | None",
+              "default": "None"
+            },
+            {
+              "name": "sent_to",
+              "type": "str",
+              "default": "''"
+            },
+            {
               "name": "lines",
               "type": "list[LineResponse]"
             },
@@ -183324,6 +185531,11 @@
             {
               "name": "issues",
               "type": "list[InvoiceCheckIssue]"
+            },
+            {
+              "name": "mail_configured",
+              "type": "bool",
+              "default": "False"
             }
           ]
         },
@@ -183535,7 +185747,8 @@
         }
       ],
       "import_dependencies": [
-        "gl"
+        "gl",
+        "inventory"
       ]
     },
     {
@@ -229911,10 +232124,10 @@
     },
     {
       "name": "accounting",
-      "ts_files": 12,
+      "ts_files": 13,
       "css_files": 0,
       "test_files": 1,
-      "total_files": 12
+      "total_files": 13
     },
     {
       "name": "admin",
@@ -230582,6 +232795,13 @@
       "total_files": 4
     },
     {
+      "name": "inventory",
+      "ts_files": 4,
+      "css_files": 0,
+      "test_files": 0,
+      "total_files": 4
+    },
+    {
       "name": "issues",
       "ts_files": 4,
       "css_files": 0,
@@ -230947,10 +233167,10 @@
     },
     {
       "name": "sales",
-      "ts_files": 38,
+      "ts_files": 40,
       "css_files": 0,
       "test_files": 4,
-      "total_files": 38
+      "total_files": 40
     },
     {
       "name": "saved-views",
@@ -230989,10 +233209,10 @@
     },
     {
       "name": "settings",
-      "ts_files": 35,
+      "ts_files": 36,
       "css_files": 0,
       "test_files": 13,
-      "total_files": 35
+      "total_files": 36
     },
     {
       "name": "signing",
@@ -231812,6 +234032,8 @@
     ],
     "fx": [],
     "gl": [
+      "contacts",
+      "fx",
       "purchasing",
       "sales"
     ],
@@ -231856,7 +234078,14 @@
       "rfi",
       "subcontractors"
     ],
+    "inventory": [
+      "gl",
+      "items",
+      "purchasing",
+      "sales"
+    ],
     "items": [
+      "inventory",
       "purchasing",
       "sales"
     ],
@@ -232114,6 +234343,7 @@
     ],
     "purchasing": [
       "gl",
+      "inventory",
       "items",
       "sales"
     ],
@@ -232149,6 +234379,10 @@
       "meetings",
       "projects",
       "users"
+    ],
+    "recurring": [
+      "gl",
+      "sales"
     ],
     "reporting": [
       "ai_agents",
@@ -232231,7 +234465,8 @@
       "users"
     ],
     "sales": [
-      "gl"
+      "gl",
+      "inventory"
     ],
     "saved_views": [
       "boq",
@@ -232429,17 +234664,17 @@
     ]
   },
   "statistics": {
-    "backend_modules": 190,
-    "modules_with_manifests": 188,
-    "total_models": 642,
-    "total_columns": 7213,
-    "total_relationships": 244,
-    "total_routes": 3646,
-    "total_schemas": 3469,
-    "total_python_files": 2193,
-    "frontend_features": 185,
-    "frontend_ts_files": 2495,
-    "frontend_backend_mapped": 163
+    "backend_modules": 192,
+    "modules_with_manifests": 190,
+    "total_models": 650,
+    "total_columns": 7303,
+    "total_relationships": 246,
+    "total_routes": 3680,
+    "total_schemas": 3502,
+    "total_python_files": 2210,
+    "frontend_features": 186,
+    "frontend_ts_files": 2503,
+    "frontend_backend_mapped": 164
   },
   "frontend_backend_mapping": {
     "about": null,
@@ -232540,6 +234775,7 @@
     "inspections": "inspections",
     "integrations": "integrations",
     "interface-management": "interface_management",
+    "inventory": "inventory",
     "issues": null,
     "items": "items",
     "jobs": "jobs",

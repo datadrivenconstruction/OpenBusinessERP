@@ -136,6 +136,11 @@ async def test_case_seeds_balanced_and_idempotent(session, monkeypatch, key):
         assert len(stock) == len(ids) and all(q > 0 for q in stock.values())
         mins = {str(i): m for i, m in (await session.execute(select(Item.id, Item.min_stock).where(Item.id.in_(ids))))}
         assert sum(stock[i] < mins[i] for i in stock) == 2
+        from app.modules.inventory.models import StockMovement, Warehouse
+
+        kinds = set((await session.execute(select(StockMovement.kind))).scalars())
+        assert {"receipt", "transfer_in", "transfer_out"} <= kinds, kinds
+        assert await session.scalar(select(func.count()).select_from(Warehouse)) == 2
     n_docs = await session.scalar(select(func.count()).select_from(SalesDocument))
     n_acc = await session.scalar(select(func.count()).select_from(Account))
     again = await install_business_demo(session, key, owner_id=owner.id, today=TODAY)
@@ -158,6 +163,7 @@ async def test_reinstall_replaces_case(session, monkeypatch):
     assert await session.scalar(select(func.count()).select_from(Account)) == first["customers"] + first["suppliers"]
     assert await installed_cases(session) == [key]
     assert again["removed"]["p2p_orders"] == 4 and again["p2p_orders"] == 4
+    assert again["removed"]["stock_movements"] > 0
     tb = await GLService(session).trial_balance(None, None)
     assert tb["balanced"]
 

@@ -36,6 +36,7 @@ import { useViewModeDefault } from './layout/useViewModeDefault';
 import { ddcVerifyIntegrity, ddcInjectMeta, DDC_ORIGIN } from '@/shared/lib/ddc-integrity';
 import { NavigationProgress } from '@/shared/lib/navigationProgress';
 import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts';
+import { useIsBusinessCompany } from '@/app/layout/useCompanyWorkspace';
 import { useTranslation } from 'react-i18next';
 import { ProjectRouteGate } from './ProjectRouteGate';
 import { getLanguageByCode } from './i18n';
@@ -415,8 +416,14 @@ const ItemDetailPage = lazy(() =>
 const PriceListsPage = lazy(() =>
   import('@/features/items').then((m) => ({ default: m.PriceListsPage }))
 );
+const InventoryPage = lazy(() =>
+  import('@/features/inventory').then((m) => ({ default: m.InventoryPage }))
+);
 const SalesListPage = lazy(() =>
   import('@/features/sales').then((m) => ({ default: m.SalesListPage }))
+);
+const RecurringInvoicesPage = lazy(() =>
+  import('@/features/sales').then((m) => ({ default: m.RecurringInvoicesPage }))
 );
 const AppointmentsPage = lazy(() =>
   import('@/features/appointments').then((m) => ({ default: m.AppointmentsPage }))
@@ -879,9 +886,11 @@ function GlobalShortcuts() {
   // listener, so we pass a no-op here to avoid duplicate triggers.
   const noop = useCallback(() => {}, []);
 
+  const isBusinessCompany = useIsBusinessCompany();
   useKeyboardShortcuts({
     onOpenSearch: noop,
     onToggleShortcutsDialog: handleToggleShortcuts,
+    business: isBusinessCompany,
   });
 
   // Ctrl+K / Cmd+K to open command palette
@@ -1572,10 +1581,12 @@ export default function App() {
         <Route path="/import" element={<P title="Import data"><ImportPage /></P>} />
         <Route path="/items" element={<P title="Products & services"><ItemsListPage /></P>} />
         <Route path="/items/price-lists" element={<P title="Price lists"><PriceListsPage /></P>} />
+        <Route path="/inventory" element={<P title="Inventory"><InventoryPage /></P>} />
         <Route path="/items/new" element={<P title="New item"><ItemDetailPage /></P>} />
         <Route path="/items/:id" element={<P title="Item"><ItemDetailPage /></P>} />
         <Route path="/appointments" element={<P title="Appointments"><AppointmentsPage /></P>} />
         <Route path="/sales" element={<P title="Sales"><SalesListPage /></P>} />
+        <Route path="/sales/recurring" element={<P title="Recurring invoices"><RecurringInvoicesPage /></P>} />
         <Route path="/sales/quotes/new" element={<P title="New quote"><SalesDocumentPage /></P>} />
         <Route path="/sales/:kind/:id" element={<P title="Sales document"><SalesDocumentPage /></P>} />
         <Route path="/banking" element={<P title="Banking"><BankingPage /></P>} />

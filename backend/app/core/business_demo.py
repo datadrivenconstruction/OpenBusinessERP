@@ -1920,6 +1920,7 @@ async def install_business_demo(
     tenant = tenant_id or DEFAULT_TENANT
     if case_key in await installed_cases(session, tenant):
         if not await _install_is_stale(session, case, tenant):
+            await _seed_recurring(session, case, tenant, date.today(), None)
             return {"case": case_key, "already_installed": True}
         # Seeded by an older build (no bank account, or books in another country's currency): redo it.
         removed = await reset_business_demo(session, case_key, tenant_id=tenant)
@@ -2259,6 +2260,8 @@ async def install_business_demo(
         if case_key in P2P_CASES
         else 0
     )
+    if case_key in P2P_CASES:
+        await _seed_inventory(session, case, tenant, today, created_by)
 
     # Paid-in capital sized so the bank never dips below one month of fixed costs; doubles as
     # the idempotency marker.
@@ -2290,6 +2293,7 @@ async def install_business_demo(
     deals = await _seed_deals(session, case, customers, currency, today, rng, owner)
     tasks, pos = await _seed_operations(session, case, owner, currency, vat, today, rng)
     bookings = await _seed_appointments(session, case, tenant, today, rng, created_by)
+    recurring = await _seed_recurring(session, case, tenant, today, created_by)
     await session.flush()
     result = {
         "case": case_key,
@@ -2307,11 +2311,68 @@ async def install_business_demo(
         "deals": deals,
         "tasks": tasks,
         "appointments": bookings,
+        "recurring_invoices": recurring,
         "purchase_orders": pos,
         "p2p_orders": p2p,
     }
     logger.info("Business demo %s installed: %s", case_key, result)
     return result
+
+
+# Recurring invoices demo: (name, line, monthly net, interval, day of month); billing starts next month.
+RECURRING_DEMO: tuple[tuple[str, str, str, str, int | None], ...] = (
+    ("Service agreement", "Maintenance and support, monthly flat fee", "450.00", "monthly", 1),
+    ("Quarterly inspection contract", "Scheduled inspection and report, per quarter", "1200.00", "quarterly", 15),
+    ("Annual licence", "Software licence and updates, per year", "2400.00", "yearly", None),
+)
+
+
+async def _seed_recurring(session, case, tenant, today, created_by) -> int:
+    """Three recurring templates on the first demo customers; skipped when the tag already has rows."""
+    try:
+        from app.modules.recurring.models import RecurringInvoice
+        from app.modules.recurring.service import RecurringService
+    except ImportError:
+        return 0
+    tag = f"demo:{case.key}"
+    try:
+        async with session.begin_nested():
+            if await session.scalar(
+                select(RecurringInvoice.id).where(RecurringInvoice.tenant_id == tenant, RecurringInvoice.tag == tag)
+            ):
+                return 0
+            accounts = [
+                a
+                for a in (await session.execute(select(Account).where(Account.role == "customer"))).scalars()
+                if tag in (a.tags or [])
+            ]
+            accounts.sort(key=lambda a: a.name)
+            if not accounts:
+                return 0
+            currency = str(read_business_settings().get("base_currency") or base_currency()).upper()
+            vat = default_tax_rate(case.country)
+            first = _months_back(today.replace(day=1), -1)
+            svc = RecurringService(session, tenant)
+            for i, (name, line, net, interval, dom) in enumerate(RECURRING_DEMO):
+                cust = accounts[i % len(accounts)]
+                await svc.create(
+                    lines=[{"description": line, "qty": "1", "unit_price": net, "tax_rate": str(vat)}],
+                    name=f"{name} {cust.name}",
+                    customer_id=cust.id,
+                    customer_name=cust.name,
+                    currency=currency,
+                    interval=interval,
+                    interval_count=1,
+                    start_date=first,
+                    day_of_month=dom,
+                    payment_terms_days=case.payment_days,
+                    tag=tag,
+                    created_by=created_by,
+                )
+    except Exception:  # noqa: BLE001 - the demo never fails over an optional module
+        logger.exception("Business demo %s: recurring invoices not seeded", case.key)
+        return 0
+    return len(RECURRING_DEMO)
 
 
 # Appointments demo: consultations, showroom visits and loading-bay pickups.
@@ -3016,6 +3077,128 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
     return 4
 
 
+DEMO_WAREHOUSE = ("SHOWROOM", "Showroom")
+
+
+async def _seed_inventory(session, case, tenant, today, created_by) -> int:
+    """Inventory on top of the demo receipts: a showroom, a transfer, deliveries of recent orders, a draft count.
+
+    Receipts already booked their stock through purchasing. Deliveries post no GL because the demo
+    books cost of sales on invoice; the showroom warehouse doubles as the idempotency marker.
+    """
+    from app.modules.inventory.models import Warehouse
+    from app.modules.inventory.service import SOURCE_DELIVERY, InventoryService
+    from app.modules.items.models import Item
+    from app.modules.sales.models import SalesDocument
+
+    inv = InventoryService(session, tenant)
+    if await session.scalar(
+        select(Warehouse.id).where(Warehouse.tenant_id == tenant, Warehouse.code == DEMO_WAREHOUSE[0])
+    ):
+        return 0
+    main = await inv.default_warehouse()
+    shop = await inv.create_warehouse(DEMO_WAREHOUSE[0], DEMO_WAREHOUSE[1], address=case.company)
+    skus = [r[0] for r in ITEMS[case.key] if r[6]]
+    items = list(
+        (
+            await session.execute(select(Item).where(Item.tenant_id == tenant, Item.sku.in_(skus)).order_by(Item.sku))
+        ).scalars()
+    )
+    if not items:
+        return 0
+    customers = [
+        acc.id
+        for acc in (await session.execute(select(Account).where(Account.role == "customer"))).scalars()
+        if f"demo:{case.key}" in (acc.tags or [])
+    ]
+    moves = 0
+    # Deliveries for invoiced orders placed after the opening stock arrived.
+    since = today - timedelta(days=36)
+    orders = list(
+        (
+            await session.execute(
+                select(SalesDocument)
+                .where(
+                    SalesDocument.tenant_id == tenant,
+                    SalesDocument.kind == "order",
+                    SalesDocument.status == "invoiced",
+                    SalesDocument.doc_date >= since,
+                    SalesDocument.customer_id.in_(customers),
+                )
+                .order_by(SalesDocument.doc_date)
+            )
+        ).scalars()
+    )
+    by_sku = {i.sku: i for i in items}
+    on_hand = await inv.on_hand([i.id for i in items])
+    for so in orders:
+        need: dict[str, Decimal] = {}
+        for ln in so.lines:
+            if ln.sku in by_sku:
+                need[ln.sku] = need.get(ln.sku, D(0)) + Decimal(ln.qty)
+        # Deliver only what keeps every item above its minimum (the demo's low-stock rows stay as seeded).
+        if not need or any(
+            on_hand.get(str(by_sku[k].id), D(0)) - q < max(D(by_sku[k].min_stock), D(1)) for k, q in need.items()
+        ):
+            continue
+        day = min(today, so.doc_date + timedelta(days=1))
+        for k, q in need.items():
+            await inv.move(
+                by_sku[k].id,
+                -q,
+                "delivery",
+                move_date=day,
+                source_type=SOURCE_DELIVERY,
+                source_id=str(so.id),
+                source_number=so.number,
+                notes=so.customer_name or "",
+                created_by=created_by,
+            )
+            on_hand[str(by_sku[k].id)] -= q
+            moves += 1
+    on_hand = await inv.on_hand([i.id for i in items])
+    stocked = [i for i in items if on_hand.get(str(i.id), D(0)) >= 4]
+    for it in stocked[:2]:
+        await inv.transfer(
+            it.id,
+            main.id,
+            shop.id,
+            D(2),
+            move_date=today - timedelta(days=7),
+            notes="Showroom display",
+            created_by=created_by,
+        )
+        moves += 2
+    if stocked:
+        await inv.create_stocktake(main.id, count_date=today, notes="Monthly count", created_by=created_by)
+    return moves
+
+
+async def _reset_inventory(session, tenant, skus, drop) -> int:
+    from app.modules.inventory.models import ItemCost, StockMovement, Stocktake, StocktakeLine, Warehouse
+    from app.modules.items.models import Item
+
+    ids = list((await session.execute(select(Item.id).where(Item.tenant_id == tenant, Item.sku.in_(skus)))).scalars())
+    if not ids:
+        return 0
+    n = await drop(StockMovement, StockMovement.tenant_id == tenant, StockMovement.item_id.in_(ids))
+    await drop(ItemCost, ItemCost.tenant_id == tenant, ItemCost.item_id.in_(ids))
+    st_ids = list(
+        (
+            await session.execute(select(StocktakeLine.stocktake_id).where(StocktakeLine.item_id.in_(ids)).distinct())
+        ).scalars()
+    )
+    if st_ids:
+        await drop(StocktakeLine, StocktakeLine.stocktake_id.in_(st_ids))
+        await drop(Stocktake, Stocktake.tenant_id == tenant, Stocktake.id.in_(st_ids))
+    shop = await session.scalar(
+        select(Warehouse.id).where(Warehouse.tenant_id == tenant, Warehouse.code == DEMO_WAREHOUSE[0])
+    )
+    if shop and not await session.scalar(select(StockMovement.id).where(StockMovement.warehouse_id == shop).limit(1)):
+        await drop(Warehouse, Warehouse.id == shop)
+    return n
+
+
 async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id: str | None = None) -> dict[str, int]:
     """Delete one case's demo rows for ``tenant_id`` (caller commits); found via source markers and tags."""
     from app.modules.items.models import Item, ItemPriceList, ItemsCategory
@@ -3204,10 +3387,19 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
         out["tasks"] = await drop(Task, Task.project_id.in_(projects))
         await drop(Project, Project.id.in_(projects))
     out["appointments"] = await _reset_appointments(session, case, tenant)
+    try:
+        from app.modules.recurring.models import RecurringInvoice
+
+        out["recurring_invoices"] = await drop(
+            RecurringInvoice, RecurringInvoice.tenant_id == tenant, RecurringInvoice.tag == tag
+        )
+    except ImportError:
+        pass
     skus = _all_skus(case_key)
     out["price_lists"] = await drop(
         ItemPriceList, ItemPriceList.tenant_id == tenant, ItemPriceList.name == f"{case.company} volume prices"
     )
+    out["stock_movements"] = await _reset_inventory(session, tenant, skus, drop)
     out["items"] = await drop(Item, Item.tenant_id == tenant, Item.sku.in_(skus))
     cats = {r[3] for r in ITEMS[case_key]}
     used = set(
