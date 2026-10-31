@@ -64,7 +64,12 @@ def upgrade() -> None:
             sa.Column("next_run_date", sa.Date(), nullable=True),
             sa.Column("auto_issue", sa.Boolean(), nullable=False, server_default=sa.true()),
             sa.Column("auto_send", sa.Boolean(), nullable=False, server_default=sa.false()),
-            sa.Column("last_document_id", sa.String(36), nullable=True),
+            sa.Column(
+                "last_document_id",
+                sa.String(36),
+                sa.ForeignKey("oe_sales_document.id", ondelete="SET NULL"),
+                nullable=True,
+            ),
             sa.Column("last_run_at", sa.DateTime(timezone=True), nullable=True),
             sa.Column("last_error", sa.String(255), nullable=False, server_default=""),
             sa.Column("tag", sa.String(64), nullable=False, server_default=""),
@@ -83,7 +88,9 @@ def upgrade() -> None:
                 nullable=False,
             ),
             sa.Column("period_date", sa.Date(), nullable=False),
-            sa.Column("document_id", sa.String(36), nullable=True),
+            sa.Column(
+                "document_id", sa.String(36), sa.ForeignKey("oe_sales_document.id", ondelete="SET NULL"), nullable=True
+            ),
             sa.Column("document_number", sa.String(32), nullable=False, server_default=""),
             sa.Column("gross_total", sa.Numeric(18, 2), nullable=False, server_default="0"),
             sa.Column("status", sa.String(16), nullable=False, server_default="generated"),

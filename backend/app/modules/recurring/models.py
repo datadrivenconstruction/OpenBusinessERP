@@ -51,7 +51,9 @@ class RecurringInvoice(Base):
     next_run_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
     auto_issue: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     auto_send: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    last_document_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), nullable=True)
+    last_document_id: Mapped[uuid.UUID | None] = mapped_column(
+        GUID(), ForeignKey("oe_sales_document.id", ondelete="SET NULL"), nullable=True
+    )
     last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_error: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     tag: Mapped[str] = mapped_column(String(64), nullable=False, default="", index=True)
@@ -68,7 +70,9 @@ class RecurringRun(Base):
     )
     period_date: Mapped[date] = mapped_column(Date, nullable=False)
     # Sales document lives in oe_sales_document; plain GUID like other cross-module links.
-    document_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), nullable=True, index=True)
+    document_id: Mapped[uuid.UUID | None] = mapped_column(
+        GUID(), ForeignKey("oe_sales_document.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     document_number: Mapped[str] = mapped_column(String(32), nullable=False, default="")
     gross_total: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False, default=Decimal(0))
     # generated | issued | sent | send_failed | failed

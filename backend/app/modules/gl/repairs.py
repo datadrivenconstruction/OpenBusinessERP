@@ -75,7 +75,7 @@ async def reconcile_template_accounts(session: AsyncSession) -> int:
 
 GL_TEMPLATE_ACCOUNTS_RECONCILE = register_data_repair(
     DataRepair(
-        repair_id=REPAIR_ID,
+        repair_id="gl_template_accounts_reconcile",
         revision="",
         summary="Add chart-template accounts (FX gains/losses and later additions) a seeded ledger lacks",
         run=reconcile_template_accounts,
