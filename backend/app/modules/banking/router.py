@@ -180,7 +180,7 @@ async def confirm(
     svc: BankingService = Depends(_svc),
     _p: None = Depends(RequirePermission("banking.post")),
 ):
-    allocs = [AllocationIn(a.target_type, a.target_id, a.amount) for a in body.allocations]
+    allocs = [AllocationIn(a.target_type, a.target_id, a.amount, a.doc_amount) for a in body.allocations]
     return await _call(
         svc.confirm(
             txn_id,

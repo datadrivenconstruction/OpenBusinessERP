@@ -92,10 +92,12 @@ class DunningLetter(Base):
     channel: Mapped[str] = mapped_column(String(10), nullable=False, default="letter")
     subject: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     body: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    # draft -> approved | discarded. Approval records the user's decision; delivery stays manual.
+    # draft -> approved | discarded | sent. ``sent`` only after a successful user-triggered e-mail.
     status: Mapped[str] = mapped_column(String(12), nullable=False, default="draft", index=True)
     decided_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sent_to: Mapped[str] = mapped_column(String(255), nullable=False, default="")
 
     run: Mapped[DunningRun] = relationship(back_populates="letters", lazy="raise_on_sql")
 

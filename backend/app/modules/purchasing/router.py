@@ -7,6 +7,7 @@ Endpoints:
     POST              /orders/{id}/receive/         -- Post (partial) goods receipt: DR inventory|expense / CR GRNI
     POST              /orders/{id}/bill/            -- Draft bill for received-not-billed qty
     GET               /receipts/[{id}/]             -- Goods receipts
+    POST              /receipts/{id}/cancel/        -- Reverse a receipt (GL, received qty, stock)
     POST              /receipts/{id}/bill/          -- Draft bill from a receipt
     GET/POST          /{bills|credit-notes}/        -- List / create draft
     GET/PATCH/DELETE  /{bills|credit-notes}/{id}/   -- One / edit draft / delete draft
@@ -224,7 +225,11 @@ async def receive(
     _p: None = POST,
 ):
     qty = None if body.lines is None else {ln.order_line_id: ln.qty for ln in body.lines}
-    return await _call(svc.receive(order_id, qty, doc_date=body.doc_date, notes=body.notes, created_by=user_id))
+    return await _call(
+        svc.receive(
+            order_id, qty, doc_date=body.doc_date, notes=body.notes, created_by=user_id, warehouse_id=body.warehouse_id
+        )
+    )
 
 
 @router.post("/orders/{order_id}/duplicate/", response_model=OrderResponse, status_code=201)
@@ -281,6 +286,13 @@ async def get_receipt(
     receipt_id: uuid.UUID, _u: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = READ
 ):
     return await _call(svc.get_receipt(receipt_id))
+
+
+@router.post("/receipts/{receipt_id}/cancel/", response_model=ReceiptResponse)
+async def cancel_receipt(
+    receipt_id: uuid.UUID, user_id: CurrentUserId, svc: PurchasingService = Depends(_svc), _p: None = POST
+):
+    return await _call(svc.cancel_receipt(receipt_id, created_by=user_id))
 
 
 @router.post("/receipts/{receipt_id}/bill/", response_model=BillResponse, status_code=201)

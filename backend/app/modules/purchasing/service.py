@@ -11,6 +11,7 @@ from typing import Any
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.gl.fx_posting import FxRateMissingError, rate_for, settlement, settlement_lines
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
 from app.modules.purchasing.models import (
@@ -281,7 +282,7 @@ class PurchasingService:
             supplier_id=data.get("supplier_id"),
             supplier_name=data.get("supplier_name") or "",
             currency=(data.get("currency") or "EUR").upper(),
-            fx_rate=Decimal(str(data.get("fx_rate") or 1)),
+            fx_rate=await self._rate(data.get("currency") or "EUR", doc_date, data.get("fx_rate")),
             notes=data.get("notes") or "",
             created_by=created_by,
         )
@@ -299,6 +300,8 @@ class PurchasingService:
         for k in ("supplier_id", "supplier_name", "currency", "fx_rate", "doc_date", "due_date", "notes"):
             if k in data and data[k] is not None:
                 setattr(po, k, data[k].upper() if k == "currency" else data[k])
+        if data.get("currency") and not data.get("fx_rate"):
+            po.fx_rate = await self._rate(po.currency, po.doc_date, None)
         if lines is not None:
             po.lines.clear()
             await self.session.flush()
@@ -345,6 +348,7 @@ class PurchasingService:
         doc_date: date | None = None,
         notes: str = "",
         created_by: str | None = None,
+        warehouse_id: uuid.UUID | None = None,
     ) -> PurchasingReceipt:
         """Post a (partial) receipt. ``quantities`` maps PO line id -> qty; None receives everything open.
 
@@ -423,6 +427,50 @@ class PurchasingService:
             if ln.stock_tracked and ln.item_id:
                 await self._add_stock(ln.item_id, ln.sku, ln.qty, ln.value)
         po.status = "received" if all(pl.qty_received >= pl.qty for pl in po.lines) else "partially_received"
+        await self.session.flush()
+        await self._inventory().receive_purchase(gr, warehouse_id)
+        return gr
+
+    def _inventory(self) -> Any:
+        from app.modules.inventory.service import InventoryService
+
+        return InventoryService(self.session, self.tenant_id)
+
+    async def cancel_receipt(self, receipt_id: uuid.UUID, created_by: str | None = None) -> PurchasingReceipt:
+        """Reverse a goods receipt: GL entry, received quantities, stock movements."""
+        from app.modules.inventory.service import SOURCE_RECEIPT as INV_SOURCE
+        from app.modules.inventory.service import InventoryError
+
+        gr = await self.get_receipt(receipt_id)
+        if gr.status == "cancelled":
+            raise PurchasingConflictError("Receipt is already cancelled")
+        po = await self.get_order(gr.order_id)
+        if po.status == "closed":
+            raise PurchasingConflictError("Order is closed")
+        by_id = {ln.id: ln for ln in po.lines}
+        for ln in gr.lines:
+            pl = by_id.get(ln.order_line_id)
+            if pl is not None and pl.qty_billed > pl.qty_received - ln.qty:
+                raise PurchasingConflictError(f"Line {pl.line_no} is already billed; cancel the bill first")
+        try:
+            await self._inventory().reverse_source(INV_SOURCE, str(gr.id), created_by=created_by)
+        except InventoryError as exc:
+            raise PurchasingConflictError(str(exc)) from exc
+        if gr.gl_entry_id:
+            await self._gl(self.gl.reverse_entry(gr.gl_entry_id, memo=f"Cancel {gr.number}", created_by=created_by))
+        for ln in gr.lines:
+            pl = by_id.get(ln.order_line_id)
+            if pl is not None:
+                pl.qty_received -= ln.qty
+            if ln.stock_tracked and ln.item_id:
+                await self._add_stock(ln.item_id, ln.sku, -ln.qty, -ln.value)
+        if all(pl.qty_received <= 0 for pl in po.lines):
+            po.status = "confirmed"
+        elif all(pl.qty_received >= pl.qty for pl in po.lines):
+            po.status = "received"
+        else:
+            po.status = "partially_received"
+        gr.status = "cancelled"
         await self.session.flush()
         return gr
 
@@ -523,7 +571,7 @@ class PurchasingService:
             receipt_id=data.get("receipt_id"),
             source_id=data.get("source_id"),
             currency=(data.get("currency") or "EUR").upper(),
-            fx_rate=Decimal(str(data.get("fx_rate") or 1)),
+            fx_rate=await self._rate(data.get("currency") or "EUR", bill_date, data.get("fx_rate")),
             notes=data.get("notes") or "",
             amount_paid=ZERO,
             created_by=created_by,
@@ -617,6 +665,8 @@ class PurchasingService:
         ):
             if k in data and data[k] is not None:
                 setattr(bill, k, data[k].upper() if k == "currency" else data[k])
+        if data.get("currency") and not data.get("fx_rate"):
+            bill.fx_rate = await self._rate(bill.currency, bill.doc_date, None)
         if lines is not None:
             bill.lines.clear()
             await self.session.flush()
@@ -625,6 +675,12 @@ class PurchasingService:
         await self._match(bill)
         await self.session.flush()
         return bill
+
+    async def _rate(self, currency: str, on_date: date | None, manual: Any) -> Decimal:
+        try:
+            return await rate_for(self.session, currency, on_date or date.today(), manual)
+        except FxRateMissingError as exc:
+            raise PurchasingValidationError(str(exc)) from exc
 
     async def delete_bill(self, bill_id: uuid.UUID) -> None:
         bill = await self.get_bill(bill_id)
@@ -726,7 +782,10 @@ class PurchasingService:
         method: str = "bank_transfer",
         reference: str = "",
         created_by: str | None = None,
+        fx_rate: Any = None,
+        base_amount: Any = None,
     ) -> PurchasingBill:
+        """Foreign bills: cash at payment rate (or actual ``base_amount``), payable cleared at bill rate."""
         bill = await self.get_bill(bill_id, "bill")
         if bill.status not in {"posted", "partially_paid"}:
             raise PurchasingConflictError(f"Payments need a posted bill (is {bill.status})")
@@ -744,15 +803,33 @@ class PurchasingService:
         )
         bill.payments.append(pay)
         await self.session.flush()
+        currency, rate = bill.currency, bill.fx_rate
+        lines = [
+            LineInput(acc["payables"], debit=amount, description=f"Payment {bill.number}"),
+            LineInput(acc["bank"], credit=amount, description=f"Payment {bill.number}"),
+        ]
+        if bill.currency != base_currency():
+            pay_rate = Decimal(1) if base_amount is not None else await self._rate(bill.currency, pay.pay_date, fx_rate)
+            s = settlement(amount, bill.fx_rate, pay_rate, money(base_amount) if base_amount is not None else None)
+            try:
+                lines = await settlement_lines(
+                    self.session,
+                    self.tenant_id,
+                    s=s,
+                    cash_account=acc["bank"],
+                    open_account=acc["payables"],
+                    incoming=False,
+                    label=f"Payment {bill.number}",
+                )
+            except FxRateMissingError as exc:
+                raise PurchasingConflictError(str(exc)) from exc
+            currency, rate = base_currency(), None
         entry = await self._gl(
             self.gl.create_entry(
                 entry_date=pay.pay_date,
-                lines=[
-                    LineInput(acc["payables"], debit=amount, description=f"Payment {bill.number}"),
-                    LineInput(acc["bank"], credit=amount, description=f"Payment {bill.number}"),
-                ],
-                currency=bill.currency,
-                fx_rate=bill.fx_rate,
+                lines=lines,
+                currency=currency,
+                fx_rate=rate,
                 memo=f"Payment {bill.number} {reference}".strip(),
                 source_type=SOURCE_PAYMENT,
                 source_id=str(pay.id),

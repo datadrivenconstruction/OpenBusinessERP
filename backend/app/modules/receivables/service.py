@@ -1,7 +1,7 @@
 """Receivables: aging, dunning levels and runs, customer block list, statement PDF.
 
-Dunning runs only produce drafts. Nothing here sends mail or posts letters;
-a user approves each draft and delivers it themselves. Fees and interest are
+Dunning runs only produce drafts. Mail leaves only when a user sends a draft
+(``send_letter``), with the invoice PDF attached; letters are delivered by hand. Fees and interest are
 off by default and computed only when switched on in the settings.
 """
 
@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.business_settings import read_business_settings
 from app.modules.banking.service import partner_key
 from app.modules.gl.models import DEFAULT_TENANT
+from app.modules.gl.service import base_currency
 from app.modules.receivables.models import (
     DunningBlock,
     DunningLetter,
@@ -185,7 +186,7 @@ class ReceivablesService:
         totals = defaultdict(lambda: ZERO)
         for inv in await self._open_invoices():
             key = partner_key(inv.customer_id, inv.customer_name)
-            open_amt = (inv.gross_total - inv.amount_paid) * (inv.fx_rate or 1)
+            open_amt = money((inv.gross_total - inv.amount_paid) * (inv.fx_rate or 1))  # base, per invoice
             days = (as_of - (inv.due_date or inv.doc_date)).days
             r = rows.setdefault(
                 key,
@@ -211,6 +212,8 @@ class ReceivablesService:
                     "due_date": inv.due_date,
                     "open": money(inv.gross_total - inv.amount_paid),
                     "currency": inv.currency,
+                    "fx_rate": inv.fx_rate,
+                    "open_base": open_amt,
                     "days_overdue": max(days, 0),
                     "bucket": b,
                 }
@@ -219,7 +222,12 @@ class ReceivablesService:
         for r in out:
             for k in (*BUCKETS, "total"):
                 r[k] = money(r[k])
-        return {"as_of": as_of, "rows": out, "totals": {k: money(totals[k]) for k in (*BUCKETS, "total")}}
+        return {
+            "as_of": as_of,
+            "base_currency": base_currency(),
+            "rows": out,
+            "totals": {k: money(totals[k]) for k in (*BUCKETS, "total")},
+        }
 
     # ── Settings & levels ─────────────────────────────────────────────────
     async def settings(self) -> DunningSettings:
@@ -454,8 +462,73 @@ class ReceivablesService:
         await self.session.flush()
         return lt
 
+    async def send_letter(
+        self,
+        letter_id: uuid.UUID,
+        *,
+        email: Any,
+        to: str | None = None,
+        cc: list[str] | None = None,
+        by: str | None = None,
+    ) -> tuple[DunningLetter, Any]:
+        """E-mail a draft or approved reminder with the invoice PDF; marks it sent on success."""
+        from app.core.email.base import EmailAttachment, EmailMessage
+        from app.modules.sales.documents import service as docs
+        from app.modules.sales.models import SalesSendLog
+
+        lt = await self.get_letter(letter_id)
+        if lt.status not in ("draft", "approved"):
+            raise ReceivablesConflictError(f"Letter is already {lt.status}")
+        inv = await self.session.get(SalesDocument, lt.invoice_id)
+        if inv is None or inv.tenant_id != self.tenant_id:
+            raise ReceivablesNotFoundError("Invoice of this letter not found")
+        try:
+            recipients = docs._validate([to or inv.customer_email, *(cc or [])])
+        except docs.SendRefusedError as exc:
+            raise ReceivablesValidationError(str(exc)) from exc
+        company = docs.company_data()
+        pdf = await docs.render_pdf(self.session, inv, company)
+        result = await email.send(
+            EmailMessage(
+                to=recipients[0],
+                cc=recipients[1:],
+                subject=lt.subject,
+                html_body=docs.html_paragraphs(lt.body),
+                reply_to=company.get("email") or None,
+                tags=["dunning", f"level_{lt.level}"],
+                attachments=[EmailAttachment(filename=docs.filename(inv), content=pdf)],
+            )
+        )
+        now = datetime.now(UTC)
+        if result.ok:
+            lt.status = "sent"
+            lt.channel = "email"
+            lt.sent_at = now
+            lt.sent_to = recipients[0][:255]
+            lt.decided_by = lt.decided_by or by
+            lt.decided_at = lt.decided_at or now
+        self.session.add(
+            SalesSendLog(
+                id=uuid.uuid4(),
+                tenant_id=self.tenant_id,
+                document_id=inv.id,
+                sent_by=by,
+                sent_at=now,
+                to_addr=recipients[0],
+                cc=recipients[1:],
+                subject=lt.subject[:255],
+                status="sent" if result.ok else "failed",
+                detail="" if result.ok else result.reason[:255],
+                backend=result.backend,
+            )
+        )
+        await self.session.flush()
+        return lt, result
+
     async def history(self, key: str | None = None) -> list[DunningLetter]:
-        q = select(DunningLetter).where(DunningLetter.tenant_id == self.tenant_id, DunningLetter.status == "approved")
+        q = select(DunningLetter).where(
+            DunningLetter.tenant_id == self.tenant_id, DunningLetter.status.in_(("approved", "sent"))
+        )
         if key:
             q = q.where(DunningLetter.partner_key == key)
         return list((await self.session.execute(q.order_by(DunningLetter.decided_at.desc()))).scalars())

@@ -12,6 +12,9 @@ export interface AgingInvoice {
   due_date: string | null;
   open: string;
   currency: string;
+  /** Open amount in base currency at the invoice rate. */
+  open_base?: string;
+  fx_rate?: string;
   days_overdue: number;
   bucket: Bucket;
 }
@@ -26,6 +29,7 @@ export type AgingRow = Record<Bucket, string> & {
 
 export interface Aging {
   as_of: string;
+  base_currency?: string;
   rows: AgingRow[];
   totals: Record<Bucket | 'total', string>;
 }
@@ -56,8 +60,10 @@ export interface DunningLetter {
   channel: 'letter' | 'email';
   subject: string;
   body: string;
-  status: 'draft' | 'approved' | 'discarded';
+  status: 'draft' | 'approved' | 'discarded' | 'sent';
   decided_at: string | null;
+  sent_at?: string | null;
+  sent_to?: string;
 }
 
 export interface DunningRun {
@@ -167,6 +173,8 @@ export const receivablesApi = {
     apiPatch<DunningLetter>(`${R}/letters/${id}/`, body),
   decide: (id: string, decision: 'approved' | 'discarded') =>
     apiPost<DunningLetter>(`${R}/letters/${id}/decision/`, { decision }),
+  sendLetter: (id: string, body: { to?: string; cc?: string[] } = {}) =>
+    apiPost<{ letter: DunningLetter; ok: boolean; reason: string }>(`${R}/letters/${id}/send/`, body),
   preview: (asOf?: string) => apiGet<DunningPreview[]>(`${R}/runs/preview/${q({ as_of: asOf })}`),
   customer: (partnerKey: string, asOf?: string) =>
     apiGet<CustomerDetail>(`${R}/customer/${q({ partner_key: partnerKey, as_of: asOf })}`),

@@ -251,9 +251,22 @@ export function SalesDocumentPage() {
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.currency', { defaultValue: 'Currency' })}
-              <input className={input} maxLength={3} disabled={!editable} aria-invalid={!!visibleErrors.currency} value={form.currency} onChange={(e) => patch({ currency: e.target.value.toUpperCase() })} />
+              <input className={input} maxLength={3} disabled={!editable} aria-invalid={!!visibleErrors.currency} value={form.currency} onChange={(e) => patch({ currency: e.target.value.toUpperCase(), fx_rate: '' })} />
               {visibleErrors.currency && <span className="text-semantic-error">{visibleErrors.currency}</span>}
             </label>
+            {baseCur && form.currency && form.currency !== baseCur && (
+              <label className="text-xs text-content-tertiary">
+                {t('sales.fx_rate', { defaultValue: 'Rate (1 {{cur}} = ? {{base}})', cur: form.currency, base: baseCur })}
+                <input
+                  className={input}
+                  inputMode="decimal"
+                  disabled={!editable}
+                  placeholder={t('sales.fx_rate_auto', { defaultValue: 'Automatic (rate on document date)' })}
+                  value={form.fx_rate}
+                  onChange={(e) => patch({ fx_rate: e.target.value.replace(',', '.') })}
+                />
+              </label>
+            )}
             <label className="text-xs text-content-tertiary">
               {t('sales.document_language', { defaultValue: 'Document language' })}
               <select className={input} disabled={!editable} value={form.language} onChange={(e) => patch({ language: e.target.value })}>
@@ -309,6 +322,7 @@ export function SalesDocumentPage() {
             currency={cur}
             paid={doc ? Number(doc.amount_paid) : 0}
             showBalance={doc?.kind === 'invoice' && doc.status !== 'draft'}
+            base={baseCur && cur !== baseCur ? { currency: baseCur, rate: Number(form.fx_rate || doc?.fx_rate || 0) } : undefined}
           />
           {doc?.due_date && !editable && (
             <p className="px-1 text-xs text-content-tertiary">

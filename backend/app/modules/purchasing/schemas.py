@@ -64,6 +64,7 @@ class ReceiveRequest(BaseModel):
     lines: list[ReceiveLine] | None = None  # None -> receive everything still open
     doc_date: date | None = None
     notes: str = ""
+    warehouse_id: uuid.UUID | None = None  # None -> default warehouse
 
 
 class PaymentCreate(BaseModel):
@@ -71,6 +72,9 @@ class PaymentCreate(BaseModel):
     pay_date: date | None = None
     method: str = Field("bank_transfer", max_length=32)
     reference: str = Field("", max_length=128)
+    # Foreign documents: payment-date rate override, or the actual base-currency amount received/paid.
+    fx_rate: Decimal | None = Field(None, gt=0)
+    base_amount: Decimal | None = Field(None, gt=0)
 
 
 class _Line(BaseModel):

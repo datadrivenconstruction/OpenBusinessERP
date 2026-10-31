@@ -12,6 +12,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.business_settings import read_business_settings
+from app.modules.gl.fx_posting import FxRateMissingError, rate_for, settlement, settlement_lines
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
 from app.modules.sales.models import (
@@ -47,7 +48,7 @@ TRANSITIONS: dict[str, dict[str, set[str]]] = {
     "order": {
         "draft": {"confirmed", "cancelled"},
         "confirmed": {"delivered", "invoiced", "cancelled"},
-        "delivered": {"invoiced"},
+        "delivered": {"invoiced", "cancelled"},
         "invoiced": set(),
         "cancelled": set(),
     },
@@ -345,7 +346,7 @@ class SalesService:
             customer_id=data.get("customer_id"),
             customer_name=data.get("customer_name") or "",
             currency=(data.get("currency") or "EUR").upper(),
-            fx_rate=Decimal(str(data.get("fx_rate") or 1)),
+            fx_rate=await self._rate(data.get("currency") or "EUR", doc_date, data.get("fx_rate")),
             due_date=data.get("due_date"),
             notes=data.get("notes") or "",
             source_id=data.get("source_id"),
@@ -376,6 +377,8 @@ class SalesService:
         ):
             if k in data and data[k] is not None:
                 setattr(doc, k, data[k].upper() if k == "currency" else data[k])
+        if data.get("currency") and not data.get("fx_rate"):
+            doc.fx_rate = await self._rate(doc.currency, doc.doc_date, None)
         if lines is not None:
             doc.lines.clear()
             await self.session.flush()
@@ -383,6 +386,12 @@ class SalesService:
             apply_totals(doc)
         await self.session.flush()
         return doc
+
+    async def _rate(self, currency: str, on_date: date | None, manual: Any) -> Decimal:
+        try:
+            return await rate_for(self.session, currency, on_date or date.today(), manual)
+        except FxRateMissingError as exc:
+            raise SalesValidationError(str(exc)) from exc
 
     async def delete(self, doc_id: uuid.UUID) -> None:
         doc = await self.get(doc_id)
@@ -407,9 +416,24 @@ class SalesService:
                 await self._gl(
                     self.gl.reverse_entry(doc.gl_entry_id, memo=f"Cancel {doc.number}", created_by=created_by)
                 )
+        if doc.kind == "order" and (target == "delivered" or doc.status == "delivered"):
+            await self._stock_for_delivery(doc, cancel=doc.status == "delivered", created_by=created_by)
         doc.status = target
         await self.session.flush()
         return doc
+
+    async def _stock_for_delivery(self, doc: SalesDocument, *, cancel: bool, created_by: str | None) -> None:
+        """Delivery issues stock (and COGS) through inventory; cancelling a delivered order reverses it."""
+        from app.modules.inventory.service import SOURCE_DELIVERY, InventoryError, InventoryService
+
+        inv = InventoryService(self.session, self.tenant_id)
+        try:
+            if cancel:
+                await inv.cancel_source(SOURCE_DELIVERY, str(doc.id), created_by=created_by)
+            else:
+                await inv.deliver_sales_order(doc, created_by=created_by)
+        except InventoryError as exc:
+            raise SalesConflictError(str(exc)) from exc
 
     async def _copy(
         self,
@@ -755,6 +779,9 @@ class SalesService:
         check_transition("invoice", inv.status, "issued")
         if inv.gross_total <= 0:
             raise SalesValidationError("Invoice total must be positive")
+        if inv.currency != base_currency() and inv.fx_rate == 1:
+            # Legacy drafts defaulted to 1; a foreign invoice must post at the document-date rate.
+            inv.fx_rate = await self._rate(inv.currency, inv.doc_date, None)
         acc = await self._accounts("receivable", "revenue", "vat")
         lines = [
             LineInput(
@@ -842,8 +869,15 @@ class SalesService:
         reference: str = "",
         created_by: str | None = None,
         debit_account_id: uuid.UUID | None = None,
+        fx_rate: Any = None,
+        base_amount: Any = None,
     ) -> SalesDocument:
-        """``debit_account_id`` overrides the bank role (a specific bank account or a write-off account)."""
+        """``debit_account_id`` overrides the bank role (a specific bank account or a write-off account).
+
+        Foreign invoices: ``amount`` is in invoice currency; cash is valued at ``fx_rate`` (default: register
+        rate on ``pay_date``) or the actual ``base_amount`` received, and the difference to the invoice rate
+        is posted as realized FX gain/loss.
+        """
         inv = await self.get(invoice_id, "invoice")
         if inv.status not in {"issued", "partially_paid"}:
             raise SalesConflictError(f"Payments need an issued invoice (is {inv.status})")
@@ -861,15 +895,34 @@ class SalesService:
         )
         inv.payments.append(pay)
         await self.session.flush()
+        currency, rate = inv.currency, inv.fx_rate
+        lines = [
+            LineInput(debit_account_id or acc["bank"], debit=amount, description=f"Payment {inv.number}"),
+            LineInput(acc["receivable"], credit=amount, description=f"Payment {inv.number}"),
+        ]
+        if inv.currency != base_currency():
+            pay_rate = Decimal(1) if base_amount is not None else await self._rate(inv.currency, pay.pay_date, fx_rate)
+            s = settlement(amount, inv.fx_rate, pay_rate, money(base_amount) if base_amount is not None else None)
+            try:
+                lines = await settlement_lines(
+                    self.session,
+                    self.tenant_id,
+                    s=s,
+                    cash_account=debit_account_id or acc["bank"],
+                    open_account=acc["receivable"],
+                    incoming=True,
+                    label=f"Payment {inv.number}",
+                )
+            except FxRateMissingError as exc:
+                raise SalesConflictError(str(exc)) from exc
+            currency, rate = base_currency(), None
+            reference = reference or f"{amount} {inv.currency}"
         entry = await self._gl(
             self.gl.create_entry(
                 entry_date=pay.pay_date,
-                lines=[
-                    LineInput(debit_account_id or acc["bank"], debit=amount, description=f"Payment {inv.number}"),
-                    LineInput(acc["receivable"], credit=amount, description=f"Payment {inv.number}"),
-                ],
-                currency=inv.currency,
-                fx_rate=inv.fx_rate,
+                lines=lines,
+                currency=currency,
+                fx_rate=rate,
                 memo=f"Payment {inv.number} {reference}".strip(),
                 source_type=SOURCE_PAYMENT,
                 source_id=str(pay.id),

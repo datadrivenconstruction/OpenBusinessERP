@@ -26,3 +26,51 @@ async def on_startup() -> None:
 
     register_fx_permissions()
     register_fx_rules()
+    _start_daily_import()
+
+
+_DAILY_TASK = None
+
+
+def _daily_enabled() -> bool:
+    import os
+
+    from app.core.business_settings import read_business_settings
+
+    if os.environ.get("OE_FX_DAILY_IMPORT") == "1":
+        return True
+    try:
+        return bool(read_business_settings().get("fx_daily_import"))
+    except Exception:  # noqa: BLE001 - settings unreadable means off
+        return False
+
+
+def _start_daily_import() -> None:
+    """Opt-in daily ECB import; offline it logs and keeps cache/seed rates, never fails startup."""
+    global _DAILY_TASK
+    if _DAILY_TASK is not None or not _daily_enabled():
+        return
+    import asyncio
+    import logging
+
+    log = logging.getLogger(__name__)
+
+    async def loop() -> None:
+        from app.database import async_session_factory
+        from app.modules.fx.service import FxService
+
+        await asyncio.sleep(60)
+        while True:
+            try:
+                async with async_session_factory() as session:
+                    res = await FxService(session).refresh()
+                    await session.commit()
+                log.info("FX daily import: %s", res.get("note"))
+            except Exception:  # noqa: BLE001 - background job must survive anything
+                log.warning("FX daily import failed", exc_info=True)
+            await asyncio.sleep(24 * 3600)
+
+    try:
+        _DAILY_TASK = asyncio.get_running_loop().create_task(loop(), name="fx-daily-import")
+    except RuntimeError:
+        log.debug("No running loop; FX daily import not scheduled")

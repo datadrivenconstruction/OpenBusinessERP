@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { AlertTriangle, FileCheck2, FileText, Plus, Receipt, Search, ShoppingBag } from 'lucide-react';
+import { AlertTriangle, FileCheck2, FileText, Plus, Receipt, Repeat, Search, ShoppingBag } from 'lucide-react';
 import {
   Breadcrumb,
   Button,
@@ -214,6 +214,14 @@ export function SalesListPage() {
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={() => navigate('/sales/recurring')}
+            className="flex items-center gap-2 border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary"
+          >
+            <Repeat size={14} />
+            {t('sales.tab_recurring', { defaultValue: 'Recurring' })}
+          </button>
         </nav>
       </div>
 

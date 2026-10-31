@@ -82,6 +82,8 @@ export interface SalesDocInput {
   customer_id?: string | null;
   customer_name?: string;
   currency?: string;
+  /** Base units per document unit; null = take the register rate on the document date. */
+  fx_rate?: string | null;
   doc_date?: string | null;
   due_date?: string | null;
   notes?: string;
@@ -108,6 +110,7 @@ export interface EmailDraft {
   body: string;
   filename: string;
   issues: CheckIssue[];
+  mail_configured: boolean;
 }
 
 export interface SendLogEntry {

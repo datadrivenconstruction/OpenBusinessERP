@@ -106,6 +106,8 @@ class AllocationIn(BaseModel):
     target_type: str = Field(..., pattern="^(sales_invoice|purchase_bill)$")
     target_id: uuid.UUID
     amount: Decimal = Field(..., gt=0)
+    # Amount in the invoice/bill currency when it differs from the bank account currency.
+    doc_amount: Decimal | None = Field(None, gt=0)
 
 
 class ConfirmIn(BaseModel):

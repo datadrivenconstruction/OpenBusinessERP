@@ -56,7 +56,7 @@ export function ReceivablesPage() {
     onChange: (k) => patch({ tab: k }),
     orientation: 'horizontal',
   });
-  const cur = aging.data?.rows[0]?.invoices[0]?.currency ?? 'EUR';
+  const cur = aging.data?.base_currency ?? aging.data?.rows[0]?.invoices[0]?.currency ?? 'EUR';
   const insights = useModuleInsights('receivables', { defaultOpen: false });
   const { datasets: insightDatasets, builtins: insightBuiltins } = useMemo(
     () => buildReceivablesInsights(aging.data, cur, t),

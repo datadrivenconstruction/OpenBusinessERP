@@ -26,7 +26,7 @@ export function docActions(kind: DocKind, status: string): DocAction[] {
   if (kind === 'invoice' && ['issued', 'partially_paid', 'paid'].includes(status))
     out.push({ key: 'credit_note', label: 'Create credit note', type: 'credit_note' });
   if (kind === 'credit_note' && status === 'draft') st('issue_cn', 'Issue', 'issued', true);
-  if (['draft', 'sent', 'confirmed'].includes(status) || (kind === 'invoice' && status === 'issued'))
+  if (['draft', 'sent', 'confirmed'].includes(status) || (kind === 'invoice' && status === 'issued') || (kind === 'order' && status === 'delivered'))
     st('cancel', 'Cancel document', 'cancelled', false, true);
   return out;
 }

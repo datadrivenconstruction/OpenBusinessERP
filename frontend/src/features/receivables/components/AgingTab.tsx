@@ -9,7 +9,7 @@ import { Button } from '@/shared/ui/Button';
 import { Card, EmptyState, SkeletonTable } from '@/shared/ui';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { getErrorMessage } from '@/shared/lib/api';
-import { BUCKETS, filterByBucket, overdueShare, receivablesApi, type Aging, type BucketFilter } from '../api';
+import { BUCKETS, filterByBucket, overdueShare, receivablesApi, type Aging, type AgingRow, type BucketFilter } from '../api';
 import { AgingChart } from './AgingChart';
 import { BUCKET_LABEL, inputCls, td, th } from './shared';
 
@@ -21,6 +21,13 @@ interface Props {
   bucket: BucketFilter | null;
   setBucket: (b: BucketFilter | null) => void;
   onOpenCustomer: (partnerKey: string) => void;
+}
+
+/** Open amounts per non-base document currency (aging buckets themselves are in base currency). */
+function foreignTotals(r: AgingRow, base: string): [string, number][] {
+  const sums = new Map<string, number>();
+  for (const i of r.invoices) if (i.currency !== base) sums.set(i.currency, (sums.get(i.currency) ?? 0) + Number(i.open));
+  return [...sums];
 }
 
 export function AgingTab({ aging, asOf, setAsOf, cur, bucket, setBucket, onOpenCustomer }: Props) {
@@ -124,6 +131,12 @@ export function AgingTab({ aging, asOf, setAsOf, cur, bucket, setBucket, onOpenC
                       <span className="text-xs text-content-tertiary">
                         {t('receivables.invoice_count', { defaultValue: '{{count}} invoices', count: r.invoices.length })}
                         {overdueShare(r) > 0 && ` · ${overdueShare(r)}% ${t('receivables.overdue', { defaultValue: 'overdue' })}`}
+                        {foreignTotals(r, cur).map(([c, v]) => (
+                          <span key={c} title={t('receivables.doc_currency_open', { defaultValue: 'Open in document currency' })}>
+                            {' · '}
+                            <MoneyDisplay amount={v} currency={c} />
+                          </span>
+                        ))}
                       </span>
                       {blocked.has(r.partner_key) && (
                         <Badge variant="neutral" className="ml-2">{t('receivables.blocked', { defaultValue: 'No dunning' })}</Badge>

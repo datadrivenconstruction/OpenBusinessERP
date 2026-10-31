@@ -109,7 +109,20 @@ def build_lines(lines: list[LineInput], fx_rate: Decimal, tenant_id: str = DEFAU
                 project_id=ln.project_id,
             )
         )
+    _absorb_fx_rounding(out)
     return out
+
+
+def _absorb_fx_rounding(out: list[GLJournalLine]) -> None:
+    """A balanced foreign entry may be off by cents after per-line base rounding; book it on the largest line."""
+    if sum((ln.debit for ln in out), ZERO) != sum((ln.credit for ln in out), ZERO):
+        return
+    diff = sum((ln.base_debit for ln in out), ZERO) - sum((ln.base_credit for ln in out), ZERO)
+    if diff == 0 or abs(diff) > Decimal("0.01") * len(out):
+        return
+    side = "base_debit" if diff > 0 else "base_credit"  # trim the heavier side
+    target = max((ln for ln in out if getattr(ln, side) > 0), key=lambda ln: getattr(ln, side))
+    setattr(target, side, getattr(target, side) - abs(diff))
 
 
 def check_balanced(lines: list[GLJournalLine]) -> None:

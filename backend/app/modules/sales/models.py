@@ -59,6 +59,9 @@ class SalesDocument(Base):
     tax_note: Mapped[str] = mapped_column(String(300), nullable=False, default="")
     payment_terms: Mapped[str] = mapped_column(String(64), nullable=False, default="")
     created_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # Last successful e-mail delivery; the full history is in oe_sales_send_log.
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sent_to: Mapped[str] = mapped_column(String(255), nullable=False, default="")
 
     lines: Mapped[list[SalesLine]] = relationship(
         back_populates="document", order_by="SalesLine.line_no", cascade="all, delete-orphan", lazy="selectin"

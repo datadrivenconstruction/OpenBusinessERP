@@ -28,7 +28,7 @@ from app.modules.banking.models import (
 )
 from app.modules.banking.parsers import StatementParseError, detect_format, parse_opening_balance, parse_statement
 from app.modules.gl.models import DEFAULT_TENANT, ENTRY_POSTED, GLAccount, GLJournalEntry
-from app.modules.gl.service import GLError, GLService, LineInput, money
+from app.modules.gl.service import GLError, GLService, LineInput, base_currency, money
 from app.modules.sales.models import SalesDocument, SalesPayment
 from app.modules.sales.service import SalesError, SalesService
 
@@ -58,7 +58,8 @@ class BankingConflictError(BankingError):
 class AllocationIn:
     target_type: str  # sales_invoice | purchase_bill
     target_id: uuid.UUID
-    amount: Decimal
+    amount: Decimal  # bank account currency
+    doc_amount: Decimal | None = None  # document currency, required when it differs
 
 
 class PaymentProvider:
@@ -433,13 +434,15 @@ class BankingService:
                 if a.target_type == "sales_invoice":
                     if txn.amount <= 0:
                         raise BankingValidationError("Outgoing payments cannot settle customer invoices")
+                    doc_amt, base_amt = self._cross(txn, (await sales.get(a.target_id, "invoice")).currency, a)
                     inv = await sales.record_payment(
                         a.target_id,
-                        amount=amt,
+                        amount=doc_amt,
                         pay_date=txn.booking_date,
                         reference=ref,
                         created_by=created_by,
                         debit_account_id=bank_gl,
+                        base_amount=base_amt,
                     )
                     self._add_match(
                         txn,
@@ -470,7 +473,9 @@ class BankingService:
                 elif a.target_type == "purchase_bill":
                     if txn.amount >= 0:
                         raise BankingValidationError("Incoming payments cannot settle supplier bills")
-                    entry_id, number, rest = await self._pay_bill(a.target_id, amt, txn, ref, bank_gl, created_by)
+                    entry_id, number, rest = await self._pay_bill(
+                        a.target_id, amt, txn, ref, bank_gl, created_by, doc_amount=a.doc_amount
+                    )
                     self._add_match(txn, "purchase_bill", a.target_id, number, amt, entry_id, created_by, confidence)
                     if wo_id and ZERO < rest <= wo_budget:
                         # Supplier accepted less than billed: clear payables against the write-off account.
@@ -517,14 +522,24 @@ class BankingService:
         bank_gl: uuid.UUID,
         by: str | None,
         method: str = "bank_transfer",
+        doc_amount: Decimal | None = None,
     ) -> tuple[uuid.UUID | None, str, Decimal]:
         Purch, _ = _purchasing()
         if Purch is None:
             raise BankingConflictError("Purchasing module is not available; use a manual GL entry")
         svc = Purch(self.session, self.tenant_id)
         try:
+            doc_amt, base_amt = self._cross(
+                txn, (await svc.get_bill(bill_id, "bill")).currency, AllocationIn("", bill_id, amount, doc_amount)
+            )
             bill = await svc.record_payment(
-                bill_id, amount=amount, pay_date=txn.booking_date, reference=ref, method=method, created_by=by
+                bill_id,
+                amount=doc_amt,
+                pay_date=txn.booking_date,
+                reference=ref,
+                method=method,
+                created_by=by,
+                base_amount=base_amt,
             )
         except Exception as exc:  # purchasing has its own error hierarchy
             if exc.__class__.__name__.startswith("Purchasing"):
@@ -538,8 +553,8 @@ class BankingService:
                     LineInput(role_bank, debit=amount, description=f"Reclass {bill.number}"),
                     LineInput(bank_gl, credit=amount, description=f"Reclass {bill.number}"),
                 ],
-                currency=bill.currency,
-                fx_rate=bill.fx_rate,
+                currency=txn.currency if bill.currency != txn.currency else bill.currency,
+                fx_rate=None if bill.currency != txn.currency else bill.fx_rate,
                 memo=f"Bank account reclass {bill.number}",
                 source_type=SOURCE_BANK,
                 source_id=str(txn.id),
@@ -548,6 +563,18 @@ class BankingService:
             )
         await self._learn_iban(txn, partner_key(bill.supplier_id, bill.supplier_name), bill.supplier_name)
         return bill.payments[-1].gl_entry_id, bill.number, bill.gross_total - bill.amount_paid
+
+    @staticmethod
+    def _cross(txn: BankTransaction, doc_ccy: str, a: AllocationIn) -> tuple[Decimal, Decimal | None]:
+        """(amount in document currency, actual base amount) for a bank allocation."""
+        amt = money(a.amount)
+        if doc_ccy.upper() == txn.currency.upper():
+            return amt, None
+        if not a.doc_amount:
+            raise BankingValidationError(f"Bank line is {txn.currency}, document is {doc_ccy}: give doc_amount")
+        if txn.currency.upper() != base_currency():
+            raise BankingValidationError("Cross-currency settlement needs a base-currency bank account")
+        return money(a.doc_amount), amt
 
     async def _writeoff_account(self, cfg: BankSettings) -> uuid.UUID:
         if cfg.writeoff_account_code:

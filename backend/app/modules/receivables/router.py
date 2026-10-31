@@ -179,6 +179,22 @@ async def decide(
     return await _call(svc.decide(letter_id, body.decision, user_id))
 
 
+@router.post("/letters/{letter_id}/send/", response_model=S.LetterSendOut)
+async def send_letter(
+    letter_id: uuid.UUID,
+    body: S.LetterSendIn,
+    user_id: CurrentUserId,
+    svc: ReceivablesService = Depends(_svc),
+    _p: None = WRITE,
+):
+    from app.core.mail_settings import mail_service, mail_status
+
+    if not mail_status()["configured"]:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Outbound mail is not configured")
+    letter, result = await _call(svc.send_letter(letter_id, email=mail_service(), to=body.to, cc=body.cc, by=user_id))
+    return {"letter": S.LetterOut.model_validate(letter), "ok": result.ok, "reason": result.reason}
+
+
 @router.get("/history/", response_model=list[S.LetterOut])
 async def history(
     _u: CurrentUserId, partner_key: str | None = None, svc: ReceivablesService = Depends(_svc), _p: None = READ

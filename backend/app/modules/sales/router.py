@@ -38,7 +38,7 @@ from typing import TypeVar
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
 from app.core.content_disposition import attachment_disposition
-from app.core.email.service import EmailService, get_email_service
+from app.core.email.service import EmailService
 from app.dependencies import CurrentCompanyTenantId, CurrentUserId, RequirePermission, SessionDep
 from app.modules.sales.documents import service as docs
 from app.modules.sales.documents.checks import check_invoice
@@ -374,7 +374,9 @@ async def document_email_draft(
 
 
 def _email_service() -> EmailService:
-    return get_email_service()
+    from app.core.mail_settings import mail_service
+
+    return mail_service()
 
 
 @router.post("/{kind}/{doc_id}/send/", response_model=SendLogResponse, status_code=201)

@@ -67,6 +67,9 @@ class PaymentCreate(BaseModel):
     pay_date: date | None = None
     method: str = Field("bank_transfer", max_length=32)
     reference: str = Field("", max_length=128)
+    # Foreign documents: payment-date rate override, or the actual base-currency amount received/paid.
+    fx_rate: Decimal | None = Field(None, gt=0)
+    base_amount: Decimal | None = Field(None, gt=0)
 
 
 class LineResponse(LineIn):
@@ -125,6 +128,8 @@ class DocumentResponse(DocumentSummary):
     delivery_end: date | None
     tax_note: str
     payment_terms: str
+    sent_at: datetime | None = None
+    sent_to: str = ""
     lines: list[LineResponse]
     payments: list[PaymentResponse]
 
@@ -169,6 +174,7 @@ class EmailDraft(BaseModel):
     body: str
     filename: str
     issues: list[InvoiceCheckIssue]
+    mail_configured: bool = False
 
 
 class ConvertLine(BaseModel):

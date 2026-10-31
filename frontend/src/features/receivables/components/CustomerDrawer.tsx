@@ -7,6 +7,7 @@ import { BellRing, FileDown, Handshake, ReceiptText, StickyNote, Wallet } from '
 import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState, KpiBand, SideDrawer, SkeletonTable } from '@/shared/ui';
+import { fmtNumber } from '@/shared/lib/formatters';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { DateDisplay } from '@/shared/ui/DateDisplay';
 import { getErrorMessage } from '@/shared/lib/api';
@@ -126,7 +127,14 @@ function InvoicesPane({ d }: { d: CustomerDetail }) {
                   : t(`receivables.bucket_${i.bucket}`, { defaultValue: BUCKET_LABEL[i.bucket] })}
               </Badge>
             </td>
-            <td className={clsx(cell, 'text-right tabular-nums')}><MoneyDisplay amount={i.open} currency={i.currency} /></td>
+            <td className={clsx(cell, 'text-right tabular-nums')}>
+              <MoneyDisplay amount={i.open} currency={i.currency} />
+              {i.open_base && i.fx_rate && Number(i.fx_rate) !== 1 && (
+                <div className="text-xs text-content-tertiary" title={t('receivables.base_at_doc_rate', { defaultValue: 'Base currency at invoice rate {{rate}}', rate: i.fx_rate })}>
+                  {t('receivables.base_short', { defaultValue: 'Base' })} {fmtNumber(i.open_base)}
+                </div>
+              )}
+            </td>
           </tr>
         ))}
       </tbody>

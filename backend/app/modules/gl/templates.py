@@ -123,8 +123,10 @@ DE_SKR03: list[tuple[str, str, str, str | None, bool]] = [
     ("8960", "Bestandsveränderungen unfertige Erzeugnisse", I, None, True),
     ("2650", "Sonstige Zinsen und ähnliche Erträge", I, None, True),
     ("2700", "Sonstige Erträge", I, None, True),
+    ("2660", "Erträge aus Kursdifferenzen", I, None, True),
     # Aufwand
     ("2100", "Zinsen und ähnliche Aufwendungen", X, None, True),
+    ("2150", "Aufwendungen aus Kursdifferenzen", X, None, True),
     ("2200", "Körperschaftsteuer", X, None, True),
     ("3100", "Fremdleistungen", X, None, True),
     ("3300", "Wareneingang 7 % Vorsteuer", X, None, True),

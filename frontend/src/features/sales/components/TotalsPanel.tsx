@@ -8,11 +8,14 @@ export function TotalsPanel({
   currency,
   paid,
   showBalance,
+  base,
 }: {
   totals: DocTotals;
   currency: string;
   paid?: number;
   showBalance?: boolean;
+  /** Foreign document: base currency and rate (base units per document unit); 0 = not yet known. */
+  base?: { currency: string; rate: number };
 }) {
   const { t } = useTranslation();
   const row = 'flex justify-between py-0.5';
@@ -52,6 +55,16 @@ export function TotalsPanel({
             <MoneyDisplay amount={totals.gross} currency={currency} />
           </dd>
         </div>
+        {base && base.rate > 0 && (
+          <div className={`${row} text-xs text-content-tertiary`}>
+            <dt>
+              {t('sales.totals.in_base', { defaultValue: 'In {{base}} at {{rate}}', base: base.currency, rate: base.rate })}
+            </dt>
+            <dd className="tabular-nums">
+              <MoneyDisplay amount={Math.round(totals.gross * base.rate * 100) / 100} currency={base.currency} />
+            </dd>
+          </div>
+        )}
         {showBalance && (
           <>
             <div className={`${row} text-content-secondary`}>

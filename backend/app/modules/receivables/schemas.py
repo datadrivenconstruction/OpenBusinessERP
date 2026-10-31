@@ -61,12 +61,25 @@ class LetterOut(BaseModel):
     body: str
     status: str
     decided_at: datetime | None
+    sent_at: datetime | None = None
+    sent_to: str = ""
 
 
 class LetterUpdate(BaseModel):
     subject: str | None = Field(None, max_length=255)
     body: str | None = None
     channel: str | None = Field(None, pattern="^(letter|email)$")
+
+
+class LetterSendIn(BaseModel):
+    to: str | None = Field(None, max_length=255)
+    cc: list[str] = Field(default_factory=list, max_length=10)
+
+
+class LetterSendOut(BaseModel):
+    letter: LetterOut
+    ok: bool
+    reason: str
 
 
 class DecisionIn(BaseModel):
