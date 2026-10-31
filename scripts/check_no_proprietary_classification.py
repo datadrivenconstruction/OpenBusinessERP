@@ -171,7 +171,6 @@ _ALLOWED_NOMINATIVE: dict[str, frozenset[str]] = {
     # Shipped release notes are a historical record and are not rewritten.
     "frontend/src/features/about/Changelog.tsx": frozenset({"summary"}),
     # Generated inventories that copy descriptions already allowed at their source.
-    "frontend/src/features/architecture/architecture_manifest.json": frozenset({"description"}),
     "scripts/_88_module_inventory.json": frozenset({"description"}),
 }
 

@@ -6,7 +6,6 @@
  * both the dialog and the page-level drag-and-drop drop zone. Routes each
  * upload to the endpoint that owns its kind so files land in the right
  * pipeline instead of all becoming generic documents:
- *   - BIM models (RVT / IFC / ...) -> POST /api/v1/bim_hub/upload-cad/
  *   - DWG / DXF drawings           -> POST /api/v1/dwg_takeoff/drawings/upload/
  *   - site photos                  -> POST /api/v1/documents/photos/upload/
  *   - everything else              -> POST /api/v1/documents/upload/
@@ -49,15 +48,12 @@ export function useFileUpload(projectId: string | null | undefined): UseFileUplo
   const updateQueueTask = useUploadQueueStore((s) => s.updateTask);
   const [uploading, setUploading] = useState(false);
 
-  // Resolve where a kind's upload should go. ``bim_model`` and
-  // ``dwg_drawing`` have their own ingest endpoints (and their own storage +
+  // Resolve where a kind's upload should go. ``dwg_drawing`` has its own
+  // ingest endpoint (and their own storage +
   // conversion pipelines); site photos go to the photo pipeline so a real
   // ProjectPhoto is created; everything else stays on the documents endpoint.
   const directUploadUrl = useCallback(
     (kind: FileKind | null): string | null => {
-      if (kind === 'bim_model') {
-        return `/api/v1/bim_hub/upload-cad/?project_id=${projectId}`;
-      }
       if (kind === 'dwg_drawing') {
         return `/api/v1/dwg_takeoff/drawings/upload/?project_id=${projectId}`;
       }

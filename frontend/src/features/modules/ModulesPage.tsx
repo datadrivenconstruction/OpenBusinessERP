@@ -1810,45 +1810,11 @@ function DataPackagesTab() {
     return counts as Record<CategoryKey, number>;
   }, [modules]);
 
-  const CATALOG_ID_TO_REGION: Record<string, string> = {
-    'catalog-ar-dubai': 'AR_DUBAI',
-    'catalog-de-berlin': 'DE_BERLIN',
-    'catalog-en-toronto': 'ENG_TORONTO',
-    'catalog-sp-barcelona': 'SP_BARCELONA',
-    'catalog-fr-paris': 'FR_PARIS',
-    'catalog-hi-mumbai': 'HI_MUMBAI',
-    'catalog-pt-saopaulo': 'PT_SAOPAULO',
-    'catalog-ru-stpetersburg': 'RU_STPETERSBURG',
-    'catalog-uk-gbp': 'UK_GBP',
-    'catalog-usa-usd': 'USA_USD',
-    'catalog-zh-shanghai': 'ZH_SHANGHAI',
-  };
-
   async function handleInstallClick(mod: MarketplaceModule): Promise<void> {
     switch (mod.category) {
-      case 'resource_catalog': {
-        const region = CATALOG_ID_TO_REGION[mod.id];
-        if (!region) {
-          addToast({ type: 'error', title: t('marketplace.unknown_region', { defaultValue: 'Unknown region' }), message: t('marketplace.no_region_mapping', { defaultValue: 'No region mapping for {{id}}', id: mod.id }) });
-          break;
-        }
-        setInstallingId(mod.id);
-        try {
-          const result = await apiPost<{ imported: number; skipped: number; region: string }>(`/v1/catalog/import/${region}`);
-          addToast({
-            type: 'success',
-            title: t('marketplace.catalog_imported', { defaultValue: 'Catalog imported' }),
-            message: t('marketplace.catalog_imported_message', { defaultValue: '{{imported}} resources imported, {{skipped}} skipped for {{region}}.', imported: result.imported, skipped: result.skipped, region: result.region }),
-          });
-          queryClient.invalidateQueries({ queryKey: ['marketplace'] });
-          queryClient.invalidateQueries({ queryKey: ['catalog'] });
-        } catch (err) {
-          addToast({ type: 'error', title: t('marketplace.import_failed', { defaultValue: 'Import failed' }), message: err instanceof Error ? err.message : t('common.unknown_error', { defaultValue: 'Unknown error' }) });
-        } finally {
-          setInstallingId(null);
-        }
+      case 'resource_catalog':
+        addToast({ type: 'error', title: t('marketplace.import_failed', { defaultValue: 'Import failed' }) });
         break;
-      }
       case 'cost_database':
         navigate('/costs/import');
         break;

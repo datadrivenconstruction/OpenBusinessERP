@@ -4,7 +4,6 @@
  *
  * Routes each upload to the endpoint that owns its kind so files land in
  * the right pipeline instead of all becoming generic documents:
- *   - BIM models (RVT / IFC / …) → POST /api/v1/bim_hub/upload-cad/
  *   - DWG / DXF drawings        → POST /api/v1/dwg_takeoff/drawings/upload/
  *   - everything else           → POST /api/v1/documents/upload/
  * The dedicated BIM/DWG endpoints stream the body server-side, so a large

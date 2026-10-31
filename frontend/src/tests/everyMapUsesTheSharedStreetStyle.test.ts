@@ -73,10 +73,10 @@ function mapConsumers(): { rel: string; text: string }[] {
 const consumers = mapConsumers();
 
 describe('the shared street style config', () => {
-  it('serves light and dark street styles from our own origin', () => {
-    expect(VECTOR_BASEMAP_STYLE_URL).toBe('/api/v1/geo-hub/basemap-style/liberty.json');
-    expect(DARK_VECTOR_BASEMAP_STYLE_URL).toBe('/api/v1/geo-hub/basemap-style/dark.json');
-    expect(basemapStyleUrl('positron')).toBe('/api/v1/geo-hub/basemap-style/positron.json');
+  it('serves light and dark street styles from OpenFreeMap', () => {
+    expect(VECTOR_BASEMAP_STYLE_URL).toBe('https://tiles.openfreemap.org/styles/liberty');
+    expect(DARK_VECTOR_BASEMAP_STYLE_URL).toBe('https://tiles.openfreemap.org/styles/dark');
+    expect(basemapStyleUrl('positron')).toBe('https://tiles.openfreemap.org/styles/positron');
   });
 
   it('picks the dark street style for the dark theme and liberty otherwise', () => {

@@ -70,7 +70,7 @@ const SNAPSHOT = `data:image/png;base64,${'A'.repeat(240)}`;
 const SITE = { lat: 52.52, lng: 13.405 };
 
 /** The relief fallback: one tile at the relief source's deepest zoom, z6. */
-const RELIEF_TILE = /^\/api\/v1\/geo-hub\/basemap\/6\/\d+\/\d+\.png$/;
+const RELIEF_TILE = /^https:\/\/tile\.openstreetmap\.org\/6\/\d+\/\d+\.png$/;
 
 function cardImage(): HTMLImageElement {
   return screen.getByRole('img') as HTMLImageElement;
@@ -168,8 +168,6 @@ describe('the project card falls back to terrain rather than to nothing', () => 
     expect(cardImage().getAttribute('src')).not.toContain('data:image');
 
     expect(creditText()).toBe(RELIEF_ATTRIBUTION);
-    expect(creditText()).toContain('Natural Earth');
-    expect(creditText()).not.toContain('OpenStreetMap');
   });
 
   it('drops back to the relief tile if a snapshot fails to decode', async () => {
@@ -203,8 +201,6 @@ describe('the two credits are actually different statements', () => {
     // would still pass while saying nothing.
     expect(TILE_ATTRIBUTION_TEXT).not.toBe(RELIEF_ATTRIBUTION);
     expect(TILE_ATTRIBUTION_TEXT).toContain('OpenStreetMap');
-    expect(TILE_ATTRIBUTION_TEXT).not.toContain('Natural Earth');
-    expect(RELIEF_ATTRIBUTION).toContain('Natural Earth');
-    expect(RELIEF_ATTRIBUTION).not.toContain('OpenStreetMap');
+    expect(RELIEF_ATTRIBUTION).toContain('OpenStreetMap');
   });
 });

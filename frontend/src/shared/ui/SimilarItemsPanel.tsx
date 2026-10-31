@@ -52,7 +52,6 @@ const DEFAULT_CROSS_PROJECT: Record<SimilarModuleKind, boolean> = {
   documents: true,
   tasks: true,
   risks: true,
-  bim_elements: false,
 };
 
 export default function SimilarItemsPanel({

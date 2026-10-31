@@ -1,77 +1,15 @@
-// DDC-CWICR-OE: DataDrivenConstruction · OpenBusinessERP
 /**
- * Shared basemap configuration.
- *
- * Every map in the app - the Cesium globe, the MapLibre 2D maps, and the
- * static card thumbnails - reaches its basemap through our own backend at
- * ``/api/v1/geo-hub/``, never through a public tile host. Browser ad and
- * privacy blockers routinely block tile hosts by name, which leaves maps
- * showing a blank square. A same-origin ``/api`` request is never blocked.
- *
- * WHY THE UPSTREAM CHANGED. The tiles used to come from CARTO's keyless
- * "Voyager" raster. It stopped being keyless without a release, a notice or
- * a single failing check: it still answers 200 with a valid PNG of the
- * correct geography, now with "API KEY REQUIRED" printed across it. The
- * refusal was in the pixels, so every status, byte-length and decode check
- * stayed green and the founder found it by looking at the screen.
- *
- * The replacement is OpenFreeMap: keyless, quota-free, ODbL, and - the part
- * that actually matters - self-hostable, so an operator who outgrows the
- * public endpoint points the backend at their own copy. Raw OpenStreetMap
- * tiles remain off the table whatever they return: the OSMF Tile Usage
- * Policy forbids proxying and app use, and they enforce by User-Agent.
- *
- * THREE SHAPES. First, interactive maps read vector tiles through the
- * vendored style below and draw the streets themselves, in the browser, on
- * the GPU. That covers every map a user pans and zooms.
- *
- * Second, the card thumbnail. It cannot consume vector data - it is a plain
- * ``<img>`` - but it no longer has to: ``./streetThumbnail`` renders this
- * same vector style once into an offscreen MapLibre instance, reads the
- * canvas as a data URL and destroys the context, so the card shows real
- * street cartography from a still image with nothing left streaming. The
- * card therefore normally shows streets and building footprints, shows a
- * neutral placeholder while the snapshot is queued, and falls back to the
- * relief tile below only when the snapshot cannot be produced (no
- * WebGL, a blocked style, a render that times out). Which of the two it is
- * showing decides which credit it must carry, and both are exported from
- * this file.
- *
- * Third, one surface still cannot consume vector data at all: the Cesium
- * globe's imagery provider, which wants raster XYZ. It reads shaded relief -
- * Natural Earth, public domain, proxied straight through - and so shows
- * terrain rather than streets. That is a deliberate downgrade in detail,
- * taken because every keyless raster street basemap has stopped being
- * keyless, and a coarse honest tile beats a detailed one with "API KEY
- * REQUIRED" printed across it. It is also what the card falls back to, so
- * the relief source stays load-bearing rather than legacy. An operator with
- * a raster street server of their own opts the globe into streets with
- * ``OE_GLOBE_STREET_TILES_URL`` and its attribution; the globe asks the
- * backend through ``fetchGlobeImagery`` below and keeps relief otherwise.
- *
- * This paragraph used to state, as settled fact, that the card could not
- * show streets and that this was a permanent property of an ``<img>``. It
- * was read that way and believed. The claim was about the tile SOURCE, not
- * about the tag: an image tag shows whatever bytes it is given, and the
- * bytes can be rendered on this side.
+ * Basemap sources shared by every map surface: OpenFreeMap vector styles for
+ * street maps and public OpenStreetMap raster tiles for the static fallback.
  */
 
 import { useThemeStore } from '@/stores/useThemeStore';
 
-/**
- * XYZ template for the raster relief basemap the backend proxies.
- *
- * Note the path: this deliberately is NOT the old ``/tiles/`` one. Those
- * responses were sent with ``Cache-Control: immutable`` for a week, and an
- * immutable entry is never revalidated - a browser holding a watermarked
- * CARTO tile would keep painting it no matter what the server now returns.
- * A new path is the only way to retire it. The backend still answers the
- * old path for external XYZ clients such as QGIS.
- */
-export const PROXY_TILE_URL = '/api/v1/geo-hub/basemap/{z}/{x}/{y}.png';
+/** XYZ template for the raster fallback basemap: public OpenStreetMap tiles. */
+export const PROXY_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 /** Base path (without ``/{z}/{x}/{y}.png``) for static single-tile thumbnails. */
-export const PROXY_TILE_BASE = '/api/v1/geo-hub/basemap';
+export const PROXY_TILE_BASE = 'https://tile.openstreetmap.org';
 
 /**
  * Deepest zoom the relief source has. Asking past it returns a blank tile,
@@ -81,15 +19,9 @@ export const PROXY_TILE_BASE = '/api/v1/geo-hub/basemap';
  */
 export const RELIEF_MAX_ZOOM = 6;
 
-/**
- * MapLibre style served by the backend from a vendored copy whose every
- * URL - vector source, low-zoom relief raster, glyphs and sprite - points
- * back at our own origin. Fetching the upstream style and rewriting it at
- * runtime would leave any field we forgot pointing at the tile host, and
- * the map would still render, so the leak would be invisible.
- */
+/** Public OpenFreeMap style for a street basemap. */
 export function basemapStyleUrl(name: BasemapStyleName): string {
-  return `/api/v1/geo-hub/basemap-style/${name}.json`;
+  return `https://tiles.openfreemap.org/styles/${name}`;
 }
 
 /**
@@ -122,18 +54,8 @@ export function useStreetBasemapStyleUrl(): string {
   return streetBasemapStyleUrl(useThemeStore((s) => s.resolved));
 }
 
-/**
- * Plain-text credit for the raster relief tiles, for consumers that render
- * their own attribution chrome (the Cesium globe passes this straight to
- * ``UrlTemplateImageryProvider``; the project card shows it whenever it is
- * displaying the relief fallback rather than a vector snapshot).
- *
- * Natural Earth is public domain and asks for no attribution at all, so this
- * is a courtesy credit, not a licence obligation. It deliberately does NOT
- * name OpenStreetMap: these tiles carry no OSM data, and crediting a source
- * that is not in the picture is its own kind of wrong.
- */
-export const RELIEF_ATTRIBUTION = 'Natural Earth · public domain';
+/** Plain-text credit for the raster fallback tiles (OpenStreetMap, ODbL). */
+export const RELIEF_ATTRIBUTION = '© OpenStreetMap contributors';
 
 /**
  * The same credit as linked HTML, for MapLibre's ``AttributionControl``.
@@ -177,70 +99,3 @@ export const TILE_ATTRIBUTION_TEXT = TILE_ATTRIBUTION_HTML.replace(/<[^>]*>/g, '
   .replace(/&copy;/g, '©')
   .replace(/\s+/g, ' ')
   .trim();
-
-/**
- * What the Cesium globe draws: raster XYZ, the credit that goes with it, the
- * deepest level the source has, and whether it is streets or relief.
- */
-export interface GlobeImagery {
-  url: string;
-  credit: string;
-  maxZoom: number;
-  streets: boolean;
-}
-
-/** The built-in globe imagery: public-domain shaded relief. */
-export const RELIEF_GLOBE_IMAGERY: GlobeImagery = {
-  url: PROXY_TILE_URL,
-  credit: RELIEF_ATTRIBUTION,
-  maxZoom: RELIEF_MAX_ZOOM,
-  streets: false,
-};
-
-/** Backend answer saying whether the operator configured raster street tiles. */
-export const GLOBE_IMAGERY_CONFIG_URL = '/api/v1/geo-hub/globe-imagery/';
-
-/**
- * Turn the ``/globe-imagery/`` answer into what the globe draws.
- *
- * Streets only when the operator configured a raster street server
- * (``OE_GLOBE_STREET_TILES_URL`` with its attribution) and the answer is
- * well formed: a same-origin tile path and a non-empty credit. Anything else
- * is relief, because a globe with no picture or an uncredited one is worse
- * than the coarse default.
- */
-export function resolveGlobeImagery(config: unknown): GlobeImagery {
-  const streets = (config as { streets?: unknown } | null | undefined)?.streets as
-    | { tile_url?: unknown; attribution?: unknown; max_zoom?: unknown }
-    | null
-    | undefined;
-  if (!streets) return RELIEF_GLOBE_IMAGERY;
-  const { tile_url: url, attribution: credit, max_zoom: maxZoom } = streets;
-  if (typeof url !== 'string' || !url.startsWith('/api/') || typeof credit !== 'string' || !credit.trim()) {
-    return RELIEF_GLOBE_IMAGERY;
-  }
-  return {
-    url,
-    credit: credit.trim(),
-    maxZoom: typeof maxZoom === 'number' && maxZoom >= 0 ? maxZoom : RELIEF_MAX_ZOOM,
-    streets: true,
-  };
-}
-
-/**
- * Ask the backend which imagery the globe should draw. Never throws: a
- * failed or slow answer means relief, so the globe always gets a picture.
- */
-export async function fetchGlobeImagery(timeoutMs = 3000): Promise<GlobeImagery> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(GLOBE_IMAGERY_CONFIG_URL, { signal: controller.signal });
-    if (!res.ok) return RELIEF_GLOBE_IMAGERY;
-    return resolveGlobeImagery(await res.json());
-  } catch {
-    return RELIEF_GLOBE_IMAGERY;
-  } finally {
-    clearTimeout(timer);
-  }
-}

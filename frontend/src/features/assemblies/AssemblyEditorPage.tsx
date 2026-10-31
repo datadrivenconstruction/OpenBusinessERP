@@ -22,7 +22,6 @@ import {
   Wrench,
   Layers as LayersIcon,
   Briefcase,
-  Boxes,
   ChevronDown,
   ChevronUp,
   Info,
@@ -68,8 +67,6 @@ export function AssemblyEditorPage() {
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [costDbModalOpen, setCostDbModalOpen] = useState(false);
-  const [catalogPickerOpen, setCatalogPickerOpen] = useState(false);
-  const [catalogPickerType, setCatalogPickerType] = useState<ResourceType | null>(null);
   // The "+ Add" split-button reveals six typed seeds — material is the
   // common case, the rest cover the standard professional vocabulary
   // (estimating tools split M/L/E/S; integrated 5D estimating suites also
@@ -211,12 +208,6 @@ export function AssemblyEditorPage() {
     },
     [addComponentMutation, assembly?.unit, defaultUnit, t],
   );
-
-  const openCatalogPicker = useCallback((rt: ResourceType | null = null) => {
-    setCatalogPickerType(rt);
-    setCatalogPickerOpen(true);
-    setAddMenuOpen(false);
-  }, []);
 
   // M/L/E roll-up — sums by component.resource_type (falling back to the
   // legacy inference for un-typed rows so old assemblies still render
@@ -458,22 +449,6 @@ export function AssemblyEditorPage() {
           >
             {t('assemblies.from_database', { defaultValue: 'Cost DB' })}
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<Boxes size={15} />}
-            onClick={() => openCatalogPicker(null)}
-            disabled={!canEditAssembly}
-            className="border-emerald-300/30 text-emerald-700 hover:bg-emerald-50"
-            title={
-              editHint ??
-              t('assemblies.from_catalog_title', {
-                defaultValue: 'Pick a typed resource (material / labor / equipment) from the catalog',
-              })
-            }
-          >
-            {t('assemblies.from_catalog', { defaultValue: 'From Catalog' })}
-          </Button>
           {/* Typed Add — split button. Default click adds a material;
               chevron opens the menu with all six standard kinds. Mirrors
               what every professional estimator uses (M/L/E/S + operator
@@ -540,16 +515,6 @@ export function AssemblyEditorPage() {
                       })}
                     </button>
                   ))}
-                  <div className="my-1 h-px bg-border-light" />
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => openCatalogPicker(null)}
-                    className="w-full px-3 py-1.5 text-left text-xs hover:bg-surface-secondary flex items-center gap-2 text-emerald-700"
-                  >
-                    <Boxes size={14} />
-                    {t('assemblies.from_catalog', { defaultValue: 'From Catalog…' })}
-                  </button>
                 </div>
               </>
             )}
@@ -764,24 +729,6 @@ export function AssemblyEditorPage() {
       />
       </div>
 
-      {/* Catalog Resource Picker Modal */}
-      {catalogPickerOpen && assemblyId && (
-        <CatalogResourcePickerModal
-          assemblyId={assemblyId}
-          initialType={catalogPickerType}
-          onClose={() => setCatalogPickerOpen(false)}
-          onAdded={() => {
-            setCatalogPickerOpen(false);
-            queryClient.invalidateQueries({ queryKey: ['assembly', assemblyId] });
-            addToast({
-              type: 'success',
-              title: t('assemblies.resource_added_from_catalog', {
-                defaultValue: 'Resource added from catalog',
-              }),
-            });
-          }}
-        />
-      )}
 
       {/* Expansion Preview Modal (Issue #365) */}
       {previewOpen && assemblyId && (
@@ -1971,223 +1918,5 @@ function BreakdownSidebar({
         </div>
       )}
     </Card>
-  );
-}
-
-/* -- Catalog Resource Picker Modal --------------------------------------- */
-
-interface CatalogResourceItem {
-  id: string;
-  resource_code: string;
-  name: string;
-  resource_type: string;
-  category: string;
-  unit: string;
-  base_price: number;
-  currency: string;
-  region: string | null;
-}
-
-/**
- * Modal that lets the user search the global resource catalog
- * (`/v1/catalog/`) by type + free text and add the picked rows as
- * typed components. Auto-fills description, unit, unit_cost,
- * resource_type, currency from the catalog row — no double entry.
- */
-function CatalogResourcePickerModal({
-  assemblyId,
-  initialType,
-  onClose,
-  onAdded,
-}: {
-  assemblyId: string;
-  initialType: ResourceType | null;
-  onClose: () => void;
-  onAdded: () => void;
-}) {
-  const { t } = useTranslation();
-  const [query, setQuery] = useState('');
-  const [type, setType] = useState<ResourceType | ''>(initialType ?? '');
-  const [adding, setAdding] = useState<string | null>(null);
-
-  const queryString = useMemo(() => {
-    const params = new URLSearchParams();
-    if (query.trim()) params.set('q', query.trim());
-    if (type) params.set('resource_type', type);
-    params.set('limit', '40');
-    return params.toString();
-  }, [query, type]);
-
-  const search = useQuery({
-    queryKey: ['catalog-search-for-assembly', queryString],
-    queryFn: () =>
-      apiGet<{ items: CatalogResourceItem[]; total: number }>(
-        `/v1/catalog/?${queryString}`,
-      ),
-  });
-
-  const addMut = useMutation({
-    mutationFn: async (item: CatalogResourceItem) => {
-      setAdding(item.id);
-      try {
-        await assembliesApi.addComponent(assemblyId, {
-          catalog_resource_id: item.id,
-          description: item.name,
-          resource_type: (item.resource_type as ResourceType) || 'material',
-          factor: 1,
-          quantity: 1,
-          unit: item.unit || 'pcs',
-          unit_cost: item.base_price || 0,
-        });
-      } finally {
-        setAdding(null);
-      }
-    },
-    onSuccess: onAdded,
-  });
-
-  const items = search.data?.items ?? [];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
-      <Card className="w-full max-w-3xl mt-12">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Boxes size={16} className="text-emerald-600" />
-            <h2 className="text-base font-semibold">
-              {t('assemblies.catalog_picker_title', {
-                defaultValue: 'Add resource from catalog',
-              })}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-content-tertiary hover:text-content-primary"
-            aria-label={t('common.close', { defaultValue: 'Close' })}
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search
-              size={14}
-              className="absolute start-2.5 top-1/2 -translate-y-1/2 text-content-tertiary"
-            />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('assemblies.catalog_search_ph', {
-                defaultValue: 'Search materials / labor / equipment…',
-              })}
-              className="w-full ps-8 pe-3 py-1.5 text-sm rounded-lg border border-border-light bg-surface-primary focus:outline-none focus:ring-1 focus:ring-emerald-400"
-              autoFocus
-            />
-          </div>
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value as ResourceType | '')}
-            className="text-xs rounded-lg border border-border-light bg-surface-primary px-2 py-1.5 cursor-pointer"
-          >
-            <option value="">
-              {t('assemblies.catalog_type_any', { defaultValue: 'All types' })}
-            </option>
-            <option value="material">{t('assemblies.type_material_full', { defaultValue: 'Material' })}</option>
-            <option value="labor">{t('assemblies.type_labor_full', { defaultValue: 'Labor' })}</option>
-            <option value="equipment">{t('assemblies.type_equipment_full', { defaultValue: 'Equipment' })}</option>
-            <option value="operator">{t('assemblies.type_operator_full', { defaultValue: 'Operator' })}</option>
-          </select>
-        </div>
-
-        {/* Results */}
-        <div className="max-h-[60vh] overflow-y-auto -mx-4 px-4 border-t border-border-light">
-          {search.isLoading && (
-            <div className="py-10 text-center text-content-tertiary">
-              <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
-              {t('common.loading', { defaultValue: 'Loading…' })}
-            </div>
-          )}
-          {!search.isLoading && items.length === 0 && (
-            <div className="py-10 text-center text-content-tertiary text-sm">
-              {t('assemblies.catalog_no_results', {
-                defaultValue: 'No matching resources. Try a broader search or import a regional catalog from /catalog.',
-              })}
-            </div>
-          )}
-          {items.length > 0 && (
-            <table className="w-full text-sm mt-2">
-              <thead>
-                <tr className="text-xs text-content-tertiary text-left">
-                  <th className="py-2 font-medium">
-                    {t('assemblies.catalog_col_name', { defaultValue: 'Name' })}
-                  </th>
-                  <th className="py-2 font-medium w-20 text-center">
-                    {t('assemblies.type', { defaultValue: 'Type' })}
-                  </th>
-                  <th className="py-2 font-medium w-16 text-center">
-                    {t('boq.unit', { defaultValue: 'Unit' })}
-                  </th>
-                  <th className="py-2 font-medium w-28 text-right">
-                    {t('assemblies.unit_cost', { defaultValue: 'Unit Cost' })}
-                  </th>
-                  <th className="py-2 w-16" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-light">
-                {items.map((it) => (
-                  <tr key={it.id} className="hover:bg-surface-secondary/50">
-                    <td className="py-2 pr-2">
-                      <div className="font-medium text-content-primary truncate max-w-[260px]">
-                        {it.name}
-                      </div>
-                      <div className="text-[11px] text-content-tertiary truncate max-w-[260px]">
-                        {it.resource_code}{it.region ? ` · ${it.region}` : ''}
-                      </div>
-                    </td>
-                    <td className="py-2 text-center">
-                      <span
-                        className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                          RESOURCE_TYPE_STYLES[it.resource_type] ?? RESOURCE_TYPE_STYLES.material
-                        }`}
-                      >
-                        {it.resource_type}
-                      </span>
-                    </td>
-                    <td className="py-2 text-center text-content-secondary">{it.unit}</td>
-                    <td className="py-2 text-right tabular-nums text-content-primary">
-                      {new Intl.NumberFormat(getNumberLocale(), {
-                        minimumFractionDigits: currencyFractionDigits(it.currency),
-                        maximumFractionDigits: currencyFractionDigits(it.currency),
-                      }).format(it.base_price || 0)}{' '}
-                      <span className="text-[10px] text-content-tertiary">{it.currency}</span>
-                    </td>
-                    <td className="py-2 text-right">
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={() => addMut.mutate(it)}
-                        disabled={adding === it.id}
-                        icon={
-                          adding === it.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Plus size={12} />
-                          )
-                        }
-                      >
-                        {t('common.add', { defaultValue: 'Add' })}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </Card>
-    </div>
   );
 }

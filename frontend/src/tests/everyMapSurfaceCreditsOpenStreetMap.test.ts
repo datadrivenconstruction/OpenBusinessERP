@@ -72,7 +72,6 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
-  RELIEF_ATTRIBUTION,
   TILE_ATTRIBUTION_HTML,
   TILE_ATTRIBUTION_TEXT,
 } from '../shared/ui/ProjectMap/basemap';
@@ -248,19 +247,6 @@ describe('every map surface credits OpenStreetMap', () => {
     for (const host of RETIRED_PROVIDERS) {
       expect(TILE_ATTRIBUTION_TEXT, `the text credit still names ${host}`).not.toContain(host);
     }
-  });
-
-  it('the relief credit does not claim OpenStreetMap data', () => {
-    expect(
-      typeof RELIEF_ATTRIBUTION,
-      `${CREDIT_MODULE} does not export ${RELIEF_CREDIT_CONST}`,
-    ).toBe('string');
-    expect(
-      /openstreetmap/i.test(RELIEF_ATTRIBUTION),
-      'the relief tiles carry no OSM data. Crediting OSM there is a false ' +
-        'licence statement, the same defect as a stale credit, mirrored.',
-    ).toBe(false);
-    expect(RELIEF_ATTRIBUTION.toLowerCase()).toContain('natural earth');
   });
 
   // Rule 6. A surface that can show two different pictures needs both

@@ -169,8 +169,6 @@ ALLOWED: frozenset[str] = frozenset(
         "approval_routes/router.py::list_delegations",
         "approval_routes/router.py::list_instances",
         "approval_routes/router.py::list_routes",
-        "architecture_map/router.py::list_connections",
-        "architecture_map/router.py::list_modules",
         "authority_submission/router.py::list_profiles",
         "authority_submission/router.py::list_submissions",
         "banking/router.py::list_accounts",

@@ -134,16 +134,13 @@ export type SimilarModuleKind =
   | 'boq'
   | 'documents'
   | 'tasks'
-  | 'risks'
-  | 'bim_elements';
+  | 'risks';
 
 const MODULE_PATH: Record<SimilarModuleKind, (id: string) => string> = {
   boq: (id) => `/api/v1/boq/positions/${encodeURIComponent(id)}/similar/`,
   documents: (id) => `/api/v1/documents/${encodeURIComponent(id)}/similar/`,
   tasks: (id) => `/api/v1/tasks/${encodeURIComponent(id)}/similar/`,
   risks: (id) => `/api/v1/risk/${encodeURIComponent(id)}/similar/`,
-  bim_elements: (id) =>
-    `/api/v1/bim_hub/elements/${encodeURIComponent(id)}/similar/`,
   // NOTE: `requirements` is intentionally absent from this table.
   // The similar-requirements route is nested under the parent set
   // (`/requirements/{set_id}/requirements/{req_id}/similar/`), so

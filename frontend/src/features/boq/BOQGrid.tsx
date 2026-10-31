@@ -1363,10 +1363,10 @@ const BOQGrid = forwardRef<BOQGridHandle, BOQGridProps>(function BOQGrid({
       onRemoveResource: onRemoveResource ?? (() => {}),
       onUpdateResource: onUpdateResource ?? (() => {}),
       onUpdateResourceFields,
-      onSaveResourceToCatalog: onSaveResourceToCatalog ?? (() => {}),
+      onSaveResourceToCatalog,
       onSaveVariantHeaderToCatalog,
       onOpenCostDbForPosition: onOpenCostDbForPosition ?? (() => {}),
-      onOpenCatalogForPosition: onOpenCatalogForPosition ?? (() => {}),
+      onOpenCatalogForPosition,
       onRepickResourceVariant,
       openVariantPickerFor: openVariantPickerSignal,
       onClearOpenVariantPicker: clearOpenVariantPicker,
@@ -3212,10 +3212,12 @@ const BOQGrid = forwardRef<BOQGridHandle, BOQGridProps>(function BOQGrid({
                   label={t('boq.add_from_database', { defaultValue: 'Add from Database' })}
                   onClick={() => { onOpenCostDbForPosition?.(d.id as string); closeContextMenu(); }}
                 />
-                <CtxItem icon={<Boxes size={14}/>}
-                  label={t('boq.add_from_catalog', { defaultValue: 'Pick from Catalog' })}
-                  onClick={() => { onOpenCatalogForPosition?.(d.id as string); closeContextMenu(); }}
-                />
+                {onOpenCatalogForPosition && (
+                  <CtxItem icon={<Boxes size={14}/>}
+                    label={t('boq.add_from_catalog', { defaultValue: 'Pick from Catalog' })}
+                    onClick={() => { onOpenCatalogForPosition?.(d.id as string); closeContextMenu(); }}
+                  />
+                )}
                 </>}
                 {onOpenAICopilot && !readOnly && (
                   <CtxItem icon={<Sparkles size={14} className="text-violet-500"/>}
@@ -3412,10 +3414,12 @@ const BOQGrid = forwardRef<BOQGridHandle, BOQGridProps>(function BOQGrid({
               const posId = d._parentPositionId as string;
               const resIdx = d._resourceIndex as number;
               return <>
-                <CtxItem icon={<BookmarkPlus size={14}/>}
-                  label={t('boq.save_to_catalog', { defaultValue: 'Save to Catalog' })}
-                  onClick={() => { gridContext.onSaveResourceToCatalog(posId, resIdx); closeContextMenu(); }}
-                />
+                {onSaveResourceToCatalog && (
+                  <CtxItem icon={<BookmarkPlus size={14}/>}
+                    label={t('boq.save_to_catalog', { defaultValue: 'Save to Catalog' })}
+                    onClick={() => { onSaveResourceToCatalog(posId, resIdx); closeContextMenu(); }}
+                  />
+                )}
                 {!readOnly && <>
                 <CtxSeparator />
                 <CtxItem icon={<X size={14}/>}
@@ -3484,10 +3488,12 @@ const BOQGrid = forwardRef<BOQGridHandle, BOQGridProps>(function BOQGrid({
                   label={t('boq.add_from_database', { defaultValue: 'Add from Database' })}
                   onClick={() => { onOpenCostDbForPosition?.(posId); closeContextMenu(); }}
                 />
-                <CtxItem icon={<Boxes size={14}/>}
-                  label={t('boq.add_from_catalog', { defaultValue: 'Pick from Catalog' })}
-                  onClick={() => { onOpenCatalogForPosition?.(posId); closeContextMenu(); }}
-                />
+                {onOpenCatalogForPosition && (
+                  <CtxItem icon={<Boxes size={14}/>}
+                    label={t('boq.add_from_catalog', { defaultValue: 'Pick from Catalog' })}
+                    onClick={() => { onOpenCatalogForPosition?.(posId); closeContextMenu(); }}
+                  />
+                )}
               </>;
             })()}
           </div>

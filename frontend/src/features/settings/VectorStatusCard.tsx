@@ -43,7 +43,6 @@ const REINDEX_PATH: Record<string, string> = {
   oe_documents: '/v1/documents/vector/reindex/',
   oe_tasks: '/v1/tasks/vector/reindex/',
   oe_risks: '/v1/risk/vector/reindex/',
-  oe_bim_elements: '/v1/bim_hub/vector/reindex/',
   oe_requirements: '/v1/requirements/vector/reindex/',
   oe_validation: '/v1/validation/vector/reindex/',
   oe_chat: '/v1/erp_chat/vector/reindex/',

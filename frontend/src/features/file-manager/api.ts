@@ -511,6 +511,7 @@ export interface KindDeleteOutcome {
  */
 export async function deleteByKind(kind: FileKind, fileId: string): Promise<void> {
   const path = deletePathForKind(kind, fileId);
+  if (!path) throw new Error(`Deleting ${kind} files is not supported in this edition`);
   await apiDelete(path);
 }
 
@@ -533,7 +534,7 @@ export async function bulkDeleteDocuments(
 /** Build the canonical DELETE path for one file kind + id. Exported so
  * tests and the dispatcher share the same routing table.
  */
-export function deletePathForKind(kind: FileKind, fileId: string): string {
+export function deletePathForKind(kind: FileKind, fileId: string): string | null {
   const enc = encodeURIComponent(fileId);
   switch (kind) {
     case 'document':
@@ -543,7 +544,7 @@ export function deletePathForKind(kind: FileKind, fileId: string): string {
     case 'sheet':
       return `/v1/documents/sheets/${enc}`;
     case 'bim_model':
-      return `/v1/bim_hub/${enc}`;
+      return null; // no BIM backend ships in this edition
     case 'dwg_drawing':
       return `/v1/dwg_takeoff/drawings/${enc}`;
     case 'takeoff':

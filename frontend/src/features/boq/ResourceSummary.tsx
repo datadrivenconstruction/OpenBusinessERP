@@ -13,11 +13,8 @@ import {
   Truck,
   Users,
   Layers,
-  BookmarkPlus,
-  Check,
 } from 'lucide-react';
 import { boqApi, type ResourceSummaryItem, type ResourceSummaryResponse } from './api';
-import { apiPost } from '@/shared/lib/api';
 import { currencyFractionDigits } from '@/shared/lib/money';
 import { useToastStore } from '@/stores/useToastStore';
 import { getResourceTypeLabel } from './boqResourceTypes';
@@ -130,69 +127,8 @@ export function ResourceSummary({
   //          80/15/5 split" so we keep it descending and the UI lights up
   //          the A/B/C class boundaries with separator rules.
   const [sortBy, setSortBy] = useState<'cost' | 'name' | 'abc'>('cost');
-  const [savedResources, setSavedResources] = useState<Set<string>>(new Set());
-  const [savingResource, setSavingResource] = useState<string | null>(null);
   const addToast = useToastStore((s) => s.addToast);
   const queryClient = useQueryClient();
-
-  const handleSaveToCatalog = useCallback(
-    async (resource: ResourceSummaryItem) => {
-      const key = `${resource.type}:${resource.name}`;
-      setSavingResource(key);
-      try {
-        const code = `MY-${resource.type.toUpperCase().slice(0, 3)}-${Date.now().toString(36).toUpperCase()}`;
-
-        // Read project & BOQ info from React Query cache
-        const boqData = queryClient.getQueryData<{ name?: string; project_id?: string }>(['boq', boqId]);
-        const projectData = boqData?.project_id
-          ? queryClient.getQueryData<{ name?: string }>(['project', boqData.project_id])
-          : undefined;
-
-        await apiPost('/v1/catalog/', {
-          resource_code: code,
-          name: resource.name,
-          resource_type: resource.type,
-          category: resource.type.charAt(0).toUpperCase() + resource.type.slice(1),
-          unit: resource.unit,
-          base_price: resource.avg_unit_rate,
-          min_price: resource.avg_unit_rate,
-          max_price: resource.avg_unit_rate,
-          currency: resource.currency || 'EUR',
-          source: 'boq_import',
-          region: 'CUSTOM',
-          specifications: {
-            total_quantity: resource.total_quantity,
-            total_cost: resource.total_cost,
-            positions_used: resource.positions_used,
-            source_project_name: projectData?.name || '',
-            source_project_id: boqData?.project_id || '',
-            source_boq_name: boqData?.name || '',
-            source_boq_id: boqId || '',
-            saved_at: new Date().toISOString(),
-          },
-          metadata: {},
-        });
-        setSavedResources((prev) => new Set(prev).add(key));
-        addToast({
-          type: 'success',
-          title: t('boq.rs_saved_to_catalog', { defaultValue: 'Saved to catalog' }),
-          message: resource.name,
-        });
-      } catch (err: unknown) {
-        const detail = err instanceof Error ? err.message : t('boq.rs_save_failed', { defaultValue: 'Failed to save' });
-        addToast({
-          type: 'error',
-          title: t('boq.rs_save_failed', { defaultValue: 'Save failed' }),
-          message: detail,
-        });
-      } finally {
-        setSavingResource(null);
-      }
-    },
-    [addToast, t, boqId, queryClient],
-  );
-
-  void savingResource; // used implicitly via savedResources
 
   /** Bulk re-pick: fan the chosen variant out to every (position, resource_idx)
    *  pair captured on the aggregated row. Mirrors the per-row re-pick on the
@@ -530,9 +466,6 @@ export function ResourceSummary({
                           <th className="px-3 py-2 text-center font-medium w-16">
                             {t('boq.rs_col_positions', { defaultValue: 'Pos.' })}
                           </th>
-                          <th className="px-2 py-2 text-center font-medium w-10">
-                            <BookmarkPlus size={12} className="inline" />
-                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -555,8 +488,6 @@ export function ResourceSummary({
                               resource={res}
                               fmt={fmt}
                               fmtMoney={fmtMoney}
-                              onSaveToCatalog={handleSaveToCatalog}
-                              isSaved={savedResources.has(`${res.type}:${res.name}`)}
                               onRepickVariant={handleRepickVariant}
                               abcDividerAbove={showAbcDivider}
                             />
@@ -647,8 +578,6 @@ function ResourceRow({
   resource,
   fmt,
   fmtMoney,
-  onSaveToCatalog,
-  isSaved,
   onRepickVariant,
   abcDividerAbove,
 }: {
@@ -657,8 +586,6 @@ function ResourceRow({
   fmt: Intl.NumberFormat;
   /** Costs and rates. Separate because the two answer to different rules. */
   fmtMoney: Intl.NumberFormat;
-  onSaveToCatalog: (resource: ResourceSummaryItem) => void;
-  isSaved: boolean;
   onRepickVariant: (resource: ResourceSummaryItem, chosen: CostVariant) => void;
   /** Issue #106 - when true, draw a thicker top border to visualise the
    *  A→B or B→C boundary in ABC sort mode. */
@@ -853,21 +780,6 @@ function ResourceRow({
       </td>
       <td className="px-3 py-2 text-center text-content-tertiary tabular-nums">
         {resource.positions_used}
-      </td>
-      <td className="px-2 py-2 text-center">
-        {isSaved ? (
-          <span className="inline-flex items-center gap-0.5 text-semantic-success text-[10px] font-medium">
-            <Check size={12} />
-          </span>
-        ) : (
-          <button
-            onClick={() => onSaveToCatalog(resource)}
-            title={t('boq.rs_save_to_catalog', { defaultValue: 'Save to My Catalog' })}
-            className="inline-flex items-center justify-center h-6 w-6 rounded-md text-content-tertiary opacity-0 group-hover:opacity-100 hover:text-oe-blue-text hover:bg-oe-blue-subtle/40 transition-all"
-          >
-            <BookmarkPlus size={13} />
-          </button>
-        )}
       </td>
     </tr>
   );

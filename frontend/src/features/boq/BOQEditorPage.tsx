@@ -117,7 +117,6 @@ import { ExcelPasteModal, type PastedRow } from './ExcelPasteModal';
 import { QualityScoreRing, TipsPanel, QuickAddFAB, EmptyBOQOnboarding, ExportWarningDialog } from './BOQSummaryPanel';
 import { ActivityPanel } from './ActivityPanel';
 import { CostDatabaseSearchModal, AssemblyPickerModal } from './BOQModals';
-import { CatalogPickerModal, type CatalogResource } from './CatalogPickerModal';
 import { CustomColumnsDialog } from './CustomColumnsDialog';
 import { BOQVariablesDialog } from './BOQVariablesDialog';
 import { CostPerAreaBenchmark } from './CostPerAreaBenchmark';
@@ -1364,8 +1363,6 @@ export function BOQEditorPage() {
   const [costDbForPositionId, setCostDbForPositionId] = useState<string | null>(null);
 
   /** Catalog picker modal state. */
-  const [catalogPickerOpen, setCatalogPickerOpen] = useState(false);
-  const [catalogForPositionId, setCatalogForPositionId] = useState<string | null>(null);
 
   // Listen for "From Database" button clicks from child SectionBlock components
   useEffect(() => {
@@ -3354,132 +3351,6 @@ export function BOQEditorPage() {
     [boq?.positions, updatePositionMutate],
   );
 
-  /** Save a resource from a position to the user's catalog. */
-  const handleSaveResourceToCatalog = useCallback(
-    async (positionId: string, resourceIndex: number) => {
-      const pos = boq?.positions.find((p) => p.id === positionId);
-      if (!pos) return;
-      const resources = (pos.metadata?.resources ?? []) as Array<Record<string, unknown>>;
-      const res = resources[resourceIndex];
-      if (!res) return;
-      try {
-        const code = `MY-${((res.type as string) ?? 'OTH').toUpperCase().slice(0, 3)}-${Date.now().toString(36).toUpperCase()}`;
-        await apiPost('/v1/catalog/', {
-          resource_code: code,
-          name: res.name,
-          resource_type: res.type || 'material',
-          category: ((res.type as string) ?? 'other').charAt(0).toUpperCase() + ((res.type as string) ?? 'other').slice(1),
-          unit: res.unit,
-          base_price: res.unit_rate,
-          min_price: res.unit_rate,
-          max_price: res.unit_rate,
-          // The project's own code, not a code reconstructed from its symbol.
-          // The reconstruction recognised three symbols and answered EUR for
-          // everything else, so a project in CLP, BRL, PLN or INR wrote its
-          // catalogue rows in euros. It could also be confidently wrong rather
-          // than merely wrong: the Chilean peso's symbol is a dollar sign.
-          // When the project never set a currency the field is omitted rather
-          // than sent blank, so the catalogue applies its own declared default.
-          // Nothing on that path backfills from the region, and an empty string
-          // passes validation and lands in the column as a currencyless row.
-          currency: currencyCode || undefined,
-          source: 'boq_import',
-          region: 'CUSTOM',
-          specifications: {
-            source_position: pos.description,
-            source_boq_id: boqId,
-            saved_at: new Date().toISOString(),
-          },
-          metadata: {},
-        });
-        addToast({
-          type: 'success',
-          title: t('boq.saved_to_catalog', { defaultValue: 'Saved to catalog' }),
-          message: res.name as string,
-        });
-      } catch {
-        addToast({
-          type: 'error',
-          title: t('boq.save_to_catalog_failed', { defaultValue: 'Save failed' }),
-        });
-      }
-    },
-    [boq?.positions, boqId, currencyCode, addToast, t],
-  );
-
-  /** Save the variant-header row to the user's catalog under a custom name.
-   *
-   *  The variant header is a SYNTHETIC grid row — it has no entry in
-   *  ``position.metadata.resources`` — so ``handleSaveResourceToCatalog``
-   *  can't reach it via index. This handler reads the chosen variant
-   *  directly off the position (``metadata.cost_item_variants`` +
-   *  ``metadata.variant``) and POSTs the user's edited name as a brand-new
-   *  catalog article so the user keeps a private copy ("превратится в
-   *  обычный артикул"). */
-  const handleSaveVariantHeaderToCatalog = useCallback(
-    async (positionId: string, customName: string) => {
-      const pos = boq?.positions.find((p) => p.id === positionId);
-      if (!pos) return;
-      const meta = (pos.metadata ?? {}) as Record<string, unknown>;
-      const variants = (meta.cost_item_variants as Array<Record<string, unknown>> | undefined) ?? [];
-      const chosenCode = (meta.variant as string | undefined) ?? null;
-      const chosen =
-        (chosenCode ? variants.find((v) => (v.code as string) === chosenCode) : null) ??
-        variants[0];
-      if (!chosen) return;
-      const trimmed = customName.trim();
-      if (!trimmed) return;
-      // Currency resolution chain: per-variant override (rare) → position
-      // metadata.currency (set when the CWICR row was applied to the
-      // position) → the project's own currency code. The catalog should keep
-      // the article in its native currency, not the project base — that
-      // matches the rest of the variant pipeline.
-      //
-      // The last link used to rebuild a code out of the display symbol and
-      // answer EUR for every symbol it did not recognise, which is most of
-      // them. It reads as a fallback and behaves as an assertion. Undefined
-      // when the project set no currency either, so the field is left out of
-      // the payload and the catalogue applies its own default.
-      const posMetaCurrency = (meta.currency as string | undefined) || undefined;
-      const catalogCurrency =
-        (chosen.currency as string | undefined) || posMetaCurrency || currencyCode || undefined;
-      const code = `MY-VAR-${Date.now().toString(36).toUpperCase()}`;
-      try {
-        await apiPost('/v1/catalog/', {
-          resource_code: code,
-          name: trimmed,
-          resource_type: 'material',
-          category: 'Variant',
-          unit: pos.unit,
-          base_price: chosen.price ?? pos.unit_rate,
-          min_price: chosen.price ?? pos.unit_rate,
-          max_price: chosen.price ?? pos.unit_rate,
-          currency: catalogCurrency,
-          source: 'boq_variant_promote',
-          region: 'CUSTOM',
-          specifications: {
-            source_position: pos.description,
-            source_boq_id: boqId,
-            promoted_from_variant: chosen.code ?? null,
-            saved_at: new Date().toISOString(),
-          },
-          metadata: {},
-        });
-        addToast({
-          type: 'success',
-          title: t('boq.saved_to_catalog', { defaultValue: 'Saved to catalog' }),
-          message: trimmed,
-        });
-      } catch {
-        addToast({
-          type: 'error',
-          title: t('boq.save_to_catalog_failed', { defaultValue: 'Save failed' }),
-        });
-      }
-    },
-    [boq?.positions, boqId, currencyCode, addToast, t],
-  );
-
   /** Re-pick the variant on an already-added resource entry (v2.6.26+).
    *
    *  Reads ``available_variants`` cached on the resource at apply-time (see
@@ -3716,81 +3587,6 @@ export function BOQEditorPage() {
       addToast({ type: 'success', title: successMsg });
     },
     [costDbForPositionId, boq?.positions, updateMutation, addToast, t],
-  );
-
-  /** Open catalog picker modal in "add resource to position" mode. */
-  const handleOpenCatalogForPosition = useCallback(
-    (positionId: string) => {
-      setCatalogForPositionId(positionId);
-      setCatalogPickerOpen(true);
-    },
-    [],
-  );
-
-  /** When a catalog resource is selected, add it as a resource to the target position. */
-  const handleCatalogSelect = useCallback(
-    (catalogRes: CatalogResource) => {
-      if (!catalogForPositionId || !boq) return;
-      const pos = boq.positions.find((p) => p.id === catalogForPositionId);
-      if (!pos) return;
-
-      const newResource = {
-        name: catalogRes.name,
-        code: catalogRes.resource_code,
-        type: catalogRes.resource_type,
-        unit: catalogRes.unit,
-        quantity: 1,
-        unit_rate: catalogRes.base_price || 0,
-        total: catalogRes.base_price || 0,
-      };
-
-      const existing = [...((pos.metadata?.resources ?? []) as Array<Record<string, unknown>>)];
-      existing.push(newResource);
-
-      // Recalculate unit_rate from all resources
-      let newRate = 0;
-      for (const r of existing) {
-        newRate += ((r.quantity as number) ?? 0) * ((r.unit_rate as number) ?? 0);
-      }
-      newRate = Math.round(newRate * 100) / 100;
-
-      // Optimistic cache write: reflect the new resource instantly in the grid.
-      // Without this, the user sees no feedback until the server round-trip
-      // completes, and onMutate in updateMutation skips non-quantity payloads.
-      queryClient.setQueryData(['boq', boqId], (old: unknown) => {
-        if (!old || typeof old !== 'object') return old;
-        const cur = old as { positions: Position[]; [k: string]: unknown };
-        return {
-          ...cur,
-          positions: cur.positions.map((p) =>
-            p.id === catalogForPositionId
-              ? {
-                  ...p,
-                  unit_rate: newRate,
-                  total: newRate * (p.quantity ?? 1),
-                  metadata: { ...p.metadata, resources: existing },
-                }
-              : p,
-          ),
-        };
-      });
-
-      updateMutation.mutate({
-        id: catalogForPositionId,
-        data: {
-          unit_rate: newRate,
-          metadata: { ...pos.metadata, resources: existing },
-        },
-      });
-
-      setCatalogPickerOpen(false);
-      setCatalogForPositionId(null);
-      addToast({
-        type: 'success',
-        title: t('boq.resource_added_from_catalog', { defaultValue: 'Resource added from catalog' }),
-      });
-    },
-    [catalogForPositionId, boq, boqId, queryClient, updateMutation, addToast, t],
   );
 
   /** Add a manual resource (not from database) to a position. */
@@ -5176,11 +4972,8 @@ export function BOQEditorPage() {
           onUpdateResource={handleUpdateResource}
           onUpdateResourceFields={handleUpdateResourceFields}
           onUpdateResourceCustomField={handleUpdateResourceCustomField}
-          onSaveResourceToCatalog={handleSaveResourceToCatalog}
-          onSaveVariantHeaderToCatalog={handleSaveVariantHeaderToCatalog}
           onRepickResourceVariant={handleRepickResourceVariant}
           onOpenCostDbForPosition={handleOpenCostDbForPosition}
-          onOpenCatalogForPosition={handleOpenCatalogForPosition}
           onOpenAICopilot={handleOpenAICopilot}
           onPriceAnalysis={setPriceAnalysisPositionId}
           onShowPositionActuals={setActualsPositionId}
@@ -5407,16 +5200,6 @@ export function BOQEditorPage() {
           }}
         />
       )}
-
-      {/* ── Catalog Picker Modal ─────────────────────────────────────── */}
-      <CatalogPickerModal
-        open={catalogPickerOpen}
-        onClose={() => {
-          setCatalogPickerOpen(false);
-          setCatalogForPositionId(null);
-        }}
-        onSelect={handleCatalogSelect}
-      />
 
       {/* ── Quick Add FAB ─────────────────────────────────────────────── */}
       {!boq.is_locked && (

@@ -561,7 +561,7 @@ export interface ResourceGridContext {
    *  Without this, two sequential `onUpdateResource` calls race on the React Query
    *  cache and the second silently overwrites the first. */
   onUpdateResourceFields?: (positionId: string, resourceIndex: number, fields: Record<string, number | string>) => void;
-  onSaveResourceToCatalog: (positionId: string, resourceIndex: number) => void;
+  onSaveResourceToCatalog?: (positionId: string, resourceIndex: number) => void;
   /** Save a variant-header synthetic row to the user's catalog under the
    *  user-edited custom name. Reads the chosen variant off the position
    *  directly (no resource index — the variant row is synthetic). */
@@ -573,7 +573,7 @@ export interface ResourceGridContext {
    *  with a manually-overridden rate, per the user's spec). */
   onUpdateVariantHeader?: (positionId: string, fields: { quantity?: number; unit_rate?: number }) => void;
   onOpenCostDbForPosition: (positionId: string) => void;
-  onOpenCatalogForPosition: (positionId: string) => void;
+  onOpenCatalogForPosition?: (positionId: string) => void;
   /**
    * Re-pick the variant on an already-added resource row (v2.6.26+).
    * Surfaces the existing CWICR ``VariantPicker`` against the resource's
@@ -3620,6 +3620,7 @@ export function EditableResourceRow({ data, ctx, slots, leftPad }: { data: Recor
       className="shrink-0 flex items-center justify-center gap-0.5 self-center"
       style={{ width: `${width}px` }}
     >
+      {ctx.onSaveResourceToCatalog && (
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -3632,6 +3633,7 @@ export function EditableResourceRow({ data, ctx, slots, leftPad }: { data: Recor
       >
         <BookmarkPlus size={10} />
       </button>
+      )}
       <button aria-label={t('common.remove', { defaultValue: 'Remove' })}
         onClick={(e) => {
           e.stopPropagation();
@@ -4247,6 +4249,7 @@ export function ResourceFullWidthRenderer(params: ICellRendererParams) {
           <Plus size={10} />
           {ctx.t('boq.add_from_database', { defaultValue: 'From Database' })}
         </button>
+        {ctx.onOpenCatalogForPosition && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -4258,6 +4261,7 @@ export function ResourceFullWidthRenderer(params: ICellRendererParams) {
           <Boxes size={10} />
           {ctx.t('boq.add_from_catalog_short', { defaultValue: 'From Catalog' })}
         </button>
+        )}
       </span>
     );
 
