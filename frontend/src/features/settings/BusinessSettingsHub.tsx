@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { Hash, Package, Search, Users } from 'lucide-react';
 import { apiGet } from '@/shared/lib/api';
 import { BusinessDocumentsSettings, profileMatches } from './BusinessDocumentsSettings';
+import { MAIL_KEYWORDS, MailSettingsSection } from './MailSettings';
 
 interface NumberingRow {
   area: string;
@@ -112,8 +113,9 @@ export function BusinessSettingsHub({ canEdit }: { canEdit: boolean }) {
   const q = query.trim().toLowerCase();
   const showProfile = profileMatches(q);
   const showNumbering = !q || NUMBERING_KEYWORDS.includes(q);
+  const showMail = !q || MAIL_KEYWORDS.includes(q);
   const links = LINK_SECTIONS.filter((s) => !q || s.keywords.includes(q));
-  const nothing = !showProfile && !showNumbering && links.length === 0;
+  const nothing = !showProfile && !showNumbering && !showMail && links.length === 0;
 
   return (
     <div data-testid="business-settings-hub">
@@ -131,6 +133,7 @@ export function BusinessSettingsHub({ canEdit }: { canEdit: boolean }) {
 
       {showProfile && <BusinessDocumentsSettings canEdit={canEdit} query={query} />}
       {showNumbering && <NumberingSection />}
+      {showMail && <MailSettingsSection canEdit={canEdit} />}
 
       {links.length > 0 && (
         <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2">

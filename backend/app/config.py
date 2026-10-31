@@ -691,6 +691,10 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     smtp_from: str = "info@datadrivenconstruction.io"
     smtp_tls: bool = True
+    # Implicit TLS (port 465); takes precedence over ``smtp_tls``.
+    smtp_ssl: bool = False
+    smtp_from_name: str = ""
+    smtp_reply_to: str = ""
     # Public URL used to build password-reset and notification links.
     # Falls back to the first CORS origin so dev installs work without
     # an explicit setting.

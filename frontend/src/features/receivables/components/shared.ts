@@ -19,7 +19,7 @@ export const BUCKET_COLOR: Record<Bucket, string> = {
   d90_plus: 'bg-red-700',
 };
 
-export const LETTER_VARIANT = { draft: 'warning', approved: 'success', discarded: 'neutral' } as const;
+export const LETTER_VARIANT = { draft: 'warning', approved: 'success', discarded: 'neutral', sent: 'blue' } as const;
 
 export const PROMISE_VARIANT: Record<PromiseStatus, BadgeVariant> = {
   open: 'blue',

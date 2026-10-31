@@ -79,6 +79,7 @@ class EmailMessage:
     headers: dict[str, str] = field(default_factory=dict)
     tags: list[str] = field(default_factory=list)
     attachments: list[EmailAttachment] = field(default_factory=list)
+    cc: list[str] = field(default_factory=list)
 
 
 @dataclass(slots=True)

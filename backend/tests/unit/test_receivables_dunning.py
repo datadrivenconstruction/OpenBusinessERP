@@ -81,7 +81,7 @@ async def test_aging_per_customer(session):
 async def test_dunning_progression_and_never_sends(session):
     sales, rec = await _setup(session)
     inv = await _invoice(sales, "Acme", "100")
-    # The module has no delivery path at all: no mail or notification imports.
+    # No automatic delivery path: mail leaves only through the explicit send_letter call.
     src = inspect.getsource(rsvc)
     assert not any(w in src for w in ("smtplib", "send_mail", "send_email", "notifications", "email_service"))
 
@@ -96,7 +96,7 @@ async def test_dunning_progression_and_never_sends(session):
     # Pending draft blocks a second proposal for the same invoice.
     assert (await rec.propose_run(DUE + timedelta(days=11))).letters == []
     await rec.decide(l1.id, "approved")
-    assert l1.status == "approved" and not hasattr(l1, "sent_at")
+    assert l1.status == "approved" and l1.sent_at is None
 
     run2 = await rec.propose_run(DUE + timedelta(days=40))
     (l2,) = run2.letters
@@ -150,3 +150,27 @@ async def test_block_list_and_isolation(session):
     assert (await other.propose_run(DUE + timedelta(days=10))).letters == []
     assert await other.history() == []
     assert all(not r.letters for r in await other.list_runs())
+
+
+@pytest.mark.asyncio
+async def test_send_letter_marks_sent_and_logs(session, monkeypatch):
+    from app.core.email.memory import MemoryEmailBackend
+    from app.core.email.service import EmailService
+    from app.modules.sales.documents import service as docs
+
+    monkeypatch.setattr(docs, "read_business_settings", lambda: {"company_name": "Muster GmbH"})
+    monkeypatch.setattr(docs, "read_company_profile", lambda: {})
+    sales, rec = await _setup(session)
+    inv = await _invoice(sales, "Acme", "100")
+    inv.customer_email = "ap@acme.example"
+    run = await rec.propose_run(DUE + timedelta(days=10))
+    letter = run.letters[0]
+    backend = MemoryEmailBackend()
+    sent, result = await rec.send_letter(letter.id, email=EmailService(backend), cc=["cfo@acme.example"], by="u1")
+    assert result.ok and sent.status == "sent" and sent.sent_to == "ap@acme.example" and sent.channel == "email"
+    msg = backend.sent[0]
+    assert msg.cc == ["cfo@acme.example"] and msg.attachments[0].content.startswith(b"%PDF")
+    assert [h.id for h in await rec.history()] == [letter.id]
+    assert (await docs.send_history(session, inv))[0].status == "sent"
+    with pytest.raises(ReceivablesConflictError):
+        await rec.send_letter(letter.id, email=EmailService(backend))

@@ -135,7 +135,7 @@ def diagnose_email_config(settings: Settings) -> str | None:
             f"Set SMTP_HOST to your provider's submission server. See {EMAIL_SETUP_DOC}."
         )
 
-    if backend == "smtp" and settings.smtp_port == 465:
+    if backend == "smtp" and settings.smtp_port == 465 and not settings.smtp_ssl:
         return (
             "SMTP_PORT=465 expects implicit TLS, which this transport does not speak - it "
             "connects in the clear and upgrades with STARTTLS, so port 465 stalls until the "

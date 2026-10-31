@@ -10,6 +10,7 @@ import { Card, EmptyState, SkeletonTable } from '@/shared/ui';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { getErrorMessage } from '@/shared/lib/api';
 import { mailtoDraft, previewByLevel, receivablesApi, type DunningLetter } from '../api';
+import { MailNotConfigured, useMailStatus } from '@/features/settings/MailSettings';
 import { FollowUpItem } from './CustomerDrawer';
 import { LETTER_VARIANT, inputCls, textareaCls } from './shared';
 
@@ -42,6 +43,20 @@ export function DunningTab({ error, setError, creating, currency, onOpenCustomer
   const save = useMutation({
     mutationFn: (lt: DunningLetter) => receivablesApi.updateLetter(lt.id, { subject: lt.subject, body: lt.body, channel: lt.channel }),
     onSuccess: (lt) => { setSelected(lt); void refresh(); },
+    onError: (e) => setError(getErrorMessage(e)),
+  });
+  const mail = useMailStatus();
+  const [sendTo, setSendTo] = useState('');
+  const sendMail = useMutation({
+    mutationFn: async (lt: DunningLetter) => {
+      if (lt.status === 'draft') await receivablesApi.updateLetter(lt.id, { subject: lt.subject, body: lt.body, channel: 'email' });
+      return receivablesApi.sendLetter(lt.id, sendTo.trim() ? { to: sendTo.trim() } : {});
+    },
+    onSuccess: (r) => {
+      setSelected(r.letter);
+      void refresh();
+      if (!r.ok) setError(t('receivables.send_failed', { defaultValue: 'Sending failed: {{reason}}', reason: r.reason }));
+    },
     onError: (e) => setError(getErrorMessage(e)),
   });
   const all = (runs.data ?? []).flatMap((r) => r.letters);
@@ -167,12 +182,32 @@ export function DunningTab({ error, setError, creating, currency, onOpenCustomer
                   </Button>
                 </>
               )}
-              {selected.status === 'approved' && (
-                <a className="text-sm text-oe-blue underline" href={mailtoDraft(selected)}>
+              {(selected.status === 'approved' || selected.status === 'sent') && (
+                <a className="text-sm text-oe-blue underline" href={mailtoDraft(selected, selected.sent_to ?? '')}>
                   {t('receivables.open_in_mail', { defaultValue: 'Open in my mail program' })}
                 </a>
               )}
             </div>
+            {selected.status === 'sent' && (
+              <p className="text-xs text-content-tertiary">
+                {t('receivables.sent_to', { defaultValue: 'E-mailed to {{to}}', to: selected.sent_to ?? '' })}
+              </p>
+            )}
+            {(selected.status === 'draft' || selected.status === 'approved') && (
+              mail.data?.configured ? (
+                <div className="flex flex-wrap items-end gap-2">
+                  <input className={clsx(inputCls, 'min-w-[220px] flex-1')} type="email" value={sendTo}
+                    placeholder={t('receivables.send_to_placeholder', { defaultValue: "Customer's e-mail on the invoice" })}
+                    aria-label={t('receivables.send_to', { defaultValue: 'Send to' })}
+                    onChange={(e) => setSendTo(e.target.value)} />
+                  <Button size="sm" variant="secondary" disabled={sendMail.isPending} onClick={() => sendMail.mutate(selected)}>
+                    {t('receivables.send_email', { defaultValue: 'Send by e-mail' })}
+                  </Button>
+                </div>
+              ) : mail.data ? (
+                <MailNotConfigured />
+              ) : null
+            )}
           </Card>
         ) : (
           <Card className="flex items-center justify-center text-sm text-content-tertiary">

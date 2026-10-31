@@ -141,7 +141,8 @@ async def test_send_writes_log_and_uses_outbox(session):
         email=EmailService(backend),
     )
     assert log.status == "sent" and log.to_addr == "buyer@example.com" and log.cc == ["acc@example.com"]
-    assert len(backend.sent) == 2
+    assert len(backend.sent) == 1 and backend.sent[0].cc == ["acc@example.com"]
+    assert doc.sent_to == "buyer@example.com" and doc.sent_at is not None
     assert backend.sent[0].attachments[0].content.startswith(b"%PDF")
     history = await docs.send_history(session, doc)
     assert [h.id for h in history] == [log.id] and history[0].sent_by == "user-1"
@@ -193,3 +194,59 @@ async def test_tenant_isolation(session):
     )
     other = await _doc(session, tenant="t-b")
     assert await docs.send_history(session, other) == []
+
+
+def test_epc_spec_example():
+    """EPC069-12 sample (Belgian Red Cross), emitted as version 002 with a two-decimal amount."""
+    payload = epc_payload(
+        name="Red Cross of Belgium",
+        iban="BE72000000001616",
+        bic="BPOTBEB1",
+        amount=D("1"),
+        purpose="CHAR",
+        remittance="Urgency fund",
+    )
+    assert payload.split("\n") == [
+        "BCD", "002", "1", "SCT", "BPOTBEB1", "Red Cross of Belgium",
+        "BE72000000001616", "EUR1.00", "CHAR", "", "Urgency fund",
+    ]  # fmt: skip
+
+
+@pytest.mark.asyncio
+async def test_template_placeholders_and_aliases(session):
+    doc = await _doc(session, due_date=date(2026, 3, 24))
+    values = docs.placeholders(doc, COMPANY)
+    text = docs.fill("{number}|{customer}|{company}|{total}|{due_date}|{unknown}", values)
+    assert text == f"{doc.number}|Kunde AG|Muster Bau GmbH|{values['total']}|24.03.2026|{{unknown}}"
+    assert "378,40" in values["total"]
+    en = await _doc(session, language="en")
+    assert "Hello" in docs.email_draft(en, COMPANY)["body"]
+    assert "Guten Tag" in docs.email_draft(doc, COMPANY)["body"]
+    custom = {**COMPANY, "document_texts": {"invoice": {"email_subject": "Rechnung {number} / {company}"}}}
+    assert docs.email_draft(doc, custom)["subject"] == f"Rechnung {doc.number} / Muster Bau GmbH"
+
+
+@pytest.mark.asyncio
+async def test_quote_send_moves_to_sent_only_on_success(session):
+    class Failing(MemoryEmailBackend):
+        async def send(self, message):
+            from app.core.email.base import DeliveryResult
+
+            return DeliveryResult.failure("memory", "boom")
+
+    quote = await _doc(session, "quote")
+    log = await docs.send_document(
+        session, quote, to="buyer@example.com", cc=[], subject="s", body="b", sent_by="u", email=EmailService(Failing())
+    )
+    assert log.status == "failed" and quote.status == "draft" and quote.sent_at is None
+    await docs.send_document(
+        session,
+        quote,
+        to="buyer@example.com",
+        cc=[],
+        subject="s",
+        body="b",
+        sent_by="u",
+        email=EmailService(MemoryEmailBackend()),
+    )
+    assert quote.status == "sent"

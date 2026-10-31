@@ -11,6 +11,8 @@ import { AlertTriangle, CheckCircle2, Download, Mail, XCircle } from 'lucide-rea
 import { triggerDownload } from '@/shared/lib/api';
 import { Button } from '@/shared/ui/Button';
 import { WideModal } from '@/shared/ui/WideModal';
+import { MailNotConfigured } from '@/features/settings/MailSettings';
+import { mailtoHref } from './modals/ReminderDraftsModal';
 import { fetchSalesPdf, kindPath, salesApi, type SalesDoc, type SendBody } from './api';
 import { formatDateValue, fmtList } from '@/shared/lib/formatters';
 
@@ -170,6 +172,17 @@ export function SendDialog({ doc, onClose }: { doc: SalesDoc; onClose: () => voi
     onError: (e) => setErr(e instanceof Error ? e.message : String(e)),
   });
 
+  const noMail = draft.data?.mail_configured === false;
+  const downloadAndMailto = () => {
+    const href = mailtoHref({ to: to.trim(), subject, body });
+    fetchSalesPdf(kind, doc.id)
+      .then((blob) => triggerDownload(blob, draft.data?.filename ?? `${doc.number}.pdf`))
+      .catch((e) => setErr(e instanceof Error ? e.message : String(e)))
+      .finally(() => {
+        window.location.href = href;
+      });
+  };
+
   const submit = () => {
     setErr(null);
     send.mutate({ to: to.trim(), cc: splitAddresses(cc), subject, body });
@@ -187,7 +200,13 @@ export function SendDialog({ doc, onClose }: { doc: SalesDoc; onClose: () => voi
           <Button size="sm" variant="secondary" onClick={onClose}>
             {t('common.cancel', { defaultValue: 'Cancel' })}
           </Button>
-          <Button size="sm" onClick={submit} disabled={send.isPending || !to.trim() || !subject.trim()}>
+          {noMail && (
+            <Button size="sm" variant="secondary" onClick={downloadAndMailto}>
+              <Download className="mr-1 h-4 w-4" />
+              {t('sales.download_and_mailto', { defaultValue: 'Download PDF and open mail program' })}
+            </Button>
+          )}
+          <Button size="sm" onClick={submit} disabled={noMail || send.isPending || !to.trim() || !subject.trim()}>
             <Mail className="mr-1 h-4 w-4" />
             {t('sales.send', { defaultValue: 'Send' })}
           </Button>
@@ -196,6 +215,11 @@ export function SendDialog({ doc, onClose }: { doc: SalesDoc; onClose: () => voi
     >
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="flex flex-col gap-2">
+          {noMail && (
+            <MailNotConfigured>
+              <p>{t('sales.mailto_hint', { defaultValue: 'You can still download the PDF and attach it in your own mail program.' })}</p>
+            </MailNotConfigured>
+          )}
           <label className="text-xs text-content-tertiary">
             {t('sales.email_to', { defaultValue: 'To' })}
             <input className={input} type="email" value={to} onChange={(e) => setTo(e.target.value)} />

@@ -33,6 +33,7 @@ import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
 
 from app.config import Settings
 
@@ -64,7 +65,7 @@ class SmtpEmailBackend(EmailBackend):
         closed" that names neither the port nor the encryption.  Refusing up
         front turns that into an instant, actionable message.
         """
-        if self._settings.smtp_port == 465:
+        if self._settings.smtp_port == 465 and not self._settings.smtp_ssl:
             return (
                 "SMTP_PORT=465 requires implicit TLS, which this transport does not support; "
                 "use SMTP_PORT=587 with SMTP_TLS=true"
@@ -96,6 +97,8 @@ class SmtpEmailBackend(EmailBackend):
     def _send_sync(self, message: EmailMessage) -> DeliveryResult:
         settings = self._settings
         from_addr = message.from_addr or settings.smtp_from
+        from_header = formataddr((settings.smtp_from_name, from_addr)) if settings.smtp_from_name else from_addr
+        reply_to = message.reply_to or settings.smtp_reply_to
 
         # Body is always multipart/alternative (plain + HTML). When the
         # message carries attachments we wrap that body in a multipart/mixed
@@ -119,24 +122,29 @@ class SmtpEmailBackend(EmailBackend):
         else:
             mime = body
 
-        mime["From"] = from_addr
+        mime["From"] = from_header
         mime["To"] = message.to
+        if message.cc:
+            mime["Cc"] = ", ".join(message.cc)
         mime["Subject"] = message.subject
-        if message.reply_to:
-            mime["Reply-To"] = message.reply_to
+        if reply_to:
+            mime["Reply-To"] = reply_to
         for k, v in message.headers.items():
             mime[k] = v
 
         try:
-            server = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=15)
+            if settings.smtp_ssl:
+                server = smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, timeout=15)
+            else:
+                server = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=15)
             try:
                 server.ehlo()
-                if settings.smtp_tls:
+                if settings.smtp_tls and not settings.smtp_ssl:
                     server.starttls()
                     server.ehlo()
                 if settings.smtp_user and settings.smtp_password:
                     server.login(settings.smtp_user, settings.smtp_password)
-                server.sendmail(from_addr, [message.to], mime.as_string())
+                server.sendmail(from_addr, [message.to, *message.cc], mime.as_string())
             finally:
                 try:
                     server.quit()

@@ -133,3 +133,90 @@ async def get_numbering(session: SessionDep, tenant_id: CurrentCompanyTenantId =
                 NumberingRow(area=area, kind=kind, prefix=prefix, last_number=n, next_number=f"{prefix}-{n + 1:06d}")
             )
     return rows
+
+
+# ── Outbound mail (SMTP) ──────────────────────────────────────────────────
+
+
+class MailSettings(BaseModel):
+    host: str
+    port: int
+    security: str
+    username: str
+    from_name: str
+    from_address: str
+    reply_to: str
+    password_set: bool
+    configured: bool
+    source: str  # env | settings | none
+
+
+class MailSettingsUpdate(BaseModel):
+    host: str | None = Field(default=None, max_length=253)
+    port: int | None = Field(default=None, ge=1, le=65535)
+    security: str | None = Field(default=None, pattern="^(starttls|ssl|none)$")
+    username: str | None = Field(default=None, max_length=200)
+    password: str | None = Field(default=None, max_length=500)
+    from_name: str | None = Field(default=None, max_length=120)
+    from_address: str | None = Field(default=None, max_length=254)
+    reply_to: str | None = Field(default=None, max_length=254)
+
+
+class MailStatus(BaseModel):
+    configured: bool
+    source: str
+
+
+class MailTestRequest(BaseModel):
+    to: str = Field(min_length=3, max_length=254)
+
+
+class MailTestResult(BaseModel):
+    ok: bool
+    backend: str
+    reason: str
+
+
+@router.get(
+    "/business-settings/mail/status/", response_model=MailStatus, dependencies=[Depends(get_current_user_payload)]
+)
+async def get_mail_status() -> MailStatus:
+    from app.core.mail_settings import mail_status
+
+    return MailStatus(**mail_status())
+
+
+@router.get("/business-settings/mail/", response_model=MailSettings, dependencies=[Depends(RequireRole("admin"))])
+async def get_mail_settings() -> MailSettings:
+    from app.core.mail_settings import read_mail_settings
+
+    return MailSettings(**read_mail_settings())
+
+
+@router.put("/business-settings/mail/", response_model=MailSettings, dependencies=[Depends(RequireRole("admin"))])
+async def put_mail_settings(body: MailSettingsUpdate) -> MailSettings:
+    from app.core.mail_settings import write_mail_settings
+
+    return MailSettings(**write_mail_settings(body.model_dump()))
+
+
+@router.post(
+    "/business-settings/mail/test/", response_model=MailTestResult, dependencies=[Depends(RequireRole("admin"))]
+)
+async def send_test_mail(body: MailTestRequest) -> MailTestResult:
+    from app.core.email.base import EmailMessage
+    from app.core.email.templates import wrap
+    from app.core.mail_settings import mail_service, mail_status
+
+    if not mail_status()["configured"]:
+        raise HTTPException(status_code=409, detail="Outbound mail is not configured")
+    svc = mail_service()
+    result = await svc.send(
+        EmailMessage(
+            to=body.to.strip(),
+            subject="OpenBusinessERP test e-mail",
+            html_body=wrap("Test e-mail", "<p>Your outbound mail settings work.</p>"),
+            tags=["mail_test"],
+        )
+    )
+    return MailTestResult(ok=result.ok, backend=result.backend, reason=result.reason)

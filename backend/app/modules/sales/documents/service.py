@@ -16,6 +16,7 @@ from app.core.company_profile import read_company_profile
 from app.core.demo_accounts import is_demo_account, is_non_mailbox_login
 from app.core.email.base import EmailAttachment, EmailMessage
 from app.core.email.service import EmailService
+from app.core.mail_settings import mail_status
 from app.modules.sales.documents.checks import check_invoice
 from app.modules.sales.documents.i18n import fmt_date, fmt_money, lang, t
 from app.modules.sales.documents.pdf import render_document
@@ -61,15 +62,19 @@ async def render_pdf(session: AsyncSession, doc: SalesDocument, company: dict[st
 
 def placeholders(doc: SalesDocument, company: dict[str, Any]) -> dict[str, str]:
     lg = lang(doc.language)
-    return {
+    values = {
         "customer_name": doc.customer_name,
         "document_title": t(lg, doc.kind),
         "document_number": doc.number,
         "document_date": fmt_date(doc.doc_date, lg),
         "due_date": fmt_date(doc.due_date, lg),
         "total": fmt_money(doc.gross_total, doc.currency, lg),
+        "balance_due": fmt_money(doc.balance_due, doc.currency, lg),
         "company_name": company.get("company_name", ""),
     }
+    # Short aliases accepted in user-written templates.
+    values.update(number=values["document_number"], customer=values["customer_name"], company=values["company_name"])
+    return values
 
 
 def fill(template: str, values: dict[str, str]) -> str:
@@ -88,7 +93,20 @@ def email_draft(doc: SalesDocument, company: dict[str, Any]) -> dict[str, Any]:
         "body": fill(texts.get("email_body") or t(lg, "email_body"), values),
         "filename": filename(doc),
         "issues": check_invoice(doc, company),
+        "mail_configured": mail_status()["configured"],
     }
+
+
+def mark_sent(doc: SalesDocument, to: str) -> None:
+    """Record a successful delivery; a draft quote moves to ``sent``."""
+    doc.sent_at = datetime.now(UTC)
+    doc.sent_to = to[:255]
+    if doc.kind == "quote" and doc.status == "draft":
+        doc.status = "sent"
+
+
+def html_paragraphs(text: str) -> str:
+    return "<p>" + html.escape(text).replace("\n\n", "</p><p>").replace("\n", "<br/>") + "</p>"
 
 
 def _validate(addresses: list[str]) -> list[str]:
@@ -120,22 +138,22 @@ async def send_document(
     pdf = await render_pdf(session, doc, company)
     values = placeholders(doc, company)
     subject = fill(subject, values)
-    html_body = "<p>" + html.escape(fill(body, values)).replace("\n\n", "</p><p>").replace("\n", "<br/>") + "</p>"
+    html_body = html_paragraphs(fill(body, values))
     attachment = EmailAttachment(filename=filename(doc), content=pdf)
-    failures: list[str] = []
-    for addr in recipients:
-        result = await email.send(
-            EmailMessage(
-                to=addr,
-                subject=subject,
-                html_body=html_body,
-                reply_to=company.get("email") or None,
-                tags=["sales_document", doc.kind],
-                attachments=[attachment],
-            )
+    result = await email.send(
+        EmailMessage(
+            to=recipients[0],
+            cc=recipients[1:],
+            subject=subject,
+            html_body=html_body,
+            reply_to=company.get("email") or None,
+            tags=["sales_document", doc.kind],
+            attachments=[attachment],
         )
-        if not result.ok:
-            failures.append(f"{addr}: {result.reason}")
+    )
+    failures = [] if result.ok else [result.reason]
+    if result.ok:
+        mark_sent(doc, recipients[0])
     log = SalesSendLog(
         id=uuid.uuid4(),
         tenant_id=doc.tenant_id,
