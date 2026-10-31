@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI-calculatiebouwer",
     "modules.catalog.allowances": "Stelposten en onvoorzien",
     "modules.catalog.approval_routes": "Goedkeuringsroutes",
-    "modules.catalog.architecture_map": "Architectuurkaart",
     "modules.catalog.asia_pac_pack": "Regionaal pakket - Azië-Pacific",
     "modules.catalog.assemblies": "Assemblages & berekeningen",
     "modules.catalog.assets": "Assetbeheer",

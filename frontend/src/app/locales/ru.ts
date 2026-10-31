@@ -507,7 +507,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI-конструктор смет",
     "modules.catalog.allowances": "Резервы и непредвиденные затраты",
     "modules.catalog.approval_routes": "Маршруты согласования",
-    "modules.catalog.architecture_map": "Карта архитектуры",
     "modules.catalog.asia_pac_pack": "Региональный пакет - Азия-Тихий океан",
     "modules.catalog.assemblies": "Сборки и расчёты",
     "modules.catalog.assets": "Эксплуатация активов",

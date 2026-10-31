@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "سازنده برآورد هوش مصنوعی",
     "modules.catalog.allowances": "تخصیص‌ها و ذخیره اضطراری",
     "modules.catalog.approval_routes": "مسیرهای تأیید",
-    "modules.catalog.architecture_map": "نقشه معماری",
     "modules.catalog.asia_pac_pack": "بسته منطقه‌ای - آسیا-اقیانوسیه",
     "modules.catalog.assemblies": "مجموعه‌ها و محاسبات",
     "modules.catalog.assets": "بهره‌برداری از دارایی‌ها",

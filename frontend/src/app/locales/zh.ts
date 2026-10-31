@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI 估算生成器",
     "modules.catalog.allowances": "暂列金额与应急费",
     "modules.catalog.approval_routes": "审批路线",
-    "modules.catalog.architecture_map": "架构图",
     "modules.catalog.asia_pac_pack": "区域包 - 亚太",
     "modules.catalog.assemblies": "组装与计算",
     "modules.catalog.assets": "资产运营",

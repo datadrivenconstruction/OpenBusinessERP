@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Générateur d'estimation IA",
     "modules.catalog.allowances": "Provisions et aléas",
     "modules.catalog.approval_routes": "Circuits d'approbation",
-    "modules.catalog.architecture_map": "Carte d'architecture",
     "modules.catalog.asia_pac_pack": "Pack régional - Asie-Pacifique",
     "modules.catalog.assemblies": "Assemblages & Calculs",
     "modules.catalog.assets": "Exploitation des actifs",

@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Generator de estimări AI",
     "modules.catalog.allowances": "Provizioane și cheltuieli neprevăzute",
     "modules.catalog.approval_routes": "Trasee de aprobare",
-    "modules.catalog.architecture_map": "Hartă arhitectură",
     "modules.catalog.asia_pac_pack": "Pachet regional - Asia-Pacific",
     "modules.catalog.assemblies": "Ansambluri și calcule",
     "modules.catalog.assets": "Operare active",

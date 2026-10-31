@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Pembangun Estimasi AI",
     "modules.catalog.allowances": "Cadangan & Kontingensi",
     "modules.catalog.approval_routes": "Rute persetujuan",
-    "modules.catalog.architecture_map": "Peta Arsitektur",
     "modules.catalog.asia_pac_pack": "Paket regional - Asia-Pasifik",
     "modules.catalog.assemblies": "Rakitan & Perhitungan",
     "modules.catalog.assets": "Operasi Aset",

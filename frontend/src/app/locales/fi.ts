@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Tekoälyn kustannusarvion rakentaja",
     "modules.catalog.allowances": "Varaukset ja riskivaraukset",
     "modules.catalog.approval_routes": "Hyväksymisreitit",
-    "modules.catalog.architecture_map": "Arkkitehtuurikartta",
     "modules.catalog.asia_pac_pack": "Alueellinen paketti - Aasia-Tyynenmeri",
     "modules.catalog.assemblies": "Kokoonpanot ja laskelmat",
     "modules.catalog.assets": "Omaisuudenhallinta",

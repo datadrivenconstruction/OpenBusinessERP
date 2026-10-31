@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI smeta tuzuvchi",
     "modules.catalog.allowances": "Rezerv va kutilmagan xarajatlar",
     "modules.catalog.approval_routes": "Tasdiqlash yoʻnalishlari",
-    "modules.catalog.architecture_map": "Arxitektura xaritasi",
     "modules.catalog.backup": "Zaxira nusxa va tiklash",
     "modules.catalog.bid_management": "Tender takliflarini boshqarish",
     "modules.catalog.bim_hub": "BIM markazi",

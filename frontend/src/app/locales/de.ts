@@ -489,7 +489,6 @@ const resource = {
     "modules.catalog.ai_estimator": "KI-Kalkulations-Assistent",
     "modules.catalog.allowances": "Bedarfspositionen & Reserve",
     "modules.catalog.approval_routes": "Freigabe-Routen",
-    "modules.catalog.architecture_map": "Architekturkarte",
     "modules.catalog.asia_pac_pack": "Regionalpaket - Asien-Pazifik",
     "modules.catalog.assemblies": "Baugruppen & Berechnungen",
     "modules.catalog.assets": "Anlagenbetrieb",

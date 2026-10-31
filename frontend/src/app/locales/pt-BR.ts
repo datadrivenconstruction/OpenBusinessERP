@@ -16,7 +16,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Construtor de Estimativas com IA",
     "modules.catalog.allowances": "Provisões e contingências",
     "modules.catalog.approval_routes": "Rotas de aprovação",
-    "modules.catalog.architecture_map": "Mapa de arquitetura",
     "modules.catalog.asia_pac_pack": "Pacote regional - Ásia-Pacífico",
     "modules.catalog.backup": "Backup & Restauração",
     "modules.catalog.bid_management": "Gestão de propostas",

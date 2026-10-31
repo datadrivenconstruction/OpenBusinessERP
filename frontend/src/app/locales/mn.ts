@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI Тооцоо зохиогч",
     "modules.catalog.allowances": "Нөөц ба гэнэтийн зардал",
     "modules.catalog.approval_routes": "Зөвшөөрлийн маршрутууд",
-    "modules.catalog.architecture_map": "Архитектурын зураг",
     "modules.catalog.asia_pac_pack": "Бүсийн багц - Ази Номхон далайн бүс",
     "modules.catalog.assemblies": "Угсралт ба тооцоо",
     "modules.catalog.assets": "Хөрөнгийн ашиглалт",

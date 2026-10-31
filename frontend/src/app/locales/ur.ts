@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI تخمینہ بلڈر",
     "modules.catalog.allowances": "الاؤنسز اور کنٹینجنسی",
     "modules.catalog.approval_routes": "منظوری روٹس",
-    "modules.catalog.architecture_map": "آرکیٹیکچر نقشہ",
     "modules.catalog.asia_pac_pack": "علاقائی پیک - ایشیا-پیسیفک",
     "modules.catalog.assemblies": "اسمبلیاں اور حسابات",
     "modules.catalog.assets": "اثاثوں کا آپریشن",

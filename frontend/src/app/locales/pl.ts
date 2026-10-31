@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Kreator kosztorysu AI",
     "modules.catalog.allowances": "Rezerwy i nieprzewidziane",
     "modules.catalog.approval_routes": "Ścieżki zatwierdzania",
-    "modules.catalog.architecture_map": "Mapa architektury",
     "modules.catalog.asia_pac_pack": "Pakiet regionalny - Azja-Pacyfik",
     "modules.catalog.assemblies": "Zestawienia i obliczenia",
     "modules.catalog.assets": "Eksploatacja majątku",

@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "منشئ التقديرات بالذكاء الاصطناعي (AI)",
     "modules.catalog.allowances": "المخصصات واحتياطي الطوارئ",
     "modules.catalog.approval_routes": "مسارات الاعتماد",
-    "modules.catalog.architecture_map": "خريطة الهيكل",
     "modules.catalog.asia_pac_pack": "حزمة إقليمية - آسيا والمحيط الهادئ",
     "modules.catalog.assemblies": "التجميعات والحسابات",
     "modules.catalog.assets": "تشغيل الأصول",

@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Yapay Zeka Tahmin Oluşturucu",
     "modules.catalog.allowances": "Ödenekler ve Beklenmedik Giderler",
     "modules.catalog.approval_routes": "Onay rotaları",
-    "modules.catalog.architecture_map": "Mimari Harita",
     "modules.catalog.asia_pac_pack": "Bölgesel paket - Asya-Pasifik",
     "modules.catalog.assemblies": "Montajlar ve Hesaplamalar",
     "modules.catalog.assets": "Varlık İşletimi",

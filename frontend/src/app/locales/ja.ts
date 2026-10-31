@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI見積ビルダー",
     "modules.catalog.allowances": "引当金・予備費",
     "modules.catalog.approval_routes": "承認ルート",
-    "modules.catalog.architecture_map": "アーキテクチャマップ",
     "modules.catalog.asia_pac_pack": "地域パック - アジア太平洋",
     "modules.catalog.assemblies": "組立と計算",
     "modules.catalog.assets": "資産運用",

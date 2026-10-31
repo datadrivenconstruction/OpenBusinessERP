@@ -2,7 +2,7 @@
   "accounting.": {
     "locales_ok": 3,
     "locales_total": 45,
-    "members": 109,
+    "members": 122,
     "missing": {
       "ar": [
         "accounting.accounts_empty",
@@ -34,6 +34,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -46,6 +51,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -83,6 +95,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -145,6 +158,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -157,6 +175,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -194,6 +219,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -256,6 +282,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -268,6 +299,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -305,6 +343,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -367,6 +406,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -379,6 +423,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -416,6 +467,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -478,6 +530,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -490,6 +547,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -527,6 +591,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -672,6 +737,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -684,6 +754,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -721,6 +798,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -783,6 +861,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -795,6 +878,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -832,6 +922,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -894,6 +985,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -906,6 +1002,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -943,6 +1046,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1005,6 +1109,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1017,6 +1126,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1054,6 +1170,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1116,6 +1233,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1128,6 +1250,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1165,6 +1294,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1227,6 +1357,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1239,6 +1374,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1276,6 +1418,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1338,6 +1481,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1350,6 +1498,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1387,6 +1542,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1449,6 +1605,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1461,6 +1622,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1498,6 +1666,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1560,6 +1729,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1572,6 +1746,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1609,6 +1790,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1671,6 +1853,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1683,6 +1870,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1720,6 +1914,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1782,6 +1977,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1794,6 +1994,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1831,6 +2038,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -1893,6 +2101,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -1905,6 +2118,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -1942,6 +2162,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2004,6 +2225,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2016,6 +2242,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2053,6 +2286,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2115,6 +2349,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2127,6 +2366,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2164,6 +2410,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2226,6 +2473,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2238,6 +2490,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2275,6 +2534,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2337,6 +2597,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2349,6 +2614,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2386,6 +2658,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2448,6 +2721,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2460,6 +2738,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2497,6 +2782,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2559,6 +2845,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2571,6 +2862,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2608,6 +2906,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2670,6 +2969,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2682,6 +2986,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2719,6 +3030,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2781,6 +3093,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2793,6 +3110,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2830,6 +3154,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -2892,6 +3217,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -2904,6 +3234,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -2941,6 +3278,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3003,6 +3341,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3015,6 +3358,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3052,6 +3402,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3114,6 +3465,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3126,6 +3482,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3163,6 +3526,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3225,6 +3589,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3237,6 +3606,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3274,6 +3650,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3336,6 +3713,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3348,6 +3730,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3385,6 +3774,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3447,6 +3837,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3459,6 +3854,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3496,6 +3898,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3558,6 +3961,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3570,6 +3978,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3607,6 +4022,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3752,6 +4168,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3764,6 +4185,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3801,6 +4229,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3863,6 +4292,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3875,6 +4309,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -3912,6 +4353,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -3974,6 +4416,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -3986,6 +4433,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -4023,6 +4477,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -4085,6 +4540,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -4097,6 +4557,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -4134,6 +4601,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -4196,6 +4664,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -4208,6 +4681,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -4245,6 +4725,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -4307,6 +4788,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -4319,6 +4805,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -4356,6 +4849,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -4418,6 +4912,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -4430,6 +4929,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -4467,6 +4973,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -4529,6 +5036,11 @@
         "accounting.col_status",
         "accounting.col_type",
         "accounting.compare_previous",
+        "accounting.datev_berater",
+        "accounting.datev_length",
+        "accounting.datev_limits",
+        "accounting.datev_mandant",
+        "accounting.datev_settings",
         "accounting.delete_msg",
         "accounting.delete_title",
         "accounting.difference",
@@ -4541,6 +5053,13 @@
         "accounting.entries_none_filtered",
         "accounting.entry",
         "accounting.export_csv",
+        "accounting.export_disclaimer",
+        "accounting.export_download",
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft",
+        "accounting.export_format",
+        "accounting.export_period_hint",
         "accounting.fiscal_periods",
         "accounting.from",
         "accounting.header_account",
@@ -4578,6 +5097,7 @@
         "accounting.remove_line",
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat",
         "accounting.reversal_date",
         "accounting.reversal_of",
@@ -4612,34 +5132,246 @@
       ]
     }
   },
-  "accounting.report_": {
-    "locales_ok": 3,
+  "accounting.export_fmt_": {
+    "locales_ok": 5,
     "locales_total": 45,
     "members": 3,
     "missing": {
       "ar": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "bg": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "bn": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "cs": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "da": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "el": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "es": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "es-CL": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "es-CO": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "es-MX": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "et": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "fa": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "fi": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "fil": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "fr": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "he": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "hi": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "hr": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "hu": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "id": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "it": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "ja": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "kk": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "ko": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "ky": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "mn": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "nl": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "no": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "pl": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "pt": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "pt-BR": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "ro": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "sv": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "th": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "tr": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "uk": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "ur": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "uz": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "vi": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ],
+      "zh": [
+        "accounting.export_fmt_datev",
+        "accounting.export_fmt_datev_contacts",
+        "accounting.export_fmt_saft"
+      ]
+    }
+  },
+  "accounting.report_": {
+    "locales_ok": 3,
+    "locales_total": 45,
+    "members": 4,
+    "missing": {
+      "ar": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "bg": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "bn": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "cs": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "da": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "de": [
@@ -4649,136 +5381,163 @@
       "el": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "es": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "es-CL": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "es-CO": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "es-MX": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "et": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "fa": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "fi": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "fil": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "fr": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "he": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "hi": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "hr": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "hu": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "id": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "it": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "ja": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "kk": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "ko": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "ky": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "mn": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "nl": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "no": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "pl": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "pt": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "pt-BR": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "ro": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "ru": [
@@ -4788,41 +5547,49 @@
       "sv": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "th": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "tr": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "uk": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "ur": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "uz": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "vi": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ],
       "zh": [
         "accounting.report_empty",
         "accounting.report_empty_hint",
+        "accounting.report_export",
         "accounting.report_vat"
       ]
     }
@@ -36395,6 +37162,660 @@
       ]
     }
   },
+  "inventory.kind_": {
+    "locales_ok": 5,
+    "locales_total": 45,
+    "members": 6,
+    "missing": {
+      "ar": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "bg": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "bn": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "cs": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "da": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "el": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "es": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "es-CL": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "es-CO": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "es-MX": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "et": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "fa": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "fi": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "fil": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "fr": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "he": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "hi": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "hr": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "hu": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "id": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "it": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "ja": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "kk": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "ko": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "ky": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "mn": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "nl": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "no": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "pl": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "pt": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "pt-BR": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "ro": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "sv": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "th": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "tr": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "uk": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "ur": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "uz": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "vi": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ],
+      "zh": [
+        "inventory.kind_adjustment",
+        "inventory.kind_delivery",
+        "inventory.kind_opening",
+        "inventory.kind_receipt",
+        "inventory.kind_transfer_in",
+        "inventory.kind_transfer_out"
+      ]
+    }
+  },
+  "inventory.st_": {
+    "locales_ok": 5,
+    "locales_total": 45,
+    "members": 6,
+    "missing": {
+      "ar": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "bg": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "bn": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "cs": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "da": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "el": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "es": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "es-CL": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "es-CO": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "es-MX": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "et": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "fa": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "fi": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "fil": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "fr": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "he": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "hi": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "hr": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "hu": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "id": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "it": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "ja": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "kk": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "ko": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "ky": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "mn": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "nl": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "no": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "pl": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "pt": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "pt-BR": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "ro": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "sv": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "th": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "tr": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "uk": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "ur": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "uz": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "vi": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ],
+      "zh": [
+        "inventory.st_cancelled",
+        "inventory.st_draft",
+        "inventory.st_lines",
+        "inventory.st_number",
+        "inventory.st_posted",
+        "inventory.st_status"
+      ]
+    }
+  },
   "items.kind_": {
     "locales_ok": 5,
     "locales_total": 45,
@@ -39856,10 +41277,878 @@
       ]
     }
   },
+  "receivables.status_": {
+    "locales_ok": 5,
+    "locales_total": 45,
+    "members": 1,
+    "missing": {
+      "ar": [
+        "receivables.status_sent"
+      ],
+      "bg": [
+        "receivables.status_sent"
+      ],
+      "bn": [
+        "receivables.status_sent"
+      ],
+      "cs": [
+        "receivables.status_sent"
+      ],
+      "da": [
+        "receivables.status_sent"
+      ],
+      "el": [
+        "receivables.status_sent"
+      ],
+      "es": [
+        "receivables.status_sent"
+      ],
+      "es-CL": [
+        "receivables.status_sent"
+      ],
+      "es-CO": [
+        "receivables.status_sent"
+      ],
+      "es-MX": [
+        "receivables.status_sent"
+      ],
+      "et": [
+        "receivables.status_sent"
+      ],
+      "fa": [
+        "receivables.status_sent"
+      ],
+      "fi": [
+        "receivables.status_sent"
+      ],
+      "fil": [
+        "receivables.status_sent"
+      ],
+      "fr": [
+        "receivables.status_sent"
+      ],
+      "he": [
+        "receivables.status_sent"
+      ],
+      "hi": [
+        "receivables.status_sent"
+      ],
+      "hr": [
+        "receivables.status_sent"
+      ],
+      "hu": [
+        "receivables.status_sent"
+      ],
+      "id": [
+        "receivables.status_sent"
+      ],
+      "it": [
+        "receivables.status_sent"
+      ],
+      "ja": [
+        "receivables.status_sent"
+      ],
+      "kk": [
+        "receivables.status_sent"
+      ],
+      "ko": [
+        "receivables.status_sent"
+      ],
+      "ky": [
+        "receivables.status_sent"
+      ],
+      "mn": [
+        "receivables.status_sent"
+      ],
+      "nl": [
+        "receivables.status_sent"
+      ],
+      "no": [
+        "receivables.status_sent"
+      ],
+      "pl": [
+        "receivables.status_sent"
+      ],
+      "pt": [
+        "receivables.status_sent"
+      ],
+      "pt-BR": [
+        "receivables.status_sent"
+      ],
+      "ro": [
+        "receivables.status_sent"
+      ],
+      "sv": [
+        "receivables.status_sent"
+      ],
+      "th": [
+        "receivables.status_sent"
+      ],
+      "tr": [
+        "receivables.status_sent"
+      ],
+      "uk": [
+        "receivables.status_sent"
+      ],
+      "ur": [
+        "receivables.status_sent"
+      ],
+      "uz": [
+        "receivables.status_sent"
+      ],
+      "vi": [
+        "receivables.status_sent"
+      ],
+      "zh": [
+        "receivables.status_sent"
+      ]
+    }
+  },
+  "recurring.interval_": {
+    "locales_ok": 5,
+    "locales_total": 45,
+    "members": 4,
+    "missing": {
+      "ar": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "bg": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "bn": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "cs": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "da": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "el": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "es": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "es-CL": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "es-CO": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "es-MX": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "et": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "fa": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "fi": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "fil": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "fr": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "he": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "hi": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "hr": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "hu": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "id": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "it": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "ja": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "kk": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "ko": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "ky": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "mn": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "nl": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "no": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "pl": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "pt": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "pt-BR": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "ro": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "sv": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "th": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "tr": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "uk": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "ur": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "uz": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "vi": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ],
+      "zh": [
+        "recurring.interval_monthly",
+        "recurring.interval_quarterly",
+        "recurring.interval_weekly",
+        "recurring.interval_yearly"
+      ]
+    }
+  },
+  "recurring.run_": {
+    "locales_ok": 5,
+    "locales_total": 45,
+    "members": 5,
+    "missing": {
+      "ar": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "bg": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "bn": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "cs": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "da": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "el": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "es": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "es-CL": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "es-CO": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "es-MX": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "et": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "fa": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "fi": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "fil": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "fr": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "he": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "hi": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "hr": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "hu": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "id": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "it": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "ja": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "kk": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "ko": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "ky": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "mn": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "nl": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "no": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "pl": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "pt": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "pt-BR": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "ro": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "sv": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "th": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "tr": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "uk": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "ur": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "uz": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "vi": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ],
+      "zh": [
+        "recurring.run_failed",
+        "recurring.run_generated",
+        "recurring.run_issued",
+        "recurring.run_send_failed",
+        "recurring.run_sent"
+      ]
+    }
+  },
+  "recurring.status_": {
+    "locales_ok": 5,
+    "locales_total": 45,
+    "members": 3,
+    "missing": {
+      "ar": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "bg": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "bn": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "cs": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "da": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "el": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "es": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "es-CL": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "es-CO": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "es-MX": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "et": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "fa": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "fi": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "fil": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "fr": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "he": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "hi": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "hr": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "hu": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "id": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "it": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "ja": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "kk": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "ko": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "ky": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "mn": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "nl": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "no": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "pl": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "pt": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "pt-BR": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "ro": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "sv": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "th": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "tr": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "uk": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "ur": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "uz": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "vi": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ],
+      "zh": [
+        "recurring.status_active",
+        "recurring.status_ended",
+        "recurring.status_paused"
+      ]
+    }
+  },
   "sales.": {
     "locales_ok": 5,
     "locales_total": 45,
-    "members": 210,
+    "members": 216,
     "missing": {
       "ar": [
         "sales.action_accept",
@@ -39924,6 +42213,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -39938,6 +42228,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -39974,6 +42266,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -40036,6 +42329,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -40054,6 +42348,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -40133,6 +42428,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -40147,6 +42443,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -40183,6 +42481,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -40245,6 +42544,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -40263,6 +42563,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -40342,6 +42643,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -40356,6 +42658,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -40392,6 +42696,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -40454,6 +42759,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -40472,6 +42778,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -40551,6 +42858,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -40565,6 +42873,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -40601,6 +42911,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -40663,6 +42974,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -40681,6 +42993,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -40760,6 +43073,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -40774,6 +43088,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -40810,6 +43126,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -40872,6 +43189,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -40890,6 +43208,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -40969,6 +43288,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -40983,6 +43303,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -41019,6 +43341,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -41081,6 +43404,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -41099,6 +43423,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -41178,6 +43503,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -41192,6 +43518,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -41228,6 +43556,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -41290,6 +43619,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -41308,6 +43638,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -41387,6 +43718,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -41401,6 +43733,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -41437,6 +43771,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -41499,6 +43834,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -41517,6 +43853,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -41596,6 +43933,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -41610,6 +43948,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -41646,6 +43986,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -41708,6 +44049,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -41726,6 +44068,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -41805,6 +44148,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -41819,6 +44163,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -41855,6 +44201,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -41917,6 +44264,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -41935,6 +44283,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -42014,6 +44363,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -42028,6 +44378,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -42064,6 +44416,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -42126,6 +44479,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -42144,6 +44498,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -42223,6 +44578,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -42237,6 +44593,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -42273,6 +44631,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -42335,6 +44694,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -42353,6 +44713,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -42432,6 +44793,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -42446,6 +44808,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -42482,6 +44846,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -42544,6 +44909,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -42562,6 +44928,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -42641,6 +45008,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -42655,6 +45023,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -42691,6 +45061,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -42753,6 +45124,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -42771,6 +45143,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -42850,6 +45223,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -42864,6 +45238,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -42900,6 +45276,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -42962,6 +45339,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -42980,6 +45358,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -43059,6 +45438,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -43073,6 +45453,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -43109,6 +45491,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -43171,6 +45554,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -43189,6 +45573,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -43268,6 +45653,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -43282,6 +45668,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -43318,6 +45706,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -43380,6 +45769,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -43398,6 +45788,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -43477,6 +45868,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -43491,6 +45883,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -43527,6 +45921,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -43589,6 +45984,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -43607,6 +46003,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -43686,6 +46083,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -43700,6 +46098,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -43736,6 +46136,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -43798,6 +46199,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -43816,6 +46218,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -43895,6 +46298,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -43909,6 +46313,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -43945,6 +46351,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -44007,6 +46414,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -44025,6 +46433,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -44104,6 +46513,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -44118,6 +46528,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -44154,6 +46566,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -44216,6 +46629,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -44234,6 +46648,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -44313,6 +46728,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -44327,6 +46743,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -44363,6 +46781,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -44425,6 +46844,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -44443,6 +46863,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -44522,6 +46943,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -44536,6 +46958,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -44572,6 +46996,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -44634,6 +47059,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -44652,6 +47078,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -44731,6 +47158,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -44745,6 +47173,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -44781,6 +47211,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -44843,6 +47274,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -44861,6 +47293,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -44940,6 +47373,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -44954,6 +47388,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -44990,6 +47426,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -45052,6 +47489,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -45070,6 +47508,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -45149,6 +47588,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -45163,6 +47603,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -45199,6 +47641,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -45261,6 +47704,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -45279,6 +47723,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -45358,6 +47803,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -45372,6 +47818,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -45408,6 +47856,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -45470,6 +47919,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -45488,6 +47938,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -45567,6 +48018,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -45581,6 +48033,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -45617,6 +48071,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -45679,6 +48134,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -45697,6 +48153,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -45776,6 +48233,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -45790,6 +48248,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -45826,6 +48286,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -45888,6 +48349,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -45906,6 +48368,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -45985,6 +48448,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -45999,6 +48463,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -46035,6 +48501,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -46097,6 +48564,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -46115,6 +48583,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -46194,6 +48663,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -46208,6 +48678,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -46244,6 +48716,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -46306,6 +48779,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -46324,6 +48798,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -46403,6 +48878,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -46417,6 +48893,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -46453,6 +48931,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -46515,6 +48994,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -46533,6 +49013,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -46612,6 +49093,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -46626,6 +49108,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -46662,6 +49146,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -46724,6 +49209,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -46742,6 +49228,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -46821,6 +49308,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -46835,6 +49323,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -46871,6 +49361,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -46933,6 +49424,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -46951,6 +49443,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -47030,6 +49523,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -47044,6 +49538,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -47080,6 +49576,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -47142,6 +49639,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -47160,6 +49658,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -47239,6 +49738,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -47253,6 +49753,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -47289,6 +49791,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -47351,6 +49854,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -47369,6 +49873,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -47448,6 +49953,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -47462,6 +49968,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -47498,6 +50006,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -47560,6 +50069,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -47578,6 +50088,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -47657,6 +50168,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -47671,6 +50183,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -47707,6 +50221,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -47769,6 +50284,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -47787,6 +50303,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -47866,6 +50383,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -47880,6 +50398,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -47916,6 +50436,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -47978,6 +50499,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -47996,6 +50518,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -48075,6 +50598,7 @@
         "sales.description",
         "sales.discount",
         "sales.document_language",
+        "sales.download_and_mailto",
         "sales.download_pdf",
         "sales.due_date",
         "sales.email_attachment",
@@ -48089,6 +50613,8 @@
         "sales.filters.search",
         "sales.filters.status",
         "sales.filters.to",
+        "sales.fx_rate",
+        "sales.fx_rate_auto",
         "sales.insights.c_by_customer",
         "sales.insights.c_by_status",
         "sales.insights.c_over_time",
@@ -48125,6 +50651,7 @@
         "sales.lines.remaining",
         "sales.lines.search_item",
         "sales.load_error",
+        "sales.mailto_hint",
         "sales.more_actions",
         "sales.net",
         "sales.new_credit-notes",
@@ -48187,6 +50714,7 @@
         "sales.tab_invoices",
         "sales.tab_orders",
         "sales.tab_quotes",
+        "sales.tab_recurring",
         "sales.tabs_aria",
         "sales.tax_note",
         "sales.tax_rate",
@@ -48205,6 +50733,7 @@
         "sales.total_gross",
         "sales.total_net",
         "sales.totals.discount",
+        "sales.totals.in_base",
         "sales.totals.paid",
         "sales.totals.tax_at",
         "sales.totals.title",
@@ -50181,247 +52710,287 @@
   "sales.tab_": {
     "locales_ok": 5,
     "locales_total": 45,
-    "members": 4,
+    "members": 5,
     "missing": {
       "ar": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "bg": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "bn": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "cs": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "da": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "el": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "es": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "es-CL": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "es-CO": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "es-MX": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "et": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "fa": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "fi": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "fil": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "fr": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "he": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "hi": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "hr": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "hu": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "id": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "it": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "ja": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "kk": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "ko": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "ky": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "mn": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "nl": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "no": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "pl": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "pt": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "pt-BR": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "ro": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "sv": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "th": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "tr": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "uk": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "ur": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "uz": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "vi": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ],
       "zh": [
         "sales.tab_credit-notes",
         "sales.tab_invoices",
         "sales.tab_orders",
-        "sales.tab_quotes"
+        "sales.tab_quotes",
+        "sales.tab_recurring"
       ]
     }
   },

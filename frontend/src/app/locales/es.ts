@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Generador de Estimaciones con IA",
     "modules.catalog.allowances": "Provisiones y contingencias",
     "modules.catalog.approval_routes": "Rutas de aprobación",
-    "modules.catalog.architecture_map": "Mapa de arquitectura",
     "modules.catalog.asia_pac_pack": "Paquete regional - Asia-Pacífico",
     "modules.catalog.assemblies": "Conjuntos y cálculos",
     "modules.catalog.assets": "Operación de activos",

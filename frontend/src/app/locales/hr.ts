@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI graditelj procjena",
     "modules.catalog.allowances": "Rezerve i nepredviđeni troškovi",
     "modules.catalog.approval_routes": "Rute odobravanja",
-    "modules.catalog.architecture_map": "Mapa arhitekture",
     "modules.catalog.asia_pac_pack": "Regionalni paket - Azija-Pacifik",
     "modules.catalog.assemblies": "Sklopovi i proračuni",
     "modules.catalog.assets": "Upravljanje imovinom",

@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Trình dựng dự toán AI",
     "modules.catalog.allowances": "Dự trù & dự phòng",
     "modules.catalog.approval_routes": "Tuyến phê duyệt",
-    "modules.catalog.architecture_map": "Sơ đồ kiến trúc",
     "modules.catalog.asia_pac_pack": "Gói khu vực - Châu Á-Thái Bình Dương",
     "modules.catalog.assemblies": "Cụm lắp ráp & Tính toán",
     "modules.catalog.assets": "Vận hành tài sản",

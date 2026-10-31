@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI tvůrce odhadu",
     "modules.catalog.allowances": "Rezervy a nepředvídané náklady",
     "modules.catalog.approval_routes": "Schvalovací trasy",
-    "modules.catalog.architecture_map": "Mapa architektury",
     "modules.catalog.asia_pac_pack": "Regionální balíček - Asie-Pacifik",
     "modules.catalog.assemblies": "Sestavy a výpočty",
     "modules.catalog.assets": "Provoz majetku",

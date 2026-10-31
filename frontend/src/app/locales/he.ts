@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "בונה אומדן בינה מלאכותית",
     "modules.catalog.allowances": "הקצבות ורזרבה",
     "modules.catalog.approval_routes": "מסלולי אישור",
-    "modules.catalog.architecture_map": "מפת ארכיטקטורה",
     "modules.catalog.asia_pac_pack": "חבילה אזורית - אסיה-פסיפיק",
     "modules.catalog.assemblies": "מכלולים וחישובים",
     "modules.catalog.assets": "תפעול נכסים",

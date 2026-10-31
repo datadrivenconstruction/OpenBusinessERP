@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI kalkulációépítő",
     "modules.catalog.allowances": "Tartalékkeretek és pótlékok",
     "modules.catalog.approval_routes": "Jóváhagyási útvonalak",
-    "modules.catalog.architecture_map": "Architektúra térkép",
     "modules.catalog.asia_pac_pack": "Regionális csomag - Ázsia és Csendes-óceáni térség",
     "modules.catalog.assemblies": "Tételcsoportok és kalkulációk",
     "modules.catalog.assets": "Eszközgazdálkodás",

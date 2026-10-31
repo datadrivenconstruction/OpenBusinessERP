@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI 견적 빌더",
     "modules.catalog.allowances": "충당금 및 예비비",
     "modules.catalog.approval_routes": "승인 경로",
-    "modules.catalog.architecture_map": "아키텍처 맵",
     "modules.catalog.asia_pac_pack": "지역 팩 - 아시아 태평양",
     "modules.catalog.assemblies": "조립 및 계산",
     "modules.catalog.assets": "자산 운영",

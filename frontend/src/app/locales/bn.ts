@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI এস্টিমেট বিল্ডার",
     "modules.catalog.allowances": "ভাতা ও কন্টিনজেন্সি",
     "modules.catalog.approval_routes": "অনুমোদন রুট",
-    "modules.catalog.architecture_map": "আর্কিটেকচার ম্যাপ",
     "modules.catalog.asia_pac_pack": "আঞ্চলিক প্যাক - এশিয়া-প্যাসিফিক",
     "modules.catalog.assemblies": "সমাবেশ ও গণনা",
     "modules.catalog.assets": "সম্পদ পরিচালনা",

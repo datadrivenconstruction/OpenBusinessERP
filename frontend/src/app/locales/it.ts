@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Generatore di Stime AI",
     "modules.catalog.allowances": "Accantonamenti e imprevisti",
     "modules.catalog.approval_routes": "Percorsi di approvazione",
-    "modules.catalog.architecture_map": "Mappa architetturale",
     "modules.catalog.asia_pac_pack": "Pacchetto regionale - Asia-Pacifico",
     "modules.catalog.assemblies": "Assiemi e calcoli",
     "modules.catalog.assets": "Gestione degli asset",

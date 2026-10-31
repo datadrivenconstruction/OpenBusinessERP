@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Конструктор кошторису ШІ",
     "modules.catalog.allowances": "Резерви та непередбачені витрати",
     "modules.catalog.approval_routes": "Маршрути погодження",
-    "modules.catalog.architecture_map": "Карта архітектури",
     "modules.catalog.backup": "Резервне копіювання та відновлення",
     "modules.catalog.bid_management": "Управління тендерними заявками",
     "modules.catalog.bim_hub": "BIM-хаб",

@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI конструктор на оценки",
     "modules.catalog.allowances": "Резерви и непредвидени разходи",
     "modules.catalog.approval_routes": "Маршрути за одобрение",
-    "modules.catalog.architecture_map": "Архитектурна карта",
     "modules.catalog.asia_pac_pack": "Регионален пакет - Азиатско-тихоокеански регион",
     "modules.catalog.assemblies": "Възли и изчисления",
     "modules.catalog.assets": "Експлоатация на активи",

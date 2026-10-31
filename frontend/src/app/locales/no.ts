@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI-estimatbygger",
     "modules.catalog.allowances": "Avsetninger og reserver",
     "modules.catalog.approval_routes": "Godkjenningsruter",
-    "modules.catalog.architecture_map": "Arkitekturkart",
     "modules.catalog.asia_pac_pack": "Regional pakke - Asia-Stillehavsregionen",
     "modules.catalog.assemblies": "Sammenstillinger & beregninger",
     "modules.catalog.assets": "Anleggsdrift",

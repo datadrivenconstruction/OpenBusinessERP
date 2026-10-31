@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI eelarve koostaja",
     "modules.catalog.allowances": "Reservid ja ettenägematud kulud",
     "modules.catalog.approval_routes": "Kinnitusmarsruudid",
-    "modules.catalog.architecture_map": "Arhitektuurikaart",
     "modules.catalog.asia_pac_pack": "Piirkondlik pakett - Aasia ja Vaikse ookeani piirkond",
     "modules.catalog.assemblies": "Koosted ja arvutused",
     "modules.catalog.assets": "Varade käitamine",

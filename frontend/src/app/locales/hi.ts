@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI अनुमान निर्माता",
     "modules.catalog.allowances": "भत्ते और आकस्मिकता",
     "modules.catalog.approval_routes": "अनुमोदन मार्ग",
-    "modules.catalog.architecture_map": "आर्किटेक्चर मानचित्र",
     "modules.catalog.asia_pac_pack": "क्षेत्रीय पैक - एशिया-प्रशांत",
     "modules.catalog.assemblies": "असेंबली और गणना",
     "modules.catalog.assets": "परिसंपत्ति संचालन",

@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Estimate Builder (AI)",
     "modules.catalog.allowances": "Allowances at Contingency",
     "modules.catalog.approval_routes": "Mga approval route",
-    "modules.catalog.architecture_map": "Mapa ng Arkitektura",
     "modules.catalog.asia_pac_pack": "Rehiyonal na pack - Asia-Pasipiko",
     "modules.catalog.assemblies": "Mga Asembliya at Kalkulasyon",
     "modules.catalog.assets": "Operasyon ng mga Ari-arian",

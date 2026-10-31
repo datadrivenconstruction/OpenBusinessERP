@@ -501,7 +501,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI Estimate Builder",
     "modules.catalog.allowances": "Allowances & Contingency",
     "modules.catalog.approval_routes": "Approval Routes",
-    "modules.catalog.architecture_map": "Architecture Map",
     "modules.catalog.asia_pac_pack": "Regional Pack - Asia-Pacific",
     "modules.catalog.assemblies": "Assemblies & Calculations",
     "modules.catalog.assets": "Asset Operations",

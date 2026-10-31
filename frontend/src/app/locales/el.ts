@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "Κατασκευαστής Εκτίμησης AI",
     "modules.catalog.allowances": "Αποζημιώσεις & Απρόβλεπτα",
     "modules.catalog.approval_routes": "Διαδρομές έγκρισης",
-    "modules.catalog.architecture_map": "Χάρτης Αρχιτεκτονικής",
     "modules.catalog.asia_pac_pack": "Περιφερειακό πακέτο - Ασία-Ειρηνικός",
     "modules.catalog.assemblies": "Συναρμολογήσεις & Υπολογισμοί",
     "modules.catalog.assets": "Λειτουργία Παγίων",

@@ -23,7 +23,6 @@ const resource = {
     "modules.catalog.ai_estimator": "ตัวช่วยสร้างประมาณราคา AI",
     "modules.catalog.allowances": "ค่าเผื่อและค่าสำรอง",
     "modules.catalog.approval_routes": "เส้นทางการอนุมัติ",
-    "modules.catalog.architecture_map": "แผนผังสถาปัตยกรรม",
     "modules.catalog.asia_pac_pack": "แพ็กภูมิภาค - เอเชีย-แปซิฟิก",
     "modules.catalog.assemblies": "การประกอบและการคำนวณ",
     "modules.catalog.assets": "การดำเนินงานสินทรัพย์",

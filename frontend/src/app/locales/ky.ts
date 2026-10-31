@@ -21,7 +21,6 @@ const resource = {
     "modules.catalog.ai_estimator": "AI сметаны түзгүч",
     "modules.catalog.allowances": "Резервдер жана резервдик коргоо",
     "modules.catalog.approval_routes": "Бекитүү маршруттары",
-    "modules.catalog.architecture_map": "Архитектура картасы",
     "modules.catalog.asia_pac_pack": "Аймактык пакет - Азия-Тынч океан",
     "modules.catalog.assemblies": "Түйүндөр жана эсептөөлөр",
     "modules.catalog.assets": "Активдерди пайдалануу",
