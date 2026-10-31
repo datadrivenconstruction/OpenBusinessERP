@@ -15,6 +15,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { BOQToolbar, type BOQToolbarProps } from '../BOQToolbar';
+import { useModuleStore } from '@/stores/useModuleStore';
 
 function stubT(key: string, options?: Record<string, string | number>): string {
   const fallback = options?.defaultValue;
@@ -58,6 +59,8 @@ function makeProps(overrides: Partial<BOQToolbarProps>): BOQToolbarProps {
 
 /** Renders the toolbar and opens the Export menu (portaled to document.body). */
 function renderWithMenuOpen(overrides: Partial<BOQToolbarProps> = {}) {
+  // The construction pack is off by default for business companies; this test is about the entry point itself.
+  useModuleStore.setState((s) => ({ enabledModules: { ...s.enabledModules, 'gaeb-exchange': true } }));
   const view = render(
     <MemoryRouter>
       <BOQToolbar {...makeProps(overrides)} />
