@@ -95,13 +95,33 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
   },
 ];
 
-const BUSINESS_HIDDEN_KEYS = new Set(['boq.title', 'costs.title', 'nav.assemblies', 'validation.title',
-  'nav.5d_cost_model', 'tendering.title', 'rfi.title', 'shortcuts.new_boq']);
+/** Business chords; must match BUSINESS_SEQUENCES in useKeyboardShortcuts. */
+const BUSINESS_NAV: ShortcutEntry[] = [
+  { keys: ['g', 'd'], descriptionKey: 'nav.dashboard' },
+  { keys: ['g', 'p'], descriptionKey: 'projects.title' },
+  { keys: ['g', 'i'], descriptionKey: 'shortcuts.biz_invoices', defaultValue: 'Invoices' },
+  { keys: ['g', 's'], descriptionKey: 'nav.sales', defaultValue: 'Quotes & invoices' },
+  { keys: ['g', 'c'], descriptionKey: 'shortcuts.biz_crm', defaultValue: 'CRM' },
+  { keys: ['g', 'o'], descriptionKey: 'contacts.title' },
+  { keys: ['g', 'm'], descriptionKey: 'meetings.title' },
+  { keys: ['g', 'r'], descriptionKey: 'nav.receivables', defaultValue: 'Receivables' },
+  { keys: ['g', 'a'], descriptionKey: 'accounting.title', defaultValue: 'Accounting' },
+];
+
+const BUSINESS_ACTIONS: ShortcutEntry[] = [
+  { keys: ['n', 'p'], descriptionKey: 'shortcuts.new_project' },
+  { keys: ['n', 'q'], descriptionKey: 'shortcuts.biz_new_quote', defaultValue: 'New quote' },
+  { keys: ['n', 't'], descriptionKey: 'shortcuts.new_task' },
+];
 
 function businessShortcutGroups(): ShortcutGroup[] {
   return SHORTCUT_GROUPS
     .filter((g) => g.titleKey !== 'shortcuts.group.boq_editor')
-    .map((g) => ({ ...g, items: g.items.filter((i) => !BUSINESS_HIDDEN_KEYS.has(i.descriptionKey)) }));
+    .map((g) => {
+      if (g.titleKey === 'shortcuts.group.navigation') return { ...g, items: BUSINESS_NAV };
+      if (g.titleKey === 'shortcuts.group.actions') return { ...g, items: BUSINESS_ACTIONS };
+      return g;
+    });
 }
 
 function Kbd({ children }: { children: string }) {

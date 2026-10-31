@@ -160,6 +160,7 @@ const TODAYS_SIMPLE = [
   // Sales sits directly under Overview.
   '/sales',
   '/items',
+  '/inventory',
   '/import',
   '/contacts',
   '/contracts',
@@ -194,6 +195,13 @@ beforeEach(() => {
 });
 
 afterEach(() => cleanup());
+
+/** With no profile the business pack is the default: sales up front, no construction rows. */
+function expectBusinessMenu(): void {
+  const hrefs = menuHrefs();
+  expect(hrefs).toContain('/sales');
+  for (const route of ['/videos', '/boq', '/timeline']) expect(hrefs).not.toContain(route);
+}
 
 describe('Simple mode with a general contractor profile', () => {
   it('shows the workspace rows, in order, and nothing else until More modules opens', async () => {
@@ -276,7 +284,7 @@ describe('Simple mode with a general contractor profile', () => {
 
     await waitFor(() => expect(localStorage.getItem('oe_company_type')).toBeNull());
     expect(screen.queryByTestId('sidebar-workspace')).toBeNull();
-    expect(menuHrefs()).toEqual(TODAYS_SIMPLE);
+    expectBusinessMenu();
   });
 
   it('reaches a browser the wizard never ran in', async () => {
@@ -324,11 +332,11 @@ describe('on a browser two people share', () => {
 
     await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith('/v1/users/me/onboarding/'));
     expect(screen.queryByTestId('sidebar-workspace')).toBeNull();
-    expect(menuHrefs()).toEqual(TODAYS_SIMPLE);
+    expectBusinessMenu();
 
     await act(async () => answer({ completed: true, company_type: null }));
     expect(screen.queryByTestId('sidebar-workspace')).toBeNull();
-    expect(menuHrefs()).toEqual(TODAYS_SIMPLE);
+    expectBusinessMenu();
     expect(client.getQueryData(meOnboardingQueryKey('user-b'))).toMatchObject({ company_type: null });
   });
 });
@@ -400,15 +408,15 @@ describe('without a workspace, or in Advanced mode', () => {
     await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith('/v1/users/me/onboarding/'));
     expect(screen.queryByTestId('sidebar-workspace')).toBeNull();
     expect(screen.queryByTestId('sidebar-more-modules')).toBeNull();
-    expect(menuHrefs()).toEqual(TODAYS_SIMPLE);
+    await waitFor(() => expect(menuHrefs()).toEqual(TODAYS_SIMPLE));
   });
 
-  it('Simple mode with no profile at all is what it always was', async () => {
+  it('Simple mode with no profile at all gets the business menu', async () => {
     serverSays(null);
     renderAt('/');
 
     await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith('/v1/users/me/onboarding/'));
-    expect(menuHrefs()).toEqual(TODAYS_SIMPLE);
+    expectBusinessMenu();
   });
 
   it('Advanced mode ignores the workspace and shows the whole catalogue', async () => {
@@ -419,6 +427,7 @@ describe('without a workspace, or in Advanced mode', () => {
     await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith('/v1/users/me/onboarding/'));
     expect(screen.queryByTestId('sidebar-workspace')).toBeNull();
     expect(screen.queryByTestId('sidebar-more-modules')).toBeNull();
+    await waitFor(() => expect(menuHrefs()).toContain('/subcontractors'));
     const hrefs = menuHrefs();
     expect(hrefs.slice(0, 7)).toEqual([...LEARN, '/', '/projects', '/files', '/inbox', '/timeline']);
     for (const route of ['/subcontractors', '/changeorders', '/finance', '/fx']) {

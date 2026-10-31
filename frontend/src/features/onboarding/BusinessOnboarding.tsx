@@ -3,7 +3,7 @@
  *
  * Writes the workspace business settings (country, currency, fiscal year,
  * industry, size), the user's currency preference and the module profile, then
- * opens the app. Construction firms are handed to the construction wizard.
+ * opens the app. Construction is an opt-in industry pack on the Modules page.
  */
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -20,7 +20,6 @@ import {
   Command,
   Code2,
   Factory,
-  HardHat,
   HeartHandshake,
   LayoutGrid,
   Loader2,
@@ -495,7 +494,6 @@ function StepIndustry({
   loading,
   selected,
   onSelect,
-  onConstruction,
   onBack,
   onNext,
 }: {
@@ -503,7 +501,6 @@ function StepIndustry({
   loading: boolean;
   selected: string;
   onSelect: (key: string) => void;
-  onConstruction: () => void;
   onBack: () => void;
   onNext: () => void;
 }) {
@@ -618,27 +615,6 @@ function StepIndustry({
               </h3>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {s.items.map(card)}
-                {s.id === 'other' && (
-                  <button
-                    type="button"
-                    onClick={onConstruction}
-                    className="flex flex-col items-start gap-1.5 rounded-xl border border-dashed border-border-light p-3.5 text-start transition-all hover:border-oe-blue/40"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-secondary text-content-secondary">
-                        <HardHat size={16} />
-                      </span>
-                      <span className="text-sm font-semibold leading-tight text-content-primary">
-                        {t('bizonb.ind_construction', { defaultValue: 'Construction & engineering' })}
-                      </span>
-                    </span>
-                    <span className="text-xs leading-snug text-content-secondary">
-                      {t('bizonb.ind_construction_desc', {
-                        defaultValue: 'Estimating, BIM, site and contracts. Opens the construction setup.',
-                      })}
-                    </span>
-                  </button>
-                )}
               </div>
             </section>
           ))}
@@ -1114,7 +1090,6 @@ export function BusinessOnboarding() {
             loading={presetsQuery.isLoading}
             selected={industry}
             onSelect={selectIndustry}
-            onConstruction={() => navigate('/onboarding/construction')}
             onBack={() => setStep(1)}
             onNext={() => setStep(3)}
           />

@@ -21,7 +21,29 @@ function isTyping(): boolean {
 export interface UseKeyboardShortcutsOptions {
   onOpenSearch: () => void;
   onToggleShortcutsDialog: () => void;
+  /** Business-pack company: construction chords are replaced by BUSINESS_SEQUENCES. */
+  business?: boolean;
 }
+
+/** Two-key map for business companies; ShortcutsDialog and Sidebar hints mirror it. */
+export const BUSINESS_SEQUENCES: Record<string, Record<string, string>> = {
+  g: {
+    d: '/',
+    p: '/projects',
+    i: '/sales?tab=invoices',
+    s: '/sales',
+    c: '/crm',
+    o: '/contacts',
+    m: '/meetings',
+    r: '/receivables',
+    a: '/accounting',
+  },
+  n: {
+    p: '/projects/new',
+    q: '/sales/quotes/new',
+    t: '/tasks',
+  },
+};
 
 /**
  * Registers global keyboard shortcuts for fast navigation and actions.
@@ -64,6 +86,7 @@ export interface UseKeyboardShortcutsOptions {
 export function useKeyboardShortcuts({
   onOpenSearch,
   onToggleShortcutsDialog,
+  business = false,
 }: UseKeyboardShortcutsOptions): void {
   const navigate = useNavigate();
   const pendingKeyRef = useRef<string | null>(null);
@@ -79,7 +102,7 @@ export function useKeyboardShortcuts({
 
   useEffect(() => {
     /** Two-key navigation map: first key -> second key -> path. */
-    const sequences: Record<string, Record<string, string>> = {
+    const sequences: Record<string, Record<string, string>> = business ? BUSINESS_SEQUENCES : {
       g: {
         d: '/',
         p: '/projects',
@@ -162,5 +185,5 @@ export function useKeyboardShortcuts({
       document.removeEventListener('keydown', handler);
       clearPending();
     };
-  }, [navigate, onOpenSearch, onToggleShortcutsDialog, clearPending]);
+  }, [navigate, onOpenSearch, onToggleShortcutsDialog, clearPending, business]);
 }

@@ -88,10 +88,11 @@ const storedHiddenGroups = (): string[] => JSON.parse(localStorage.getItem(HIDDE
 
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('oe_company_type', 'general_contractor');
   api.apiGet.mockReset();
   api.apiGet.mockImplementation((path: string) =>
     path === '/v1/users/me/onboarding/'
-      ? Promise.resolve({ completed: true, company_type: null })
+      ? Promise.resolve({ completed: true, company_type: 'general_contractor' })
       : Promise.resolve([]),
   );
   useAuthStore.setState({ isAuthenticated: true, userRole: 'editor', userId: 'user-a', accessToken: null });

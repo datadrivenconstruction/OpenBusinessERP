@@ -13,7 +13,7 @@
 import { create } from 'zustand';
 import { getModuleDefaults, getModuleDependents, getModuleDependencies } from '@/modules/_registry';
 import { apiGet, apiPatch } from '@/shared/lib/api';
-import { BUSINESS_PRESET_KEYS, COMPANY_TYPE_STORAGE_KEY } from '@/app/layout/useCompanyWorkspace';
+import { COMPANY_TYPE_STORAGE_KEY, isBusinessPreset } from '@/app/layout/useCompanyWorkspace';
 
 const STORE_KEY = 'oe_enabled_modules';
 
@@ -46,10 +46,9 @@ const CONSTRUCTION_CORE = new Set(['costs']);
 
 function isBusinessPack(): boolean {
   try {
-    const key = localStorage.getItem(COMPANY_TYPE_STORAGE_KEY);
-    return key !== null && BUSINESS_PRESET_KEYS.has(key);
+    return isBusinessPreset(localStorage.getItem(COMPANY_TYPE_STORAGE_KEY));
   } catch {
-    return false;
+    return true;
   }
 }
 
@@ -58,12 +57,26 @@ function isCoreModule(key: string): boolean {
   return CORE_MODULES.has(key) || (CONSTRUCTION_CORE.has(key) && !isBusinessPack());
 }
 
+/** Frontend modules of the construction industry pack: off by default for business companies. */
+export const CONSTRUCTION_INDUSTRY_MODULES: ReadonlySet<string> = new Set([
+  '5d', 'assemblies', 'cost-benchmark', 'ddc-ifc-converter', 'ddc-rvt-converter', 'gaeb-exchange',
+  'methodology', 'pdf-takeoff', 'regional-exchange', 'risk-analysis', 'schedule', 'sustainability',
+  'tendering', 'validation', 'templates',
+]);
+
 /** Optional modules with their default enabled state. */
-const OPTIONAL_DEFAULTS: Record<string, boolean> = {
+const BASE_DEFAULTS: Record<string, boolean> = {
   templates: true,
   // Plugin module defaults are auto-merged from MODULE_REGISTRY
   ...getModuleDefaults(),
 };
+
+function optionalDefaults(): Record<string, boolean> {
+  if (!isBusinessPack()) return { ...BASE_DEFAULTS };
+  const out: Record<string, boolean> = { ...BASE_DEFAULTS };
+  for (const key of CONSTRUCTION_INDUSTRY_MODULES) out[key] = false;
+  return out;
+}
 
 /**
  * One-time migration: merge old `oe_installed_plugins` into `oe_enabled_modules`
@@ -98,11 +111,11 @@ migrateInstalledPlugins();
 function readState(): Record<string, boolean> {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return { ...OPTIONAL_DEFAULTS, ...JSON.parse(raw) };
+    if (raw) return { ...optionalDefaults(), ...JSON.parse(raw) };
   } catch {
     // ignore
   }
-  return { ...OPTIONAL_DEFAULTS };
+  return optionalDefaults();
 }
 
 /** Read the persisted hidden-groups list. Backward compatible: a missing or

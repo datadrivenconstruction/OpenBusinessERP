@@ -76,9 +76,9 @@ import {
   type SnapshotRestoreResponse,
 } from '@/features/costs/vectorIndex';
 import { useToastStore } from '@/stores/useToastStore';
-import { useModuleStore } from '@/stores/useModuleStore';
+import { CONSTRUCTION_INDUSTRY_MODULES, useModuleStore } from '@/stores/useModuleStore';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { type MeOnboarding } from '@/app/layout/useCompanyWorkspace';
+import { type MeOnboarding, useIsBusinessCompany } from '@/app/layout/useCompanyWorkspace';
 import { useMeOnboardingQueryKey } from '@/app/layout/meOnboardingQuery';
 import { getModulesByCategory } from '@/modules/_registry';
 import { translateManifestText } from '@/modules/_i18n';
@@ -277,6 +277,7 @@ const MODULE_CATEGORY_ORDER = [
   'converter',
   'tools',
   'regional',
+  'industry_construction',
 ] as const;
 
 const MODULE_CATEGORY_META: Record<string, { labelKey: string; defaultLabel: string }> = {
@@ -299,6 +300,7 @@ const MODULE_CATEGORY_META: Record<string, { labelKey: string; defaultLabel: str
   converter: { labelKey: 'modules.cat_converter', defaultLabel: 'CAD / BIM Converters' },
   tools: { labelKey: 'nav.group_tools', defaultLabel: 'Tools' },
   regional: { labelKey: 'modules.cat_regional', defaultLabel: 'Regional Standards' },
+  industry_construction: { labelKey: 'modules.cat_industry_construction', defaultLabel: 'Industry: construction' },
 };
 
 /**
@@ -523,6 +525,7 @@ function presetModuleName(
 }
 
 function CompanyProfilesTab() {
+  const isBusinessCompany = useIsBusinessCompany();
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const onboardingQueryKey = useMeOnboardingQueryKey();
@@ -824,6 +827,7 @@ function CompanyProfilesTab() {
           setModuleEnabled={setModuleEnabled}
           canDisable={canDisable}
           getEnabledDependents={getEnabledDependents}
+          business={isBusinessCompany}
         />
       </div>
 
@@ -1625,6 +1629,8 @@ interface ModuleTogglesSectionProps {
   setModuleEnabled: (key: string, enabled: boolean) => void;
   canDisable: (key: string) => { allowed: boolean; blockedBy: string[] };
   getEnabledDependents: (key: string) => string[];
+  /** Business company: construction modules go under "Industry: construction". */
+  business?: boolean;
 }
 
 export function ModuleTogglesSection({
@@ -1632,10 +1638,23 @@ export function ModuleTogglesSection({
   setModuleEnabled,
   canDisable,
   getEnabledDependents,
+  business: isBusiness = false,
 }: ModuleTogglesSectionProps) {
   const { t } = useTranslation();
   const addToast = useToastStore((s) => s.addToast);
-  const grouped = getModulesByCategory();
+  const grouped = useMemo(() => {
+    const byCat = getModulesByCategory();
+    if (!isBusiness) return byCat;
+    // Business companies see construction modules in one opt-in industry group.
+    const out: Record<string, typeof byCat[string]> = {};
+    for (const [cat, mods] of Object.entries(byCat)) {
+      for (const m of mods) {
+        const key = CONSTRUCTION_INDUSTRY_MODULES.has(m.id) ? 'industry_construction' : cat;
+        (out[key] ??= []).push(m);
+      }
+    }
+    return out;
+  }, [isBusiness]);
 
   function handleToggle(key: string, name: string, currentlyEnabled: boolean) {
     if (currentlyEnabled) {

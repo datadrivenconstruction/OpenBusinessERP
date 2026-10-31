@@ -179,7 +179,7 @@ export const CONSTRUCTION_GROUP_IDS: ReadonlySet<string> = new Set([
   'grp_takeoff', 'grp_cost_data', 'grp_estimating', 'grp_drawings', 'grp_reality',
   'grp_coordination', 'grp_cost_control', 'grp_estimate_detail', 'grp_change',
   'grp_field', 'grp_site', 'grp_handover', 'grp_real_estate', 'grp_rate_buildup',
-  'grp_estimating_ai',
+  'grp_estimating_ai', 'grp_safety', 'grp_esg',
 ]);
 
 /** Rows a business-pack company never sees (construction-specific). */
@@ -195,6 +195,9 @@ export const BUSINESS_HIDDEN_ROUTES: ReadonlySet<string> = new Set([
   '/reports', '/project-controls', '/dashboards',
   // 4D/takt/portfolio scheduling is construction planning.
   '/schedule', '/schedule-advanced', '/portfolio', '/takt',
+  // Site QA/QC and authority sign-off belong to the construction industry pack.
+  '/validation', '/construction-control', '/ncr', '/punchlist', '/inspections',
+  '/review-authority', '/project-route', '/rfi', '/submittals', '/transmittals',
 ]);
 
 /** Rows that sit in a different section for a business-pack company. */
@@ -215,7 +218,7 @@ const BUSINESS_LEADING_GROUPS: ReadonlySet<string> = new Set([
 
 /** Rows shown only for these presets (route -> presets). */
 const BUSINESS_PRESET_ROUTES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
-  ['/funding', new Set(['nonprofit', 'education_training', 'food_production', 'business_all'])],
+  ['/funding', new Set(['nonprofit', 'education_training', 'food_production'])],
   [
     '/equipment',
     new Set([
@@ -231,7 +234,7 @@ export const BUSINESS_GROUP_LABELS: ReadonlyMap<string, { key: string; defaultLa
   ['grp_documents', { key: 'shell.biz_group_workspace', defaultLabel: 'Workspace' }],
 ]);
 
-const BUSINESS_SALES_ORDER = ['/crm', '/sales', '/contacts', '/items', '/import'];
+const BUSINESS_SALES_ORDER = ['/crm', '/sales', '/contacts', '/items', '/inventory', '/import'];
 
 /** A group's static rows as a business-pack company sees them. */
 export function businessGroupItems(
@@ -362,6 +365,7 @@ export const navGroups: NavGroup[] = [
       { labelKey: 'nav.crm', to: '/crm', icon: Briefcase, advancedOnly: true },
       { labelKey: 'nav.sales', defaultLabel: 'Quotes & invoices', to: '/sales', icon: FileText },
       { labelKey: 'nav.items', defaultLabel: 'Products & services', to: '/items', icon: Package },
+      { labelKey: 'nav.inventory', defaultLabel: 'Inventory', to: '/inventory', icon: Warehouse },
       { labelKey: 'nav.import_data', defaultLabel: 'Import data', to: '/import', icon: FileUp },
       { labelKey: 'contacts.title', to: '/contacts', icon: Users },
       { labelKey: 'nav.contracts', to: '/contracts', icon: FileSignature },

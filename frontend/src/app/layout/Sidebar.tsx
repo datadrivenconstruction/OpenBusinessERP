@@ -38,7 +38,7 @@ import {
 import { BUSINESS_GROUP_LABELS, CONSTRUCTION_GROUP_IDS, LEARN_GROUP_ID, businessGroupItems, navGroups, type NavGroup, type NavItem } from './navCatalog';
 import { LEARN_ANCHOR_ATTR, anchorRect, flyLearn } from './learnFlight';
 import { PRESET_WORKSPACES, resolveWorkspace, shownTab } from './workspaces';
-import { BUSINESS_PRESET_KEYS, useCompanyPresetKey, useCompanyWorkspace } from './useCompanyWorkspace';
+import { isBusinessPreset, useCompanyPresetKey, useCompanyWorkspace } from './useCompanyWorkspace';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useModuleStore } from '@/stores/useModuleStore';
 import { useToastStore } from '@/stores/useToastStore';
@@ -390,6 +390,21 @@ const KBD_BY_LETTER: Record<string, string> = {
   a: '/ai-estimate',
   ',': '/settings',
 };
+/** Business-pack chords; must match BUSINESS_SEQUENCES in useKeyboardShortcuts. */
+const BUSINESS_KBD_HINTS: Record<string, string> = {
+  '/': 'G D',
+  '/projects': 'G P',
+  '/sales': 'G I',
+  '/crm': 'G C',
+  '/settings': 'G ,',
+};
+const BUSINESS_KBD_BY_LETTER: Record<string, string> = {
+  d: '/',
+  p: '/projects',
+  i: '/sales?tab=invoices',
+  c: '/crm',
+  ',': '/settings',
+};
 
 /** Addresses the router answers with a redirect, by the menu row they belong
  *  to. `/` redirects to `/dashboard`, so without this the Dashboard row
@@ -490,7 +505,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   // for a profile without a workspace.
   const workspace = useCompanyWorkspace();
   const presetKey = useCompanyPresetKey();
-  const isBusinessCompany = presetKey !== null && BUSINESS_PRESET_KEYS.has(presetKey);
+  const isBusinessCompany = isBusinessPreset(presetKey);
   const workspaceActive = workspace !== null && !isAdvanced;
   const workspaceItems = useMemo(
     () => (workspaceActive && workspace ? resolveWorkspace(workspace) : []),
@@ -857,7 +872,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       if (!key) return;
 
       if (firstKeyRef.current === 'g') {
-        const route = KBD_BY_LETTER[key];
+        const route = (isBusinessCompany ? BUSINESS_KBD_BY_LETTER : KBD_BY_LETTER)[key];
         if (route) {
           e.preventDefault();
           // The dashboard chord must reach the dashboard even on fresh
@@ -889,7 +904,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       document.removeEventListener('keydown', handler);
       clearFirst();
     };
-  }, [navigate]);
+  }, [navigate, isBusinessCompany]);
 
   // Resolve pinned route strings into full NavItems (skipping any
   // routes that are no longer in the registry — e.g. a module the user
@@ -1112,6 +1127,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
         style={{ animationDelay: `${i * 18}ms` }}
       >
         <SidebarItem
+                    business={isBusinessCompany}
           item={item}
           label={t(item.labelKey, { defaultValue: item.defaultLabel })}
           onClick={onClose}
@@ -1346,6 +1362,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
                   style={{ animationDelay: `${i * 18}ms` }}
                 >
                   <SidebarItem
+                    business={isBusinessCompany}
                     item={item}
                     label={t(item.labelKey, { defaultValue: item.defaultLabel })}
                     onClick={onClose}
@@ -2113,6 +2130,7 @@ function LearnSection({
 
 function SidebarItem({
   item,
+  business,
   label,
   onClick,
   badge: numericBadge,
@@ -2142,10 +2160,11 @@ function SidebarItem({
   editMode?: boolean;
   isItemHidden?: boolean;
   onToggleHidden?: (route: string) => void;
+  business?: boolean;
 }) {
   const { t } = useTranslation();
   const Icon = item.icon;
-  const kbdHint = KBD_HINTS[item.to];
+  const kbdHint = (business ? BUSINESS_KBD_HINTS : KBD_HINTS)[item.to];
   const tourTestId = PRODUCT_TOUR_NAV_TESTIDS[item.to];
   // Hover tooltip: label, plus the "when to use this" one-liner when the
   // item defines one (procurement look-alikes, #280). Kept on one line.
