@@ -822,12 +822,10 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError:
         suffix_gap_baseline = {}
     stale_suffix_gaps = sorted(
-        k for k, locs in suffix_gap_baseline.items()
-        if set(locs) - set(suffix_locale_gaps.get(k, ()))
+        k for k, locs in suffix_gap_baseline.items() if set(locs) - set(suffix_locale_gaps.get(k, ()))
     )
     suffix_locale_gaps = {
-        k: [s for s in gap if s not in set(suffix_gap_baseline.get(k, ()))]
-        for k, gap in suffix_locale_gaps.items()
+        k: [s for s in gap if s not in set(suffix_gap_baseline.get(k, ()))] for k, gap in suffix_locale_gaps.items()
     }
     suffix_locale_gaps = {k: gap for k, gap in suffix_locale_gaps.items() if gap}
 
