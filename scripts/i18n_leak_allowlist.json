@@ -1528,5 +1528,20 @@
     "en_value": "Subtotal",
     "note": "Subtotal is the ordinary word for this column in da, es (all variants), id, no, pt (both) and ro, so the translation equals English by design",
     "reason_category": "cognate_loanword"
+  },
+  "accounting.export_fmt_datev": {
+    "en_value": "DATEV Buchungsstapel (EXTF CSV)",
+    "note": "name of the German DATEV import format (Buchungsstapel) and its file type; the format is only ever called by its German name, so en and ru carry it verbatim",
+    "reason_category": "product_name"
+  },
+  "accounting.export_fmt_saft": {
+    "en_value": "SAF-T Financial 2.0 (OECD XML)",
+    "note": "OECD standard name and version (Standard Audit File for Tax) with its file type; a proper name, written the same in ru",
+    "reason_category": "product_name"
+  },
+  "bizonb.app_crm": {
+    "en_value": "CRM",
+    "note": "the abbreviation CRM is the established product term in Russian as in English",
+    "reason_category": "abbreviation"
   }
 }
