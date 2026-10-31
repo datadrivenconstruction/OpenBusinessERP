@@ -398,3 +398,87 @@ async def delete_attachment(
 ) -> Response:
     await _call(svc.delete_attachment(attachment_id))
     return Response(status_code=204)
+
+
+# ── Accountant exports ────────────────────────────────────────────────────
+
+
+@router.get("/export/settings/")
+async def get_export_settings(
+    _user_id: CurrentUserId,
+    _perm: None = Depends(RequirePermission("gl.read")),
+) -> dict[str, Any]:
+    from app.modules.gl.exports import read_export_settings
+
+    return read_export_settings()
+
+
+@router.put("/export/settings/")
+async def put_export_settings(
+    body: dict[str, Any],
+    _user_id: CurrentUserId,
+    _perm: None = Depends(RequirePermission("gl.write")),
+) -> dict[str, Any]:
+    from app.modules.gl.exports import write_export_settings
+
+    return write_export_settings(body)
+
+
+def _attachment(data: bytes, filename: str, media_type: str) -> Response:
+    return Response(data, media_type=media_type, headers={"Content-Disposition": f'attachment; filename="{filename}"'})
+
+
+@router.get("/export/{fmt}/")
+async def export_file(
+    fmt: str,
+    _user_id: CurrentUserId,
+    session: SessionDep,
+    date_from: date = Query(...),
+    date_to: date = Query(...),
+    svc: GLService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("gl.read")),
+) -> Response:
+    """fmt: datev (Buchungsstapel CSV), datev-contacts (Debitoren/Kreditoren CSV), saft (SAF-T 2.0 XML)."""
+    from datetime import datetime
+    from decimal import Decimal
+
+    from app.core.business_settings import read_business_settings
+    from app.modules.gl import exports as gx
+    from app.modules.purchasing.service import PurchasingService
+    from app.modules.sales.service import SalesService
+
+    if date_to < date_from:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "date_to before date_from")
+    settings = gx.read_export_settings()
+    biz = read_business_settings()
+    now = datetime.now()
+    stamp = f"{date_from:%Y%m%d}_{date_to:%Y%m%d}"
+    if fmt == "datev-contacts":
+        contacts = gx.assign_contact_numbers(
+            await gx.collect_contacts(session, svc.tenant_id), settings["sachkontenlaenge"]
+        )
+        data = gx.datev_contacts_csv(contacts, settings, fy_start=date(date_from.year, 1, 1), created=now)
+        return _attachment(data, f"EXTF_Debitoren_Kreditoren_{stamp}.csv", "text/csv; charset=windows-1252")
+    if fmt not in ("datev", "saft"):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown export format")
+    col = await gx.collect(session, svc.tenant_id, date_from, date_to)
+    currency = str(biz.get("base_currency") or "EUR")
+    if fmt == "datev":
+        data = gx.datev_booking_csv(
+            col["entries"], settings, date_from=date_from, date_to=date_to,
+            fy_start=col["fy_start"], created=now, currency=currency,
+        )  # fmt: skip
+        return _attachment(data, f"EXTF_Buchungsstapel_{stamp}.csv", "text/csv; charset=windows-1252")
+    contacts = await gx.collect_contacts(session, svc.tenant_id)
+    company = gx.XCompany(
+        name=str(biz.get("company_name") or ""), vat=str(biz.get("vat_id") or ""),
+        country=str(biz.get("country_code") or "DE"), currency=currency, fy_start=col["fy_start"],
+    )  # fmt: skip
+    rates = [(f"VAT{i + 1}", r["name"], Decimal(str(r["rate"]))) for i, r in enumerate(biz.get("tax_rates") or [])]
+    data = gx.saft_xml(
+        company=company, accounts=col["accounts"], contacts=contacts, entries=col["entries"],
+        tax_rates=rates, date_from=date_from, date_to=date_to, created=now,
+        receivable_account=(await SalesService(session, svc.tenant_id).account_mapping()).get("receivable") or "",
+        payable_account=(await PurchasingService(session, svc.tenant_id).account_mapping()).get("payables") or "",
+    )  # fmt: skip
+    return _attachment(data, f"SAF-T_{stamp}.xml", "application/xml")

@@ -13,12 +13,13 @@ import {
   glApi, presetRange, previousRange, toCsv, useBusinessCurrency,
   type BalanceSheet, type ProfitLoss, type Section, type TrialBalance, type VatReport,
 } from './api';
+import { ExportPanel } from './ExportPanel';
 import { PeriodPicker } from './PeriodPicker';
 import { AccountingShell, EmptyBlock, ErrorBlock, LoadingBlock, numCls, thCls } from './ui';
 
-type Tab = 'trial' | 'balance' | 'pnl' | 'vat';
-const TABS: Tab[] = ['trial', 'balance', 'pnl', 'vat'];
-const TAB_LABEL: Record<Tab, string> = { trial: 'Trial balance', balance: 'Balance sheet', pnl: 'Profit and loss', vat: 'VAT return' };
+type Tab = 'trial' | 'balance' | 'pnl' | 'vat' | 'export';
+const TABS: Tab[] = ['trial', 'balance', 'pnl', 'vat', 'export'];
+const TAB_LABEL: Record<Tab, string> = { trial: 'Trial balance', balance: 'Balance sheet', pnl: 'Profit and loss', vat: 'VAT return', export: 'Export' };
 
 export interface ReportRow {
   kind: 'head' | 'acc' | 'total';
@@ -73,7 +74,7 @@ export function ReportsPage() {
   const def = useMemo(() => presetRange('year'), []);
   const from = params.get('from') || def.from;
   const to = params.get('to') || def.to;
-  const compare = params.get('compare') !== '0' && tab !== 'trial' && tab !== 'vat';
+  const compare = params.get('compare') !== '0' && tab !== 'trial' && tab !== 'vat' && tab !== 'export';
   const prev = previousRange(from, to);
   const L = (k: string, d: string) => t(k, { defaultValue: d });
 
@@ -133,7 +134,7 @@ export function ReportsPage() {
     <AccountingShell
       title={t('accounting.tab_reports', { defaultValue: 'Reports' })}
       actions={
-        <Button size="sm" variant="secondary" icon={<Download size={14} />} disabled={!ready || empty} onClick={exportCsv}>
+        <Button size="sm" variant="secondary" icon={<Download size={14} />} disabled={!ready || empty || tab === 'export'} onClick={exportCsv}>
           {t('accounting.export_csv', { defaultValue: 'Export CSV' })}
         </Button>
       }
@@ -154,7 +155,7 @@ export function ReportsPage() {
       </div>
       <div className="flex flex-wrap items-end gap-4">
         <PeriodPicker from={from} to={to} single={tab === 'balance'} onChange={(r) => update({ from: r.from, to: r.to })} />
-        {tab !== 'trial' && (
+        {tab !== 'trial' && tab !== 'export' && (
           <label className="mb-1 flex items-center gap-2 text-sm text-content-primary">
             <input type="checkbox" checked={compare} onChange={(e) => update({ compare: e.target.checked ? null : '0' })} />
             {t('accounting.compare_previous', { defaultValue: 'Compare with previous period' })}
@@ -163,7 +164,9 @@ export function ReportsPage() {
         {unbalanced && <Badge variant="warning" size="sm">{t('accounting.not_balanced_short', { defaultValue: 'Does not balance' })}</Badge>}
       </div>
 
-      {active.isLoading ? (
+      {tab === 'export' ? (
+        <ExportPanel from={from} to={to} />
+      ) : active.isLoading ? (
         <LoadingBlock />
       ) : active.error ? (
         <ErrorBlock error={active.error} onRetry={() => active.refetch()} />

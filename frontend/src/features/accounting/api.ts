@@ -296,3 +296,16 @@ export const natural = (type: AccountType, closing: string | number): number => 
   const n = Number(closing) || 0;
   return type === 'asset' || type === 'expense' ? n : -n;
 };
+
+export type ExportFormat = 'datev' | 'datev-contacts' | 'saft';
+export const EXPORT_FORMATS: ExportFormat[] = ['datev', 'datev-contacts', 'saft'];
+
+export function exportUrl(fmt: ExportFormat, from: string, to: string): string {
+  return `/api/v1/gl/export/${fmt}/?date_from=${from}&date_to=${to}`;
+}
+
+export function exportFilename(fmt: ExportFormat, from: string, to: string): string {
+  const stamp = `${from.replaceAll('-', '')}_${to.replaceAll('-', '')}`;
+  if (fmt === 'saft') return `SAF-T_${stamp}.xml`;
+  return fmt === 'datev' ? `EXTF_Buchungsstapel_${stamp}.csv` : `EXTF_Debitoren_Kreditoren_${stamp}.csv`;
+}

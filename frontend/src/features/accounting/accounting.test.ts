@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { entryBalance, previousRange, toCsv, validateEntry } from './api';
+import { entryBalance, exportFilename, exportUrl, previousRange, toCsv, validateEntry } from './api';
 
 const L = (account_id: string, debit = '', credit = '') => ({ account_id, description: '', debit, credit });
 
@@ -20,4 +20,12 @@ describe('helpers', () => {
     expect(previousRange('2026-03-01', '2026-03-31')).toEqual({ from: '2026-01-29', to: '2026-02-28' });
   });
   it('quotes csv cells', () => expect(toCsv([['a,b', 'c"d']])).toBe('\uFEFF"a,b","c""d"'));
+});
+
+describe('accountant exports', () => {
+  it('builds export urls and filenames', () => {
+    expect(exportUrl('saft', '2026-01-01', '2026-03-31')).toBe('/api/v1/gl/export/saft/?date_from=2026-01-01&date_to=2026-03-31');
+    expect(exportFilename('datev', '2026-01-01', '2026-03-31')).toBe('EXTF_Buchungsstapel_20260101_20260331.csv');
+    expect(exportFilename('saft', '2026-01-01', '2026-01-31')).toBe('SAF-T_20260101_20260131.xml');
+  });
 });
