@@ -56,6 +56,7 @@ from app_routes import collect, print_unresolved, require_self_test  # noqa: E40
 REPO_ROOT = Path(__file__).resolve().parent.parent
 APP_TSX = REPO_ROOT / "frontend" / "src" / "app" / "App.tsx"
 MODULES_DIR = REPO_ROOT / "frontend" / "src" / "modules"
+PLAYBOOKS_TS = REPO_ROOT / "frontend" / "src" / "features" / "cases" / "playbooks.ts"
 PLAYBOOK_DIR = REPO_ROOT / "frontend" / "src" / "features" / "cases" / "data"
 PLAYBOOK_GLOB = "*.playbook.ts"
 
@@ -110,8 +111,11 @@ def main() -> int:
     if not APP_TSX.is_file():
         print(f"ERROR: {APP_TSX} not found", file=sys.stderr)
         return 1
-    if not PLAYBOOK_DIR.is_dir():
-        print(f"ERROR: {PLAYBOOK_DIR} not found", file=sys.stderr)
+    # No data folder means no case ships, which is only clean while the loader
+    # still reads that folder; a loader that moved would make this pass blind.
+    no_cases = not PLAYBOOK_DIR.is_dir()
+    if no_cases and "'./data/*.playbook.ts'" not in PLAYBOOKS_TS.read_text(encoding="utf-8"):
+        print(f"ERROR: {PLAYBOOK_DIR} not found and {PLAYBOOKS_TS} no longer globs it", file=sys.stderr)
         return 1
 
     # The collector proves it can still read a route table, and still refuse one,
@@ -139,7 +143,7 @@ def main() -> int:
     app_routes = [r.path for r in table.app_routes if r.path != "*"]
     module_routes = [r.path for r in table.module_routes if r.default_enabled is not False]
     routes = app_routes + module_routes
-    steps = read_steps(PLAYBOOK_DIR)
+    steps = [] if no_cases else read_steps(PLAYBOOK_DIR)
 
     # An empty read is a broken scan, not a clean tree. Both of these have moved
     # before, and a guard that silently measures nothing is worse than none.
@@ -154,6 +158,9 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if no_cases:
+        print(f"case routes OK: no case ships ({PLAYBOOK_DIR} absent), {len(routes)} routes collected")
+        return 0
     if not steps:
         print(
             f"ERROR: no case steps found under {PLAYBOOK_DIR}/{PLAYBOOK_GLOB}",

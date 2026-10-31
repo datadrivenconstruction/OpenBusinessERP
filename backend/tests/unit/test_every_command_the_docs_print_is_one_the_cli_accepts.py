@@ -92,11 +92,9 @@ MUST_BE_COVERED = (
     "README.md",
     "backend/README.md",
     "docs/INSTALL_LINUX.md",
-    "docs/docs.html",
-    "docs/partner-packs/README.md",
 )
-MINIMUM_FILES = 100
-MINIMUM_INVOCATIONS = 60
+MINIMUM_FILES = 60
+MINIMUM_INVOCATIONS = 45
 
 PROGRAM_NAMES = ("openbusinesserp", "openestimate")
 

@@ -219,22 +219,22 @@ def _fixture(tmp: str, pyproject_edit=None, dockerfile_edit=None) -> tuple[str, 
     return pyproject_copy, dockerfile_copy
 
 
-def _map_line_adder(slug: str):
-    """Return an edit that adds ``slug`` to the map, after the last pack in it."""
+def _map_line_adder(path: str):
+    """Return an edit that adds ``path`` to the map, after its last outside-backend entry."""
 
     def edit(text: str) -> str:
         lines = text.splitlines(keepends=True)
-        last = max(index for index, line in enumerate(lines) if line.startswith('"../packs/'))
-        lines.insert(last + 1, f'"../packs/{slug}/src" = "packs/{slug}/src"\n')
+        last = max(index for index, line in enumerate(lines) if line.startswith('"../'))
+        lines.insert(last + 1, f'"../{path}" = "{path}"\n')
         return "".join(lines)
 
     return edit
 
 
-# A pack that really is in the tree and really is absent from the map, so
+# A directory that really is in the tree and really is absent from the map, so
 # adding it to one file at a time isolates one direction at a time without
 # also tripping the does-it-exist rule.
-HELD_BACK = "aus-nzs"
+HELD_BACK = "data/templates"
 
 
 def _line_adder(line: str):
@@ -270,7 +270,7 @@ def selftest() -> int:
         # The image builds, and ships a pack that is held back on purpose.
         pyproject, dockerfile = _fixture(
             tmp,
-            dockerfile_edit=_line_adder(f"COPY packs/{HELD_BACK}/src/ packs/{HELD_BACK}/src/"),
+            dockerfile_edit=_line_adder(f"COPY {HELD_BACK}/ {HELD_BACK}/"),
         )
         found = check(pyproject, dockerfile)
         if len(found) != 1 or HELD_BACK not in found[0] or "ships it publicly" not in found[0]:
@@ -284,8 +284,8 @@ def selftest() -> int:
         # a path nobody has committed still fails the build.
         pyproject, dockerfile = _fixture(
             tmp,
-            pyproject_edit=_map_line_adder("selftest-absent"),
-            dockerfile_edit=_line_adder("COPY packs/selftest-absent/src/ packs/selftest-absent/src/"),
+            pyproject_edit=_map_line_adder("data/selftest-absent"),
+            dockerfile_edit=_line_adder("COPY data/selftest-absent/ data/selftest-absent/"),
         )
         found = check(pyproject, dockerfile)
         if len(found) != 1 or "no such path exists" not in found[0]:
@@ -300,7 +300,7 @@ def selftest() -> int:
         pyproject, dockerfile = _fixture(
             tmp,
             pyproject_edit=_map_line_adder(HELD_BACK),
-            dockerfile_edit=_line_adder(f"# packs/{HELD_BACK}/src is mentioned here and nowhere else"),
+            dockerfile_edit=_line_adder(f"# {HELD_BACK} is mentioned here and nowhere else"),
         )
         if not check(pyproject, dockerfile):
             print("selftest FAILED: a comment naming the path was accepted as a copy")
@@ -311,7 +311,7 @@ def selftest() -> int:
         pyproject, dockerfile = _fixture(
             tmp,
             pyproject_edit=_map_line_adder(HELD_BACK),
-            dockerfile_edit=_line_adder(f"COPY --from=frontend-build packs/{HELD_BACK}/src/ packs/{HELD_BACK}/src/"),
+            dockerfile_edit=_line_adder(f"COPY --from=frontend-build {HELD_BACK}/ {HELD_BACK}/"),
         )
         if not check(pyproject, dockerfile):
             print("selftest FAILED: a COPY --from= was accepted as a copy from the build context")
@@ -325,7 +325,7 @@ def selftest() -> int:
             pyproject_edit=_map_line_adder(HELD_BACK),
             dockerfile_edit=lambda text: text.replace(
                 "# Data catalogs (for seed/enrichment).\n",
-                f"COPY packs/{HELD_BACK}/src/ packs/{HELD_BACK}/src/\n# Data catalogs (for seed/enrichment).\n",
+                f"COPY {HELD_BACK}/ {HELD_BACK}/\n# Data catalogs (for seed/enrichment).\n",
                 1,
             ),
         )
@@ -335,7 +335,7 @@ def selftest() -> int:
 
     print(
         "selftest ok: reports a force-include entry with no COPY, reports a COPY of a held-back "
-        "pack with no entry, refuses a comment and a COPY --from= as substitutes, and stays quiet "
+        "path with no entry, refuses a comment and a COPY --from= as substitutes, and stays quiet "
         "on the files as they are"
     )
     return 0

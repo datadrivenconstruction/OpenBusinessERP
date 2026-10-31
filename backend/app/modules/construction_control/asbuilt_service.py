@@ -432,86 +432,14 @@ class AsBuiltService:
         return record
 
     async def import_from_scan(self, data: AsBuiltImportFromScanIn, user_id: str | None) -> AsBuiltRecord:
-        """Create an as-built from a point-cloud scan registration (a deviation result).
+        """Create an as-built from a point-cloud scan registration.
 
-        Carries the registration's RMS error across as the accuracy value, links the
-        deviation map and the registration's target element where it resolves, and re-checks
-        the scan's project so a cross-project registration is rejected (404). Degrades to a
-        clear 400 if the point-cloud module is not installed.
+        This edition ships no point-cloud module, so there is no registration to read.
         """
-        try:
-            from app.modules.pointcloud.models import ScanDataset, ScanRegistration
-        except ImportError as exc:  # pragma: no cover - depends on optional module
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Point-cloud module is not available; cannot import an as-built from a scan",
-            ) from exc
-
-        if data.criterion_id is not None:
-            await self._get_criterion_in_project(data.criterion_id, data.project_id)
-
-        registration = await self.session.get(ScanRegistration, data.registration_id)
-        if registration is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scan registration not found")
-        scan = await self.session.get(ScanDataset, registration.scan_id)
-        if scan is None or scan.project_id != data.project_id:
-            # Same 404 for "no such scan" and "scan in another project" (IDOR defence).
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Scan registration not found in this project",
-            )
-
-        rms = registration.rms_error
-        record = AsBuiltRecord(
-            project_id=data.project_id,
-            title=data.title,
-            discipline=data.discipline,
-            capture_method="laser_scan",
-            accuracy_class="survey",
-            accuracy_value=str(rms) if rms is not None else None,
-            accuracy_unit="mm" if rms is not None else None,
-            criterion_id=str(data.criterion_id) if data.criterion_id else None,
-            deviation_value=str(registration.out_of_tolerance_count),
-            source_kind="pointcloud_registration",
-            source_ref=str(registration.id),
-            deviation_map_uri=registration.deviation_map_uri,
-            status="draft",
-            created_by=user_id,
-            metadata_={
-                **(data.metadata or {}),
-                "scan_id": str(scan.id),
-                "registration_id": str(registration.id),
-                "coverage_pct": str(registration.coverage_pct) if registration.coverage_pct is not None else None,
-            },
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Point-cloud module is not available; cannot import an as-built from a scan",
         )
-        record = await self.records.create(record)
-
-        # The registration's target may name a BIM element id; link it through the UER.
-        target_ref = (registration.target_ref or "").strip()
-        if target_ref:
-            from app.modules.construction_control.schemas import ElementRefIn
-
-            try:
-                element_uuid = uuid.UUID(target_ref)
-            except (ValueError, TypeError):
-                element_uuid = None
-            if element_uuid is not None:
-                try:
-                    await self._attach_element(
-                        str(record.id), record.project_id, ElementRefIn(bim_element_id=element_uuid)
-                    )
-                except HTTPException:
-                    # The target was not a resolvable element in this project; leave the
-                    # as-built unlinked rather than failing the whole import.
-                    logger.info("As-built import: target_ref %s did not resolve to an element", target_ref)
-
-        logger.info(
-            "As-built %s imported from scan registration %s (project %s)",
-            record.record_number,
-            registration.id,
-            data.project_id,
-        )
-        return record
 
     # ── Element links (UER) ──────────────────────────────────────────────────
 

@@ -366,8 +366,6 @@ HOME_CATALOG_ROWS = [
 @pytest.fixture
 def wired(monkeypatch: pytest.MonkeyPatch, fake_swap: list[str], db: AsyncEngine) -> Iterator[dict[str, Any]]:
     """Every outside dependency of the two endpoints, faked; the database is real."""
-    import app.modules.catalog.router as catalog_router
-
     sync_url = db.url.set(drivername="postgresql+psycopg2").render_as_string(hide_password=False)
     state: dict[str, Any] = {"staged": []}
 
@@ -407,8 +405,8 @@ def wired(monkeypatch: pytest.MonkeyPatch, fake_swap: list[str], db: AsyncEngine
         return {"imported": len(HOME_ITEMS)}
 
     monkeypatch.setattr(costs_router, "load_cwicr_region", _load)
-    monkeypatch.setattr(catalog_router, "fetch_market_catalog_rows", _market_rows)
-    monkeypatch.setattr(catalog_router, "fetch_region_catalog_rows", _home_rows)
+    monkeypatch.setattr(costs_router, "fetch_market_catalog_rows", _market_rows)
+    monkeypatch.setattr(costs_router, "fetch_region_catalog_rows", _home_rows)
     monkeypatch.setattr(costs_router, "_process_and_insert_cwicr", _import_home_parquet)
     # The overlay's own sync engine has to reach this test's database. Set and
     # put back here, not through ``monkeypatch``: monkeypatch is undone after

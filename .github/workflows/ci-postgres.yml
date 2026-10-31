@@ -189,22 +189,10 @@ jobs:
       - name: Run demo seed and import consistency tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: >-
-          pytest tests/unit/test_demo_contact_types.py
-          tests/unit/test_demo_variations_vocabulary.py
-          tests/unit/test_demo_correspondence_parties.py
-          tests/unit/test_contacts_import_vocabulary.py
-          tests/unit/test_demo_rfi_dates.py
-          tests/unit/test_demo_party_lookup.py
+          pytest tests/unit/test_contacts_import_vocabulary.py
           tests/unit/test_demo_seed_text_has_no_scaffolding_words.py
           tests/unit/test_demo_insight_dimensions.py
-          tests/unit/test_demo_seed_has_no_real_firm_names.py
-          tests/unit/test_demo_contact_domains.py
-          tests/unit/test_demo_bid_line_items.py
           tests/unit/test_tender_package_scope.py
-          tests/unit/test_demo_safety_vocabulary.py
-          tests/unit/test_demo_seed_speaks_module_vocabularies.py
-          tests/unit/test_demo_progress_periods.py
-          tests/unit/test_demo_resource_leaves_add_up_to_the_position_rate.py
           -q -p no:cacheprovider
       # The region to currency table. Attached for the same reason as the suites
       # around it, which is that tests/unit runs in no lane that blocks a merge.
@@ -804,41 +792,11 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           set -o pipefail
-          pytest tests/unit/test_bim_*.py tests/unit/test_bimlv_container.py -q -p no:cacheprovider | tee bim.log
+          pytest tests/unit/test_bim_*.py -q -p no:cacheprovider | tee bim.log
           if grep -qE '[0-9]+ skipped' bim.log; then
             echo "::error::A BIM test skipped instead of running. This step proved nothing about the rules it is here to gate." >&2
             exit 1
           fi
-      # The two BIM documents cross-link guards live in tests/modules/bim_hub,
-      # and the string bim_hub appears in no workflow in this repository. The
-      # sharded backend lane runs tests/unit only; tests/modules is named five
-      # times in this file and never for this directory; the tenant isolation
-      # job selects on a marker these files do not carry and on a keyword chain
-      # in which no word matches any of their node ids. So both files passed
-      # nightly and could stop nothing, which is the state that let the defect
-      # they cover be written down as fixed while a second instance of the same
-      # wrong keyword sat 170 lines away in the same router, commemorated in a
-      # comment.
-      #
-      # Not described as blocking, because nothing here is. main is protected by
-      # three rules, deletion, non-fast-forward and linear history, and carries
-      # no required status checks at all, so no job in this workflow stops a
-      # push today and this step does not either. What it buys is that the guard
-      # runs where somebody looks instead of nightly where nobody does, and that
-      # the list is already right on the day required checks are turned on.
-      #
-      # Whole files rather than selected tests, because selecting is
-      # what went wrong here in the first place. Own step because it needs a
-      # database: one file commits through the worker's own session and asserts
-      # what PostgreSQL did with the row, the other reproduces a real refusal
-      # with a 300-character filename. Eight tests, about three minutes here,
-      # nearly all of it cluster boot and per-test template clones.
-      - name: Run the BIM documents cross-link guards
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: >-
-          pytest tests/modules/bim_hub/test_cad_upload_cross_link.py
-          tests/modules/bim_hub/test_sheets_pdf_cross_link.py
-          -q -p no:cacheprovider --timeout=300 --timeout-method=thread
       # The funding module's own tests ran in no lane anyone reads, for the same
       # reason as the BIM guards above: the sharded backend lane runs tests/unit
       # only and no step here named tests/modules/funding. Only its PG backfill
@@ -971,8 +929,6 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: >-
           pytest tests/unit/test_contract_standard_registration.py
-          tests/unit/test_contract_standard_matching_hazard.py
-          tests/unit/test_demo_contract_standard.py
           tests/unit/test_ccdc_notice_periods_are_held_not_guessed.py
           tests/unit/test_notice_standard_picker_parity.py
           tests/unit/test_time_bar.py
@@ -1121,14 +1077,10 @@ jobs:
       - name: Run module and unit ownership guards
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: >-
-          pytest tests/modules/geo_hub/test_overlay_crud_idor.py
-          tests/modules/qms/test_qms_idor.py
+          pytest tests/modules/qms/test_qms_idor.py
           tests/modules/rfi/test_rfi_cross_tenant_idor.py
           tests/modules/variations/test_variations_idor.py
-          tests/unit/test_bim_requirements_validate_idor.py
           tests/unit/test_carbon_idor.py
-          tests/unit/test_clash_idor.py
-          tests/unit/test_coordination_idor.py
           tests/unit/test_plan_read_idor.py
           tests/unit/test_takeoff_idor.py
           tests/unit/teams/test_teams_access_control.py
@@ -1201,7 +1153,6 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: >-
           pytest tests/integration/test_assemblies_idor.py
-          tests/integration/test_bim_hub_idor.py
           tests/integration/test_costs_idor.py
           tests/integration/test_dashboards_idor.py
           tests/integration/test_eac_idor.py
@@ -1481,7 +1432,7 @@ jobs:
       run:
         working-directory: frontend
     env:
-      # Fourteen of the fifty-three files below are jsdom component tests, which
+      # Eleven of the forty-four files below are jsdom component tests, which
       # are the expensive kind, and this runner has four cores rather than the
       # twelve the local measurement was taken on. Both figures are counted by
       # parsing this list, never by adding one to what the comment said: it read
@@ -1489,8 +1440,8 @@ jobs:
       # sessions each appended an entry without recounting. It drifted the same
       # way again and said "twelve of thirty-nine" at fifty entries, so the
       # habit the previous paragraph warned about survived the warning. Counted
-      # two ways this time and they agree: fourteen entries end in .tsx and
-      # fourteen import the React testing library, and it is the same fourteen,
+      # two ways this time and they agree: eleven entries end in .tsx and
+      # eleven import the React testing library, and it is the same eleven,
       # compared as sets rather than as counts. The whole-program type check
       # and the build in the other workflow already need this ceiling and are
       # skipped on macOS because a 9 GB heap does not fit that runner at all.
@@ -1508,11 +1459,6 @@ jobs:
         src/app/layout/Header.titleKeys.test.ts
         src/app/layout/navCatalog.test.ts
         src/features/assemblies/__tests__/preview-totals-no-blended-scalar.test.tsx
-        src/features/bim/BIMConverterVerifyGate.test.tsx
-        src/features/cases/caseVocabulary.test.ts
-        src/features/cases/cases.test.ts
-        src/features/cases/casesProjectContext.test.tsx
-        src/features/cases/chipConsistency.test.ts
         src/features/cases/roles.test.ts
         src/features/contracts/ContractAnalyticsPanels.test.tsx
         src/features/contracts/ContractDetailDrawerDelete.test.tsx
@@ -1532,9 +1478,7 @@ jobs:
         src/features/funding/api.test.ts
         src/features/funding/fundingInsights.test.ts
         src/features/funding/obligationLabel.test.ts
-        src/features/geo-hub/__tests__/cropPolygonPositionsAreNeverMutatedAfterConstruction.test.tsx
         src/features/integrations/calendarFeed.test.ts
-        src/features/issues/IssueHubLink.test.ts
         src/features/module-builder/api.test.ts
         src/features/module-builder/draft.test.ts
         src/features/module-builder/fields.test.ts
@@ -1863,7 +1807,19 @@ jobs:
         run: |
           mkdir -p ../frontend/dist
           touch ../frontend/dist/.gitkeep
+      - name: Check that the previous release is published
+        id: previous
+        # The renamed package has no earlier release on PyPI yet; with nothing
+        # to upgrade from, the job says so and passes instead of failing pip.
+        run: |
+          if python -m pip download --no-deps --quiet -d "$RUNNER_TEMP/probe" "openbusinesserp==$OE_UPGRADE_FROM_VERSION" >/dev/null 2>&1; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Upgrade check skipped: openbusinesserp==$OE_UPGRADE_FROM_VERSION is not published on PyPI, so there is no previous release to upgrade from."
+          fi
       - name: Install the previous release into a virtualenv of its own
+        if: steps.previous.outputs.available == 'true'
         # Its own interpreter, with no path into this working tree. The aging
         # script asserts that ``app`` resolves outside the repository before it
         # touches the database, because an ``app`` that resolved back here
@@ -1880,10 +1836,12 @@ jobs:
           "$RUNNER_TEMP/venv-previous/bin/python" -m pip install --upgrade pip
           "$RUNNER_TEMP/venv-previous/bin/python" -m pip install "openbusinesserp==$OE_UPGRADE_FROM_VERSION"
       - name: Install the current code
+        if: steps.previous.outputs.available == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev,server]"
       - name: Build the database with the previous release, and put rows in it
+        if: steps.previous.outputs.available == 'true'
         # The rows are load-bearing. PostgreSQL accepts
         # ADD COLUMN ... NOT NULL with no default on an EMPTY table and rejects
         # it only once rows exist, so an unseeded database would let the exact
@@ -1891,55 +1849,12 @@ jobs:
         run: |
           "$RUNNER_TEMP/venv-previous/bin/python" scripts/age_database_to_previous_release.py
       - name: Run the current code against the aged database
+        if: steps.previous.outputs.available == 'true'
         # Proves five things, and fails loudly rather than vacuously on each:
         # the database really was old, it was at an older revision than the
         # code, the schema moved, /api/health agrees that it moved, and an
         # authenticated read of the affected register answers 200.
         run: python scripts/verify_upgrade_from_previous_release.py
-
-  # Every pack installed the way an admin installs it, each on a fresh
-  # database cloned from a booted template. The unit suite checks pack wiring
-  # from the outside and never installs anything, and every layer of the
-  # installer is fail-soft, so this is the only place a pack that installs half
-  # a workspace goes red. About a hundred demo projects in total, so it is split
-  # six ways and kept out of the main job's thirty minutes (the file skips
-  # itself unless OE_PACK_MATRIX is set).
-  pack-installs:
-    name: Pack installs (shard ${{ matrix.shard }}/6)
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4, 5, 6]
-    defaults:
-      run:
-        working-directory: backend
-    env:
-      OE_TEST_DB: pg
-      OE_PACK_MATRIX: '1'
-      OE_PACK_SHARD: ${{ matrix.shard }}/6
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-          cache: pip
-          cache-dependency-path: backend/pyproject.toml
-      - name: Create empty frontend dist (hatchling force-include)
-        run: |
-          mkdir -p ../frontend/dist
-          touch ../frontend/dist/.gitkeep
-      - name: Install dependencies
-        id: install
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev,server]"
-      - name: Install every pack on a fresh database
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: >-
-          pytest tests/pg/test_every_pack_installs.py -v -rA -p no:cacheprovider
-          --timeout=1800 --timeout-method=thread --durations=0
 
   # Every cost base a pack resolves to, downloaded from the public CWICR
   # repository and imported on a fresh database, with the import's own memory
@@ -1987,41 +1902,6 @@ jobs:
         run: >-
           pytest tests/pg/test_every_pack_cost_base_loads.py -v -s -rA -p no:cacheprovider
           --timeout=1800 --timeout-method=thread --durations=0
-
-  # The packs as an installed wheel sees them. The unit gates read the tree and
-  # the publish workflow reads the archive only at tag time, with a floor of
-  # fifteen packs rather than the list. This builds the wheel, installs it into
-  # a clean virtualenv and asks discovery from outside the repository, so a pack
-  # that only a source checkout can see goes red before a tag exists. The
-  # frontend is a stub: the question is about the packs, not the bundle.
-  pack-wheel:
-    name: Packs in the installed wheel
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-          cache: pip
-          cache-dependency-path: backend/pyproject.toml
-      - name: Create empty frontend dist (hatchling force-include)
-        run: |
-          mkdir -p frontend/dist
-          touch frontend/dist/.gitkeep
-      - name: Build and install the wheel into a clean virtualenv
-        id: install
-        run: |
-          python -m pip install --upgrade build
-          (cd backend && python -m build --wheel --outdir "$RUNNER_TEMP/dist/")
-          python -m venv "$RUNNER_TEMP/wheel-venv"
-          "$RUNNER_TEMP/wheel-venv/bin/python" -m pip install --upgrade pip
-          "$RUNNER_TEMP/wheel-venv/bin/python" -m pip install "$RUNNER_TEMP"/dist/*.whl
-      - name: Ask the installed wheel which packs it lists
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: |
-          cd "$RUNNER_TEMP"
-          "$RUNNER_TEMP/wheel-venv/bin/python" "$GITHUB_WORKSPACE/scripts/check_wheel_ships_every_pack.py" "$GITHUB_WORKSPACE"
 
   # Every GET route of a fresh install, called as the demo admin. The boot is
   # the one a self-hosted user gets: demo seed on, the showcase and flagship

@@ -36,15 +36,25 @@ _UNIQUES = {
 }
 
 
+# data-rewrite-ack: table=oe_gl_account growth=bounded rows=chart of accounts, configured once per company
+# data-rewrite-ack: table=oe_gl_fiscal_year growth=bounded rows=one row per fiscal year
+# data-rewrite-ack: table=oe_gl_period growth=bounded rows=accounting periods, a dozen per fiscal year
+# data-rewrite-ack: table=oe_gl_journal_entry growth=tenure rows=one row per posted journal entry
+# data-rewrite-ack: table=oe_gl_journal_line growth=tenure rows=one row per journal line, several per entry
+# data-rewrite-ack: table=oe_sales_document growth=tenure rows=one row per quote, order or invoice
+# data-rewrite-ack: table=oe_sales_line growth=tenure rows=one row per document line
+# data-rewrite-ack: table=oe_sales_payment growth=tenure rows=one row per recorded payment
+# data-rewrite-ack: table=oe_sales_sequence growth=bounded rows=one numbering counter per document kind
+# data-rewrite-ack: table=oe_sales_account_map growth=bounded rows=one GL mapping per posting role# boot-repair: gap - backfills tenant_id to the default company tenant; on an install that never runs alembic the boot heal adds the column empty, so pre-existing GL and sales rows keep tenant_id NULL
 def upgrade() -> None:
     bind = op.get_bind()
     insp = sa.inspect(bind)
     existing = set(insp.get_table_names())
-    tables = [t for t in _TABLES if t in existing]
-    if not tables:
-        return
     tenant = "default"  # app.core.tenant_scope.DEFAULT_COMPANY_TENANT
-    for table in tables:
+    # Iterate the literal tuple so the data-rewrite guard can name each table.
+    for table in _TABLES:
+        if table not in existing:
+            continue
         cols = {c["name"] for c in insp.get_columns(table)}
         if "tenant_id" in cols:
             continue

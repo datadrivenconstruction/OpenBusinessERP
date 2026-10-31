@@ -75,8 +75,9 @@ BODY_CLOSE = """]);
 
 def country_portraits() -> list[str]:
     """The country portrait filenames on disk, sorted."""
+    # No folder is no portraits bought: the manifest must then be empty, not stale.
     if not PEOPLE_DIR.is_dir():
-        raise SystemExit(f"asset folder not found: {PEOPLE_DIR}")
+        return []
     return sorted(p.name for p in PEOPLE_DIR.iterdir() if COUNTRY_PORTRAIT_RE.match(p.name))
 
 

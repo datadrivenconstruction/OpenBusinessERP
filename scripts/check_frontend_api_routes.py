@@ -106,7 +106,11 @@ MAX_PREFIX_ONLY = 228
 # Known unmatched calls that are right as they are. Key format:
 #   "<VERDICT> <METHOD|*> <path as written> @ <file under frontend/src>"
 # Every entry carries its reason; an entry that stops matching fails the run.
-ALLOWED: dict[str, str] = {}
+ALLOWED: dict[str, str] = {
+    "MISSING GET /v1/receivables/customer/{q({ partner_key: partnerKey, as_of: asOf })} @ features/receivables/api.ts": (
+        "q() returns a query string ('?partner_key=...'), not a path segment; the call hits GET /customer/"
+    ),
+}
 
 
 # --------------------------------------------------------------------------

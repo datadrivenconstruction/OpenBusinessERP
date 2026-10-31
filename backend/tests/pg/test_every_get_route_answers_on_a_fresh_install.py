@@ -90,20 +90,7 @@ _GENERIC_PARAMS = frozenset({"id", "item_id", "entry_id", "record_id", "key", "n
 #: refuses on purpose for data the demo seed does not carry. Keyed by the full
 #: path template. An entry excuses only the outcomes it names, so the same route
 #: answering 500 still fails, and every excused call is listed in the report.
-ALLOWLIST: dict[str, tuple[frozenset[str], str]] = {
-    "/api/v1/boq/boqs/{boq_id}/export/gaeb-x31/": (
-        frozenset({"422"}),
-        "X31 carries measured quantities; the demo bills have no measurement sheet, and the route says so",
-    ),
-    "/api/v1/finance/invoices/{invoice_id}/einvoice": (
-        frozenset({"422"}),
-        "the demo contacts lack the buyer name, country and city EN 16931 requires; the route lists what is missing",
-    ),
-    "/api/v1/bim-hub/models/{model_id}/download/": (
-        frozenset({"timeout", "slow"}),
-        "streams the model file; the test transport buffers the whole body, so a large model reaches the ceiling",
-    ),
-}
+ALLOWLIST: dict[str, tuple[frozenset[str], str]] = {}
 
 #: Routes that need one of several query parameters, none of them required on
 #: its own, so the signature cannot tell the walker. Each entry names the
@@ -111,6 +98,7 @@ ALLOWLIST: dict[str, tuple[frozenset[str], str]] = {
 #: demo project) and the alternatives the route accepts. Called bare, these
 #: answer 422 with a plain-text detail.
 _EITHER_OR: dict[str, tuple[str, str | None, str]] = {
+    "/api/v1/appointments/clients/bookings/": ("contact_id", "/api/v1/contacts/", "email or contact_id"),
     "/api/v1/documents/bim-links/": ("document_id", "/api/v1/documents/", "element_id or document_id"),
     "/api/v1/property-dev/instalments/": (
         "schedule_id",

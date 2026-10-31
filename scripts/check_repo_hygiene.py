@@ -442,11 +442,13 @@ def main() -> int:
         # Paths from the repository root whatever the working directory, so a
         # run from a subdirectory reads the same packs as one from the root.
         root = _repo_root()
+        tracked = sorted(_git_tracked_set(root)) if root is not None else []
+        has_packs = any(p.startswith("packs/") for p in tracked)
         if root is not None:
-            dead_globs, patterns_checked, packs_checked = _empty_package_data_globs(
-                root, sorted(_git_tracked_set(root))
-            )
-        if packs_checked == 0:
+            dead_globs, patterns_checked, packs_checked = _empty_package_data_globs(root, tracked)
+        # A tree with no packs/ at all has nothing to read; one with packs/ that yields
+        # no pyproject means the reader broke.
+        if packs_checked == 0 and (has_packs or root is None):
             print(
                 "ERROR: the pack package-data check read no packs/*/pyproject.toml, so it "
                 "would pass without looking at anything.",

@@ -253,9 +253,7 @@ async def test_the_demo_administrator_installs_a_pack_from_the_modules_page(self
 async def test_an_account_below_admin_is_refused_the_installer(self_installed) -> None:
     """The control: without it a green result above could mean the role is never read."""
     client, _factory = self_installed
-    from app.core.demo_accounts import DEMO_ACCOUNT_EMAILS
-
-    below = sorted(DEMO_ACCOUNT_EMAILS - {DEMO_ADMIN})
+    below = sorted(set(_seeded_accounts()) - {DEMO_ADMIN})
     assert below, "no seeded account below admin to act as the control"
     refused = 0
     for email in below:
