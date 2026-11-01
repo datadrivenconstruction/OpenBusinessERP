@@ -454,6 +454,16 @@ def _payment_block(
     return [KeepTogether([block])]
 
 
+def _online_payment_block(kit: _Kit, url: str) -> list[Any]:
+    """Provider checkout link (Stripe / Mollie) with a QR code; printed below the bank details."""
+    st = kit.st
+    safe = url.replace("&", "&amp;").replace("<", "").replace(">", "").replace('"', "")
+    text = [_p(t(kit.lg, "pay_online"), st["bold"]), Paragraph(f'<link href="{safe}">{safe}</link>', st["small"])]
+    block = Table([[text, _qr_drawing(url, 22 * mm)]], colWidths=[kit.frame_w - 30 * mm, 30 * mm])
+    block.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+    return [Spacer(1, 3 * mm), KeepTogether([block])]
+
+
 def _terms(kit: _Kit) -> list[Any]:
     text = kit.design.get("terms_text") or ""
     if not text:
@@ -631,6 +641,7 @@ def render_document(
     *,
     language: str | None = None,
     source_number: str | None = None,
+    payment_url: str | None = None,
 ) -> bytes:
     """Quote, order confirmation, invoice or credit note (``doc`` is a SalesDocument)."""
     lg = lang(language or doc.language)
@@ -668,6 +679,8 @@ def render_document(
             amount=doc.gross_total - (doc.amount_paid or 0),
             reference=doc.number,
         )
+        if payment_url:
+            story += _online_payment_block(kit, payment_url)
     story += [Spacer(1, 3 * mm), _p(texts.get("closing") or t(lg, f"closing.{doc.kind}"), st["body"])]
     story += _terms(kit)
     recipient = [doc.customer_name, *(doc.customer_address or "").splitlines()]

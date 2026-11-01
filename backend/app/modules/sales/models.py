@@ -7,6 +7,7 @@ Tables:
     oe_sales_sequence    - gap-free number counter per document kind.
     oe_sales_account_map - GL account code per posting role (overrides defaults).
     oe_sales_send_log    - who emailed which document to whom, and the outcome.
+    oe_sales_payment_link - online payment link (Stripe / Mollie) per invoice; settled once by webhook.
 """
 
 from __future__ import annotations
@@ -167,3 +168,22 @@ class SalesSendLog(Base):
     status: Mapped[str] = mapped_column(String(16), nullable=False)
     detail: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     backend: Mapped[str] = mapped_column(String(32), nullable=False, default="")
+
+
+class SalesPaymentLink(Base):
+    __tablename__ = "oe_sales_payment_link"
+    __table_args__ = (UniqueConstraint("provider", "provider_ref", name="uq_oe_sales_payment_link_provider_ref"),)
+
+    tenant_id: Mapped[str] = mapped_column(String(36), nullable=False, default=DEFAULT_TENANT, index=True)
+    invoice_id: Mapped[uuid.UUID] = mapped_column(
+        GUID(), ForeignKey("oe_sales_document.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    provider: Mapped[str] = mapped_column(String(16), nullable=False)
+    # Stripe Checkout Session id / Mollie payment id; the idempotency key for webhooks.
+    provider_ref: Mapped[str] = mapped_column(String(128), nullable=False)
+    url: Mapped[str] = mapped_column(String(1000), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(MONEY, nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="open")  # open|processing|paid|unapplied
+    paid_amount: Mapped[Decimal | None] = mapped_column(MONEY, nullable=True)
+    payment_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), nullable=True)

@@ -37,7 +37,7 @@ from datetime import date
 from decimal import Decimal
 from typing import TypeVar
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
@@ -517,3 +517,73 @@ async def document_related(
     _perm: None = Depends(RequirePermission("sales.read")),
 ):
     return await _call(svc.related(doc_id, _kind(kind)))
+
+
+# ── Online payment links (Stripe / Mollie) ───────────────────────────────
+class PaymentLinkResponse(BaseModel):
+    provider: str
+    url: str
+    amount: Decimal
+    currency: str
+    status: str
+
+
+@router.post("/invoices/{doc_id}/payment-link/", response_model=PaymentLinkResponse, status_code=201)
+async def create_payment_link(
+    doc_id: uuid.UUID,
+    _user_id: CurrentUserId,
+    session: SessionDep,
+    svc: SalesService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("sales.write")),
+):
+    from app.modules.sales import online_payments as op
+
+    doc = await _call(svc.get(doc_id, "invoice"))
+    try:
+        link = await op.ensure_link(session, doc)
+    except op.PaymentProviderError as exc:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc)) from exc
+    if link is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "No payment provider configured or nothing is due")
+    return link
+
+
+@router.post("/payment-webhooks/stripe/")
+async def stripe_webhook(request: Request, session: SessionDep):
+    """Unauthenticated by design; trust comes from the Stripe-Signature HMAC."""
+    from app.core.payment_settings import secrets
+    from app.modules.sales import online_payments as op
+
+    cfg = secrets()
+    if not cfg["stripe_webhook_secret"]:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Stripe is not configured")
+    prov = op.StripeProvider(cfg)
+    try:
+        event = prov.verify(await request.body(), request.headers.get("stripe-signature", ""))
+    except op.WebhookRejectedError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+    paid = op.StripeProvider.payment_from_event(event)
+    outcome = "ignored" if paid is None else await op.settle(session, "stripe", paid)
+    return {"received": True, "outcome": outcome}
+
+
+@router.post("/payment-webhooks/mollie/")
+async def mollie_webhook(request: Request, session: SessionDep):
+    """Mollie posts only ``id``; the state is fetched from Mollie with our key, so a forged id proves nothing."""
+    from app.core.payment_settings import secrets
+    from app.modules.sales import online_payments as op
+
+    cfg = secrets()
+    if not cfg["mollie_api_key"]:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Mollie is not configured")
+    form = await request.form()
+    payment_id = str(form.get("id") or "")
+    if not payment_id.startswith("tr_") or len(payment_id) > 64 or not payment_id[3:].isalnum():
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unknown payment id")
+    try:
+        paid = await op.MollieProvider(cfg).fetch(payment_id)
+    except op.PaymentProviderError as exc:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc)) from exc
+    if paid.provider_ref != payment_id:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Payment id mismatch")
+    return {"received": True, "outcome": await op.settle(session, "mollie", paid)}

@@ -230,3 +230,70 @@ async def send_test_mail(body: MailTestRequest) -> MailTestResult:
         )
     )
     return MailTestResult(ok=result.ok, backend=result.backend, reason=result.reason)
+
+
+class PaymentSettings(BaseModel):
+    provider: str
+    public_base_url: str
+    return_url: str
+    clearing_account_code: str
+    stripe_secret_key_set: bool
+    stripe_webhook_secret_set: bool
+    mollie_api_key_set: bool
+    configured: bool
+    test_mode: bool | None
+
+
+class PaymentSettingsUpdate(BaseModel):
+    provider: str | None = Field(default=None, pattern="^(none|stripe|mollie)$")
+    public_base_url: str | None = Field(default=None, max_length=500)
+    return_url: str | None = Field(default=None, max_length=500)
+    clearing_account_code: str | None = Field(default=None, max_length=32)
+    stripe_secret_key: str | None = Field(default=None, max_length=500)
+    stripe_webhook_secret: str | None = Field(default=None, max_length=500)
+    mollie_api_key: str | None = Field(default=None, max_length=500)
+
+
+class PaymentTestResult(BaseModel):
+    ok: bool
+    provider: str
+    test_mode: bool | None
+    reason: str
+
+
+@router.get(
+    "/business-settings/payments/", response_model=PaymentSettings, dependencies=[Depends(RequireRole("admin"))]
+)
+async def get_payment_settings() -> PaymentSettings:
+    from app.core.payment_settings import read_payment_settings
+
+    return PaymentSettings(**read_payment_settings())
+
+
+@router.put(
+    "/business-settings/payments/", response_model=PaymentSettings, dependencies=[Depends(RequireRole("admin"))]
+)
+async def put_payment_settings(body: PaymentSettingsUpdate) -> PaymentSettings:
+    from app.core.payment_settings import write_payment_settings
+
+    return PaymentSettings(**write_payment_settings(body.model_dump()))
+
+
+@router.post(
+    "/business-settings/payments/test/",
+    response_model=PaymentTestResult,
+    dependencies=[Depends(RequireRole("admin"))],
+)
+async def test_payment_connection() -> PaymentTestResult:
+    from app.core.payment_settings import payment_status
+    from app.modules.sales import online_payments as op
+
+    status_ = payment_status()
+    prov = op.provider()
+    if prov is None:
+        raise HTTPException(status_code=409, detail="No payment provider configured")
+    try:
+        await prov.test()
+    except op.PaymentProviderError as exc:
+        return PaymentTestResult(ok=False, provider=prov.name, test_mode=status_["test_mode"], reason=str(exc))
+    return PaymentTestResult(ok=True, provider=prov.name, test_mode=status_["test_mode"], reason="")
