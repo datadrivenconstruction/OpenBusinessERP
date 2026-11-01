@@ -498,7 +498,7 @@ function SupportUsModal({ onClose, copied, setCopied }: ModalProps) {
               >
                 {copied ? <Check size={12} className="text-semantic-success" /> : <Copy size={12} />}
                 {copied
-                  ? t('support.share_copied', { defaultValue: 'Copied!' })
+                  ? t('support.share_copied', { defaultValue: 'Copied' })
                   : t('support.share_copy', { defaultValue: 'Copy text + link' })}
               </button>
             </div>

@@ -3017,7 +3017,7 @@ export function CostModelPage() {
                 {t('costmodel.prereq_title', { defaultValue: 'Getting Started' })}
               </p>
               <p className="mt-0.5 text-xs text-amber-700/80 dark:text-amber-400/70">
-                {t('costmodel.prereq_desc', { defaultValue: 'Create a project and build your BOQ estimate first. Once your BOQ is ready, generate the project budget to unlock the full 5D cost model with all analytics capabilities.' })}
+                {t('costmodel.prereq_desc', { defaultValue: 'Create a project and build your BOQ estimate first. Once your BOQ is ready, generate the project budget to open the 5D cost model.' })}
               </p>
             </div>
           </div>

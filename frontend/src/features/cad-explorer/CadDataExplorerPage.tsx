@@ -3290,7 +3290,7 @@ function UploadConvertZone({
         ) : done ? (
           <div className="flex items-center justify-center gap-2 px-6 py-5">
             <CheckCircle2 size={18} className="text-green-500" />
-            <p className="text-sm font-medium text-green-600">{t('explorer.done', { defaultValue: 'Conversion complete! Loading...' })}</p>
+            <p className="text-sm font-medium text-green-600">{t('explorer.done', { defaultValue: 'Conversion complete. Loading...' })}</p>
           </div>
         ) : (
           <div className="px-8 py-10">

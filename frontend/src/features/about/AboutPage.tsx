@@ -895,7 +895,7 @@ export function AboutPage() {
               <p className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-2xs font-medium text-emerald-700 dark:text-emerald-300">
                 <Sparkles size={12} className="shrink-0" />
                 {t('about.support_perk_badge', {
-                  defaultValue: 'Donors unlock the Inside track: early word on what shipped and a say in what is next',
+                  defaultValue: 'Donors get the Inside track: notes on what shipped and a say in what is next',
                 })}
               </p>
 
