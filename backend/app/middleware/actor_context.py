@@ -89,6 +89,7 @@ class ActorContextMiddleware(BaseHTTPMiddleware):
             ip_address=ip,
             user_agent=ua,
             request_id=rid,
+            request_path=f"{request.method} {request.url.path}",
         )
         token = set_audit_context(ctx)
         try:
