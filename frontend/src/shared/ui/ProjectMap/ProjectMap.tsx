@@ -264,11 +264,7 @@ async function geocode(query: string, signal?: AbortSignal): Promise<LatLng | nu
   const cached = readCache(query);
   if (cached) return cached;
 
-  // Goes to GET /api/v1/geo-hub/geocode/suggest, never to a public
-  // geocoder from the browser. ``geocodeSuggest`` throws ApiError on a
-  // non-2xx and rejects on abort; the catch below turns both into the
-  // same null a miss already produced, so the caller's loading and error
-  // states are unchanged.
+  // No geocoder backend ships: geocodeSuggest returns no match offline.
   try {
     const res = await geocodeSuggest(query, { limit: 1, signal });
     const first = res.suggestions[0];

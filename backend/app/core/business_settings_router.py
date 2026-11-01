@@ -6,6 +6,8 @@ PUT /api/v1/business-settings/ - admin only. Merge and persist.
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -56,6 +58,9 @@ class BusinessSettings(BaseModel):
     logo_data_url: str = ""
     document_texts: dict[str, dict[str, str]] = Field(default_factory=dict)
     tax_rates: list[TaxRate] = Field(default_factory=list)
+    invoice_prefix: str = ""
+    small_business: bool = False
+    setup: dict[str, Any] = Field(default_factory=dict)
 
 
 class BusinessSettingsUpdate(BaseModel):
@@ -84,6 +89,9 @@ class BusinessSettingsUpdate(BaseModel):
     logo_data_url: str | None = Field(default=None, max_length=700_000)
     document_texts: dict[str, dict[str, str]] | None = None
     tax_rates: list[TaxRate] | None = Field(default=None, max_length=20)
+    invoice_prefix: str | None = Field(default=None, max_length=10)
+    small_business: bool | None = None
+    setup: dict[str, Any] | None = None
 
 
 @router.get(
@@ -117,6 +125,7 @@ async def get_numbering(session: SessionDep, tenant_id: CurrentCompanyTenantId =
     from app.modules.purchasing.service import PREFIX as PURCHASING_PREFIX
     from app.modules.sales.models import SalesSequence
     from app.modules.sales.service import PREFIX as SALES_PREFIX
+    from app.modules.sales.service import prefix_for
 
     rows: list[NumberingRow] = []
     for area, model, prefixes in (
@@ -127,7 +136,8 @@ async def get_numbering(session: SessionDep, tenant_id: CurrentCompanyTenantId =
             seq.kind: seq.last_number
             for seq in (await session.scalars(select(model).where(model.tenant_id == tenant_id))).all()
         }
-        for kind, prefix in prefixes.items():
+        for kind in prefixes:
+            prefix = prefix_for(kind) if area == "sales" else prefixes[kind]
             n = last.get(kind, 0)
             rows.append(
                 NumberingRow(area=area, kind=kind, prefix=prefix, last_number=n, next_number=f"{prefix}-{n + 1:06d}")

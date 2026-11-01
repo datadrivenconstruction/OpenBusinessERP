@@ -53,7 +53,13 @@ DEFAULT_BUSINESS_SETTINGS: dict[str, Any] = {
     "logo_data_url": "",
     "document_texts": {},
     "tax_rates": [],
+    "invoice_prefix": "",
+    "small_business": False,
+    # Business setup wizard progress, so a reload or another browser resumes it.
+    "setup": {},
 }
+
+SETUP_STEPS = ("company", "tax", "bank", "documents", "mail", "invoice")
 
 #: Free-text legal fields and their length caps.
 TEXT_FIELDS: dict[str, int] = {
@@ -78,6 +84,7 @@ MAX_LOGO_CHARS = 700_000
 _LOGO = re.compile(r"^data:image/(png|jpeg);base64,[A-Za-z0-9+/=]+$")
 _IBAN = re.compile(r"^[A-Z]{2}[0-9]{2}[A-Z0-9]{10,30}$")
 
+_PREFIX = re.compile(r"^[A-Z0-9][A-Z0-9-]{0,9}$")
 _COUNTRY = re.compile(r"^[A-Z]{2}$")
 _CURRENCY = re.compile(r"^[A-Z]{3}$")
 _KEY = re.compile(r"^[a-z][a-z0-9_]{1,48}$")
@@ -111,6 +118,21 @@ def _clean_tax_rates(raw: Any) -> list[dict[str, Any]]:
             break
     for extra in [r for r in out if r["default"]][1:]:
         extra["default"] = False
+    return out
+
+
+def _clean_setup(raw: Any) -> dict[str, Any]:
+    """Wizard progress ``{step, done, skipped, finished}``; unknown steps dropped."""
+    if not isinstance(raw, dict):
+        return {}
+    step = raw.get("step")
+    out: dict[str, Any] = {
+        "step": step if isinstance(step, int) and not isinstance(step, bool) and 0 <= step < len(SETUP_STEPS) else 0,
+        "finished": raw.get("finished") is True,
+    }
+    for key in ("done", "skipped"):
+        items = raw.get(key)
+        out[key] = [s for s in SETUP_STEPS if isinstance(items, list) and s in items]
     return out
 
 
@@ -158,6 +180,12 @@ def sanitise(raw: Any) -> dict[str, Any]:
     if isinstance(logo, str) and len(logo) <= MAX_LOGO_CHARS and (_LOGO.match(logo) or logo == ""):
         out["logo_data_url"] = logo
     out["tax_rates"] = _clean_tax_rates(raw.get("tax_rates"))
+    prefix = raw.get("invoice_prefix")
+    if isinstance(prefix, str) and (_PREFIX.match(prefix.strip().upper()) or not prefix.strip()):
+        out["invoice_prefix"] = prefix.strip().upper()
+    if isinstance(raw.get("small_business"), bool):
+        out["small_business"] = raw["small_business"]
+    out["setup"] = _clean_setup(raw.get("setup"))
     texts = raw.get("document_texts")
     if isinstance(texts, dict):
         clean: dict[str, dict[str, str]] = {}

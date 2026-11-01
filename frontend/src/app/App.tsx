@@ -624,6 +624,9 @@ const ImportDatabasePage = lazy(() =>
 const OnboardingWizard = lazy(() =>
   import('@/features/onboarding/OnboardingWizard').then((m) => ({ default: m.OnboardingWizard }))
 );
+const BusinessSetup = lazy(() =>
+  import('@/features/onboarding/BusinessSetup').then((m) => ({ default: m.BusinessSetup }))
+);
 const BusinessOnboarding = lazy(() =>
   import('@/features/onboarding/BusinessOnboarding').then((m) => ({ default: m.BusinessOnboarding }))
 );
@@ -1206,6 +1209,9 @@ export default function App() {
         {/* Onboarding — full-screen, no layout */}
         <Route path="/onboarding" element={
           <RequireAuth><Suspense fallback={<LoadingScreen />}><BusinessOnboarding /></Suspense></RequireAuth>
+        } />
+        <Route path="/setup" element={
+          <RequireAuth><Suspense fallback={<LoadingScreen />}><BusinessSetup /></Suspense></RequireAuth>
         } />
         <Route path="/onboarding/construction" element={
           <RequireAuth><Suspense fallback={<LoadingScreen />}><OnboardingWizard /></Suspense></RequireAuth>

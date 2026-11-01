@@ -14,6 +14,8 @@ import {
   LayoutGrid, Package, Plus, Receipt, RotateCcw, Truck, Upload, Wallet, X,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { normalizeRole } from '@/shared/lib/roles';
+import { SetupChecklist } from '@/features/onboarding/BusinessSetup';
 import { useModuleStore } from '@/stores/useModuleStore';
 import { apiGet, type Page } from '@/shared/lib/api';
 import { Button, DateDisplay, EmptyState, ModuleGuideButton, MoneyDisplay, PAGE_CONTAINER_CLS } from '@/shared/ui';
@@ -77,6 +79,7 @@ export function BusinessHome() {
   const qc = useQueryClient();
   const preset = useCompanyPresetKey();
   const isModuleEnabled = useModuleStore((s) => s.isModuleEnabled);
+  const isAdmin = normalizeRole(useAuthStore((s) => s.userRole)) === 'admin';
   const firstName = (useAuthStore((s) => s.userFullName) ?? '').trim().split(/\s+/)[0] ?? '';
 
   const now = new Date();
@@ -737,6 +740,8 @@ export function BusinessHome() {
           </>
         }
       />
+
+      {isAdmin && <SetupChecklist />}
 
       {sampleCase && (
         <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-oe-blue/40 bg-oe-blue/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" data-testid="biz-sample-cta">

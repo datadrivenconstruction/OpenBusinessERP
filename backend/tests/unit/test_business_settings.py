@@ -60,3 +60,45 @@ def test_tax_rates_are_cleaned() -> None:
         {"name": "Reduced", "rate": 7.0, "default": False},
     ]
     assert sanitise({"tax_rates": "x"})["tax_rates"] == []
+
+
+def test_invoice_prefix_and_small_business_are_cleaned() -> None:
+    assert sanitise({"invoice_prefix": " re-2026 ", "small_business": True})["invoice_prefix"] == "RE-2026"
+    assert sanitise({"invoice_prefix": "bad prefix!"})["invoice_prefix"] == ""
+    assert sanitise({"small_business": "yes"})["small_business"] is False
+
+
+def test_setup_progress_keeps_known_steps_only() -> None:
+    out = sanitise({"setup": {"step": 3, "done": ["company", "nope"], "skipped": ["mail"], "finished": "x"}})
+    assert out["setup"] == {"step": 3, "done": ["company"], "skipped": ["mail"], "finished": False}
+    assert sanitise({"setup": {"step": 99}})["setup"]["step"] == 0
+
+
+def test_invoice_number_uses_workspace_prefix(tmp_path, monkeypatch) -> None:
+    from app.modules.sales.service import prefix_for
+
+    monkeypatch.setenv("OE_DATA_DIR", str(tmp_path))
+    assert prefix_for("invoice") == "INV"
+    write_business_settings({"invoice_prefix": "RE"}, tmp_path)
+    assert prefix_for("invoice") == "RE"
+    assert prefix_for("quote") == "QT"
+
+
+def test_setup_progress_round_trips_through_the_api(tmp_path, monkeypatch) -> None:
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+
+    from app.core.business_settings_router import router
+    from app.dependencies import get_current_user_payload
+
+    monkeypatch.setenv("OE_DATA_DIR", str(tmp_path))
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.dependency_overrides[get_current_user_payload] = lambda: {"sub": "u1", "role": "admin"}
+    client = TestClient(app)
+    body = {"setup": {"step": 2, "done": ["company", "tax"], "skipped": []}, "invoice_prefix": "re"}
+    res = client.put("/api/v1/business-settings/", json=body)
+    assert res.status_code == 200, res.text
+    got = client.get("/api/v1/business-settings/").json()
+    assert got["setup"]["done"] == ["company", "tax"]
+    assert got["invoice_prefix"] == "RE"

@@ -30,6 +30,17 @@ ZERO = Decimal(0)
 HUNDRED = Decimal(100)
 DERIVES = {"quote": "order", "order": "invoice"}
 PREFIX = {"quote": "QT", "order": "SO", "invoice": "INV", "credit_note": "CN"}
+
+
+def prefix_for(kind: str) -> str:
+    """Number prefix; invoices take the workspace ``invoice_prefix`` when set."""
+    if kind == "invoice":
+        from app.core.business_settings import read_business_settings
+
+        return read_business_settings().get("invoice_prefix") or PREFIX[kind]
+    return PREFIX[kind]
+
+
 SOURCE_INVOICE = "sales_invoice"
 SOURCE_PAYMENT = "sales_payment"
 SOURCE_CREDIT = "sales_credit_note"
@@ -224,7 +235,7 @@ class SalesService:
             self.session.add(seq)
         seq.last_number += 1
         await self.session.flush()
-        return f"{PREFIX[kind]}-{seq.last_number:06d}"
+        return f"{prefix_for(kind)}-{seq.last_number:06d}"
 
     # ── Documents ─────────────────────────────────────────────────────────
     async def get(self, doc_id: uuid.UUID, kind: str | None = None) -> SalesDocument:
@@ -416,6 +427,7 @@ class SalesService:
                 await self._gl(
                     self.gl.reverse_entry(doc.gl_entry_id, memo=f"Cancel {doc.number}", created_by=created_by)
                 )
+            await self._stock_for_invoice(doc, cancel=True, created_by=created_by)
         if doc.kind == "order" and (target == "delivered" or doc.status == "delivered"):
             await self._stock_for_delivery(doc, cancel=doc.status == "delivered", created_by=created_by)
         doc.status = target
@@ -427,7 +439,6 @@ class SalesService:
         from app.modules.inventory.service import SOURCE_DELIVERY, InventoryError, InventoryService
 
         inv = InventoryService(self.session, self.tenant_id)
-            await self._stock_for_invoice(doc, cancel=True, created_by=created_by)
         try:
             if cancel:
                 await inv.cancel_source(SOURCE_DELIVERY, str(doc.id), created_by=created_by)
@@ -850,6 +861,7 @@ class SalesService:
             )
         )
         inv.gl_entry_id = entry.id
+        await self._stock_for_invoice(inv, cancel=False, created_by=created_by)
         inv.status = "issued"
         await self.session.flush()
         return inv
@@ -862,7 +874,6 @@ class SalesService:
             raise SalesValidationError("Credit note total must be positive")
         inv = await self.get(cn.source_id, "invoice") if cn.source_id else None
         if inv is not None:
-        await self._stock_for_invoice(inv, cancel=False, created_by=created_by)
             if inv.status not in {"issued", "partially_paid", "paid"}:
                 raise SalesConflictError(f"Source invoice {inv.number} is {inv.status}")
             credited = ZERO
@@ -960,8 +971,8 @@ class SalesService:
                     label=f"Payment {inv.number}",
                 )
             except FxRateMissingError as exc:
-            pay.fx_rate = pay_rate if base_amount is None else q_rate(s.base_cash / amount)
                 raise SalesConflictError(str(exc)) from exc
+            pay.fx_rate = pay_rate if base_amount is None else q_rate(s.base_cash / amount)
             currency, rate = base_currency(), None
             reference = reference or f"{amount} {inv.currency}"
         entry = await self._gl(

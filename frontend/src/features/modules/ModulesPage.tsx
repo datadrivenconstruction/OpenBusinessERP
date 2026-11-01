@@ -1813,7 +1813,7 @@ function DataPackagesTab() {
   async function handleInstallClick(mod: MarketplaceModule): Promise<void> {
     switch (mod.category) {
       case 'resource_catalog':
-        addToast({ type: 'error', title: t('marketplace.import_failed', { defaultValue: 'Import failed' }) });
+        // No catalog import backend ships; the card hides this action.
         break;
       case 'cost_database':
         navigate('/costs/import');
@@ -2931,7 +2931,7 @@ function MarketplaceCard({ module: mod, index, isInstalling, onInstall, isDemoIn
               <Button variant="secondary" size="sm" disabled icon={<Check size={14} />}>
                 {t('marketplace.imported', { defaultValue: 'Imported' })}
               </Button>
-            ) : mod.installed && mod.category === 'vector_index' ? (
+            ) : mod.category === 'resource_catalog' ? null : mod.installed && mod.category === 'vector_index' ? (
               <Button variant="secondary" size="sm" disabled icon={<Check size={14} />}>
                 {t('marketplace.indexed', { defaultValue: 'Indexed' })}
               </Button>
