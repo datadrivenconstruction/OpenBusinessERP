@@ -5,6 +5,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 from datetime import date, datetime
 from decimal import Decimal
+from pathlib import Path
 
 from app.modules.gl import exports as gx
 
@@ -79,15 +80,43 @@ def test_datev_header_golden():
     assert len(head.split(";")) == 31
 
 
-def test_datev_rows_golden():
+GOLDEN = Path(__file__).resolve().parents[1] / "fixtures" / "datev"
+
+
+def _golden_csv() -> bytes:
+    es = _entries()
+    es[0].partner_id, es[0].partner_vat = "c1", "AT U12345678"
+    es[0].due_date, es[0].service_date = date(2026, 4, 4), date(2026, 3, 3)
+    es[0].lines[1].cost_center, es[0].lines[1].project = "KS-100", "P 2026/01"
+    cfg = gx._clean_settings({**SETTINGS, "diktatkuerzel": "ob", "festschreibung": True})
+    return gx.datev_booking_csv(
+        es, cfg, date_from=date(2026, 3, 1), date_to=date(2026, 3, 31), fy_start=date(2026, 1, 1), created=NOW,
+        partner_accounts={"c1": 10000}, collective_accounts=("1400", "1600"),
+    )  # fmt: skip
+
+
+def test_datev_booking_golden_file():
+    # Regenerate deliberately: write _golden_csv() to the fixture and review the diff.
+    assert _golden_csv() == (GOLDEN / "EXTF_Buchungsstapel.csv").read_bytes()
+
+
+def test_datev_rows_have_125_columns_and_core_fields():
+    lines = _golden_csv().decode("cp1252").split("\r\n")[:-1]
+    assert all(len(ln.split(";")) == 125 for ln in lines[1:])
+    head = lines[0].split(";")
+    assert (head[17], head[20]) == ('"OB"', "1")  # Diktatkürzel, Festschreibung
+    f = lines[2].split(";")
+    assert f[:3] == ["1190,00", '"S"', '"EUR"'] and (f[6], f[7], f[9]) == ("10000", "8400", "0503")
+    assert (f[36], f[37], f[39]) == ('"KS100"', '"P202601"', '"ATU12345678"')
+    assert (f[113], f[114], f[116]) == ("1", "03032026", "04042026")
+    # Rows without a partner keep the collective account and carry no due date / UStID.
+    g = lines[3].split(";")
+    assert (g[6], g[7], g[8], g[39], g[116]) == ("1200", "4210", '"9"', '""', "")
+
+
+def test_datev_without_partner_map_uses_collective_account():
     lines = _csv()
-    assert lines[1].split(";")[:3] == ["Umsatz (ohne Soll/Haben-Kz)", "Soll/Haben-Kennzeichen", "WKZ Umsatz"]
-    assert lines[2:] == [
-        '1190,00;"S";"EUR";;;"";1400;8400;"";0503;"RE-2026-001";"";;"Rechnung ""Müller"" GmbH"',
-        '595,00;"H";"EUR";;;"";1200;4210;"9";1203;"ER-7";"";;"Miete März"',
-        '100,25;"S";"EUR";;;"";1200;1000;"";2003;"GL-3";"";;"Umbuchung"',
-        '200,25;"S";"EUR";;;"";1200;1360;"";2003;"GL-3";"";;"Umbuchung"',
-    ]
+    assert lines[2].split(";")[6] == "1400"
 
 
 def test_datev_encoding_is_cp1252():
@@ -131,7 +160,28 @@ def test_contacts_csv():
 def test_settings_roundtrip(tmp_path):
     assert gx.read_export_settings(tmp_path)["sachkontenlaenge"] == 4
     out = gx.write_export_settings({"berater_nr": 12345, "sachkontenlaenge": 99, "mandant_nr": "7"}, tmp_path)
-    assert out == {"berater_nr": 12345, "mandant_nr": 7, "sachkontenlaenge": 4, "skr": "03"}
+    assert out == {**gx.DEFAULT_SETTINGS, "berater_nr": 12345, "mandant_nr": 7}
+
+
+def test_settings_ranges_validated(tmp_path):
+    out = gx.write_export_settings({"debitor_from": 20000, "debitor_to": 29999, "kreditor_from": 80000,
+                                    "kreditor_to": 89999, "diktatkuerzel": "a-b!"}, tmp_path)  # fmt: skip
+    assert (out["debitor_from"], out["kreditor_to"], out["diktatkuerzel"]) == (20000, 89999, "AB")
+    bad = gx._clean_settings({"debitor_from": 1000, "debitor_to": 5, "kreditor_from": 70000, "kreditor_to": 99999})
+    assert (bad["debitor_from"], bad["debitor_to"]) == (10000, 69999)
+    overlap = gx._clean_settings({"debitor_from": 10000, "debitor_to": 80000, "kreditor_from": 70000,
+                                  "kreditor_to": 99999})  # fmt: skip
+    assert (overlap["debitor_to"], overlap["kreditor_from"]) == (69999, 70000)
+    assert gx._clean_settings({"sachkontenlaenge": 6})["kreditor_from"] == 7000000
+
+
+def test_contact_numbers_stable_and_bounded():
+    mk = lambda i, created: gx.XContact(i, "customer", f"Z{i}", created=created)  # noqa: E731
+    cs = gx.assign_contact_numbers([mk("b", "2026-02"), mk("a", "2026-01")], {"debitor_from": 10000,
+                                   "debitor_to": 10000, "kreditor_from": 70000, "kreditor_to": 99999})  # fmt: skip
+    assert {c.id: c.number for c in cs} == {"a": 10000, "b": 0}
+    out = gx.datev_contacts_csv(cs, SETTINGS, fy_start=date(2026, 1, 1), created=NOW).decode("cp1252")
+    assert '"Zb"' not in out and out.split("\r\n")[2].startswith("10000;")
 
 
 def test_saft_structure_and_totals():
