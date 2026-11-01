@@ -695,10 +695,10 @@ async def get_me(
     parsing on the literal ``"me"``. Both must be declared *before* the
     ``/{user_id}`` route - FastAPI matches in source order.
     """
-    from app.core.permissions import permission_registry
+    from app.core.business_roles import effective_permissions, preset_of
 
     user = await service.get_user(uuid.UUID(user_id))
-    permissions = permission_registry.get_role_permissions(user.role)
+    permissions = effective_permissions(user.role, preset_of(user.metadata_))
     return UserMeResponse(
         **UserResponse.model_validate(user).model_dump(),
         permissions=permissions,

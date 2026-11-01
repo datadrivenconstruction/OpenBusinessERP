@@ -47,6 +47,7 @@ import { Card, CardHeader, CardContent, Badge, Button, Skeleton } from '@/shared
 import { apiGet, ApiError } from '@/shared/lib/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { fetchUsers, type User, type UserRole } from '@/features/users/api';
+import { SettingsRolePresets } from './SettingsRolePresets';
 
 // Commercial license request page on the marketing site. The product is
 // AGPL-3.0; this is the honest upgrade path (no in-app payment flow).
@@ -370,6 +371,8 @@ export function SettingsTeamPanel() {
           )}
         </CardContent>
       </Card>
+
+      {canListMembers && <SettingsRolePresets canEdit={isAdmin} />}
 
       {/* ── License & Plan card ─────────────────────────────────────────── */}
       <Card>
