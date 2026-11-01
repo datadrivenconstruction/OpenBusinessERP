@@ -88,7 +88,7 @@ export function StatCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="truncate text-2xs font-medium uppercase tracking-wide text-content-tertiary">
+          <div className="line-clamp-2 hyphens-auto break-words text-2xs font-medium uppercase tracking-wide text-content-tertiary">
             {label}
           </div>
           <div
@@ -101,7 +101,7 @@ export function StatCard({
             {value}
           </div>
           {sub != null && (
-            <div className="mt-0.5 truncate text-xs text-content-tertiary">{sub}</div>
+            <div className="mt-0.5 line-clamp-2 text-xs text-content-tertiary">{sub}</div>
           )}
           {delta != null && (
             <div

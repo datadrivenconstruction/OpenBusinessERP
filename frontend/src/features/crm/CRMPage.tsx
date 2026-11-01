@@ -559,7 +559,7 @@ export function CRMPage() {
 
       {/* View switcher + search */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-lg border border-border-light bg-surface-secondary p-0.5">
+        <div className="inline-flex max-w-full overflow-x-auto rounded-lg border border-border-light bg-surface-secondary p-0.5">
           {TABS.map((it) => {
             const Icon = it.icon;
             const active = view === it.id;

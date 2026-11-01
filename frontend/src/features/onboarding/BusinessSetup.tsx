@@ -125,6 +125,11 @@ export function BusinessSetup() {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    const key = SETUP_STEPS[step] ?? 'company';
+    document.title = `${t(`bizsetup.${key}_title`)} | OpenBusinessERP`;
+  }, [step, t]);
+
+  useEffect(() => {
     const data = settingsQuery.data;
     if (!data || form) return;
     const country = data.country_code;
@@ -510,11 +515,11 @@ export function BusinessSetup() {
       </main>
 
       <footer className="border-t border-border-light">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2 px-6 py-4">
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6">
           <Button variant="ghost" disabled={step === 0 || busy} onClick={() => setStep(step - 1)}>
             {t('bizsetup.back', { defaultValue: 'Back' })}
           </Button>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
             <Button variant="ghost" disabled={busy} onClick={() => run(() => saveProgress(key, 'skipped'))} data-testid="setup-skip">
               {t('bizsetup.skip', { defaultValue: 'Skip for now' })}
             </Button>

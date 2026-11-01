@@ -123,7 +123,7 @@ export function AccountingShell({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => navigate(TAB_PATH[x.id])}
                 className={clsx(
-                  'flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors',
+                  'flex shrink-0 items-center gap-2 whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors',
                   isActive
                     ? 'border-oe-blue text-oe-blue'
                     : 'border-transparent text-content-secondary hover:text-content-primary',
