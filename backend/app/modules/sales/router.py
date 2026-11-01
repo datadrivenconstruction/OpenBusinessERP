@@ -155,8 +155,11 @@ async def preview_document_design(
     """Render a sample document with an unsaved design, for the settings live preview."""
     unsaved = design.sanitise_design({**design.read_design(), **body.design.model_dump(exclude_none=True)})
     company = {**docs.company_data(), "document_design": unsaved}
-    pdf = await run_in_threadpool(render_sample, body.kind, company, language=lang(body.language), n_lines=body.lines)
-    return Response(pdf, media_type="application/pdf", headers={"Cache-Control": "no-store"})
+    language = lang(body.language)
+    pdf = await run_in_threadpool(render_sample, body.kind, company, language=language, n_lines=body.lines)
+    return Response(
+        pdf, media_type="application/pdf", headers={"Cache-Control": "no-store", "Content-Language": language}
+    )
 
 
 @router.get("/settings/accounts/", response_model=AccountMapping)

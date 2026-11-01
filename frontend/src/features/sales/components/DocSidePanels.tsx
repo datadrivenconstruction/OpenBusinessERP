@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowDownRight, ArrowUpLeft, CreditCard, History, Paperclip } from 'lucide-react';
 import { Badge, Button, DateDisplay, MoneyDisplay } from '@/shared/ui';
 import { STATUS_VARIANT, kindPath, type ActivityEntry, type RelatedDocs, type SalesDoc, type SalesDocSummary } from '../api';
+import { fmtNumber } from '@/shared/lib/formatters';
 
 const card = 'rounded-xl border border-border-light bg-surface-elevated p-4 shadow-xs';
 const h2 = 'mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-content-tertiary';
@@ -60,7 +61,7 @@ export function PaymentsCard({ doc, onRecord }: { doc: SalesDoc; onRecord?: () =
               <span className="text-content-secondary">
                 <DateDisplay value={p.pay_date} />
                 {p.reference && <span className="ml-1 text-content-tertiary">· {p.reference}</span>}
-                {p.fx_rate && <span className="ml-1 text-content-tertiary">· {t('sales.payment_rate', { defaultValue: 'Rate {{rate}}', rate: Number(p.fx_rate).toFixed(4) })}</span>}
+                {p.fx_rate && <span className="ml-1 text-content-tertiary">· {t('sales.payment_rate', { defaultValue: 'Rate {{rate}}', rate: fmtNumber(p.fx_rate, 4) })}</span>}
               </span>
               <MoneyDisplay amount={p.amount} currency={doc.currency} className="font-medium tabular-nums" />
             </li>

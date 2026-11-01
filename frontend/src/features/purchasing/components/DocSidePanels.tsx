@@ -9,6 +9,7 @@ import type { PurchasingDoc, RelatedRef } from '../api';
 import { usePurchasingActivity, usePurchasingRelated } from '../hooks';
 import type { PurchasingKind } from '../api';
 import { Section, StatusBadge } from './common';
+import { fmtNumber } from '@/shared/lib/formatters';
 
 export function PaymentsCard({ doc, canPay, onPay }: { doc: PurchasingDoc; canPay: boolean; onPay: () => void }) {
   const { t } = useTranslation();
@@ -31,7 +32,7 @@ export function PaymentsCard({ doc, canPay, onPay }: { doc: PurchasingDoc; canPa
           {pays.map((p) => (
             <li key={p.id} className="flex items-center justify-between py-1.5">
               <span className="text-content-secondary">
-                <DateDisplay value={p.pay_date} /> {p.method && <span className="ml-1">· {p.method}</span>} {p.reference && <span className="ml-1">· {p.reference}</span>} {p.fx_rate && <span className="ml-1 text-content-tertiary">· {t('sales.payment_rate', { defaultValue: 'Rate {{rate}}', rate: Number(p.fx_rate).toFixed(4) })}</span>}
+                <DateDisplay value={p.pay_date} /> {p.method && <span className="ml-1">· {p.method}</span>} {p.reference && <span className="ml-1">· {p.reference}</span>} {p.fx_rate && <span className="ml-1 text-content-tertiary">· {t('sales.payment_rate', { defaultValue: 'Rate {{rate}}', rate: fmtNumber(p.fx_rate, 4) })}</span>}
               </span>
               <MoneyDisplay amount={p.amount} currency={doc.currency} className="tabular-nums" />
             </li>

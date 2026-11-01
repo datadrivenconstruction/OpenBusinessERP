@@ -52,7 +52,7 @@ RENDERING_ROUTES: dict[str, set[str]] = {
     "modules/contracts/router.py": {"export_aia_application_pdf"},
     "modules/purchasing/router.py": {"order_pdf", "bill_pdf"},
     "modules/receivables/router.py": {"statement"},
-    "modules/sales/router.py": {"document_pdf"},
+    "modules/sales/router.py": {"document_pdf", "dunning_pdf", "preview_document_design"},
     "modules/daily_diary/router.py": {"diary_pdf"},
     "modules/einvoice/router.py": {"generate_invoice"},
     "modules/fieldreports/router.py": {"export_pdf"},

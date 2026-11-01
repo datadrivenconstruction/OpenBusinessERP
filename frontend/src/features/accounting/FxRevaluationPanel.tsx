@@ -5,6 +5,7 @@ import { Button, MoneyDisplay } from '@/shared/ui';
 import { getErrorMessage } from '@/shared/lib/api';
 import { glApi, type FxRevalResult } from './api';
 import { inputCls, numCls, thCls } from './ui';
+import { fmtNumber } from '@/shared/lib/formatters';
 
 /** Period-end revaluation of open foreign-currency receivables and payables. */
 export function FxRevaluationPanel() {
@@ -104,8 +105,8 @@ export function FxRevaluationPanel() {
                       <td className="px-4 py-2">{r.number}</td>
                       <td className="px-4 py-2">{r.party}</td>
                       <td className={numCls}><MoneyDisplay amount={r.open} currency={r.currency} /></td>
-                      <td className={numCls}>{Number(r.doc_rate).toFixed(4)}</td>
-                      <td className={numCls}>{Number(r.closing_rate).toFixed(4)}</td>
+                      <td className={numCls}>{fmtNumber(r.doc_rate, 4)}</td>
+                      <td className={numCls}>{fmtNumber(r.closing_rate, 4)}</td>
                       <td className={numCls}><MoneyDisplay amount={r.booked} currency={base} /></td>
                       <td className={numCls}><MoneyDisplay amount={r.revalued} currency={base} /></td>
                       <td className={numCls}><MoneyDisplay amount={r.gain} currency={base} colorize /></td>

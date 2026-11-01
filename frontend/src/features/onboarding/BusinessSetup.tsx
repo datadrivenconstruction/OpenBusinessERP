@@ -19,6 +19,7 @@ import { getCountry, sortedCountries } from '@/shared/lib/countries';
 import { MailSettingsSection } from '@/features/settings/MailSettings';
 import { fetchSalesPdf } from '@/features/sales/api';
 import { fetchBusinessDemoCases, installBusinessDemoCase } from '@/features/business-demo/api';
+import { fmtCurrency, fmtDate } from '@/shared/lib/formatters';
 
 export const SETUP_STEPS = ['company', 'tax', 'bank', 'documents', 'mail', 'invoice'] as const;
 export type SetupStep = (typeof SETUP_STEPS)[number];
@@ -385,7 +386,7 @@ export function BusinessSetup() {
                 </select>
               </Field>
               <p className="text-2xs text-content-tertiary">
-                {t('bizsetup.number_format', { defaultValue: 'Numbers and dates: {{sample}}', sample: `${new Intl.NumberFormat(undefined, { style: 'currency', currency: /^[A-Z]{3}$/.test(form.base_currency) ? form.base_currency : 'EUR' }).format(1234.5)} · ${new Date().toLocaleDateString()}` })}
+                {t('bizsetup.number_format', { defaultValue: 'Numbers and dates: {{sample}}', sample: `${fmtCurrency(1234.5, /^[A-Z]{3}$/.test(form.base_currency) ? form.base_currency : 'EUR')} · ${fmtDate(new Date().toISOString().slice(0, 10))}` })}
               </p>
             </div>
           </div>
