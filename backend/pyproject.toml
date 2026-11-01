@@ -332,7 +332,7 @@ ai = [
 # text off the page on top of the geometry the base install already detects.
 cv = [
     "paddleocr>=2.9.0,<4",
-    "Pillow>=12.1.1,<13",
+    "Pillow>=12.1.1,<14",
 ]
 # E57 reader for the Point Cloud module (app/modules/pointcloud). The open
 # LAS/LAZ/COPC family is decoded out of the box (laspy + lazrs are base deps),
