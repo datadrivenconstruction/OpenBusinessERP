@@ -99,7 +99,7 @@ dependencies = [
     # embedded cluster to a new PostgreSQL major. That is a data migration with
     # its own release note and test run, not a routine dependency bump.
     "pixeltable-pgserver>=0.5.1,<0.6",
-    "asyncpg>=0.30.0,<0.32",
+    "asyncpg>=0.30.0,<0.33",
     "psycopg2-binary>=2.9.10,<3",
     "alembic>=1.14.0,<2",
     "pydantic>=2.10.0,<3",
