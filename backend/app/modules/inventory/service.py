@@ -19,6 +19,7 @@ from typing import Any
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.modules.gl.models import GLAccount
 from app.modules.gl.service import GLError, GLService, LineInput
@@ -206,8 +207,17 @@ class InventoryService:
                 select(Warehouse).where(Warehouse.tenant_id == self.tenant_id).order_by(Warehouse.created_at).limit(1)
             )
             if wh is None:
-                wh = Warehouse(tenant_id=self.tenant_id, code="MAIN", name="Main warehouse", address="", active=True)
-                self.session.add(wh)
+                # Parallel first requests race to create MAIN; the loser re-reads the winner's row.
+                try:
+                    async with self.session.begin_nested():
+                        wh = Warehouse(tenant_id=self.tenant_id, code="MAIN", name="Main warehouse", address="", active=True, is_default=True)
+                        self.session.add(wh)
+                except IntegrityError:
+                    wh = await self.session.scalar(
+                        select(Warehouse).where(Warehouse.tenant_id == self.tenant_id, Warehouse.code == "MAIN").limit(1)
+                    )
+                    if wh is None:
+                        raise
             wh.is_default = True
             await self.session.flush()
         return wh
