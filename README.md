@@ -7,6 +7,8 @@
 <p align="center"><b>An open-source, self-hosted ERP for small and mid-sized businesses, from the first quote to the closed accounting period.</b></p>
 
 <p align="center">
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml"><img src="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/codeql.yml"><img src="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/codeql.yml/badge.svg?branch=main" alt="CodeQL"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
   <img src="https://img.shields.io/badge/version-18.4.0-2563eb.svg" alt="Version 18.4.0">
   <img src="https://img.shields.io/badge/python-3.12%2B-3776ab.svg" alt="Python 3.12+">
@@ -18,6 +20,8 @@
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
   <a href="#a-tour-of-the-workspace">Feature tour</a> ·
+  <a href="#at-a-glance">At a glance</a> ·
+  <a href="ROADMAP.md">Roadmap</a> ·
   <a href="#architecture">Architecture</a> ·
   <a href="#configuration">Configuration</a> ·
   <a href="#faq">FAQ</a> ·
@@ -27,6 +31,11 @@
 ---
 
 OpenBusinessERP is a free, open-source ERP (enterprise resource planning) system for small and mid-sized companies. It covers quotes and invoicing, CRM, products and stock, purchasing, double-entry accounting, bank reconciliation, receivables and appointments in a single web application that you host yourself. It is a modular business suite you can run on your own server, adapt and extend.
+
+<p align="center">
+  <img src="docs/images/sales-flow.gif" alt="A quote becomes an order, then an invoice that is issued, posted and paid" width="960">
+  <br><sub>Quote → order → invoice → posted → paid, recorded on the bundled demo company.</sub>
+</p>
 
 ## Who it's for
 
@@ -64,9 +73,15 @@ One list covers the whole sales cycle, with status filters, overdue tracking and
 
 <img src="docs/images/sales.png" alt="Sales list with quotes, orders and invoices" width="100%">
 
-Each document shows where it is in the *Quote → Order → Delivered → Invoiced → Paid* chain, along with its line items, payments, related documents and activity log. Documents go out as PDF by email, and e-invoices can be produced as CII XML.
+Each document shows where it is in the *Quote → Order → Delivered → Invoiced → Paid* chain, along with its line items, payments, related documents and activity log. Documents go out as PDF by email through your own SMTP server (configured under **Settings**), and e-invoices can be produced as CII XML. Invoices in EUR can carry a SEPA payment QR code (EPC "GiroCode"), so the customer's banking app fills in the transfer.
 
 <img src="docs/images/invoice.png" alt="A paid invoice with line items, totals, payments and activity" width="100%">
+
+### Recurring invoices
+
+Subscriptions and service contracts are set up once: customer, lines, interval (weekly, monthly, quarterly or yearly), start and optional end date. Each period an invoice is generated and, if you choose, issued, posted and e-mailed automatically. The overview shows monthly recurring revenue (MRR), annual run rate (ARR) and what falls due in the next seven days.
+
+<img src="docs/images/recurring.png" alt="Recurring invoices with MRR, ARR and next run dates" width="100%">
 
 ### CRM
 
@@ -79,6 +94,12 @@ A pipeline board takes deals from lead to won and links them to contacts and com
 One catalogue holds everything you sell or buy: SKU, unit, sales price, cost, margin, tax rate and stock on hand, with minimum-stock alerts and CSV export.
 
 <img src="docs/images/products.png" alt="Products and services catalogue with prices, margins and stock" width="100%">
+
+### Inventory
+
+Stock is kept per warehouse in a movement ledger: goods receipts, deliveries, transfers between warehouses and manual adjustments each leave a dated entry. Stocktakes count a warehouse and post the differences. Items are valued at moving-average cost, and items below their minimum stock are flagged.
+
+<img src="docs/images/inventory.png" alt="Inventory: stock per warehouse with minimum levels" width="100%">
 
 ### Purchasing
 
@@ -94,7 +115,7 @@ Import bank statements (CSV, MT940, camt) and reconcile them in a two-pane works
 
 ### Receivables and dunning
 
-Aging buckets show who owes you and how overdue each balance is. A dunning run proposes a reminder level per customer, and you can exclude individual customers.
+Aging buckets show who owes you and how overdue each balance is. A dunning run proposes a reminder level per customer, you can exclude individual customers, and reminders are sent by e-mail.
 
 <img src="docs/images/receivables.png" alt="Receivables aging and dunning" width="100%">
 
@@ -107,6 +128,16 @@ Sales and purchase documents post to the ledger automatically. You can review th
 The reports are trial balance, balance sheet, profit & loss (with comparison to the previous period) and VAT return. All of them export to CSV.
 
 <img src="docs/images/reports.png" alt="Profit and loss report with previous-period comparison" width="100%">
+
+### Multi-currency
+
+Sales and purchase documents can be issued in a foreign currency. Exchange rates can be fetched from the European Central Bank reference rates or entered by hand; when a foreign invoice is paid at a different rate, the realised exchange gain or loss is posted to the ledger.
+
+### Exports for your accountant
+
+**Accounting → Reports → Export** produces a DATEV *Buchungsstapel* (EXTF CSV) plus customer and supplier master data, and an OECD SAF-T 2.0 XML file for a chosen period. These files are not certified; have your tax adviser check them before you import or file them.
+
+<img src="docs/images/export.png" alt="Accounting export panel with DATEV and SAF-T formats" width="100%">
 
 ### Appointments and online booking
 
@@ -135,6 +166,22 @@ Ask about your own data in plain language, for example "which invoices are overd
 ### Projects and service
 
 Projects, service cases and tasks support companies that deliver work as well as goods.
+
+## At a glance
+
+How OpenBusinessERP compares on the points people usually check first. Project policy keeps other products' names out of this repository, so the comparison is left to you; each row below is verifiable in this codebase.
+
+| Criterion | OpenBusinessERP |
+|---|---|
+| License | AGPL-3.0; commercial license on request |
+| Stack | Python 3.12, FastAPI, SQLAlchemy 2, PostgreSQL; React 18 + TypeScript frontend |
+| Database | Embedded PostgreSQL started automatically, or your own PostgreSQL server |
+| Bookkeeping | Double-entry general ledger; SKR03 and an IFRS-style chart included |
+| Accountant export | DATEV Buchungsstapel (EXTF) and SAF-T 2.0 XML |
+| E-invoicing | CII XML export |
+| Interface languages | 45 locale bundles, including right-to-left scripts |
+| Self-hosting | One command: `make quickstart` (Docker) or `openbusinesserp serve --embedded-pg` |
+| API | REST under `/api/v1/` with an OpenAPI schema |
 
 ## Architecture
 
@@ -252,7 +299,7 @@ Bug reports, translations and pull requests are welcome. Please read [CONTRIBUTI
 
 ## License
 
-OpenBusinessERP is licensed under the [GNU Affero General Public License v3.0](LICENSE). You can use, modify and self-host it freely. If you offer a modified version to users over a network, you must make its source code available to them under the same license. A commercial license is available on request. See also [NOTICE](NOTICE), [TRADEMARK.md](TRADEMARK.md), [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
+OpenBusinessERP is licensed under the [GNU Affero General Public License v3.0](LICENSE). You can use, modify and self-host it freely. If you offer a modified version to users over a network, you must make its source code available to them under the same license. A commercial license is available on request. See also [ROADMAP.md](ROADMAP.md), [NOTICE](NOTICE), [TRADEMARK.md](TRADEMARK.md), [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 
 ## Disclaimer
 
