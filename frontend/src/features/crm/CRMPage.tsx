@@ -35,6 +35,7 @@ import {
   type DragStartEvent,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { DateField } from '@/shared/ui/DateField';
 import {
   LayoutGrid,
   List as ListIcon,
@@ -3149,8 +3150,8 @@ function CreateModal({
               })}
               span={2}
             >
-              <input
-                type="date"
+              <DateField
+               
                 value={dealForm.expected_close_date}
                 onChange={(e) =>
                   setDealForm({
@@ -3322,8 +3323,8 @@ function CreateModal({
             </select>
           </WideModalField>
           <WideModalField label={t('crm.due', { defaultValue: 'Due' })}>
-            <input
-              type="date"
+            <DateField
+             
               value={actForm.due_at}
               onChange={(e) =>
                 setActForm({ ...actForm, due_at: e.target.value })

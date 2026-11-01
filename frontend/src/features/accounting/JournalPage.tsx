@@ -7,6 +7,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
 import { STATUS_VARIANT, glApi, toCents } from './api';
 import { AccountingShell, EmptyBlock, ErrorBlock, Field, LoadingBlock, SourceChip, inputCls, numCls, thCls } from './ui';
+import { DateField } from '@/shared/ui/DateField';
 
 const STATUSES = ['draft', 'posted', 'reversed'] as const;
 
@@ -51,10 +52,10 @@ export function JournalPage() {
           </select>
         </Field>
         <Field label={t('accounting.from', { defaultValue: 'From' })}>
-          <input type="date" className={inputCls} value={from} onChange={(e) => set('from', e.target.value)} />
+          <DateField className={inputCls} value={from} onChange={(e) => set('from', e.target.value)} />
         </Field>
         <Field label={t('accounting.to', { defaultValue: 'To' })}>
-          <input type="date" className={inputCls} value={to} onChange={(e) => set('to', e.target.value)} />
+          <DateField className={inputCls} value={to} onChange={(e) => set('to', e.target.value)} />
         </Field>
         <Field label={t('accounting.col_source', { defaultValue: 'Source' })}>
           <input className={inputCls} placeholder={t('accounting.source_ph', { defaultValue: 'e.g. sales_invoice' })} value={source} onChange={(e) => set('source', e.target.value)} />

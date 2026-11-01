@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RANGE_PRESETS, glApi, presetRange, type RangePreset } from './api';
 import { Field, inputCls } from './ui';
+import { DateField } from '@/shared/ui/DateField';
 
 interface Props {
   from: string;
@@ -64,11 +65,11 @@ export function PeriodPicker({ from, to, onChange, single }: Props) {
       </Field>
       {!single && (
         <Field label={t('accounting.from', { defaultValue: 'From' })}>
-          <input type="date" className={inputCls} value={from} max={to || undefined} onChange={(e) => onChange({ from: e.target.value, to })} />
+          <DateField className={inputCls} value={from} max={to || undefined} onChange={(e) => onChange({ from: e.target.value, to })} />
         </Field>
       )}
       <Field label={single ? t('accounting.as_of', { defaultValue: 'As of' }) : t('accounting.to', { defaultValue: 'To' })}>
-        <input type="date" className={inputCls} value={to} min={single ? undefined : from || undefined} onChange={(e) => onChange({ from, to: e.target.value })} />
+        <DateField className={inputCls} value={to} min={single ? undefined : from || undefined} onChange={(e) => onChange({ from, to: e.target.value })} />
       </Field>
     </div>
   );

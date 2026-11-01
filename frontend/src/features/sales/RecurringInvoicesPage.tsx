@@ -27,6 +27,7 @@ import {
   type RecurringStatus,
   type RecurringTemplate,
 } from './recurringApi';
+import { DateField } from '@/shared/ui/DateField';
 
 const input =
   'w-full rounded-lg border border-border-light bg-surface-primary px-2 py-1.5 text-sm text-content-primary focus:border-oe-blue focus:outline-none';
@@ -358,7 +359,7 @@ function RecurringForm({
         </label>
         <label className="text-xs text-content-tertiary">
           {t('recurring.start_date', { defaultValue: 'First invoice' })}
-          <input type="date" className={input} value={f.start_date} onChange={(e) => set({ start_date: e.target.value })} />
+          <DateField className={input} value={f.start_date} onChange={(e) => set({ start_date: e.target.value })} />
         </label>
         {usesDay && (
           <label className="text-xs text-content-tertiary">
@@ -391,7 +392,7 @@ function RecurringForm({
         {endMode === 'date' && (
           <label className="text-xs text-content-tertiary">
             {t('recurring.end_date', { defaultValue: 'End date' })}
-            <input type="date" className={input} value={f.end_date ?? ''} onChange={(e) => set({ end_date: e.target.value || null })} />
+            <DateField className={input} value={f.end_date ?? ''} onChange={(e) => set({ end_date: e.target.value || null })} />
           </label>
         )}
         {endMode === 'count' && (

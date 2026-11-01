@@ -8,6 +8,7 @@ import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { getErrorMessage } from '@/shared/lib/api';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { itemsApi, type PriceBreak, type PriceList, type PriceListInput, type PriceQuote } from './api';
+import { DateField } from '@/shared/ui/DateField';
 
 const input =
   'h-9 w-full rounded-lg border border-border bg-surface-primary px-3 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
@@ -193,11 +194,11 @@ export function PriceListsPage() {
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-medium text-content-secondary">{t('items.valid_from', { defaultValue: 'Valid from' })}</span>
-                <input type="date" className={input} value={form.valid_from ?? ''} onChange={(e) => set('valid_from', e.target.value || null)} />
+                <DateField className={input} value={form.valid_from ?? ''} onChange={(e) => set('valid_from', e.target.value || null)} />
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-medium text-content-secondary">{t('items.valid_to', { defaultValue: 'Valid to' })}</span>
-                <input type="date" className={input} value={form.valid_to ?? ''} onChange={(e) => set('valid_to', e.target.value || null)} />
+                <DateField className={input} value={form.valid_to ?? ''} onChange={(e) => set('valid_to', e.target.value || null)} />
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-medium text-content-secondary">{t('items.priority', { defaultValue: 'Priority' })}</span>
@@ -309,7 +310,7 @@ export function PriceListsPage() {
           </label>
           <label className="block">
             <span className="mb-1 block text-xs font-medium text-content-secondary">{t('items.on_date', { defaultValue: 'On date' })}</span>
-            <input type="date" className={input} value={pv.on_date} onChange={(e) => setPv({ ...pv, on_date: e.target.value })} />
+            <DateField className={input} value={pv.on_date} onChange={(e) => setPv({ ...pv, on_date: e.target.value })} />
           </label>
           <Button type="submit" size="sm" variant="primary" disabled={!pv.item_id || preview.isPending}>
             {t('items.calculate', { defaultValue: 'Calculate' })}

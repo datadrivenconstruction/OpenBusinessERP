@@ -15,11 +15,15 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WideModal, WideModalSection, WideModalField } from '@/shared/ui/WideModal';
 import { Button, Input } from '@/shared/ui';
+import { DateField } from '@/shared/ui/DateField';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { apiPost, getErrorMessage } from '@/shared/lib/api';
 import { invalidateFinanceFigures } from './financeQueryKeys';
 import { subtractDecimalStrings } from '@/shared/lib/exactDecimal';
 import { paymentDecimalInput, paymentIdempotencyKey } from './paymentDecimalInput';
+
+const dateInputCls =
+  'h-9 rounded-lg border border-border bg-surface-primary px-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
 
 export interface PaymentModalProps {
   open: boolean;
@@ -108,7 +112,7 @@ export function PaymentModal({
     <WideModal open={open} title={t('finance.payment.recordTitle')} onClose={onClose}>
       <WideModalSection title={t('finance.payment.detailsSection')}>
         <WideModalField label={t('finance.payment.date')}>
-          <Input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} />
+          <DateField className={dateInputCls} value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} />
         </WideModalField>
         <WideModalField label={t('finance.payment.withholding')}>
           <Input
@@ -124,7 +128,7 @@ export function PaymentModal({
           />
         </WideModalField>
         <WideModalField label={t('finance.payment.releaseDate')}>
-          <Input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} />
+          <DateField className={dateInputCls} value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} />
         </WideModalField>
         <WideModalField label={t('finance.payment.reference')}>
           <Input value={reference} onChange={(e) => setReference(e.target.value)} />

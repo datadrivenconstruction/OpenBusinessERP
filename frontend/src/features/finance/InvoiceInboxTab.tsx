@@ -18,6 +18,7 @@ import {
   Sparkles,
   Info,
 } from 'lucide-react';
+import { DateField } from '@/shared/ui/DateField';
 import { Button, Card, Badge, EmptyState, SkeletonTable } from '@/shared/ui';
 import { WideModal } from '@/shared/ui/WideModal';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
@@ -734,8 +735,8 @@ function CaptureDetail({
                 label={t('finance.inbox.date', { defaultValue: 'Invoice date' })}
                 conf={capture.field_confidence?.['invoice_date']}
               >
-                <input
-                  type="date"
+                <DateField
+                 
                   className={inputCls}
                   disabled={!editable}
                   value={draft.invoice_date ?? ''}
@@ -743,8 +744,8 @@ function CaptureDetail({
                 />
               </Field>
               <Field label={t('finance.inbox.due_date', { defaultValue: 'Due date' })}>
-                <input
-                  type="date"
+                <DateField
+                 
                   className={inputCls}
                   disabled={!editable}
                   value={draft.due_date ?? ''}

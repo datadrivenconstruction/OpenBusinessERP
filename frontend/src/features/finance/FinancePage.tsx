@@ -34,6 +34,7 @@ import {
   Landmark,
   FileCode2,
 } from 'lucide-react';
+import { DateField } from '@/shared/ui/DateField';
 import clsx from 'clsx';
 import {
   Button,
@@ -3153,9 +3154,9 @@ export function InvoicesTab({ projectId }: { projectId: string }) {
               required
               error={invoiceErrors.invoice_date}
             >
-              <input
+              <DateField
                 ref={invoiceDateRef}
-                type="date"
+               
                 value={invoiceForm.invoice_date}
                 onChange={(e) => {
                   setInvoiceForm((f) => ({ ...f, invoice_date: e.target.value }));
@@ -3316,8 +3317,8 @@ export function InvoicesTab({ projectId }: { projectId: string }) {
               label={t('finance.due_date', { defaultValue: 'Due Date' })}
               span={2}
             >
-              <input
-                type="date"
+              <DateField
+               
                 value={invoiceForm.due_date}
                 onChange={(e) => setInvoiceForm((f) => ({ ...f, due_date: e.target.value }))}
                 className={inputCls}

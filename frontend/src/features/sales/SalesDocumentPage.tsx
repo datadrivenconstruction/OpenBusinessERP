@@ -24,6 +24,7 @@ import { PdfPreviewPanel } from './components/PdfPreviewPanel';
 import type { ActionMenuItem } from './components/ActionMenu';
 import { ConvertDialog } from './modals/ConvertDialog';
 import { RecordPaymentModal } from './modals/RecordPaymentModal';
+import { DateField } from '@/shared/ui/DateField';
 
 const input =
   'w-full rounded-lg border border-border-light bg-surface-primary px-2 py-1 text-sm text-content-primary focus:border-oe-blue focus:outline-none disabled:bg-surface-secondary aria-[invalid=true]:border-semantic-error';
@@ -222,7 +223,7 @@ export function SalesDocumentPage() {
           <section className={`${card} grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4`}>
             <label className="text-xs text-content-tertiary">
               {t('sales.date', { defaultValue: 'Date' })}
-              <input type="date" className={input} disabled={!editable} aria-invalid={!!visibleErrors.doc_date} value={form.doc_date} onChange={(e) => patch({ doc_date: e.target.value })} />
+              <DateField className={input} disabled={!editable} aria-invalid={!!visibleErrors.doc_date} value={form.doc_date} onChange={(e) => patch({ doc_date: e.target.value })} />
               {visibleErrors.doc_date && <span className="text-semantic-error">{visibleErrors.doc_date}</span>}
             </label>
             <label className="text-xs text-content-tertiary">
@@ -237,8 +238,8 @@ export function SalesDocumentPage() {
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.due_date', { defaultValue: 'Due date' })}
-              <input
-                type="date"
+              <DateField
+               
                 className={input}
                 disabled={!editable}
                 aria-invalid={!!visibleErrors.due_date}
@@ -280,11 +281,11 @@ export function SalesDocumentPage() {
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.delivery_date', { defaultValue: 'Delivery date / period start' })}
-              <input type="date" className={input} disabled={!editable} value={form.delivery_date} onChange={(e) => patch({ delivery_date: e.target.value })} />
+              <DateField className={input} disabled={!editable} value={form.delivery_date} onChange={(e) => patch({ delivery_date: e.target.value })} />
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.delivery_end', { defaultValue: 'Period end (optional)' })}
-              <input type="date" className={input} disabled={!editable} value={form.delivery_end} onChange={(e) => patch({ delivery_end: e.target.value })} />
+              <DateField className={input} disabled={!editable} value={form.delivery_end} onChange={(e) => patch({ delivery_end: e.target.value })} />
             </label>
           </section>
 

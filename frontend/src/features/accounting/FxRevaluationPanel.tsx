@@ -6,6 +6,7 @@ import { getErrorMessage } from '@/shared/lib/api';
 import { glApi, type FxRevalResult } from './api';
 import { inputCls, numCls, thCls } from './ui';
 import { fmtNumber } from '@/shared/lib/formatters';
+import { DateField } from '@/shared/ui/DateField';
 
 /** Period-end revaluation of open foreign-currency receivables and payables. */
 export function FxRevaluationPanel() {
@@ -53,7 +54,7 @@ export function FxRevaluationPanel() {
         </label>
         <label className="text-xs text-content-tertiary">
           {t('accounting.fx_reval_date', { defaultValue: 'Closing date' })}
-          <input type="date" className={inputCls} value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
+          <DateField className={inputCls} value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
         </label>
         {currencies.map((c) => (
           <label key={c} className="text-xs text-content-tertiary">

@@ -9,6 +9,7 @@ import { DateDisplay } from '@/shared/ui/DateDisplay';
 import { getErrorMessage } from '@/shared/lib/api';
 import { fmtUpTo } from '@/shared/lib/formatters';
 import { inventoryApi, type Stocktake } from './api';
+import { DateField } from '@/shared/ui/DateField';
 
 export const fieldCls =
   'h-9 w-full rounded-lg border border-border bg-surface-primary px-3 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
@@ -90,7 +91,7 @@ export function TransferDrawer({ itemId, onClose }: { itemId: string | null; onC
             <input className={fieldCls} type="number" min="0" step="any" value={f.qty} onChange={(e) => setF({ ...f, qty: e.target.value })} required />
           </Field>
           <Field label={t('inventory.col_date', { defaultValue: 'Date' })}>
-            <input className={fieldCls} type="date" value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
+            <DateField className={fieldCls} value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
           </Field>
         </div>
         <Field label={t('inventory.notes', { defaultValue: 'Notes' })}>
@@ -165,7 +166,7 @@ export function AdjustDrawer({ itemId, onClose }: { itemId: string | null; onClo
             </select>
           </Field>
           <Field label={t('inventory.col_date', { defaultValue: 'Date' })}>
-            <input className={fieldCls} type="date" value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
+            <DateField className={fieldCls} value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
           </Field>
           <Field label={t('inventory.col_qty', { defaultValue: 'Quantity' })}>
             <input className={fieldCls} type="number" step="any" value={f.qty} onChange={(e) => setF({ ...f, qty: e.target.value })} required />

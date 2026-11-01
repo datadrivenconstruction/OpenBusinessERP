@@ -83,6 +83,8 @@ export interface WideModalProps {
    * way to set it, so specs asserted on a testid that could not exist.
    */
   testId?: string;
+  /** Called on Enter in a single-line field of the body, so the form submits without reaching for the footer. */
+  onSubmit?: () => void;
 }
 
 export function WideModal({
@@ -97,6 +99,7 @@ export function WideModal({
   hideCloseButton = false,
   className,
   testId,
+  onSubmit,
 }: WideModalProps) {
   const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -223,7 +226,18 @@ export function WideModal({
         </header>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
+        <div
+          className="flex-1 overflow-y-auto px-6 py-5"
+          onKeyDown={(e) => {
+            if (!onSubmit || busy || e.defaultPrevented || e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+            const el = e.target as HTMLElement;
+            if (el.tagName !== 'INPUT' || /^(button|submit|checkbox|radio|file)$/.test((el as HTMLInputElement).type)) return;
+            e.preventDefault();
+            onSubmit();
+          }}
+        >
+          {children}
+        </div>
 
         {/* Sticky footer */}
         {footer && (

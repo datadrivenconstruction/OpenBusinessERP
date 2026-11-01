@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { Search, X } from 'lucide-react';
 import { ContactSearchInput } from '@/shared/ui/ContactSearchInput';
 import { STATUSES_BY_KIND, clearFilters, hasActiveFilters, type SalesFilters } from '../lib/filters';
+import { DateField } from '@/shared/ui/DateField';
 
 export const inputCls =
   'h-9 rounded-lg border border-border bg-surface-primary px-3 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
@@ -49,11 +50,11 @@ export function SalesFiltersBar({ filters, onChange }: { filters: SalesFilters; 
         </div>
         <label className="flex items-center gap-1.5 text-xs text-content-tertiary">
           {t('sales.filters.from', { defaultValue: 'From' })}
-          <input type="date" className={inputCls} value={filters.date_from} onChange={(e) => set({ date_from: e.target.value })} />
+          <DateField className={inputCls} value={filters.date_from} onChange={(e) => set({ date_from: e.target.value })} />
         </label>
         <label className="flex items-center gap-1.5 text-xs text-content-tertiary">
           {t('sales.filters.to', { defaultValue: 'To' })}
-          <input type="date" className={inputCls} value={filters.date_to} onChange={(e) => set({ date_to: e.target.value })} />
+          <DateField className={inputCls} value={filters.date_to} onChange={(e) => set({ date_to: e.target.value })} />
         </label>
         {filters.tab === 'invoices' && (
           <label className="flex cursor-pointer items-center gap-1.5 text-sm text-content-secondary">

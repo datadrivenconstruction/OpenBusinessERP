@@ -22,6 +22,7 @@ import { StickyActionBar, useUnsavedGuard, type MoreAction } from './components/
 import { PdfPreviewPanel } from './components/PdfPreviewPanel';
 import { ReceiveDialog } from './modals/ReceiveDialog';
 import { PaymentDialog } from './modals/PaymentDialog';
+import { DateField } from '@/shared/ui/DateField';
 
 const NEW_LABEL: Record<PurchasingKind, string> = { orders: 'New purchase order', bills: 'New bill', 'credit-notes': 'New credit note' };
 const blankLine = (tax: string): PurchasingLine => ({ item_id: null, sku: '', description: '', qty: '1', unit_price: '0', tax_rate: tax, discount_pct: '' });
@@ -232,7 +233,7 @@ export function PurchasingDocumentPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <label className="text-xs text-content-tertiary">
                 {t('purchasing.date', { defaultValue: 'Date' })}
-                <input type="date" className={inputCls} disabled={!editable} value={form.doc_date}
+                <DateField className={inputCls} disabled={!editable} value={form.doc_date}
                   onChange={(e) => update({ doc_date: e.target.value, ...(form.payment_terms_days ? { due_date: addDays(e.target.value, Number(form.payment_terms_days)) } : {}) })} />
               </label>
               <label className="text-xs text-content-tertiary">
@@ -245,7 +246,7 @@ export function PurchasingDocumentPage() {
               </label>
               <label className="text-xs text-content-tertiary">
                 {isOrder ? t('purchasing.expected_date', { defaultValue: 'Expected delivery' }) : t('purchasing.due_date', { defaultValue: 'Due date' })}
-                <input type="date" className={`${inputCls} ${showErrors && formErrors.due ? 'border-semantic-error' : ''}`} disabled={!editable} value={form.due_date} onChange={(e) => update({ due_date: e.target.value })} />
+                <DateField className={`${inputCls} ${showErrors && formErrors.due ? 'border-semantic-error' : ''}`} disabled={!editable} value={form.due_date} onChange={(e) => update({ due_date: e.target.value })} />
                 {showErrors && formErrors.due && <span className="text-semantic-error">{formErrors.due}</span>}
               </label>
               <label className="text-xs text-content-tertiary">

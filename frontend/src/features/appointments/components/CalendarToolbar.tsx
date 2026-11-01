@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/shared/ui';
 import { STATUSES, STATUS_LABEL, addDays, type Resource } from '../api';
+import { DateField } from '@/shared/ui/DateField';
 
 export const inputCls =
   'h-9 w-full rounded-lg border border-border bg-surface-primary px-3 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
@@ -32,8 +33,8 @@ export function CalendarToolbar(p: Props) {
       <Button size="sm" variant="secondary" onClick={() => p.onDate(new Date())}>{t('appointments.today', { defaultValue: 'Today' })}</Button>
       <Button size="sm" variant="secondary" aria-label={t('appointments.previous', { defaultValue: 'Previous' })} onClick={() => shift(-1)} icon={<ChevronLeft size={14} />} />
       <Button size="sm" variant="secondary" aria-label={t('appointments.next', { defaultValue: 'Next' })} onClick={() => shift(1)} icon={<ChevronRight size={14} />} />
-      <input
-        type="date"
+      <DateField
+       
         className={clsx(inputCls, 'w-auto')}
         value={`${p.date.getFullYear()}-${String(p.date.getMonth() + 1).padStart(2, '0')}-${String(p.date.getDate()).padStart(2, '0')}`}
         onChange={(e) => {

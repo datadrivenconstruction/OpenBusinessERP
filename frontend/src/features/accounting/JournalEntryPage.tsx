@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { STATUS_VARIANT, entryBalance, glApi, iso, toCents, useBusinessCurrency, validateEntry, type Account, type LineDraft } from './api';
 import { AccountingShell, ErrorBlock, Field, LoadingBlock, SourceChip, inputCls, numCls, thCls } from './ui';
 import { formatFileSize } from '@/shared/lib/formatters';
+import { DateField } from '@/shared/ui/DateField';
 
 const emptyLine = (): LineDraft => ({ account_id: '', description: '', debit: '', credit: '' });
 
@@ -94,7 +95,7 @@ function NewEntry() {
         >
           <div className="grid gap-3 sm:grid-cols-[160px_1fr]">
             <Field label={t('accounting.col_date', { defaultValue: 'Date' })}>
-              <input type="date" required className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} autoFocus />
+              <DateField required className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} autoFocus />
             </Field>
             <Field label={t('accounting.col_memo', { defaultValue: 'Memo' })}>
               <input className={inputCls} value={memo} onChange={(e) => setMemo(e.target.value)} />
@@ -316,7 +317,7 @@ function EntryDetail({ id }: { id: string }) {
                 onKeyDown={(ev) => ev.key === 'Escape' && setReversing(false)}
               >
                 <Field label={t('accounting.reversal_date', { defaultValue: 'Reversal date' })}>
-                  <input type="date" required autoFocus className={inputCls} value={revDate} onChange={(ev) => setRevDate(ev.target.value)} />
+                  <DateField required autoFocus className={inputCls} value={revDate} onChange={(ev) => setRevDate(ev.target.value)} />
                 </Field>
                 <Button type="submit" size="sm" loading={reverse.isPending}>{t('accounting.reverse_confirm', { defaultValue: 'Create reversal' })}</Button>
                 <Button type="button" size="sm" variant="ghost" onClick={() => setReversing(false)}>{t('common.cancel', { defaultValue: 'Cancel' })}</Button>

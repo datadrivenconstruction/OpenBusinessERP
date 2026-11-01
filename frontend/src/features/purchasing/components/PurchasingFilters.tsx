@@ -7,6 +7,7 @@ import { Button } from '@/shared/ui/Button';
 import { MATCH_LABEL, type MatchStatus } from '../api';
 import { activeFilterCount, EMPTY_FILTERS, type ListFilters, type ListTab } from '../helpers';
 import { inputCls } from './common';
+import { DateField } from '@/shared/ui/DateField';
 
 export const STATUS_OPTIONS: Record<ListTab, string[]> = {
   orders: ['draft', 'confirmed', 'partially_received', 'received', 'closed', 'cancelled'],
@@ -61,11 +62,11 @@ export function PurchasingFilters({ tab, value, onChange }: Props) {
         )}
         <label className="flex items-center gap-1.5 text-xs text-content-tertiary">
           {t('purchasing.filter_from', { defaultValue: 'From' })}
-          <input type="date" className={clsx(inputCls, 'w-36')} value={value.date_from} onChange={(e) => set({ date_from: e.target.value })} />
+          <DateField className={clsx(inputCls, 'w-36')} value={value.date_from} onChange={(e) => set({ date_from: e.target.value })} />
         </label>
         <label className="flex items-center gap-1.5 text-xs text-content-tertiary">
           {t('purchasing.filter_to', { defaultValue: 'To' })}
-          <input type="date" className={clsx(inputCls, 'w-36')} value={value.date_to} onChange={(e) => set({ date_to: e.target.value })} />
+          <DateField className={clsx(inputCls, 'w-36')} value={value.date_to} onChange={(e) => set({ date_to: e.target.value })} />
         </label>
         {tab === 'bills' && (
           <>
