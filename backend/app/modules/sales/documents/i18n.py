@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
-LANGUAGES = ("en", "de", "ru", "fr", "es", "it", "pl")
+LANGUAGES = ("en", "de", "ru", "fr", "es", "it", "pl", "ar")
 
 _L: dict[str, dict[str, str]] = {
     "en": {
@@ -336,6 +336,124 @@ _L: dict[str, dict[str, str]] = {
     },
 }
 
+_L["en"].update(
+    {
+        "dunning": "{n}. Payment reminder",
+        "dunning.1": "Payment reminder",
+        "purchase_order": "Purchase order",
+        "bill": "Supplier bill",
+        "supplier_credit_note": "Supplier credit note",
+        "carry_out": "Subtotal carried forward",
+        "carry_in": "Brought forward",
+        "tax_amount": "VAT",
+        "expected_delivery": "Expected delivery",
+        "supplier_ref": "Supplier reference",
+        "invoice_date": "Invoice date",
+        "amount_paid": "Paid",
+        "balance_due": "Open amount",
+        "terms": "Terms and conditions",
+        "intro.purchase_order": "We hereby order the following items:",
+        "closing.purchase_order": "Please confirm this order and the delivery date.",
+        "intro.bill": "Supplier bill as received:",
+        "closing.bill": "",
+        "intro.supplier_credit_note": "Supplier credit note as received:",
+        "closing.supplier_credit_note": "",
+        "intro.dunning": "According to our records the following invoice is still open:",
+        "closing.dunning": "Please transfer the open amount within 7 days. "
+        "If you have paid in the meantime, please disregard this letter.",
+    }
+)
+_L["de"].update(
+    {
+        "dunning": "{n}. Mahnung",
+        "dunning.1": "Zahlungserinnerung",
+        "purchase_order": "Bestellung",
+        "bill": "Eingangsrechnung",
+        "supplier_credit_note": "Lieferantengutschrift",
+        "carry_out": "Zwischensumme (Übertrag)",
+        "carry_in": "Übertrag",
+        "tax_amount": "USt.",
+        "expected_delivery": "Liefertermin",
+        "supplier_ref": "Lieferantenreferenz",
+        "invoice_date": "Rechnungsdatum",
+        "amount_paid": "Bezahlt",
+        "balance_due": "Offener Betrag",
+        "terms": "Allgemeine Geschäftsbedingungen",
+        "intro.purchase_order": "Hiermit bestellen wir folgende Positionen:",
+        "closing.purchase_order": "Bitte bestätigen Sie die Bestellung und den Liefertermin.",
+        "intro.bill": "Eingangsrechnung wie erhalten:",
+        "intro.supplier_credit_note": "Lieferantengutschrift wie erhalten:",
+        "intro.dunning": "Laut unserer Buchhaltung ist folgende Rechnung noch offen:",
+        "closing.dunning": "Bitte überweisen Sie den offenen Betrag innerhalb von 7 Tagen. "
+        "Sollten Sie inzwischen gezahlt haben, betrachten Sie dieses Schreiben als gegenstandslos.",
+    }
+)
+_L["ar"] = {
+    "quote": "عرض سعر",
+    "order": "تأكيد الطلب",
+    "invoice": "فاتورة",
+    "credit_note": "إشعار دائن",
+    "number": "رقم",
+    "date": "التاريخ",
+    "due_date": "تاريخ الاستحقاق",
+    "delivery_date": "تاريخ التسليم",
+    "delivery_period": "فترة الخدمة",
+    "customer_vat": "رقمكم الضريبي",
+    "pos": "#",
+    "description": "البند",
+    "qty": "الكمية",
+    "unit_price": "سعر الوحدة",
+    "discount": "خصم %",
+    "rate": "الضريبة %",
+    "amount": "الصافي",
+    "net_total": "الإجمالي الصافي",
+    "tax_line": "ضريبة {rate} % على {net}",
+    "gross_total": "المبلغ المستحق",
+    "credit_total": "إجمالي الدائن",
+    "payment_terms": "شروط الدفع",
+    "bank": "البيانات المصرفية",
+    "account_holder": "صاحب الحساب",
+    "vat_id": "الرقم الضريبي",
+    "tax_number": "الرقم الضريبي",
+    "register": "السجل التجاري",
+    "directors": "المديرون",
+    "page": "صفحة {n} من {m}",
+    "qr": "امسح للدفع عبر تطبيق البنك",
+    "relates_to": "متعلق بالمستند {ref}",
+    "terms_days": "يرجى الدفع خلال {days} يومًا، حتى {due}.",
+    "terms_now": "مستحق الدفع فورًا.",
+    "intro.quote": "شكرًا لاستفساركم. يسعدنا أن نقدم لكم ما يلي:",
+    "intro.order": "شكرًا لطلبكم، ونؤكده كما يلي:",
+    "intro.invoice": "نطالبكم بقيمة السلع والخدمات التالية:",
+    "intro.credit_note": "نقيد لصالحكم المبالغ التالية:",
+    "closing.quote": "هذا العرض صالح لمدة 30 يومًا.",
+    "closing.order": "سنبقيكم على اطلاع بموعد التسليم.",
+    "closing.invoice": "شكرًا لتعاملكم معنا.",
+    "closing.credit_note": "ستتم تسوية المبلغ أو رده.",
+    "email_subject": "{document_title} {document_number} من {company_name}",
+    "email_body": "مرحبًا {customer_name}،\n\nمرفق {document_title} {document_number} بتاريخ {document_date}. "
+    "المبلغ: {total}.\n\nمع التحية\n{company_name}",
+    "dunning": "تذكير بالدفع رقم {n}",
+    "dunning.1": "تذكير بالدفع",
+    "purchase_order": "أمر شراء",
+    "bill": "فاتورة مورد",
+    "supplier_credit_note": "إشعار دائن من المورد",
+    "carry_out": "المجموع المرحل",
+    "carry_in": "المجموع المنقول",
+    "tax_amount": "الضريبة",
+    "expected_delivery": "التسليم المتوقع",
+    "supplier_ref": "مرجع المورد",
+    "invoice_date": "تاريخ الفاتورة",
+    "amount_paid": "المدفوع",
+    "balance_due": "المبلغ المتبقي",
+    "terms": "الشروط والأحكام",
+    "intro.purchase_order": "نطلب منكم البنود التالية:",
+    "closing.purchase_order": "يرجى تأكيد الطلب وموعد التسليم.",
+    "intro.dunning": "وفقًا لسجلاتنا، لا تزال الفاتورة التالية غير مسددة:",
+    "closing.dunning": "يرجى تحويل المبلغ المتبقي خلال 7 أيام.",
+}
+RTL_LANGUAGES = frozenset({"ar"})
+
 # (thousands separator, decimal separator, symbol before amount)
 _NUM = {
     "en": (",", ".", True),
@@ -344,6 +462,7 @@ _NUM = {
     "fr": (" ", ",", False),
     "es": (".", ",", False),
     "it": (".", ",", False),
+    "ar": (",", ".", False),
     "pl": (" ", ",", False),
 }
 _DATE = {
@@ -354,6 +473,7 @@ _DATE = {
     "es": "%d/%m/%Y",
     "it": "%d/%m/%Y",
     "pl": "%d.%m.%Y",
+    "ar": "%d/%m/%Y",
 }
 _SYMBOL = {"EUR": "€", "USD": "$", "GBP": "£", "PLN": "zł", "RUB": "₽", "CHF": "CHF"}
 

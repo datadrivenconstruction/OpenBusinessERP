@@ -13,6 +13,8 @@ Endpoints ({kind} is quotes | orders | invoices):
     POST   /invoices/{id}/payments/         -- Record payment, post DR bank / CR AR
     POST   /invoices/{id}/credit-note/      -- Draft a credit note (status issued posts the GL reversal)
     GET    /{kind}/{id}/pdf/                -- Render the document as PDF
+    GET    /invoices/{id}/dunning-pdf/      -- Payment reminder / dunning letter PDF
+    GET|PUT /settings/document-design/      -- PDF template and letterhead design (+ POST preview/)
     GET    /{kind}/{id}/check/              -- Missing mandatory invoice data (a check, not a guarantee)
     GET    /{kind}/{id}/email-draft/        -- Prefilled send dialog (to, subject, body)
     POST   /{kind}/{id}/send/               -- E-mail the PDF (explicit user action), writes send log
@@ -36,13 +38,17 @@ from decimal import Decimal
 from typing import TypeVar
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from pydantic import BaseModel, Field
+from starlette.concurrency import run_in_threadpool
 
 from app.core.content_disposition import attachment_disposition
 from app.core.email.service import EmailService
 from app.dependencies import CurrentCompanyTenantId, CurrentUserId, RequirePermission, SessionDep
+from app.modules.sales.documents import design
 from app.modules.sales.documents import service as docs
 from app.modules.sales.documents.checks import check_invoice
 from app.modules.sales.documents.i18n import lang
+from app.modules.sales.documents.pdf import render_dunning, render_sample
 from app.modules.sales.schemas import (
     AccountMapping,
     ActivityEvent,
@@ -109,6 +115,50 @@ def _picked(body: ConvertRequest | None) -> list[tuple[uuid.UUID, Decimal]] | No
 
 
 # ── Settings (declared before /{kind}/ so it is not captured) ─────────────
+class DocumentDesignBody(BaseModel):
+    template: str | None = None
+    accent_color: str | None = None
+    font: str | None = None
+    logo_position: str | None = None
+    logo_size: str | None = None
+    footer_blocks: list[str] | None = None
+    header_contact: bool | None = None
+    page_numbers: bool | None = None
+    din5008: bool | None = None
+    fold_marks: bool | None = None
+    terms_text: str | None = Field(default=None, max_length=design.MAX_TERMS)
+
+
+class DesignPreviewBody(BaseModel):
+    design: DocumentDesignBody = DocumentDesignBody()
+    kind: str = Field("invoice", pattern="^(quote|order|invoice|credit_note|dunning|purchase_order)$")
+    language: str = Field("en", max_length=5)
+    lines: int = Field(6, ge=1, le=80)
+
+
+@router.get("/settings/document-design/")
+async def get_document_design(_user_id: CurrentUserId, _perm: None = Depends(RequirePermission("sales.read"))):
+    return design.read_design()
+
+
+@router.put("/settings/document-design/")
+async def put_document_design(
+    body: DocumentDesignBody, _user_id: CurrentUserId, _perm: None = Depends(RequirePermission("sales.manage"))
+):
+    return design.write_design(body.model_dump())
+
+
+@router.post("/settings/document-design/preview/")
+async def preview_document_design(
+    body: DesignPreviewBody, _user_id: CurrentUserId, _perm: None = Depends(RequirePermission("sales.read"))
+):
+    """Render a sample document with an unsaved design, for the settings live preview."""
+    unsaved = design.sanitise_design({**design.read_design(), **body.design.model_dump(exclude_none=True)})
+    company = {**docs.company_data(), "document_design": unsaved}
+    pdf = await run_in_threadpool(render_sample, body.kind, company, language=lang(body.language), n_lines=body.lines)
+    return Response(pdf, media_type="application/pdf", headers={"Cache-Control": "no-store"})
+
+
 @router.get("/settings/accounts/", response_model=AccountMapping)
 async def get_accounts(
     _user_id: CurrentUserId,
@@ -328,6 +378,26 @@ async def credit_invoice(
 
 
 # ── Printing and e-mail ───────────────────────────────────────────────────
+@router.get("/invoices/{doc_id}/dunning-pdf/")
+async def dunning_pdf(
+    doc_id: uuid.UUID,
+    _user_id: CurrentUserId,
+    level: int = Query(1, ge=1, le=9),
+    svc: SalesService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("sales.read")),
+):
+    doc = await _call(svc.get(doc_id, "invoice"))
+    pdf = await run_in_threadpool(render_dunning, doc, docs.company_data(), level=level)
+    return Response(
+        pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": attachment_disposition(f"dunning-{level}-{docs.filename(doc)}", inline=True),
+            "Content-Language": lang(doc.language),
+        },
+    )
+
+
 @router.get("/{kind}/{doc_id}/pdf/")
 async def document_pdf(
     kind: str,

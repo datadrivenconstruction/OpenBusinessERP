@@ -18,6 +18,7 @@ from app.core.email.base import EmailAttachment, EmailMessage
 from app.core.email.service import EmailService
 from app.core.mail_settings import mail_status
 from app.modules.sales.documents.checks import check_invoice
+from app.modules.sales.documents.design import read_design
 from app.modules.sales.documents.i18n import fmt_date, fmt_money, lang, t
 from app.modules.sales.documents.pdf import render_document
 from app.modules.sales.models import SalesDocument, SalesSendLog
@@ -42,6 +43,7 @@ def company_data() -> dict[str, Any]:
     for key in ("email", "phone", "website"):
         if not data.get(key):
             data[key] = profile.get(key, "")
+    data["document_design"] = read_design()
     return data
 
 
