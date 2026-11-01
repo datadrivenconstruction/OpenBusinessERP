@@ -446,3 +446,6 @@ email-delivery-failures*.jsonl
 !docs/images/*.png
 !frontend/public/**/*.png
 !desktop/src-tauri/icons/*.png
+
+# mkdocs build output
+/site/

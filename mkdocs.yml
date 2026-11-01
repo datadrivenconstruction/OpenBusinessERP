@@ -1,0 +1,93 @@
+site_name: OpenBusinessERP documentation
+site_description: User and administrator documentation for OpenBusinessERP, a self-hosted ERP for small businesses.
+site_url: https://datadrivenconstruction.github.io/OpenBusinessERP/
+repo_url: https://github.com/datadrivenconstruction/OpenBusinessERP
+repo_name: datadrivenconstruction/OpenBusinessERP
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+# docs/ also holds older engineering notes and legal texts. They stay in the
+# repository and are not part of the published manual.
+exclude_docs: |
+  README.md
+  api/
+  architecture/
+  compliance/
+  desktop/
+  install/
+  legal/
+  module-development/
+  platform/
+  INSTALL_LINUX.md
+  backup-monitoring.md
+  email-setup.md
+  getting-started.md
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.action.edit
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.details
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Install: manual/install.md
+      - Set up and send your first invoice: manual/first-invoice.md
+  - Daily work:
+      - Customers and CRM: manual/customers-crm.md
+      - Quote, order, delivery, invoice: manual/sales-flow.md
+      - Recurring invoices: manual/recurring.md
+      - Purchasing and inventory: manual/purchasing-inventory.md
+      - Email and PDF templates: manual/templates.md
+  - Money:
+      - Banking and reconciliation: manual/banking.md
+      - Dunning: manual/dunning.md
+      - Multi-currency and revaluation: manual/multi-currency.md
+      - DATEV and SAF-T export: manual/accountant-export.md
+  - Running the system:
+      - Roles and audit log: manual/roles-audit.md
+      - Backup and restore: manual/backup.md
+      - Upgrading: manual/upgrading.md
+  - Reference:
+      - FAQ: manual/faq.md
+      - Glossary DE/EN: manual/glossary.md
+  - For administrators and developers:
+      - Architecture: admin/architecture.md
+      - API: admin/api.md
+      - Contributing: admin/contributing.md

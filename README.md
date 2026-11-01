@@ -21,6 +21,7 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#a-tour-of-the-workspace">Feature tour</a> ·
   <a href="#at-a-glance">At a glance</a> ·
+  <a href="https://datadrivenconstruction.github.io/OpenBusinessERP/">Documentation</a> ·
   <a href="ROADMAP.md">Roadmap</a> ·
   <a href="#architecture">Architecture</a> ·
   <a href="#configuration">Configuration</a> ·
