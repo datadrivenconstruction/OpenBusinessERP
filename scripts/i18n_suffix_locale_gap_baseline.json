@@ -1,1071 +1,643 @@
 {
   "guide.accounting.accounts.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.accounts.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.automatic.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.automatic.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.journal.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.journal.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.reports.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.reports.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.accounting.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.calendar.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.calendar.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.online.body_drafts": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.online.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.setup.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.setup.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.status.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.status.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.appointments.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.accounts.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.accounts.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.book.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.book.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.import.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.import.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.reconcile.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.reconcile.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.banking.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.attention.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.attention.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.money.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.money.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.today.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.biz_home.today.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.filter.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.filter.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.progress.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.progress.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.start.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.start.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.steps.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.steps.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.bizcases.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.choose.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.choose.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.map.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.map.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.undo.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.undo.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.validate.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.import.validate.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.accounts.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.accounts.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.catalogue.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.catalogue.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.pricing.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.pricing.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.stock.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.stock.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.items.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.bills.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.bills.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.orders.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.orders.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.payments.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.payments.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.receipts.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.receipts.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.purchasing.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.aging.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.aging.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.dunning.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.dunning.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.exclude.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.exclude.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.statement.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.statement.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.receivables.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.cta": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.intro": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.invoices.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.invoices.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.output.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.output.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.payments.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.payments.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.quotes.body": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.quotes.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ],
   "guide.sales.title": [
-    "bn",
     "fil",
-    "hi",
-    "id",
     "mn",
-    "th",
     "ur",
     "uz"
   ]
