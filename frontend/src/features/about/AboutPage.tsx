@@ -234,6 +234,17 @@ export function AboutPage() {
             <span>2026</span>
             <span>&middot;</span>
             <Badge variant="blue" size="sm">AGPL-3.0</Badge>
+            <span>&middot;</span>
+            {/* AGPL-3.0 section 13: network users must be offered the Corresponding Source. */}
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-content-primary"
+              data-testid="about-source-code-link"
+            >
+              {t('login.github_sub', { defaultValue: 'Source code' })}
+            </a>
           </div>
         </div>
 

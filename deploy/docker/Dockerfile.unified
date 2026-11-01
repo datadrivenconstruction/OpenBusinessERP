@@ -63,6 +63,8 @@ ARG OE_EXTRAS=server,semantic-clients
 # for both, and it cannot be. The extras list is shared instead, through
 # OE_EXTRAS, which is the part that actually drifted.
 FROM python:3.12-slim AS backend-base
+LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later" \
+      org.opencontainers.image.source="https://github.com/datadrivenconstruction/OpenBusinessERP"
 
 # libpq for PostgreSQL support.
 RUN apt-get update \
@@ -77,6 +79,7 @@ WORKDIR /app
 # The whole backend (pyproject.toml + README.md + all source) before installing.
 # pip needs the app/ package present to build the wheel.
 COPY backend/ backend/
+RUN mkdir -p /usr/share/licenses/openbusinesserp && cp backend/LICENSE backend/NOTICE /usr/share/licenses/openbusinesserp/
 
 # Everything else the wheel's force-include map names, because hatchling
 # resolves that map while pip builds the wheel and aborts the whole build on

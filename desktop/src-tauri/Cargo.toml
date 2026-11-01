@@ -1,7 +1,9 @@
 [package]
 name = "openbusinesserp-desktop"
 version = "18.4.0"
-description = "OpenBusinessERP Desktop, construction cost estimation and BOQ platform"
+description = "OpenBusinessERP Desktop, open-source ERP for small businesses"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/datadrivenconstruction/OpenBusinessERP"
 authors = ["DataDrivenConstruction <info@datadrivenconstruction.io>"]
 edition = "2021"
 

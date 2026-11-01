@@ -35,6 +35,8 @@ COPY frontend/ .
 RUN NODE_OPTIONS=--max-old-space-size=12288 npm run build
 
 FROM nginx:alpine
+LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later" \
+      org.opencontainers.image.source="https://github.com/datadrivenconstruction/OpenBusinessERP"
 
 RUN rm /etc/nginx/conf.d/default.conf
 
