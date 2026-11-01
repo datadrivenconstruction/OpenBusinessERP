@@ -110,6 +110,9 @@ ALLOWED: dict[str, str] = {
     "MISSING GET /v1/receivables/customer/{q({ partner_key: partnerKey, as_of: asOf })} @ features/receivables/api.ts": (
         "q() returns a query string ('?partner_key=...'), not a path segment; the call hits GET /customer/"
     ),
+    "MISSING POST /v1/sales/invoices/ @ features/onboarding/BusinessSetup.tsx": (
+        "answered by POST /{kind}/ in sales/router.py; 'invoices' is a KIND_PATHS literal, not a missing route"
+    ),
 }
 
 

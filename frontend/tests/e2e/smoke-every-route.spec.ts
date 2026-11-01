@@ -190,8 +190,9 @@ async function resolveParams(page: Page): Promise<Params> {
     devId: (await firstId(['/v1/property-dev/developments/'])) ?? fromLinks(new RegExp(`^/property-dev/developments/${UUIDISH}/`)),
     // Shipped playbooks are source files; the id is the file stem.
     playbookId:
-      fs
-        .readdirSync(path.join(process.cwd(), 'src', 'features', 'cases', 'data'))
+      (fs.existsSync(path.join(process.cwd(), 'src', 'features', 'cases', 'data'))
+        ? fs.readdirSync(path.join(process.cwd(), 'src', 'features', 'cases', 'data'))
+        : [])
         .find((f) => f.endsWith('.playbook.ts'))
         ?.replace(/\.playbook\.ts$/, '') ?? fromLinks(new RegExp(`^/cases/${UUIDISH}$`)),
     eacId: fromLinks(new RegExp(`^/eac/blocks/${UUIDISH}$`)),

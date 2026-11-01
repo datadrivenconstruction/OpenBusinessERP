@@ -18,8 +18,8 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from sqlalchemy import func, or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.gl.models import GLAccount
 from app.modules.gl.service import GLError, GLService, LineInput
@@ -210,11 +210,20 @@ class InventoryService:
                 # Parallel first requests race to create MAIN; the loser re-reads the winner's row.
                 try:
                     async with self.session.begin_nested():
-                        wh = Warehouse(tenant_id=self.tenant_id, code="MAIN", name="Main warehouse", address="", active=True, is_default=True)
+                        wh = Warehouse(
+                            tenant_id=self.tenant_id,
+                            code="MAIN",
+                            name="Main warehouse",
+                            address="",
+                            active=True,
+                            is_default=True,
+                        )
                         self.session.add(wh)
                 except IntegrityError:
                     wh = await self.session.scalar(
-                        select(Warehouse).where(Warehouse.tenant_id == self.tenant_id, Warehouse.code == "MAIN").limit(1)
+                        select(Warehouse)
+                        .where(Warehouse.tenant_id == self.tenant_id, Warehouse.code == "MAIN")
+                        .limit(1)
                     )
                     if wh is None:
                         raise

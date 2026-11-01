@@ -1543,5 +1543,35 @@
     "en_value": "CRM",
     "note": "the abbreviation CRM is the established product term in Russian as in English",
     "reason_category": "abbreviation"
+  },
+  "accounting.export_fmt_datev_contacts": {
+    "en_value": "DATEV Debitoren/Kreditoren (EXTF CSV)",
+    "note": "name of the German DATEV master-data import format and its file type, kept verbatim like its sibling accounting.export_fmt_datev",
+    "reason_category": "product_name"
+  },
+  "appointments.intro_link_crm": {
+    "en_value": "CRM",
+    "note": "the acronym CRM, written the same way in every locale including ru",
+    "reason_category": "acronym"
+  },
+  "shortcuts.biz_crm": {
+    "en_value": "CRM",
+    "note": "the acronym CRM, written the same way in every locale including ru",
+    "reason_category": "acronym"
+  },
+  "bizonb.size_large": {
+    "en_value": "250+",
+    "note": "company-size headcount range: digits and a range dash, the same in every locale including ru",
+    "reason_category": "symbol"
+  },
+  "bizonb.size_medium": {
+    "en_value": "51–250",
+    "note": "company-size headcount range: digits and a range dash, the same in every locale including ru",
+    "reason_category": "symbol"
+  },
+  "bizonb.size_small": {
+    "en_value": "2–50",
+    "note": "company-size headcount range: digits and a range dash, the same in every locale including ru",
+    "reason_category": "symbol"
   }
 }
