@@ -92,6 +92,7 @@ class PaymentResponse(BaseModel):
     method: str
     reference: str
     gl_entry_id: uuid.UUID | None
+    fx_rate: Decimal | None = None
 
 
 class DocumentSummary(BaseModel):

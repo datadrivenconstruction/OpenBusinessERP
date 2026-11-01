@@ -12,7 +12,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.business_settings import read_business_settings
-from app.modules.gl.fx_posting import FxRateMissingError, rate_for, settlement, settlement_lines
+from app.modules.gl.fx_posting import FxRateMissingError, q_rate, rate_for, settlement, settlement_lines
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
 from app.modules.sales.models import (
@@ -427,11 +427,56 @@ class SalesService:
         from app.modules.inventory.service import SOURCE_DELIVERY, InventoryError, InventoryService
 
         inv = InventoryService(self.session, self.tenant_id)
+            await self._stock_for_invoice(doc, cancel=True, created_by=created_by)
         try:
             if cancel:
                 await inv.cancel_source(SOURCE_DELIVERY, str(doc.id), created_by=created_by)
             else:
-                await inv.deliver_sales_order(doc, created_by=created_by)
+                await inv.deliver_sales_order(doc, created_by=created_by, already=await self._invoiced_stock(doc, inv))
+        except InventoryError as exc:
+            raise SalesConflictError(str(exc)) from exc
+
+    async def _invoiced_stock(self, order: SalesDocument, inv: Any) -> dict[uuid.UUID, Decimal]:
+        """Item -> qty already issued by invoices of this order that skipped delivery."""
+        from app.modules.inventory.service import SOURCE_INVOICE_ISSUE
+
+        out: dict[uuid.UUID, Decimal] = {}
+        ids = (
+            await self.session.execute(
+                select(SalesDocument.id).where(
+                    SalesDocument.tenant_id == self.tenant_id,
+                    SalesDocument.kind == "invoice",
+                    SalesDocument.source_id == order.id,
+                )
+            )
+        ).scalars()
+        for inv_id in ids:
+            for m in await inv._source_moves(SOURCE_INVOICE_ISSUE, str(inv_id)):
+                out[m.item_id] = out.get(m.item_id, ZERO) - Decimal(m.qty)
+        return out
+
+    async def _stock_for_invoice(self, invoice: SalesDocument, *, cancel: bool, created_by: str | None) -> None:
+        """An invoice of an order that was never delivered issues its stock (and COGS) itself, exactly once."""
+        from app.modules.inventory.service import (
+            SOURCE_DELIVERY,
+            SOURCE_INVOICE_ISSUE,
+            InventoryError,
+            InventoryService,
+        )
+
+        if invoice.source_id is None:
+            return
+        order = await self.session.get(SalesDocument, invoice.source_id)
+        if order is None or order.kind != "order" or order.tenant_id != self.tenant_id:
+            return
+        inv = InventoryService(self.session, self.tenant_id)
+        try:
+            if cancel:
+                await inv.cancel_source(SOURCE_INVOICE_ISSUE, str(invoice.id), created_by=created_by)
+            elif not await inv._source_moves(SOURCE_DELIVERY, str(order.id)):
+                await inv.deliver_sales_order(
+                    invoice, created_by=created_by, on=invoice.doc_date, source_type=SOURCE_INVOICE_ISSUE
+                )
         except InventoryError as exc:
             raise SalesConflictError(str(exc)) from exc
 
@@ -817,6 +862,7 @@ class SalesService:
             raise SalesValidationError("Credit note total must be positive")
         inv = await self.get(cn.source_id, "invoice") if cn.source_id else None
         if inv is not None:
+        await self._stock_for_invoice(inv, cancel=False, created_by=created_by)
             if inv.status not in {"issued", "partially_paid", "paid"}:
                 raise SalesConflictError(f"Source invoice {inv.number} is {inv.status}")
             credited = ZERO
@@ -914,6 +960,7 @@ class SalesService:
                     label=f"Payment {inv.number}",
                 )
             except FxRateMissingError as exc:
+            pay.fx_rate = pay_rate if base_amount is None else q_rate(s.base_cash / amount)
                 raise SalesConflictError(str(exc)) from exc
             currency, rate = base_currency(), None
             reference = reference or f"{amount} {inv.currency}"

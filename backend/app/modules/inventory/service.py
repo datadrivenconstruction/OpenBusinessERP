@@ -38,6 +38,7 @@ CENT = Decimal("0.01")
 COST_Q = Decimal("0.000001")
 SOURCE_RECEIPT = "purchasing_receipt"
 SOURCE_DELIVERY = "sales_delivery"
+SOURCE_INVOICE_ISSUE = "sales_invoice_issue"  # invoice issued straight from an undelivered order
 SOURCE_STOCKTAKE = "inventory_stocktake"
 SOURCE_ADJUST = "inventory_adjustment"
 SOURCE_TRANSFER = "inventory_transfer"
@@ -482,11 +483,17 @@ class InventoryService:
         warehouse_id: uuid.UUID | None = None,
         on: date | None = None,
         post_gl: bool = True,
+        source_type: str = SOURCE_DELIVERY,
+        already: dict[uuid.UUID, Decimal] | None = None,
     ) -> list[StockMovement]:
-        """Outbound movements for the order's stock-tracked lines plus one COGS entry at average cost."""
+        """Outbound movements for the document's stock-tracked lines plus one COGS entry at average cost.
+
+        Runs once per (source_type, document); ``already`` maps item -> qty issued earlier by other sources.
+        """
         ids = {ln.item_id for ln in order.lines if ln.item_id}
-        if not ids:
+        if not ids or await self._source_moves(source_type, str(order.id)):
             return []
+        skip = dict(already or {})
         tracked = set(
             (
                 await self.session.execute(
@@ -497,15 +504,20 @@ class InventoryService:
         day = on or date.today()
         moves = []
         for ln in order.lines:
-            if ln.item_id in tracked and ln.qty > 0:
+            qty = Decimal(ln.qty)
+            done = min(qty, skip.get(ln.item_id, ZERO))
+            if done > 0:
+                skip[ln.item_id] -= done
+                qty -= done
+            if ln.item_id in tracked and qty > 0:
                 moves.append(
                     await self.move(
                         ln.item_id,
-                        -Decimal(ln.qty),
+                        -qty,
                         "delivery",
                         warehouse_id=warehouse_id,
                         move_date=day,
-                        source_type=SOURCE_DELIVERY,
+                        source_type=source_type,
                         source_id=str(order.id),
                         source_number=order.number,
                         notes=order.customer_name or "",

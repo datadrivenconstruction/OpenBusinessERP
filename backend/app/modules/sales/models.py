@@ -127,6 +127,8 @@ class SalesPayment(Base):
     amount: Mapped[Decimal] = mapped_column(MONEY, nullable=False)
     method: Mapped[str] = mapped_column(String(32), nullable=False, default="bank_transfer")
     reference: Mapped[str] = mapped_column(String(128), nullable=False, default="")
+    # Base units per one document-currency unit on the payment date (None for base-currency documents).
+    fx_rate: Mapped[Decimal | None] = mapped_column(Numeric(20, 10), nullable=True)
     gl_entry_id: Mapped[uuid.UUID | None] = mapped_column(GUID(), nullable=True)
 
     invoice: Mapped[SalesDocument] = relationship(back_populates="payments", lazy="raise_on_sql")

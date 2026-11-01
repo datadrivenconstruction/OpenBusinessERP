@@ -27,6 +27,7 @@ from app.modules.banking.models import (
     BankTransaction,
 )
 from app.modules.banking.parsers import StatementParseError, detect_format, parse_opening_balance, parse_statement
+from app.modules.gl.fx_posting import FxRateMissingError, resolve_doc_rate
 from app.modules.gl.models import DEFAULT_TENANT, ENTRY_POSTED, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency, money
 from app.modules.sales.models import SalesDocument, SalesPayment
@@ -498,6 +499,7 @@ class BankingService:
                         LineInput(wo_id if incoming else bank_gl, credit=leftover, description="Bank difference"),
                     ],
                     currency=txn.currency,
+                    fx_rate=await self._txn_rate(txn),
                     memo=f"Bank difference {ref}".strip(),
                     source_type=SOURCE_BANK,
                     source_id=str(txn.id),
@@ -540,29 +542,23 @@ class BankingService:
                 method=method,
                 created_by=by,
                 base_amount=base_amt,
+                credit_account_id=bank_gl,
             )
         except Exception as exc:  # purchasing has its own error hierarchy
             if exc.__class__.__name__.startswith("Purchasing"):
                 raise BankingConflictError(str(exc)) from exc
             raise
-        role_bank = (await svc._accounts("bank"))["bank"]
-        if role_bank != bank_gl:
-            await self.gl.create_entry(
-                entry_date=txn.booking_date,
-                lines=[
-                    LineInput(role_bank, debit=amount, description=f"Reclass {bill.number}"),
-                    LineInput(bank_gl, credit=amount, description=f"Reclass {bill.number}"),
-                ],
-                currency=txn.currency if bill.currency != txn.currency else bill.currency,
-                fx_rate=None if bill.currency != txn.currency else bill.fx_rate,
-                memo=f"Bank account reclass {bill.number}",
-                source_type=SOURCE_BANK,
-                source_id=str(txn.id),
-                created_by=by,
-                post=True,
-            )
         await self._learn_iban(txn, partner_key(bill.supplier_id, bill.supplier_name), bill.supplier_name)
         return bill.payments[-1].gl_entry_id, bill.number, bill.gross_total - bill.amount_paid
+
+    async def _txn_rate(self, txn: BankTransaction) -> Decimal | None:
+        """Booking-date register rate for a foreign-currency bank line (None in base currency)."""
+        if txn.currency.upper() == base_currency():
+            return None
+        try:
+            return await resolve_doc_rate(self.session, txn.currency, txn.booking_date)
+        except FxRateMissingError as exc:
+            raise BankingConflictError(f"{exc} (FX register) before booking this {txn.currency} line") from exc
 
     @staticmethod
     def _cross(txn: BankTransaction, doc_ccy: str, a: AllocationIn) -> tuple[Decimal, Decimal | None]:
@@ -681,6 +677,7 @@ class BankingService:
                     LineInput(contra if incoming else bank_gl, credit=amt, description=text[:200]),
                 ],
                 currency=txn.currency,
+                fx_rate=await self._txn_rate(txn),
                 memo=f"Bank: {text}"[:500],
                 source_type=SOURCE_BANK,
                 source_id=str(txn.id),

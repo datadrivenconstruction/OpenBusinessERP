@@ -34,6 +34,7 @@ from typing import Any, TypeVar
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
 
 from app.dependencies import CurrentCompanyTenantId, CurrentUserId, RequirePermission, SessionDep
+from app.modules.gl import fx_revaluation
 from app.modules.gl.schemas import (
     AccountCreate,
     AccountResponse,
@@ -43,6 +44,7 @@ from app.modules.gl.schemas import (
     EntryUpdate,
     FiscalYearCreate,
     FiscalYearResponse,
+    FxRevaluationRequest,
     PeriodResponse,
     PeriodStatusRequest,
     ReverseRequest,
@@ -163,6 +165,27 @@ async def set_period_status(
     _perm: None = Depends(RequirePermission("gl.manage")),
 ):
     return await _call(svc.set_period_status(period_id, body.status))
+
+
+# ── Period-end FX revaluation ─────────────────────────────────────────────
+@router.post("/fx-revaluation/preview/")
+async def fx_revaluation_preview(
+    body: FxRevaluationRequest,
+    _user_id: CurrentUserId,
+    svc: GLService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("gl.read")),
+):
+    return await _call(fx_revaluation.preview(svc.session, svc.tenant_id, body.period_end, body.rates))
+
+
+@router.post("/fx-revaluation/")
+async def fx_revaluation_post(
+    body: FxRevaluationRequest,
+    user_id: CurrentUserId,
+    svc: GLService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("gl.manage")),
+):
+    return await _call(fx_revaluation.post(svc.session, svc.tenant_id, body.period_end, body.rates, user_id))
 
 
 # ── Entries ───────────────────────────────────────────────────────────────

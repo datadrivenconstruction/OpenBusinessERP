@@ -149,3 +149,9 @@ class EntryResponse(BaseModel):
     reversal_of_id: uuid.UUID | None
     reversed_by_id: uuid.UUID | None
     lines: list[LineResponse]
+
+
+class FxRevaluationRequest(BaseModel):
+    period_end: date
+    # Closing rate overrides per currency (base units per one unit); others come from the FX register.
+    rates: dict[str, Decimal] | None = None

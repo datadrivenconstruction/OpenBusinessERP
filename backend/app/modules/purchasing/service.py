@@ -11,7 +11,14 @@ from typing import Any
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.gl.fx_posting import FxRateMissingError, rate_for, settlement, settlement_lines
+from app.modules.gl.fx_posting import (
+    FxRateMissingError,
+    fx_account_ids,
+    q_rate,
+    rate_for,
+    settlement,
+    settlement_lines,
+)
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
 from app.modules.purchasing.models import (
@@ -222,13 +229,22 @@ class PurchasingService:
             out[role] = acc.id
         return out
 
-    async def _post(self, doc: Any, lines: list[LineInput], memo: str, source: str, source_id: str, by: str | None):
+    async def _post(
+        self,
+        doc: Any,
+        lines: list[LineInput],
+        memo: str,
+        source: str,
+        source_id: str,
+        by: str | None,
+        base: bool = False,
+    ):
         return await self._gl(
             self.gl.create_entry(
                 entry_date=doc.doc_date,
                 lines=lines,
-                currency=doc.currency,
-                fx_rate=doc.fx_rate,
+                currency=base_currency() if base else doc.currency,
+                fx_rate=None if base else doc.fx_rate,
                 memo=memo,
                 source_type=source,
                 source_id=source_id,
@@ -726,8 +742,11 @@ class PurchasingService:
             return bill
 
         po_lines: dict[uuid.UUID, PurchasingOrderLine] = {}
+        po_rate = bill.fx_rate
         if bill.order_id:
-            po_lines = {pl.id: pl for pl in (await self.get_order(bill.order_id)).lines}
+            po = await self.get_order(bill.order_id)
+            po_lines = {pl.id: pl for pl in po.lines}
+            po_rate = po.fx_rate or bill.fx_rate
         grni = ZERO
         for ln in bill.lines:
             pl = po_lines.get(ln.order_line_id) if ln.order_line_id else None
@@ -747,11 +766,46 @@ class PurchasingService:
         lines.append(
             LineInput(acc["payables"], credit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip())
         )
-        entry = await self._post(bill, lines, f"Supplier bill {num}", SOURCE_BILL, str(bill.id), created_by)
+        base = bool(grni) and bill.currency != base_currency() and po_rate != bill.fx_rate
+        if base:
+            lines = await self._bill_lines_base(bill, acc, grni, expense, po_rate)
+        entry = await self._post(bill, lines, f"Supplier bill {num}", SOURCE_BILL, str(bill.id), created_by, base)
         bill.gl_entry_id = entry.id
         bill.status = "posted"
         await self.session.flush()
         return bill
+
+    async def _bill_lines_base(
+        self, bill: PurchasingBill, acc: dict[str, uuid.UUID], grni: Decimal, expense: Decimal, po_rate: Decimal
+    ) -> list[LineInput]:
+        """Bill in base currency when the receipt (PO) rate differs from the bill rate.
+
+        GRNI is cleared at the receipt rate it was booked at, payable/VAT/expense at the bill rate; the
+        rate-only difference goes to the FX difference account (price variance stays in expense).
+        """
+        num, r = bill.number, bill.fx_rate
+        grni_b = money(grni * po_rate)
+        exp_b = money(expense * r)
+        tax_b = money(bill.tax_total * r)
+        payable = money(bill.gross_total * r)
+        lines = [LineInput(acc["grni"], debit=grni_b, description=f"{num} GRNI")]
+        if exp_b:
+            lines.append(_signed(acc["expense"], exp_b, num))
+        if tax_b:
+            lines.append(LineInput(acc["input_vat"], debit=tax_b, description=f"{num} VAT"))
+        lines.append(LineInput(acc["payables"], credit=payable, description=f"{num} {bill.supplier_name}".strip()))
+        loss = payable - grni_b - exp_b - tax_b
+        if loss:
+            gain_id, loss_id = await fx_account_ids(self.session, self.tenant_id)
+            fx_acc = loss_id if loss > 0 else gain_id
+            if fx_acc is None:
+                raise PurchasingConflictError("FX gain/loss account is missing from the chart of accounts")
+            lines.append(
+                LineInput(fx_acc, debit=loss, description=f"{num} FX GRNI")
+                if loss > 0
+                else LineInput(fx_acc, credit=-loss, description=f"{num} FX GRNI")
+            )
+        return lines
 
     async def cancel_bill(self, bill_id: uuid.UUID, created_by: str | None = None) -> PurchasingBill:
         bill = await self.get_bill(bill_id)
@@ -784,8 +838,11 @@ class PurchasingService:
         created_by: str | None = None,
         fx_rate: Any = None,
         base_amount: Any = None,
+        credit_account_id: uuid.UUID | None = None,
     ) -> PurchasingBill:
-        """Foreign bills: cash at payment rate (or actual ``base_amount``), payable cleared at bill rate."""
+        """Foreign bills: cash at payment rate (or actual ``base_amount``), payable cleared at bill rate.
+
+        ``credit_account_id`` overrides the bank role (a specific bank account or a write-off account)."""
         bill = await self.get_bill(bill_id, "bill")
         if bill.status not in {"posted", "partially_paid"}:
             raise PurchasingConflictError(f"Payments need a posted bill (is {bill.status})")
@@ -794,6 +851,8 @@ class PurchasingService:
         if amount <= 0 or amount > outstanding:
             raise PurchasingValidationError(f"Payment must be between 0.01 and the outstanding {outstanding}")
         acc = await self._accounts("payables", "bank")
+        if credit_account_id is not None:
+            acc["bank"] = credit_account_id
         pay = PurchasingPayment(
             tenant_id=self.tenant_id,
             pay_date=pay_date or date.today(),
@@ -811,6 +870,7 @@ class PurchasingService:
         if bill.currency != base_currency():
             pay_rate = Decimal(1) if base_amount is not None else await self._rate(bill.currency, pay.pay_date, fx_rate)
             s = settlement(amount, bill.fx_rate, pay_rate, money(base_amount) if base_amount is not None else None)
+            pay.fx_rate = pay_rate if base_amount is None else q_rate(s.base_cash / amount)
             try:
                 lines = await settlement_lines(
                     self.session,
