@@ -44387,6 +44387,10 @@ const resource = {
     "settings.hub_numbering_empty": "Nummerdatud dokumente veel pole. Numbrid ilmuvad pärast esimest pakkumist või arvet.",
     "settings.hub_numbering_error": "Numeratsioon pole selle ettevõtte jaoks veel saadaval.",
     "settings.hub_search_label": "Otsi sätteid",
+    "datefield.open_calendar": "Ava kalender",
+    "datefield.prev_month": "Eelmine kuu",
+    "datefield.next_month": "Järgmine kuu",
+    "datefield.invalid": "Sisestage kuupäev kujul {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

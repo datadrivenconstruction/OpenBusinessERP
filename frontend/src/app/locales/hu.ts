@@ -44394,6 +44394,10 @@ const resource = {
     "settings.hub_numbering_empty": "Még nincs számozott dokumentum. A számok az első árajánlat vagy számla után jelennek meg.",
     "settings.hub_numbering_error": "A számozás ehhez a céghez még nem érhető el.",
     "settings.hub_search_label": "Beállítások keresése",
+    "datefield.open_calendar": "Naptár megnyitása",
+    "datefield.prev_month": "Előző hónap",
+    "datefield.next_month": "Következő hónap",
+    "datefield.invalid": "Adja meg a dátumot ebben a formában: {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

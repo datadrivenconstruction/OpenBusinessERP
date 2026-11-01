@@ -44716,6 +44716,10 @@ const resource = {
     "settings.hub_numbering_empty": "Încă nu există documente numerotate. Numerele apar după prima ofertă sau factură.",
     "settings.hub_numbering_error": "Numerotarea nu este încă disponibilă pentru această firmă.",
     "settings.hub_search_label": "Caută în setări",
+    "datefield.open_calendar": "Deschide calendarul",
+    "datefield.prev_month": "Luna anterioară",
+    "datefield.next_month": "Luna următoare",
+    "datefield.invalid": "Introduceți o dată în formatul {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

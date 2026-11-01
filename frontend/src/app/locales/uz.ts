@@ -44399,6 +44399,10 @@ const resource = {
     "settings.hub_numbering_empty": "Hozircha raqamlangan hujjatlar yo‘q. Raqamlar birinchi taklif yoki hisob-fakturadan keyin paydo bo‘ladi.",
     "settings.hub_numbering_error": "Bu kompaniya uchun raqamlash hali mavjud emas.",
     "settings.hub_search_label": "Sozlamalarni qidirish",
+    "datefield.open_calendar": "Kalendarni ochish",
+    "datefield.prev_month": "Oldingi oy",
+    "datefield.next_month": "Keyingi oy",
+    "datefield.invalid": "Sanani {{pattern}} formatida kiriting",
   }
 } as { translation: Record<string, string> };
 

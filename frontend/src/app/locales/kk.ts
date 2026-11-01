@@ -44400,6 +44400,10 @@ const resource = {
     "settings.hub_numbering_empty": "Нөмірленген құжаттар әлі жоқ. Нөмірлер бірінші ұсыныстан немесе шот-фактурадан кейін пайда болады.",
     "settings.hub_numbering_error": "Бұл компания үшін нөмірлеу әлі қолжетімді емес.",
     "settings.hub_search_label": "Параметрлерді іздеу",
+    "datefield.open_calendar": "Күнтізбені ашу",
+    "datefield.prev_month": "Алдыңғы ай",
+    "datefield.next_month": "Келесі ай",
+    "datefield.invalid": "Күнді {{pattern}} форматында енгізіңіз",
   }
 } as { translation: Record<string, string> };
 

@@ -44203,6 +44203,10 @@ const resource = {
     "settings.hub_numbering_empty": "번호가 매겨진 문서가 아직 없습니다. 첫 견적 또는 청구서 이후에 번호가 표시됩니다.",
     "settings.hub_numbering_error": "이 회사에서는 아직 번호 매기기를 사용할 수 없습니다.",
     "settings.hub_search_label": "설정 검색",
+    "datefield.open_calendar": "달력 열기",
+    "datefield.prev_month": "이전 달",
+    "datefield.next_month": "다음 달",
+    "datefield.invalid": "날짜를 {{pattern}} 형식으로 입력하세요",
   }
 } as { translation: Record<string, string> };
 

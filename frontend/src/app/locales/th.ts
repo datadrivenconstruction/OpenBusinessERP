@@ -43949,9 +43949,9 @@ const resource = {
     "payments.provider": "ผู้ให้บริการ",
     "payments.provider_none": "ปิด",
     "payments.clearing_account": "บัญชีพัก (รหัสบัญชีแยกประเภท ไม่บังคับ)",
-    "payments.stripe_key": "Stripe secret key",
-    "payments.stripe_webhook_secret": "Stripe webhook signing secret",
-    "payments.mollie_key": "Mollie API key",
+    "payments.stripe_key": "คีย์ลับของ Stripe",
+    "payments.stripe_webhook_secret": "รหัสลับสำหรับลงนาม Webhook ของ Stripe",
+    "payments.mollie_key": "คีย์ API ของ Mollie",
     "payments.public_base_url": "ที่อยู่สาธารณะของแอปนี้",
     "payments.return_url": "หน้าที่แสดงหลังชำระเงิน (ไม่บังคับ)",
     "payments.webhook_hint": "ที่อยู่ Webhook:",
@@ -44200,6 +44200,10 @@ const resource = {
     "settings.hub_numbering_empty": "ยังไม่มีเอกสารที่มีเลขที่ เลขที่จะปรากฏหลังจากใบเสนอราคาหรือใบแจ้งหนี้แรก",
     "settings.hub_numbering_error": "ยังไม่รองรับการกำหนดเลขที่สำหรับบริษัทนี้",
     "settings.hub_search_label": "ค้นหาการตั้งค่า",
+    "datefield.open_calendar": "เปิดปฏิทิน",
+    "datefield.prev_month": "เดือนก่อนหน้า",
+    "datefield.next_month": "เดือนถัดไป",
+    "datefield.invalid": "กรอกวันที่ในรูปแบบ {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

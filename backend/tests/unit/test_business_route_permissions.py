@@ -24,7 +24,11 @@ BUSINESS_ROUTERS = [
 ]
 
 # (module, method, path) reachable without a permission, each for a stated reason.
-PUBLIC_ROUTES: set[tuple[str, str, str]] = set()
+PUBLIC_ROUTES: set[tuple[str, str, str]] = {
+    # Provider callbacks: Stripe is trusted via its signature HMAC, Mollie by re-fetching the payment with our key.
+    ("app.modules.sales.router", "POST", "/payment-webhooks/stripe/"),
+    ("app.modules.sales.router", "POST", "/payment-webhooks/mollie/"),
+}
 PUBLIC_PATH_MARKERS = ("/public/", "/booking/")
 # Read-only status endpoints any signed-in user may call.
 AUTHENTICATED_ONLY = {

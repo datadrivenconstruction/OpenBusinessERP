@@ -44439,6 +44439,10 @@ const resource = {
     "settings.hub_numbering_empty": "अभी कोई क्रमांकित दस्तावेज़ नहीं। पहले कोटेशन या इनवॉइस के बाद क्रमांक दिखेंगे।",
     "settings.hub_numbering_error": "इस कंपनी के लिए क्रमांकन अभी उपलब्ध नहीं है।",
     "settings.hub_search_label": "सेटिंग खोजें",
+    "datefield.open_calendar": "कैलेंडर खोलें",
+    "datefield.prev_month": "पिछला महीना",
+    "datefield.next_month": "अगला महीना",
+    "datefield.invalid": "तारीख {{pattern}} प्रारूप में दर्ज करें",
   }
 } as { translation: Record<string, string> };
 

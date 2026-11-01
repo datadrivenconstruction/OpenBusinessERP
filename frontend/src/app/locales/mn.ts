@@ -44445,6 +44445,10 @@ const resource = {
     "settings.hub_numbering_empty": "Дугаарласан баримт хараахан алга. Дугаарууд эхний үнийн санал эсвэл нэхэмжлэлийн дараа гарна.",
     "settings.hub_numbering_error": "Энэ компанид дугаарлалт хараахан боломжгүй байна.",
     "settings.hub_search_label": "Тохиргоо хайх",
+    "datefield.open_calendar": "Календарь нээх",
+    "datefield.prev_month": "Өмнөх сар",
+    "datefield.next_month": "Дараагийн сар",
+    "datefield.invalid": "Огноог {{pattern}} форматаар оруулна уу",
   }
 } as { translation: Record<string, string> };
 

@@ -44203,6 +44203,10 @@ const resource = {
     "settings.hub_numbering_empty": "採番された文書はまだありません。最初の見積または請求書の後に番号が表示されます。",
     "settings.hub_numbering_error": "この会社ではまだ採番を利用できません。",
     "settings.hub_search_label": "設定を検索",
+    "datefield.open_calendar": "カレンダーを開く",
+    "datefield.prev_month": "前の月",
+    "datefield.next_month": "次の月",
+    "datefield.invalid": "日付を {{pattern}} の形式で入力してください",
   }
 } as { translation: Record<string, string> };
 

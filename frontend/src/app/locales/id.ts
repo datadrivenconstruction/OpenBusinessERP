@@ -44199,6 +44199,10 @@ const resource = {
     "settings.hub_numbering_empty": "Belum ada dokumen bernomor. Nomor muncul setelah penawaran atau faktur pertama.",
     "settings.hub_numbering_error": "Penomoran belum tersedia untuk perusahaan ini.",
     "settings.hub_search_label": "Cari pengaturan",
+    "datefield.open_calendar": "Buka kalender",
+    "datefield.prev_month": "Bulan sebelumnya",
+    "datefield.next_month": "Bulan berikutnya",
+    "datefield.invalid": "Masukkan tanggal dengan format {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

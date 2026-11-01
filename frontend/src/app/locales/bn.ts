@@ -44397,6 +44397,10 @@ const resource = {
     "settings.hub_numbering_empty": "এখনও কোনো নম্বরযুক্ত নথি নেই। প্রথম কোটেশন বা ইনভয়েসের পর নম্বর দেখা যাবে।",
     "settings.hub_numbering_error": "এই কোম্পানির জন্য নম্বরিং এখনও উপলব্ধ নয়।",
     "settings.hub_search_label": "সেটিংস খুঁজুন",
+    "datefield.open_calendar": "ক্যালেন্ডার খুলুন",
+    "datefield.prev_month": "আগের মাস",
+    "datefield.next_month": "পরের মাস",
+    "datefield.invalid": "তারিখ লিখুন {{pattern}} ফরম্যাটে",
   }
 } as { translation: Record<string, string> };
 

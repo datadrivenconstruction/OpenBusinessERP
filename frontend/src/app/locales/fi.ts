@@ -44440,6 +44440,10 @@ const resource = {
     "settings.hub_numbering_empty": "Ei vielä numeroituja asiakirjoja. Numerot ilmestyvät ensimmäisen tarjouksen tai laskun jälkeen.",
     "settings.hub_numbering_error": "Numerointi ei ole vielä käytettävissä tälle yritykselle.",
     "settings.hub_search_label": "Hae asetuksia",
+    "datefield.open_calendar": "Avaa kalenteri",
+    "datefield.prev_month": "Edellinen kuukausi",
+    "datefield.next_month": "Seuraava kuukausi",
+    "datefield.invalid": "Anna päivämäärä muodossa {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

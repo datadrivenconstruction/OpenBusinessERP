@@ -44553,6 +44553,10 @@ const resource = {
     "settings.hub_numbering_empty": "Номерленген документтер азырынча жок. Номерлер биринчи сунуштан же эсеп-фактурадан кийин пайда болот.",
     "settings.hub_numbering_error": "Бул компания үчүн номерлөө азырынча жеткиликтүү эмес.",
     "settings.hub_search_label": "Жөндөөлөрдү издөө",
+    "datefield.open_calendar": "Күнтизмени ачуу",
+    "datefield.prev_month": "Мурунку ай",
+    "datefield.next_month": "Кийинки ай",
+    "datefield.invalid": "Датаны {{pattern}} форматында киргизиңиз",
   }
 } as { translation: Record<string, string> };
 

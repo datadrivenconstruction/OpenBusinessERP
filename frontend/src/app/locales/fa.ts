@@ -44399,6 +44399,10 @@ const resource = {
     "settings.hub_numbering_empty": "هنوز سند شماره‌دار نیست. شماره‌ها پس از اولین پیش‌فاکتور یا فاکتور ظاهر می‌شوند.",
     "settings.hub_numbering_error": "شماره‌گذاری هنوز برای این شرکت در دسترس نیست.",
     "settings.hub_search_label": "جستجوی تنظیمات",
+    "datefield.open_calendar": "باز کردن تقویم",
+    "datefield.prev_month": "ماه قبل",
+    "datefield.next_month": "ماه بعد",
+    "datefield.invalid": "تاریخ را به صورت {{pattern}} وارد کنید",
   }
 } as { translation: Record<string, string> };
 

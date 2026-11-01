@@ -38794,6 +38794,10 @@ const resource = {
     "settings.hub_numbering_empty": "Ainda não há documentos numerados. Os números aparecem após o primeiro orçamento ou fatura.",
     "settings.hub_numbering_error": "A numeração ainda não está disponível para esta empresa.",
     "settings.hub_search_label": "Pesquisar configurações",
+    "datefield.open_calendar": "Abrir calendário",
+    "datefield.prev_month": "Mês anterior",
+    "datefield.next_month": "Próximo mês",
+    "datefield.invalid": "Digite uma data no formato {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

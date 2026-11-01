@@ -44442,6 +44442,10 @@ const resource = {
     "settings.hub_numbering_empty": "Nog geen genummerde documenten. Nummers verschijnen na de eerste offerte of factuur.",
     "settings.hub_numbering_error": "Nummering is nog niet beschikbaar voor dit bedrijf.",
     "settings.hub_search_label": "Instellingen zoeken",
+    "datefield.open_calendar": "Kalender openen",
+    "datefield.prev_month": "Vorige maand",
+    "datefield.next_month": "Volgende maand",
+    "datefield.invalid": "Voer een datum in als {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

@@ -77,6 +77,7 @@ nav:
       - Email and PDF templates: manual/templates.md
   - Money:
       - Banking and reconciliation: manual/banking.md
+      - Online payments: payments.md
       - Dunning: manual/dunning.md
       - Multi-currency and revaluation: manual/multi-currency.md
       - DATEV and SAF-T export: manual/accountant-export.md

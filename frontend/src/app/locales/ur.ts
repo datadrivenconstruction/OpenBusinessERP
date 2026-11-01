@@ -44399,6 +44399,10 @@ const resource = {
     "settings.hub_numbering_empty": "ابھی کوئی نمبر والی دستاویز نہیں۔ پہلی کوٹیشن یا انوائس کے بعد نمبر ظاہر ہوں گے۔",
     "settings.hub_numbering_error": "اس کمپنی کے لیے نمبرنگ ابھی دستیاب نہیں۔",
     "settings.hub_search_label": "ترتیبات تلاش کریں",
+    "datefield.open_calendar": "کیلنڈر کھولیں",
+    "datefield.prev_month": "پچھلا مہینہ",
+    "datefield.next_month": "اگلا مہینہ",
+    "datefield.invalid": "تاریخ {{pattern}} کی شکل میں درج کریں",
   }
 } as { translation: Record<string, string> };
 

@@ -44399,6 +44399,10 @@ const resource = {
     "settings.hub_numbering_empty": "Δεν υπάρχουν ακόμη αριθμημένα έγγραφα. Οι αριθμοί εμφανίζονται μετά την πρώτη προσφορά ή το πρώτο τιμολόγιο.",
     "settings.hub_numbering_error": "Η αρίθμηση δεν είναι ακόμη διαθέσιμη για αυτήν την εταιρεία.",
     "settings.hub_search_label": "Αναζήτηση ρυθμίσεων",
+    "datefield.open_calendar": "Άνοιγμα ημερολογίου",
+    "datefield.prev_month": "Προηγούμενος μήνας",
+    "datefield.next_month": "Επόμενος μήνας",
+    "datefield.invalid": "Εισαγάγετε ημερομηνία ως {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

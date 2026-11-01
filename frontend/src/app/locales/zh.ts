@@ -44202,6 +44202,10 @@ const resource = {
     "settings.hub_numbering_empty": "暂无编号文档。首张报价单或发票之后会出现编号。",
     "settings.hub_numbering_error": "此公司暂不支持编号。",
     "settings.hub_search_label": "搜索设置",
+    "datefield.open_calendar": "打开日历",
+    "datefield.prev_month": "上个月",
+    "datefield.next_month": "下个月",
+    "datefield.invalid": "请按 {{pattern}} 格式输入日期",
   }
 } as { translation: Record<string, string> };
 

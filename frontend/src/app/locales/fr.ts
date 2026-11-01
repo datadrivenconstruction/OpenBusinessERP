@@ -44726,6 +44726,10 @@ const resource = {
     "settings.hub_numbering_empty": "Aucun document numéroté pour l'instant. Les numéros apparaissent après le premier devis ou la première facture.",
     "settings.hub_numbering_error": "La numérotation n'est pas encore disponible pour cette entreprise.",
     "settings.hub_search_label": "Rechercher dans les paramètres",
+    "datefield.open_calendar": "Ouvrir le calendrier",
+    "datefield.prev_month": "Mois précédent",
+    "datefield.next_month": "Mois suivant",
+    "datefield.invalid": "Saisissez une date au format {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

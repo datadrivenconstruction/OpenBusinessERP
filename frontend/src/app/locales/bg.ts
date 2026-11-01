@@ -44440,6 +44440,10 @@ const resource = {
     "settings.hub_numbering_empty": "Все още няма номерирани документи. Номерата се появяват след първата оферта или фактура.",
     "settings.hub_numbering_error": "Номерацията още не е налична за тази фирма.",
     "settings.hub_search_label": "Търсене в настройките",
+    "datefield.open_calendar": "Отваряне на календара",
+    "datefield.prev_month": "Предишен месец",
+    "datefield.next_month": "Следващ месец",
+    "datefield.invalid": "Въведете дата във формат {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

@@ -5228,7 +5228,7 @@ const resource = {
     "boq.markup_percentage": "%",
     "boq.markup_amount": "Importo",
     "boq.markup_active": "Attivo",
-    "boq.markup_override": "Override",
+    "boq.markup_override": "Ricarico personalizzato",
     "boq.markup_override_hint": "Sostituisce la riga dell'intero computo metrico, solo in questa sezione",
     "boq.markup_section_only": "Solo questa sezione",
     "boq.markup_section_only_hint": "Si applica solo a questa sezione",
@@ -42296,7 +42296,7 @@ const resource = {
     "bizonb.ind_restaurant_cafe": "Ristorante e caffè",
     "bizonb.ind_restaurant_cafe_desc": "Ristoranti, caffè, bar e catering: menù, fornitori, food cost, controlli igienici ed eventi.",
     "bizonb.ind_restaurant_cafe_tax": "Cibi e bevande serviti sul posto sono soggetti all'aliquota ordinaria; il cibo da asporto ha spesso un'aliquota ridotta (DE: 7 %).",
-    "bizonb.tag_food_cost": "Food cost",
+    "bizonb.tag_food_cost": "Costo delle materie prime",
     "bizonb.tag_events": "Eventi",
     "bizonb.ind_small_hotel": "Hotel e pensione",
     "bizonb.ind_small_hotel_desc": "Piccoli hotel, pensioni e case vacanza: ospiti, notti, gruppi, pulizie e manutenzione.",
@@ -44393,7 +44393,7 @@ const resource = {
     "payments.mode_live": "Modalità live",
     "payments.desc": "Aggiunge un link di pagamento online alle fatture inviate (e-mail e PDF). Le fatture pagate vengono registrate automaticamente sul conto transitorio. Le chiavi sono memorizzate cifrate.",
     "payments.admin_only": "Solo un amministratore può modificare le impostazioni di pagamento.",
-    "payments.provider": "Provider",
+    "payments.provider": "Fornitore",
     "payments.provider_none": "Disattivato",
     "payments.clearing_account": "Conto transitorio (codice contabile, facoltativo)",
     "payments.stripe_key": "Chiave segreta Stripe",
@@ -44724,6 +44724,10 @@ const resource = {
     "settings.hub_numbering_empty": "Ancora nessun documento numerato. I numeri compaiono dopo il primo preventivo o la prima fattura.",
     "settings.hub_numbering_error": "La numerazione non è ancora disponibile per questa azienda.",
     "settings.hub_search_label": "Cerca nelle impostazioni",
+    "datefield.open_calendar": "Apri calendario",
+    "datefield.prev_month": "Mese precedente",
+    "datefield.next_month": "Mese successivo",
+    "datefield.invalid": "Inserisci una data come {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

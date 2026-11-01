@@ -44995,6 +44995,10 @@ const resource = {
     "settings.hub_numbering_empty": "Zatím žádné číslované dokumenty. Čísla se objeví po první nabídce nebo faktuře.",
     "settings.hub_numbering_error": "Číslování zatím není pro tuto firmu k dispozici.",
     "settings.hub_search_label": "Hledat v nastavení",
+    "datefield.open_calendar": "Otevřít kalendář",
+    "datefield.prev_month": "Předchozí měsíc",
+    "datefield.next_month": "Další měsíc",
+    "datefield.invalid": "Zadejte datum ve formátu {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

@@ -44726,6 +44726,10 @@ const resource = {
     "settings.hub_numbering_empty": "Još nema numeriranih dokumenata. Brojevi se pojavljuju nakon prve ponude ili računa.",
     "settings.hub_numbering_error": "Numeriranje još nije dostupno za ovu tvrtku.",
     "settings.hub_search_label": "Pretraži postavke",
+    "datefield.open_calendar": "Otvori kalendar",
+    "datefield.prev_month": "Prethodni mjesec",
+    "datefield.next_month": "Sljedeći mjesec",
+    "datefield.invalid": "Unesite datum u obliku {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

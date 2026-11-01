@@ -44955,6 +44955,10 @@ const resource = {
     "settings.hub_numbering_empty": "Нумерованих документів ще немає. Номери з’являються після першої пропозиції або рахунку.",
     "settings.hub_numbering_error": "Нумерація ще недоступна для цієї компанії.",
     "settings.hub_search_label": "Пошук налаштувань",
+    "datefield.open_calendar": "Відкрити календар",
+    "datefield.prev_month": "Попередній місяць",
+    "datefield.next_month": "Наступний місяць",
+    "datefield.invalid": "Введіть дату у форматі {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

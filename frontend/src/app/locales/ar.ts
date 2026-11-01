@@ -45552,6 +45552,10 @@ const resource = {
     "settings.hub_numbering_empty": "لا توجد مستندات مرقمة بعد. تظهر الأرقام بعد أول عرض سعر أو فاتورة.",
     "settings.hub_numbering_error": "الترقيم غير متاح لهذه الشركة بعد.",
     "settings.hub_search_label": "بحث في الإعدادات",
+    "datefield.open_calendar": "فتح التقويم",
+    "datefield.prev_month": "الشهر السابق",
+    "datefield.next_month": "الشهر التالي",
+    "datefield.invalid": "أدخل التاريخ بالصيغة {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

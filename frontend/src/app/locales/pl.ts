@@ -44996,6 +44996,10 @@ const resource = {
     "settings.hub_numbering_empty": "Brak numerowanych dokumentów. Numery pojawią się po pierwszej ofercie lub fakturze.",
     "settings.hub_numbering_error": "Numeracja nie jest jeszcze dostępna dla tej firmy.",
     "settings.hub_search_label": "Szukaj w ustawieniach",
+    "datefield.open_calendar": "Otwórz kalendarz",
+    "datefield.prev_month": "Poprzedni miesiąc",
+    "datefield.next_month": "Następny miesiąc",
+    "datefield.invalid": "Wpisz datę w formacie {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

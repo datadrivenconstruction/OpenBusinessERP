@@ -44442,6 +44442,10 @@ const resource = {
     "settings.hub_numbering_empty": "Henüz numaralandırılmış belge yok. Numaralar ilk teklif veya faturadan sonra görünür.",
     "settings.hub_numbering_error": "Numaralandırma bu şirket için henüz kullanılamıyor.",
     "settings.hub_search_label": "Ayarlarda ara",
+    "datefield.open_calendar": "Takvimi aç",
+    "datefield.prev_month": "Önceki ay",
+    "datefield.next_month": "Sonraki ay",
+    "datefield.invalid": "Tarihi {{pattern}} biçiminde girin",
   }
 } as { translation: Record<string, string> };
 

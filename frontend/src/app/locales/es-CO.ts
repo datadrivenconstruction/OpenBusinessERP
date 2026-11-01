@@ -38834,6 +38834,10 @@ const resource = {
     "settings.hub_numbering_empty": "Aún no hay documentos numerados. Los números aparecen tras el primer presupuesto o factura.",
     "settings.hub_numbering_error": "La numeración aún no está disponible para esta empresa.",
     "settings.hub_search_label": "Buscar ajustes",
+    "datefield.open_calendar": "Abrir calendario",
+    "datefield.prev_month": "Mes anterior",
+    "datefield.next_month": "Mes siguiente",
+    "datefield.invalid": "Ingresa una fecha como {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

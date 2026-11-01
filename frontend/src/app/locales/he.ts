@@ -44678,6 +44678,10 @@ const resource = {
     "settings.hub_numbering_empty": "עדיין אין מסמכים ממוספרים. המספרים מופיעים לאחר הצעת המחיר או החשבונית הראשונה.",
     "settings.hub_numbering_error": "מספור עדיין אינו זמין עבור חברה זו.",
     "settings.hub_search_label": "חיפוש הגדרות",
+    "datefield.open_calendar": "פתח לוח שנה",
+    "datefield.prev_month": "החודש הקודם",
+    "datefield.next_month": "החודש הבא",
+    "datefield.invalid": "הזן תאריך בפורמט {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

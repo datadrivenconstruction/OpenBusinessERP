@@ -44436,6 +44436,10 @@ const resource = {
     "settings.hub_numbering_empty": "Ingen nummererte dokumenter ennå. Numre vises etter det første tilbudet eller fakturaen.",
     "settings.hub_numbering_error": "Nummerering er ikke tilgjengelig for dette firmaet ennå.",
     "settings.hub_search_label": "Søk i innstillinger",
+    "datefield.open_calendar": "Åpne kalender",
+    "datefield.prev_month": "Forrige måned",
+    "datefield.next_month": "Neste måned",
+    "datefield.invalid": "Skriv inn en dato som {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

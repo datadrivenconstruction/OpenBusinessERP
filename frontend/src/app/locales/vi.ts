@@ -44208,6 +44208,10 @@ const resource = {
     "settings.hub_numbering_empty": "Chưa có tài liệu được đánh số. Số sẽ xuất hiện sau báo giá hoặc hóa đơn đầu tiên.",
     "settings.hub_numbering_error": "Chức năng đánh số chưa khả dụng cho công ty này.",
     "settings.hub_search_label": "Tìm cài đặt",
+    "datefield.open_calendar": "Mở lịch",
+    "datefield.prev_month": "Tháng trước",
+    "datefield.next_month": "Tháng sau",
+    "datefield.invalid": "Nhập ngày theo định dạng {{pattern}}",
   }
 } as { translation: Record<string, string> };
 

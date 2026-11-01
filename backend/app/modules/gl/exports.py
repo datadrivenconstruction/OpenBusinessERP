@@ -610,8 +610,13 @@ async def collect(session: Any, tenant_id: str, date_from: date, date_to: date) 
             year=pstart.year,
             lines=[
                 XLine(
-                    accounts[ln.account_id].code, ln.base_debit, ln.base_credit, ln.description, ln.tax_code,
-                    ln.cost_center or "", projects.get(ln.project_id, "") if ln.project_id else "",
+                    accounts[ln.account_id].code,
+                    ln.base_debit,
+                    ln.base_credit,
+                    ln.description,
+                    ln.tax_code,
+                    ln.cost_center or "",
+                    projects.get(ln.project_id, "") if ln.project_id else "",
                 )
                 for ln in e.lines
             ],
@@ -664,14 +669,21 @@ async def _entry_partners(session: Any, sources: list[tuple[str | None, str | No
     sdocs = ids("sales_invoice", "sales_credit_note")
     spays = ids("sales_payment")
     if spays:
-        pay_map = dict((await session.execute(
-            select(SalesPayment.id, SalesPayment.invoice_id).where(SalesPayment.id.in_(spays)))).all())
+        pay_map = dict(
+            (
+                await session.execute(
+                    select(SalesPayment.id, SalesPayment.invoice_id).where(SalesPayment.id.in_(spays))
+                )
+            ).all()
+        )
         sdocs |= set(pay_map.values())
     else:
         pay_map = {}
     docs = {}
     if sdocs:
-        docs = {d.id: d for d in (await session.execute(select(SalesDocument).where(SalesDocument.id.in_(sdocs)))).scalars()}
+        docs = {
+            d.id: d for d in (await session.execute(select(SalesDocument).where(SalesDocument.id.in_(sdocs)))).scalars()
+        }
     for did, d in docs.items():
         if d.customer_id:
             info = (str(d.customer_id), d.due_date, d.delivery_end or d.delivery_date, d.customer_vat_id or "")
@@ -684,12 +696,20 @@ async def _entry_partners(session: Any, sources: list[tuple[str | None, str | No
     bpays = ids("purchasing_payment")
     bpay_map = {}
     if bpays:
-        bpay_map = dict((await session.execute(
-            select(PurchasingPayment.id, PurchasingPayment.bill_id).where(PurchasingPayment.id.in_(bpays)))).all())
+        bpay_map = dict(
+            (
+                await session.execute(
+                    select(PurchasingPayment.id, PurchasingPayment.bill_id).where(PurchasingPayment.id.in_(bpays))
+                )
+            ).all()
+        )
         bdocs |= set(bpay_map.values())
     bills = {}
     if bdocs:
-        bills = {b.id: b for b in (await session.execute(select(PurchasingBill).where(PurchasingBill.id.in_(bdocs)))).scalars()}
+        bills = {
+            b.id: b
+            for b in (await session.execute(select(PurchasingBill).where(PurchasingBill.id.in_(bdocs)))).scalars()
+        }
     for bid, b in bills.items():
         if b.supplier_id:
             info = (str(b.supplier_id), b.due_date, None, "")
