@@ -52,7 +52,7 @@ Stop the program, then copy the whole data directory. Copying the database folde
 
 Restore by putting the folder back while the program is stopped.
 
-The desktop app also runs an embedded database. This manual does not state where the desktop app keeps its data folder, because the desktop guide does not say. Check where it is on your machine before you rely on a copy.
+The desktop app keeps its data in the same kind of folder: `.openestimate` in your home directory (on Windows, under `C:\Users\<your name>`). Close the app before you copy it.
 
 ## Your own PostgreSQL server
 

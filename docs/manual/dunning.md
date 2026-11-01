@@ -28,16 +28,21 @@ A level defines when a letter is due and what it says. The defaults in English a
 | 2 | First notice | 21 |
 | 3 | Second notice | 35 |
 
-German texts are included as well. You can rename levels, change the days, set a fee per level and write your own subject and body. Texts accept these placeholders: `{customer}`, `{number}`, `{doc_date}`, `{due_date}`, `{outstanding}`, `{currency}`, `{days_overdue}`, `{fee}`, `{interest}`, `{total}`.
+German texts are included as well. A level can have its own name, days, fee, subject and body.
+
+!!! note "Editing levels"
+    The Receivables screen shows the levels, fees and interest status but has no form to change them yet. Change them through the API: `PUT /api/v1/receivables/levels/` and `PUT /api/v1/receivables/settings/`. See [API](../admin/api.md). A form for this is an open task on the issue tracker.
+
+Texts accept these placeholders: `{customer}`, `{number}`, `{doc_date}`, `{due_date}`, `{outstanding}`, `{currency}`, `{days_overdue}`, `{fee}`, `{interest}`, `{total}`.
 
 ## Fees and interest
 
-Both are **off by default**. If you switch them on:
+Both are **off by default**. You switch them on in the settings (`PUT /api/v1/receivables/settings/`, fields `fees_enabled`, `interest_enabled`, `interest_rate_pct`). If they are on:
 
 - A fee is added per level, as you set it.
 - Interest is computed with the rate in percent that you enter. The program does not look up a legal rate. For Germany, the statutory default interest is the base rate plus 5 points (consumers) or 9 points (businesses). Check the current figures and what you may charge with your adviser.
 
-The setting "minimum days between letters" (default 7) stops two letters going out for one invoice in quick succession.
+The setting `min_days_between` (default 7) stops two letters going out for one invoice in quick succession.
 
 ## The routine
 
