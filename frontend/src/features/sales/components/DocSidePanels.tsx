@@ -60,6 +60,7 @@ export function PaymentsCard({ doc, onRecord }: { doc: SalesDoc; onRecord?: () =
               <span className="text-content-secondary">
                 <DateDisplay value={p.pay_date} />
                 {p.reference && <span className="ml-1 text-content-tertiary">· {p.reference}</span>}
+                {p.fx_rate && <span className="ml-1 text-content-tertiary">· {t('sales.payment_rate', { defaultValue: 'Rate {{rate}}', rate: Number(p.fx_rate).toFixed(4) })}</span>}
               </span>
               <MoneyDisplay amount={p.amount} currency={doc.currency} className="font-medium tabular-nums" />
             </li>

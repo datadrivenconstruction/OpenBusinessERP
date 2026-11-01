@@ -31,7 +31,7 @@ export function PaymentsCard({ doc, canPay, onPay }: { doc: PurchasingDoc; canPa
           {pays.map((p) => (
             <li key={p.id} className="flex items-center justify-between py-1.5">
               <span className="text-content-secondary">
-                <DateDisplay value={p.pay_date} /> {p.method && <span className="ml-1">· {p.method}</span>} {p.reference && <span className="ml-1">· {p.reference}</span>}
+                <DateDisplay value={p.pay_date} /> {p.method && <span className="ml-1">· {p.method}</span>} {p.reference && <span className="ml-1">· {p.reference}</span>} {p.fx_rate && <span className="ml-1 text-content-tertiary">· {t('sales.payment_rate', { defaultValue: 'Rate {{rate}}', rate: Number(p.fx_rate).toFixed(4) })}</span>}
               </span>
               <MoneyDisplay amount={p.amount} currency={doc.currency} className="tabular-nums" />
             </li>

@@ -31,6 +31,7 @@ interface Form {
   supplier_name: string;
   supplier_ref: string;
   currency: string;
+  fx_rate: string;
   doc_date: string;
   due_date: string;
   payment_terms_days: string;
@@ -43,6 +44,7 @@ const toForm = (d?: PurchasingDoc, currency = 'EUR', tax = '0'): Form => ({
   supplier_name: d?.supplier_name ?? '',
   supplier_ref: d?.supplier_ref ?? '',
   currency: d?.currency ?? currency,
+  fx_rate: d && Number(d.fx_rate) !== 1 ? String(d.fx_rate) : '',
   doc_date: d?.doc_date ?? new Date().toISOString().slice(0, 10),
   due_date: d?.due_date ?? '',
   payment_terms_days: d?.payment_terms_days != null ? String(d.payment_terms_days) : '',
@@ -66,6 +68,7 @@ export function PurchasingDocumentPage() {
     queryFn: () => apiGet<{ base_currency?: string | null; country_code?: string | null }>('/v1/business-settings/'),
     retry: false,
   });
+  const baseCur = settings.data?.base_currency || '';
   const baseTax = String(defaultTaxRate(settings.data?.country_code));
 
   const [form, setForm] = useState<Form>(toForm());
@@ -100,6 +103,7 @@ export function PurchasingDocumentPage() {
     supplier_name: form.supplier_name,
     ...(isOrder ? {} : { supplier_ref: form.supplier_ref }),
     currency: form.currency.toUpperCase(),
+    fx_rate: Number(form.fx_rate) > 0 ? form.fx_rate : null,
     doc_date: form.doc_date || null,
     due_date: form.due_date || null,
     payment_terms_days: form.payment_terms_days ? Number(form.payment_terms_days) : null,
@@ -246,8 +250,16 @@ export function PurchasingDocumentPage() {
               </label>
               <label className="text-xs text-content-tertiary">
                 {t('purchasing.currency', { defaultValue: 'Currency' })}
-                <input className={inputCls} maxLength={3} disabled={!editable} value={form.currency} onChange={(e) => update({ currency: e.target.value.toUpperCase() })} />
+                <input className={inputCls} maxLength={3} disabled={!editable} value={form.currency} onChange={(e) => update({ currency: e.target.value.toUpperCase(), fx_rate: '' })} />
               </label>
+              {baseCur && form.currency && form.currency !== baseCur && (
+                <label className="text-xs text-content-tertiary">
+                  {t('sales.fx_rate', { defaultValue: 'Rate (1 {{cur}} = ? {{base}})', cur: form.currency, base: baseCur })}
+                  <input className={inputCls} inputMode="decimal" disabled={!editable}
+                    placeholder={t('sales.fx_rate_auto', { defaultValue: 'Automatic (rate on document date)' })}
+                    value={form.fx_rate} onChange={(e) => update({ fx_rate: e.target.value.replace(',', '.') })} />
+                </label>
+              )}
               {!isOrder && (
                 <label className="text-xs text-content-tertiary">
                   {t('purchasing.supplier_ref', { defaultValue: 'Supplier invoice no.' })}
@@ -298,7 +310,8 @@ export function PurchasingDocumentPage() {
               })
             }
           />
-          <DocTotals lines={form.lines} currency={cur} paid={paid} showBalance={!isOrder && !!doc && doc.status !== 'draft'} />
+          <DocTotals lines={form.lines} currency={cur} paid={paid} showBalance={!isOrder && !!doc && doc.status !== 'draft'}
+            base={baseCur && cur !== baseCur ? { currency: baseCur, rate: Number(form.fx_rate || doc?.fx_rate || 0) } : undefined} />
           {doc && kind !== 'orders' && doc.status !== 'draft' && <PaymentsCard doc={doc} canPay={canPay} onPay={() => setPayOpen(true)} />}
           {doc && <RelatedDocs kind={kind} id={doc.id} />}
         </aside>

@@ -96,6 +96,8 @@ export interface AccountSummary {
   gl_balance: string | null;
   /** balance - gl_balance; null when the account has no GL mapping. */
   gl_difference: string | null;
+  /** false for foreign-currency accounts: GL is kept in the base currency, so no 1:1 comparison. */
+  gl_comparable?: boolean;
   line_count: number;
   unmatched_count: number;
   last_booking_date: string | null;

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { AlertTriangle, Landmark, Pencil, Upload } from 'lucide-react';
 import { Badge, Button, Card, DateDisplay, EmptyState, MoneyDisplay } from '@/shared/ui';
 import type { AccountSummary, BankAccount } from '../api';
+import { useBusinessCurrency } from '@/features/accounting/api';
 import { ledgerGap } from './BankingKpis';
 
 interface Props {
@@ -21,6 +22,7 @@ export function groupIban(iban: string): string {
 
 export function AccountCards({ accounts, summary, onEdit, onImport, onReconcile, onAdd }: Props) {
   const { t } = useTranslation();
+  const baseCur = useBusinessCurrency();
   if (accounts.length === 0) {
     return (
       <Card padding="none">
@@ -66,7 +68,12 @@ export function AccountCards({ accounts, summary, onEdit, onImport, onReconcile,
               <div className="mt-0.5 text-xs text-content-tertiary">
                 {t('banking.kpi_balance_sub', { defaultValue: 'Opening balance + statement lines' })}
               </div>
-              {gap !== null && (
+              {s?.gl_comparable === false && (
+                <div className="mt-1.5 text-xs text-content-tertiary">
+                  {t('banking.gl_not_comparable', { defaultValue: 'GL is kept in {{base}}; statement in {{currency}} is not compared 1:1', base: baseCur, currency: a.currency })}
+                </div>
+              )}
+              {s?.gl_comparable !== false && gap !== null && (
                 <button
                   type="button"
                   onClick={() => onReconcile(a.id)}

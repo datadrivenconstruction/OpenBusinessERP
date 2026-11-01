@@ -41,6 +41,7 @@ export interface SalesPayment {
   method: string;
   reference: string;
   gl_entry_id: string | null;
+  fx_rate?: string | null;
 }
 
 export interface SalesDocSummary {

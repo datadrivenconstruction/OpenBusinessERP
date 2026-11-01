@@ -7,6 +7,7 @@ import { fmtMoney } from '@/features/sales/api';
 import { Badge } from '@/shared/ui/Badge';
 import { glApi, presetRange, useBusinessCurrency } from './api';
 import { PeriodPicker } from './PeriodPicker';
+import { FxRevaluationPanel } from './FxRevaluationPanel';
 import { AccountingShell, ErrorBlock } from './ui';
 
 function Kpi({ label, value, hint }: { label: string; value: string | null; hint?: string }) {
@@ -86,6 +87,7 @@ export function AccountingOverviewPage() {
           </Link>
         ))}
       </div>
+      <FxRevaluationPanel />
     </AccountingShell>
   );
 }

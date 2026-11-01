@@ -180,7 +180,37 @@ async function uploadAttachment(entryId: string, file: File): Promise<GlAttachme
   return body as GlAttachment;
 }
 
+export interface FxRevalRow {
+  side: 'receivable' | 'payable';
+  id: string;
+  number: string;
+  party: string;
+  currency: string;
+  open: string;
+  doc_rate: string;
+  closing_rate: string;
+  booked: string;
+  revalued: string;
+  gain: string;
+}
+export interface FxRevalResult {
+  period_end: string;
+  reversal_date: string;
+  base_currency: string;
+  rates: Record<string, string>;
+  rows: FxRevalRow[];
+  receivable_diff: string;
+  payable_diff: string;
+  net_gain: string;
+  posted: boolean;
+  entry_id?: string | null;
+  reversal_id?: string | null;
+}
+export interface FxRevalBody { period_end: string; rates?: Record<string, string> }
+
 export const glApi = {
+  fxRevalPreview: (b: FxRevalBody) => apiPost<FxRevalResult>('/v1/gl/fx-revaluation/preview/', b),
+  fxRevalPost: (b: FxRevalBody) => apiPost<FxRevalResult>('/v1/gl/fx-revaluation/', b),
   attachments: (entryId: string) => apiGet<GlAttachment[]>(`/v1/gl/entries/${entryId}/attachments/`),
   uploadAttachment,
   downloadAttachment: (a: GlAttachment) => downloadWithAuth(`/api/v1/gl/attachments/${a.id}/download/`, a.filename),

@@ -4,7 +4,7 @@ import type { PurchasingLine } from '../api';
 import { totalsByTaxRate } from '../helpers';
 import { Section } from './common';
 
-export function DocTotals({ lines, currency, paid, showBalance }: { lines: PurchasingLine[]; currency: string; paid?: number; showBalance?: boolean }) {
+export function DocTotals({ lines, currency, paid, showBalance, base }: { lines: PurchasingLine[]; currency: string; paid?: number; showBalance?: boolean; base?: { currency: string; rate: number } }) {
   const { t } = useTranslation();
   const tt = totalsByTaxRate(lines);
   const row = 'flex justify-between py-0.5 text-content-secondary';
@@ -27,6 +27,12 @@ export function DocTotals({ lines, currency, paid, showBalance }: { lines: Purch
           <dt>{t('purchasing.total_gross', { defaultValue: 'Total' })}</dt>
           <dd className="tabular-nums"><MoneyDisplay amount={tt.gross} currency={currency} /></dd>
         </div>
+        {base && base.rate > 0 && (
+          <div className="flex justify-between py-0.5 text-xs text-content-tertiary">
+            <dt>{t('sales.totals.in_base', { defaultValue: 'In {{base}} at {{rate}}', base: base.currency, rate: base.rate })}</dt>
+            <dd className="tabular-nums"><MoneyDisplay amount={Math.round(tt.gross * base.rate * 100) / 100} currency={base.currency} /></dd>
+          </div>
+        )}
         {showBalance && (
           <>
             <div className={row}>
