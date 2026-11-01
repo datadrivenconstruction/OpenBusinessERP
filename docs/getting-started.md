@@ -37,7 +37,18 @@ The package ships the FastAPI backend and a pre-built React frontend in a single
 
 ## Path C: Docker
 
-Download both Compose files and start the stack:
+One container, with PostgreSQL bundled inside and all data on a named volume:
+
+```bash
+docker run -p 8080:8080 -v obe-data:/data ghcr.io/datadrivenconstruction/openbusinesserp:latest
+```
+
+The image is multi-arch (amd64, arm64) and runs as a non-root user. Set
+`DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/db` to use your own
+PostgreSQL instead, and `JWT_SECRET` to manage the signing key yourself (otherwise
+one is generated on the volume). `:edge` tracks `main`; `:X.Y.Z` pins a release.
+
+For a separate PostgreSQL container, download both Compose files and start the stack:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/datadrivenconstruction/OpenBusinessERP/main/docker-compose.quickstart.yml       -o docker-compose.yml

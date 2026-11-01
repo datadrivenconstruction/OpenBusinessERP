@@ -40,7 +40,7 @@ def run_entrypoint(tmp_path: Path):
         env = dict(os.environ)
         # Nothing inherited may decide the outcome: the cases below set what
         # they mean to set and clear the rest.
-        for key in ("DATABASE_URL", "DATABASE_SYNC_URL", "OE_DB_PASSWORD", "OE_DB_HOST"):
+        for key in ("DATABASE_URL", "DATABASE_SYNC_URL", "OE_DB_PASSWORD", "OE_DB_HOST", "OE_USE_EMBEDDED_PG"):
             env.pop(key, None)
         env.update(env_overrides)
         env["PATH"] = f"{stub_dir}{os.pathsep}{env['PATH']}"
@@ -56,8 +56,14 @@ def run_entrypoint(tmp_path: Path):
     return run
 
 
-def test_a_missing_url_is_refused_by_name(run_entrypoint) -> None:
-    result = run_entrypoint()
+def test_a_missing_url_starts_the_bundled_postgres(run_entrypoint, tmp_path: Path) -> None:
+    result = run_entrypoint(OE_DATA_DIR=str(tmp_path))
+    assert result.returncode == 0, result.stderr
+    assert "-m app.cli serve" in result.stdout and str(tmp_path) in result.stdout
+
+
+def test_a_missing_url_is_refused_by_name_when_embedded_is_off(run_entrypoint) -> None:
+    result = run_entrypoint(OE_USE_EMBEDDED_PG="0")
     assert result.returncode == 1
     assert "DATABASE_URL is not set" in result.stderr
 

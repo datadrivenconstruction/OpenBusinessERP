@@ -158,7 +158,8 @@ CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port
 # from the Dockerfile. The setup-node steps in .github/workflows pin the same
 # major; when this line moves, they move with it, or CI tests one runtime and
 # the image ships another.
-FROM node:24.20-alpine AS frontend-build
+# The bundle is architecture-independent: build it natively, never under QEMU.
+FROM --platform=$BUILDPLATFORM node:24.20-alpine AS frontend-build
 
 WORKDIR /build
 COPY frontend/package.json frontend/package-lock.json ./
