@@ -43903,7 +43903,7 @@ const resource = {
     "accounting.datev_kreditor_range": "Yetkazib beruvchi hisoblari (Kreditoren) dan / gacha",
     "accounting.datev_diktat": "Bosh harflar (Diktatkürzel)",
     "accounting.datev_festschreibung": "Importda yozuvlarni qulflash (Festschreibung)",
-    "accounting.datev_limits": "Hisob-fakturalar, kiruvchi hisoblar va ularning to'lovlari yuqoridagi oraliqlardagi shaxsiy hisoblarga (Debitoren/Kreditoren) yaratilish tartibida yoziladi; asosiy ma'lumotlarni xuddi shu sozlamalar bilan eksport qiling. Boshqa yozuvlar umumlashtiruvchi hisoblarda qoladi. QQS yalpi summalarga qo'shiladi. Summalar asosiy valyutada.",
+    "accounting.datev_limits": "Hisob-fakturalar, kiruvchi hisoblar va ularning toʻlovlari yuqoridagi oraliqlardagi shaxsiy hisoblarga (Debitoren/Kreditoren) yaratilish tartibida yoziladi; asosiy maʼlumotlarni xuddi shu sozlamalar bilan eksport qiling. Boshqa yozuvlar umumlashtiruvchi hisoblarda qoladi. QQS yalpi summalarga qoʻshiladi. Summalar asosiy valyutada.",
     "accounting.export_disclaimer": "Bu fayllar DATEV yoki biror soliq organi tomonidan sertifikatlanmagan. Import qilish yoki topshirishdan oldin har bir eksportni soliq maslahatchingizga tekshirtiring.",
     "banking.add_account": "Hisob qoʻshish",
     "banking.feeds_note": "Jonli bank maʼlumot oqimlari ulanmagan. Onlayn bankingdan eksport qilingan koʻchirma fayllarini (camt.053, MT940 yoki CSV) import qiling.",
