@@ -162,6 +162,9 @@ DEFAULT_TAX_RATES: dict[str, Decimal] = {
         "IN": "18",
         "JP": "10",
         "SG": "9",
+        "MX": "16",
+        "AE": "5",
+        "ZA": "15",
     }.items()
 }
 

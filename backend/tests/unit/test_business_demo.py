@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import re
 from datetime import date, timedelta
+from decimal import Decimal
+from pathlib import Path
 
 import pytest
 import pytest_asyncio
@@ -81,10 +84,35 @@ def test_no_construction_vocabulary():
         assert not words.search(repr(case)), case.key
 
 
+EUROPE = {"AT", "BE", "CH", "DE", "DK", "ES", "FI", "FR", "GB", "IE", "IT", "NL", "NO", "PL", "PT", "SE"}
+EURO_AREA = EUROPE - {"CH", "DK", "GB", "NO", "PL", "SE"}
+
+
+def test_cases_span_the_world_with_tax_preset_and_currency():
+    from app.core.currency_registry import CURRENCIES
+    from app.modules import i18n_foundation
+    from app.modules.sales.service import default_tax_rate
+
+    seed = Path(i18n_foundation.__file__).parent / "seed_data" / "tax_configurations.json"
+    presets = {
+        r["country_code"]: Decimal(r["rate_pct"])
+        for r in json.loads(seed.read_text(encoding="utf-8"))
+        if r["is_default"] and not r["subdivision_code"] and not r["effective_to"]
+    }
+    countries = {c.country for c in CASES.values()}
+    assert len(countries - EUROPE) >= 5, countries
+    for case in CASES.values():
+        cc = case.country
+        assert cc in presets and default_tax_rate(cc) == presets[cc], case.key
+        assert cc in EURO_AREA or cc in business_demo._CASE_CURRENCY, case.key
+        assert business_demo._CASE_CURRENCY.get(cc, "EUR") in CURRENCIES, case.key
+        assert len(business_demo.demo_bank_iban(case)) <= 34, case.key
+
+
 @pytest.mark.parametrize("key", sorted(CASES))
 async def test_case_seeds_balanced_and_idempotent(session, monkeypatch, key):
     case = CASES[key]
-    currency = {"GB": "GBP", "PL": "PLN", "CH": "CHF"}.get(case.country, "EUR")
+    currency = business_demo._CASE_CURRENCY.get(case.country, "EUR")
     monkeypatch.setattr(gl_service, "read_business_settings", _settings(case.country, currency))
     monkeypatch.setattr(business_demo, "read_business_settings", _settings(case.country, currency))
     owner = User(email=f"{key}@example.com", hashed_password="x", full_name="Owner", role="admin")
@@ -103,6 +131,10 @@ async def test_case_seeds_balanced_and_idempotent(session, monkeypatch, key):
 
     tb = await GLService(session).trial_balance(None, None)
     assert tb["balanced"] and tb["total_debit"] > 0
+    if business_demo.minor_units(currency) == 0:
+        gl_rows = (await session.execute(select(GLJournalLine.debit, GLJournalLine.credit))).all()
+        doc_rows = (await session.execute(select(SalesDocument.tax_total, SalesDocument.gross_total))).all()
+        assert all(v == v.to_integral_value() for row in [*gl_rows, *doc_rows] for v in row), "sub-unit amounts"
 
     bank, payables, income, expense = await _figures(session, key)
     assert min(bank) >= 0, bank

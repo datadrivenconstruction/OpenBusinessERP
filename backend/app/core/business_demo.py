@@ -16,13 +16,14 @@ import uuid
 import zlib
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
-from decimal import ROUND_CEILING, Decimal
+from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
 from typing import Any
 
 from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.business_settings import read_business_settings
+from app.core.currency_registry import minor_units, money_quantum
 from app.modules.crm.models import Account, Opportunity, OpportunityStageHistory, PipelineStage
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLFiscalYear, GLJournalEntry, GLJournalLine
 from app.modules.gl.service import GLService, LineInput, base_currency
@@ -222,53 +223,53 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="professional_services",
-            company="Brightwell Advisory Partners",
-            country="NL",
+            company="Selvane Advisory Pte. Ltd.",
+            country="SG",
             industry="Management consulting",
-            summary="Management and finance consulting boutique, Amsterdam.",
+            summary="Management and finance consulting boutique for Southeast Asian mid-sized companies, Singapore.",
             customers=[
-                ("Duinhaven Foods B.V.", "NL"),
-                ("Lindewaard Housing Cooperative", "NL"),
-                ("Stroomvaart Energy Services N.V.", "NL"),
-                ("Kaaiwerk Port Services NV", "BE"),
-                ("Hellmark Privatbank AG", "DE"),
-                ("Vermelin Santé Groupe", "FR"),
-                ("Corrigan Fintech Labs Ltd", "IE"),
-                ("Skovlund Design Retail ApS", "DK"),
-                ("Strehlau Mobility GmbH", "AT"),
-                ("Arrietza Renewables S.L.", "ES"),
-                ("Kestridge Insurance Group plc", "GB"),
+                ("Orchidvale Foods Pte. Ltd.", "SG"),
+                ("Pasirwick Logistics Pte. Ltd.", "SG"),
+                ("Lumora Health Group Pte. Ltd.", "SG"),
+                ("Kembara Property Trust", "SG"),
+                ("Tembusu Lane Retail Pte. Ltd.", "SG"),
+                ("Seri Kenanga Manufacturing Sdn. Bhd.", "MY"),
+                ("PT Nusa Velora Energi", "ID"),
+                ("Hoa Lanh Trading JSC", "VN"),
+                ("Siam Velaris Co., Ltd.", "TH"),
+                ("Jadeharbour Holdings Ltd", "HK"),
+                ("Wattlebrook Capital Pty Ltd", "AU"),
                 ("Ambercove Capital LLC", "US"),
             ],
             suppliers=[
-                ("Grachtzijde Offices B.V.", "NL", "rent"),
-                ("Freelance Analytics Collective", "NL", "services"),
+                ("Cendrawasih Office Suites Pte. Ltd.", "SG", "rent"),
+                ("Associate Analysts Collective", "SG", "services"),
                 ("Quorvane Research Ltd", "GB", "software"),
-                ("Vliegwiel Travel Desk B.V.", "NL", "other"),
+                ("Velaway Travel Desk Pte. Ltd.", "SG", "other"),
             ],
             expenses=[
-                ("Office rent Amsterdam", "rent", 5200),
-                ("Salaries", "wages", 46000),
-                ("Associate consultants", "services", 6500),
-                ("Research databases", "software", 1400),
-                ("Travel", "other", 1800),
+                ("Office rent Singapore", "rent", 7800),
+                ("Salaries", "wages", 69000),
+                ("Associate consultants", "services", 9800),
+                ("Research databases", "software", 2100),
+                ("Regional travel", "other", 2700),
             ],
             deals=[
                 "Operating model redesign",
                 "Post-merger integration support",
                 "Pricing strategy review",
                 "Finance function benchmarking",
-                "Vendor due diligence",
+                "Vendor due diligence Jakarta",
                 "Board advisory retainer 2027",
                 "Cost reduction programme",
                 "ESG reporting readiness",
             ],
             tasks=[
-                "Prepare steering committee deck for Stroomvaart Energy",
+                "Prepare steering committee deck for Lumora Health",
                 "Staff plan for Q1 engagements",
                 "Send timesheet reminders",
                 "Renew professional indemnity insurance",
-                "Write case study Duinhaven Foods",
+                "File the quarterly GST return",
             ],
             quotes=30,
             lines_per_doc=(1, 3),
@@ -327,43 +328,43 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="retail_ecommerce",
-            company="Little Fern Online Store",
-            country="FR",
+            company="Little Fern Goods LLC",
+            country="US",
             industry="E-commerce",
-            summary="Online shop for sustainable home and kitchen goods, Lyon.",
+            summary="Online shop for sustainable home and kitchen goods, Portland, Oregon.",
             b2c=True,
             payment_days=7,
             quotes=48,
             lines_per_doc=(1, 3),
             customers=[
-                ("Camille Durand", "FR"),
-                ("Julien Lefèvre", "FR"),
-                ("Sophie Martin", "FR"),
-                ("Lucas Bernard", "FR"),
-                ("Emma Petit", "FR"),
-                ("Hugo Laurent", "FR"),
-                ("Léa Moreau", "FR"),
-                ("Nicolas Girard", "FR"),
-                ("Anna Schmidt", "DE"),
-                ("Marco Bianchi", "IT"),
-                ("Laura García", "ES"),
-                ("Pieter de Vries", "NL"),
-                ("Boutique Écolo Verdelune", "FR"),
-                ("Concept Store Mirabelle SARL", "FR"),
-                ("Café Botanique Fleurac", "FR"),
+                ("Emily Carter", "US"),
+                ("Jordan Reyes", "US"),
+                ("Megan O'Brien", "US"),
+                ("Tyler Nguyen", "US"),
+                ("Ashley Thompson", "US"),
+                ("Brandon Kim", "US"),
+                ("Olivia Patel", "US"),
+                ("Daniel Brooks", "US"),
+                ("Chloe Tremblay", "CA"),
+                ("Hannah Fischer", "DE"),
+                ("Yuki Tanaka", "JP"),
+                ("Isabel Ortega", "MX"),
+                ("Willowbank Eco Boutique", "US"),
+                ("Cedarline Concept Store LLC", "US"),
+                ("Mossgrove Café", "US"),
             ],
             suppliers=[
-                ("Verre & Céramique Atelier SAS", "FR", "goods"),
-                ("Bamboo Goods Wholesale Ltd", "GB", "goods"),
-                ("Colivra Business Services", "FR", "services"),
-                ("Vitrinéo Platform SAS", "FR", "software"),
-                ("Social Ads Agency Pixane", "FR", "marketing"),
+                ("Riverglass Ceramics Co.", "US", "goods"),
+                ("Zhuyuan Bamboo Housewares Co., Ltd.", "CN", "goods"),
+                ("Packwise Fulfillment LLC", "US", "services"),
+                ("Shopvale Commerce Inc.", "US", "software"),
+                ("Pixane Social Ads LLC", "US", "marketing"),
             ],
             expenses=[
-                ("Parcel shipping", "services", 1900),
-                ("Shop platform and payments", "software", 420),
-                ("Online advertising", "marketing", 2200),
-                ("Salaries", "wages", 9800),
+                ("Parcel shipping", "services", 2100),
+                ("Shop platform and payments", "software", 460),
+                ("Online advertising", "marketing", 2400),
+                ("Salaries", "wages", 10800),
             ],
             deals=[
                 "Wholesale order concept stores",
@@ -371,66 +372,66 @@ CASES: dict[str, Case] = {
                 "Café merchandise partnership",
                 "Marketplace listing expansion",
                 "Subscription box pilot",
-                "Wedding list partnership",
+                "Wedding registry partnership",
             ],
             tasks=[
                 "Prepare Black Friday campaign",
                 "Reorder bestselling glass bottles",
                 "Answer open customer returns",
                 "Photograph spring collection",
-                "Review shipping tariffs",
+                "Review USPS and UPS shipping rates",
             ],
         ),
         Case(
             key="field_service",
-            company="Kaltavia Klimaservice GmbH",
-            country="AT",
+            company="Larchfield Climate Services Inc.",
+            country="CA",
             industry="HVAC service",
-            summary="Heating, ventilation and air-conditioning maintenance and repair, Vienna.",
+            summary="Heating, ventilation and air-conditioning maintenance and repair, Calgary.",
             customers=[
-                ("Hotel Auwinkel GmbH", "AT"),
-                ("Bürozentrum Lindgrund KG", "AT"),
-                ("Gesundheitszentrum Talwies Betriebs GmbH", "AT"),
-                ("Supermarkt Hollerer & Co", "AT"),
-                ("Privatschule Sonnhalde", "AT"),
-                ("Wohnhausverwaltung Grabner", "AT"),
-                ("Bäckerei Mairhofer", "AT"),
-                ("Datenhalle Ostbrück GmbH", "AT"),
-                ("Fitnessstudio Vitalwerk", "AT"),
-                ("Autohaus Steinwender", "AT"),
-                ("Restaurant Zum Silbernen Kranich", "AT"),
-                ("Pharmalog Vendura GmbH", "AT"),
-                ("Dunavec Office Park s.r.o.", "SK"),
+                ("Bowridge Hotel Ltd.", "CA"),
+                ("Lindgrove Office Centre Ltd.", "CA"),
+                ("Tallwillow Health Centre", "CA"),
+                ("Hollerer Fresh Market Ltd.", "CA"),
+                ("Sunhill Academy", "CA"),
+                ("Grabner Property Management Inc.", "CA"),
+                ("Mairhof Bakery", "CA"),
+                ("Eastbridge Data Hall Inc.", "CA"),
+                ("Vitalwerk Fitness", "CA"),
+                ("Stonewynd Motors Ltd.", "CA"),
+                ("Silver Crane Restaurant", "CA"),
+                ("Vendura Pharmalog Ltd.", "CA"),
+                ("Ridgeway Office Park LLC", "US"),
             ],
             suppliers=[
-                ("Frostlinde Kältetechnik Großhandel GmbH", "AT", "goods"),
-                ("Filter & Luft Vertriebs GmbH", "DE", "goods"),
-                ("Fuhrpark Leasing Rovena", "AT", "other"),
-                ("Gewerbehof Kranzbach", "AT", "rent"),
+                ("Frostlinde HVAC Supply Ltd.", "CA", "goods"),
+                ("Airwise Filters Inc.", "US", "goods"),
+                ("Rovena Fleet Leasing Ltd.", "CA", "other"),
+                ("Kranzbach Industrial Park Ltd.", "CA", "rent"),
             ],
             expenses=[
-                ("Salaries technicians", "wages", 41000),
-                ("Van leasing and fuel", "other", 3900),
-                ("Workshop rent", "rent", 2800),
-                ("Field service app", "software", 520),
+                ("Salaries technicians", "wages", 61500),
+                ("Van leasing and fuel", "other", 5850),
+                ("Workshop rent", "rent", 4200),
+                ("Field service app", "software", 780),
             ],
             deals=[
                 "Hospital ventilation service contract",
                 "Hotel AC replacement 40 rooms",
                 "Data centre cooling audit",
-                "Supermarket chain maintenance 6 sites",
+                "Grocery chain maintenance 6 sites",
                 "Office park heat pump retrofit",
                 "School ventilation upgrade",
             ],
             tasks=[
-                "Schedule winter boiler checks",
-                "Renew F-gas certificates for two technicians",
+                "Schedule fall furnace checks",
+                "Renew refrigerant handling certificates for two technicians",
                 "Restock vans with filters",
-                "Follow up quote Datenhalle Ostbrück",
+                "Follow up quote Eastbridge Data Hall",
                 "Plan route for Monday call-outs",
             ],
             quotes=40,
-            payment_days=14,
+            payment_days=30,
         ),
         Case(
             key="logistics",
@@ -489,37 +490,37 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="it_agency",
-            company="Quillbright Digital Ltd",
-            country="GB",
+            company="Tarangam Digital Pvt. Ltd.",
+            country="IN",
             industry="Digital agency",
-            summary="Web, app and digital-marketing agency for mid-sized brands, Manchester.",
+            summary="Web, app and digital-marketing agency for Indian and overseas brands, Bengaluru.",
             customers=[
-                ("Ironvale Rail Heritage Trust", "GB"),
-                ("Highcairn Outdoor Ltd", "GB"),
-                ("Tollbridge Craft Brewery", "GB"),
-                ("Ravensby Legal LLP", "GB"),
-                ("Spokewell Bike Co.", "GB"),
-                ("Thistlegate Fashion House Ltd", "GB"),
-                ("Brynmor Dental Group", "GB"),
-                ("Flinkrad Mobility GmbH", "DE"),
-                ("Feestpoort Event Tickets B.V.", "NL"),
+                ("Kaveriya Organics Pvt. Ltd.", "IN"),
+                ("Vrindaline Fashion House Pvt. Ltd.", "IN"),
+                ("Malnad Hills Craft Brewery LLP", "IN"),
+                ("Pedalwala Bicycles Pvt. Ltd.", "IN"),
+                ("Ashvika Dental Clinics", "IN"),
+                ("Rangoli Heritage Rail Trust", "IN"),
+                ("Tejasvi & Rao Legal LLP", "IN"),
+                ("Sahyavan Outdoor Gear Pvt. Ltd.", "IN"),
+                ("Chaikoti Tea Rooms", "IN"),
                 ("Emberline Coffee Roasters Inc.", "US"),
-                ("Marésia Surf Schools Lda", "PT"),
-                ("Dalesbury Tea Rooms Ltd", "GB"),
-                ("Linwick Language Courses Ltd", "GB"),
+                ("Highcairn Outdoor Ltd", "GB"),
+                ("Flinkrad Mobility GmbH", "DE"),
+                ("Dunesail Events FZ-LLC", "AE"),
             ],
             suppliers=[
-                ("Nimbusworth Hosting Ltd", "GB", "software"),
-                ("Freelance Dev Network", "GB", "services"),
-                ("Millrace Studios Workspace", "GB", "rent"),
+                ("Nimbusvault Cloud Services Pvt. Ltd.", "IN", "software"),
+                ("Freelance Dev Network Bengaluru", "IN", "services"),
+                ("Koramvale Tech Park Workspace", "IN", "rent"),
                 ("Framewell Media Library Ltd", "GB", "software"),
             ],
             expenses=[
-                ("Salaries", "wages", 44000),
-                ("Freelance developers", "services", 8800),
-                ("Studio rent", "rent", 4600),
-                ("Hosting and SaaS tools", "software", 2100),
-                ("Conferences and marketing", "marketing", 900),
+                ("Salaries", "wages", 1980000),
+                ("Freelance developers", "services", 396000),
+                ("Office rent", "rent", 207000),
+                ("Hosting and SaaS tools", "software", 94500),
+                ("Conferences and marketing", "marketing", 40500),
             ],
             deals=[
                 "E-commerce replatforming",
@@ -528,14 +529,14 @@ CASES: dict[str, Case] = {
                 "Headless CMS migration",
                 "Annual SEO retainer",
                 "Accessibility audit and fixes",
-                "Customer portal MVP",
+                "UPI checkout integration",
             ],
             tasks=[
-                "Sprint review with Spokewell Bike Co.",
+                "Sprint review with Pedalwala Bicycles",
                 "Renew SSL certificates for hosted clients",
-                "Update rate card for 2027",
-                "Security patching on managed hosting",
-                "Draft proposal for Ravensby Legal LLP",
+                "Update rate card for FY 2027-28",
+                "Reconcile GSTR-1 for October",
+                "Draft proposal for Tejasvi & Rao Legal LLP",
             ],
             quotes=32,
             lines_per_doc=(1, 3),
@@ -592,110 +593,109 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="craft_trades",
-            company="Vossberg Elektrotechnik GmbH",
-            country="DE",
+            company="Kookarra Electrical Services Pty Ltd",
+            country="AU",
             industry="Electrical trade",
-            summary="Electrical installation, testing and e-mobility business with eight electricians, Stuttgart.",
+            summary="Electrical installation, testing and EV-charging business with eight electricians, Brisbane.",
             customers=[
-                ("Hausverwaltung Kesselbach GmbH", "DE"),
-                ("Wohnbau Talblick eG", "DE"),
-                ("Bäckerei Wolfsried KG", "DE"),
-                ("Autohaus Brennwald GmbH", "DE"),
-                ("Hotel Rosenhain Betriebs GmbH", "DE"),
-                ("Praxisgemeinschaft am Lindenring", "DE"),
-                ("Kita Pusteblume e.V.", "DE"),
-                ("Weinstube Rebstöckle", "DE"),
-                ("Schreinerei Voglreiter", "DE"),
-                ("Familie Maier", "DE"),
-                ("WEG Birkenweg 12", "DE"),
-                ("Druckerei Lämmerhof GmbH", "DE"),
+                ("Kessington Strata Management Pty Ltd", "AU"),
+                ("Talbrook Community Housing Ltd", "AU"),
+                ("Wolfsridge Bakery Pty Ltd", "AU"),
+                ("Brennvale Motors Pty Ltd", "AU"),
+                ("Hotel Rosella Grove", "AU"),
+                ("Lindenring Medical Centre", "AU"),
+                ("Little Wattlebirds Childcare", "AU"),
+                ("Vine Lane Wine Bar", "AU"),
+                ("Brushbox Joinery Pty Ltd", "AU"),
+                ("Nguyen family", "AU"),
+                ("Body Corporate 12 Birchwood Street", "AU"),
+                ("Paperbark Print Works Pty Ltd", "AU"),
             ],
             suppliers=[
-                ("Elektrogroßhandel Voltaris GmbH", "DE", "goods"),
-                ("Kabelwerk Drahtquell GmbH", "DE", "goods"),
-                ("Flottenservice Radwerk GmbH", "DE", "services"),
-                ("Gewerbehof Funkenried GmbH", "DE", "rent"),
+                ("Voltaris Electrical Wholesale Pty Ltd", "AU", "goods"),
+                ("Copperbank Cables Pty Ltd", "AU", "goods"),
+                ("Utefleet Leasing Pty Ltd", "AU", "services"),
+                ("Sparkhill Trade Park Pty Ltd", "AU", "rent"),
             ],
             expenses=[
-                ("Workshop and storage rent", "rent", 2400),
-                ("Salaries", "wages", 38000),
-                ("Van leasing and fuel", "services", 2600),
-                ("Job and time-capture software", "software", 290),
-                ("Online listings and vehicle lettering", "marketing", 450),
+                ("Workshop and storage rent", "rent", 4100),
+                ("Salaries", "wages", 64600),
+                ("Ute leasing and fuel", "services", 4400),
+                ("Job and time-capture software", "software", 490),
+                ("Online listings and vehicle signage", "marketing", 770),
             ],
             deals=[
-                "Wallbox rollout Autohaus Brennwald",
-                "Annual DGUV V3 testing contract",
+                "EV charger rollout Brennvale Motors",
+                "Annual test and tag contract",
                 "LED retrofit for bakery branches",
-                "Rewiring of 12 flats Wohnbau Talblick",
-                "Smart home upgrade Familie Maier",
-                "Emergency service agreement Hausverwaltung Kesselbach",
-                "Kita electrical safety check",
-                "PV maintenance for Druckerei Lämmerhof",
+                "Rewiring of 12 units Talbrook Community Housing",
+                "Smart home upgrade Nguyen family",
+                "Emergency service agreement Kessington Strata",
+                "Childcare electrical safety check",
+                "Solar maintenance for Paperbark Print Works",
             ],
             tasks=[
-                "Order materials for the Maier kitchen rewiring",
-                "DGUV V3 testing round at Hotel Rosenhain",
-                "Renew van leases",
-                "Chase final invoice WEG Birkenweg",
-                "Plan apprentice exam preparation",
+                "Order materials for the Nguyen kitchen rewiring",
+                "Test and tag round at Hotel Rosella Grove",
+                "Renew ute leases",
+                "Chase final invoice Body Corporate 12 Birchwood Street",
+                "Plan apprentice TAFE block release",
             ],
             payment_days=14,
             quotes=40,
         ),
         Case(
             key="food_production",
-            company="Almtaler Hofkäserei Zennbach GmbH",
-            country="DE",
+            company="Rimuvale Farmhouse Dairy Ltd",
+            country="NZ",
             industry="Food production",
-            summary="Farm dairy making mountain cheese, butter and yoghurt from local hay milk, Allgäu.",
+            summary="Farm dairy making aged gouda, cheddar, butter and yoghurt from grass-fed milk, Hamilton (Waikato).",
             customers=[
-                ("Feinkost Gamsgrat KG", "DE"),
-                ("Biomarkt Wiesengrund eG", "DE"),
-                ("Gasthof Zum Hirschsprung", "DE"),
-                ("Käsehandel Lindhuber GmbH", "DE"),
-                ("Hotel Gipfelruh", "DE"),
-                ("Metzgerei Hubmann Partyservice", "DE"),
-                ("Hofladen-Kooperative Almwiese eG", "DE"),
-                ("Betriebskantine Energiewerke Talgrund", "DE"),
-                ("Fromagerie Dubrelle", "FR"),
-                ("Feinkost Seewinkel AG", "CH"),
-                ("Delikatessen Rovelli", "IT"),
+                ("Tuiwhenua Fine Foods Ltd", "NZ"),
+                ("Greenhollow Organics Co-operative", "NZ"),
+                ("Harakeke Lodge", "NZ"),
+                ("Lindhurst Cheesemongers Ltd", "NZ"),
+                ("Kahikatea Hotel Waikato", "NZ"),
+                ("Waipuna Butchery & Catering Ltd", "NZ"),
+                ("Matariki Farm Shop Collective", "NZ"),
+                ("Riverlea Energy Staff Canteen", "NZ"),
+                ("Wattle & Whey Providores Pty Ltd", "AU"),
+                ("Kowloon Bayview Gourmet Ltd", "HK"),
+                ("Shiokaze Fine Foods K.K.", "JP"),
             ],
             suppliers=[
-                ("Milchhof Weberling GbR", "DE", "goods"),
-                ("Molkereibedarf Kannwerk GmbH", "DE", "goods"),
-                ("Kühltransporte Frostfalke GmbH", "DE", "services"),
-                ("Hofgut Hubmann Verpachtung", "DE", "rent"),
+                ("Pukeora Milk Supply Partnership", "NZ", "goods"),
+                ("Dairykit Supplies Ltd", "NZ", "goods"),
+                ("Coolkea Chilled Freight Ltd", "NZ", "services"),
+                ("Rimuvale Farm Trust", "NZ", "rent"),
             ],
             expenses=[
-                ("Dairy and ripening cellar lease", "rent", 2900),
-                ("Salaries", "wages", 22000),
-                ("Refrigerated transport", "services", 2100),
-                ("Energy for cooling and boiler", "other", 3200),
-                ("Hygiene lab testing", "other", 450),
-                ("Markets and tastings", "marketing", 600),
-                ("Batch tracking software", "software", 180),
+                ("Dairy and ripening room lease", "rent", 5200),
+                ("Salaries", "wages", 39600),
+                ("Refrigerated transport", "services", 3800),
+                ("Energy for cooling and boiler", "other", 5750),
+                ("Food safety lab testing", "other", 810),
+                ("Markets and tastings", "marketing", 1080),
+                ("Batch tracking software", "software", 320),
             ],
             deals=[
-                "Cheese counter listing Biomarkt Wiesengrund",
+                "Cheese counter listing Greenhollow Organics",
                 "Hotel breakfast supply 2027",
-                "Christmas gift boxes for Energiewerke Talgrund",
-                "Export trial Fromagerie Dubrelle",
+                "Christmas gift boxes for Riverlea Energy",
+                "Export trial Shiokaze Fine Foods",
                 "Canteen dairy supply contract",
-                "Wedding season platters Hubmann",
-                "Mountain cheese 12 months for Käsehandel Lindhuber",
+                "Wedding season platters Waipuna",
+                "Aged gouda 12 months for Lindhurst Cheesemongers",
             ],
             tasks=[
                 "Monthly hygiene swab sampling",
-                "Turn and brush cheese in cellar 2",
-                "Renew organic certification audit",
+                "Turn and brush cheese in ripening room 2",
+                "Prepare the Risk Management Programme verification",
                 "Calibrate cold store temperature loggers",
                 "Plan Christmas gift box production",
             ],
-            payment_days=14,
+            payment_days=20,
             quotes=36,
-            extra={"rates": {"Hard cheese": 7, "Soft cheese": 7, "Dairy": 7, "Gift boxes": 7, "Platters": 7}},
         ),
         Case(
             key="franchise_multisite",
@@ -851,51 +851,52 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="creative_studio",
-            company="Studio Zwaanveld B.V.",
-            country="NL",
+            company="Studio Kumoshiro K.K.",
+            country="JP",
             industry="Creative studio",
-            summary="Branding, campaign and content studio with twelve designers and makers, Rotterdam.",
+            summary="Branding, campaign and content studio with twelve designers and makers, Tokyo (Meguro).",
             customers=[
-                ("Kademolen Brouwerij B.V.", "NL"),
-                ("Spaakwind Fietsen B.V.", "NL"),
-                ("Cultuurfonds Waterpoort", "NL"),
-                ("Kaasmakerij De Vreeling", "NL"),
-                ("Blauwtegel Living B.V.", "NL"),
+                ("Hinoki Ridge Brewing Co., Ltd.", "JP"),
+                ("Sorakaze Cycles K.K.", "JP"),
+                ("Minatomachi Culture Foundation", "JP"),
+                ("Yukimura Dairy Co., Ltd.", "JP"),
+                ("Aoitile Living K.K.", "JP"),
+                ("Kazeguruma Energy Cooperative", "JP"),
+                ("Hotel Umineko Kamakura", "JP"),
+                ("Hidamari Care Group", "JP"),
+                ("Kirameki Optics Co., Ltd.", "JP"),
                 ("Brandauer Mode GmbH", "DE"),
-                ("Stichting Scheepshuis", "NL"),
-                ("Windvlinder Energie Coöperatie U.A.", "NL"),
-                ("Lucerna Optics N.V.", "BE"),
-                ("Hotel Kadezicht", "NL"),
-                ("Zorggroep Lindehof", "NL"),
+                ("Hanbit Beauty Lab Co., Ltd.", "KR"),
             ],
             suppliers=[
-                ("Fotostudio Lichtkamer", "NL", "services"),
-                ("Beeldbron Licenties B.V.", "NL", "software"),
-                ("Creative Hub Werfkwartier", "NL", "rent"),
+                ("Studio Hikarima Photography", "JP", "services"),
+                ("Eizou Stock Licensing K.K.", "JP", "software"),
+                ("Meguro Riverside Creative Hub", "JP", "rent"),
             ],
             expenses=[
-                ("Studio rent", "rent", 3800),
-                ("Salaries", "wages", 36000),
-                ("Freelance photographers and illustrators", "services", 3500),
-                ("Design software and stock licences", "software", 1100),
-                ("Portfolio and awards", "marketing", 600),
+                ("Studio rent", "rent", 600000),
+                ("Salaries", "wages", 5800000),
+                ("Freelance photographers and illustrators", "services", 560000),
+                ("Design software and stock licences", "software", 180000),
+                ("Portfolio and awards", "marketing", 100000),
             ],
             deals=[
-                "Rebrand Kademolen Brouwerij",
-                "Spring campaign Spaakwind Fietsen",
-                "Exhibition identity Scheepshuis",
-                "Packaging range Kaasmakerij De Vreeling",
-                "Content retainer Windvlinder Energie",
-                "Product film Lucerna Optics",
-                "Employer brand Zorggroep Lindehof",
+                "Rebrand Hinoki Ridge Brewing",
+                "Spring campaign Sorakaze Cycles",
+                "Exhibition identity Minatomachi Culture Foundation",
+                "Packaging range Yukimura Dairy",
+                "Content retainer Kazeguruma Energy",
+                "Product film Kirameki Optics",
+                "Employer brand Hidamari Care Group",
             ],
             tasks=[
-                "Present key visual to Spaakwind Fietsen",
-                "Book photographer for Blauwtegel shoot",
-                "Renew image usage rights Hotel Kadezicht",
-                "Archive final files Kademolen Brouwerij",
-                "Plan content calendar for Windvlinder Energie",
+                "Present key visual to Sorakaze Cycles",
+                "Book photographer for Aoitile Living shoot",
+                "Renew image usage rights Hotel Umineko",
+                "Archive final files Hinoki Ridge Brewing",
+                "Check qualified-invoice registration numbers of freelancers",
             ],
+            payment_days=45,
             quotes=34,
             lines_per_doc=(1, 3),
         ),
@@ -1073,48 +1074,48 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="beauty_salon",
-            company="Lorvana Hair & Beauty e.U.",
-            country="AT",
+            company="Lorvana Hair & Beauty Salon L.L.C.",
+            country="AE",
             industry="Beauty salon",
-            summary="Hair and beauty salon with six stylists, nail bar and retail shelf, Vienna Neubau.",
+            summary="Hair and beauty salon with six stylists, nail bar and retail shelf, Dubai (Al Barsha).",
             customers=[
-                ("Hotel Kranzgasse Suites", "AT"),
-                ("Weissl & Weissl Hochzeitsplanung OG", "AT"),
-                ("Julia Gruber", "AT"),
-                ("Magdalena Steiner", "AT"),
-                ("Lisa Bauer", "AT"),
-                ("Katrin Hofer", "AT"),
-                ("Andrea Wimmer", "AT"),
-                ("Stefanie Mayr", "AT"),
-                ("Modehaus Leitgeb", "AT"),
-                ("Theatergruppe Kulissenwerk", "AT"),
+                ("Palmcrest Suites Hotel", "AE"),
+                ("Noor & Layla Wedding Planners L.L.C.", "AE"),
+                ("Fatima Al Mansoori", "AE"),
+                ("Priya Menon", "AE"),
+                ("Sarah Collins", "AE"),
+                ("Hessa Al Suwaidi", "AE"),
+                ("Maria Santos", "AE"),
+                ("Aisha Rahman", "AE"),
+                ("Maison Zaffran Boutique L.L.C.", "AE"),
+                ("Qamar Theatre Collective", "AE"),
             ],
             suppliers=[
-                ("Friseurbedarf Scherenwerk GmbH", "AT", "goods"),
-                ("Kosmetik Großhandel Rosalie", "AT", "goods"),
-                ("Textilpflege Flussweiß", "AT", "services"),
-                ("Hausverwaltung Fliedergasse", "AT", "rent"),
+                ("Scissorline Salon Supplies Trading L.L.C.", "AE", "goods"),
+                ("Rosalie Cosmetics FZE", "AE", "goods"),
+                ("Snowdrift Laundry Services L.L.C.", "AE", "services"),
+                ("Sandvale Properties L.L.C.", "AE", "rent"),
             ],
             expenses=[
-                ("Salon rent", "rent", 2600),
-                ("Salaries", "wages", 17000),
-                ("Towel and gown laundry", "services", 450),
-                ("Online booking system", "software", 160),
-                ("Social media ads", "marketing", 600),
+                ("Salon rent", "rent", 10400),
+                ("Salaries", "wages", 68000),
+                ("Towel and gown laundry", "services", 1800),
+                ("Online booking system", "software", 640),
+                ("Social media ads", "marketing", 2400),
             ],
             deals=[
-                "Bridal packages Weissl & Weissl",
-                "Hotel guest styling Kranzgasse Suites",
-                "Fashion show styling Modehaus Leitgeb",
+                "Bridal packages Noor & Layla",
+                "Hotel guest styling Palmcrest Suites",
+                "Fashion show styling Maison Zaffran",
                 "Theatre premiere make-up",
                 "Voucher partnership with florist",
                 "Nail bar expansion",
             ],
             tasks=[
-                "Order colour stock for December",
+                "Order colour stock before Eid",
                 "Train new stylist on balayage",
                 "Clean and disinfect tools log",
-                "Plan Christmas voucher campaign",
+                "Plan National Day voucher campaign",
                 "Reorder retail shelf best-sellers",
             ],
             b2c=True,
@@ -1181,109 +1182,105 @@ CASES: dict[str, Case] = {
         ),
         Case(
             key="restaurant_cafe",
-            company="Café & Bistro Möwenkai GmbH",
-            country="DE",
+            company="Café Tlalmira S.A. de C.V.",
+            country="MX",
             industry="Restaurant",
-            summary="Harbour-side café bistro with 90 seats, takeaway counter, catering and private events, Kiel.",
+            summary="Café bistro with 90 seats, takeaway counter, catering and private events, Mexico City (Roma Norte).",
             customers=[
-                ("Reederei Wellenreiter GmbH", "DE"),
-                ("Agentur Leuchtfeuer Events GmbH", "DE"),
-                ("Segelclub Windkante e.V.", "DE"),
-                ("Kanzlei Petersmann & Lundt", "DE"),
-                ("Buchtwerk Software GmbH", "DE"),
-                ("Hochzeitsplanung Seeschwalbe", "DE"),
-                ("Forschungsstation Seegras", "DE"),
-                ("Seglarvik Yachting AB", "SE"),
-                ("Hafenkontor Möwenkai GmbH", "DE"),
+                ("Agencia Lumbrera Eventos S.A. de C.V.", "MX"),
+                ("Club de Remo Xochimanca A.C.", "MX"),
+                ("Despacho Petrell & Luna Abogados S.C.", "MX"),
+                ("Bytemaíz Software S.A. de C.V.", "MX"),
+                ("Bodas Golondrina Planeación", "MX"),
+                ("Instituto de Ecología Ahuehuete A.C.", "MX"),
+                ("Galería Ocrevista", "MX"),
+                ("Corporativo Tezontle Plaza S.C.", "MX"),
+                ("Mesaverde Tours LLC", "US"),
             ],
             suppliers=[
-                ("Frischeküche Großmarkt Kombüse GmbH", "DE", "goods"),
-                ("Getränke Gischt GmbH", "DE", "goods"),
-                ("Rösterei Bohnenkai", "DE", "goods"),
-                ("Gebäudereinigung Blankenhorn", "DE", "services"),
-                ("Hafenimmobilien Möwenkai GmbH", "DE", "rent"),
+                ("Distribuidora Frescamar S.A. de C.V.", "MX", "goods"),
+                ("Bebidas Cenzontle S.A. de C.V.", "MX", "goods"),
+                ("Tostaduría Cafeto Alto S.A. de C.V.", "MX", "goods"),
+                ("Limpiezas Brillaluz S.A. de C.V.", "MX", "services"),
+                ("Inmobiliaria Tlalmira S.A. de C.V.", "MX", "rent"),
             ],
             expenses=[
-                ("Restaurant rent", "rent", 5200),
-                ("Salaries", "wages", 32000),
-                ("Cleaning service", "services", 900),
-                ("Energy and gas", "other", 2100),
-                ("POS and table reservations", "software", 260),
-                ("Local marketing", "marketing", 500),
+                ("Restaurant rent", "rent", 78000),
+                ("Salaries", "wages", 480000),
+                ("Cleaning service", "services", 13500),
+                ("Electricity and gas", "other", 31500),
+                ("POS and table reservations", "software", 3900),
+                ("Local marketing", "marketing", 7500),
             ],
             deals=[
-                "Summer party Buchtwerk Software",
-                "Regatta catering Segelclub Windkante",
-                "Wedding reception Seeschwalbe",
-                "Weekly lunch delivery Hafenkontor",
-                "Christmas dinners Reederei Wellenreiter",
-                "Conference coffee breaks institute",
+                "Summer party Bytemaíz Software",
+                "Regatta catering Club de Remo Xochimanca",
+                "Wedding reception Bodas Golondrina",
+                "Weekly lunch delivery Corporativo Tezontle",
+                "Posada dinners Despacho Petrell & Luna",
+                "Conference coffee breaks Instituto Ahuehuete",
             ],
             tasks=[
-                "Daily HACCP temperature log",
+                "Daily food safety temperature log",
                 "Order fish for the weekend menu",
                 "Deep clean of the extraction hood",
-                "Plan staff rota for regatta week",
-                "Check allergen labelling on new menu",
+                "Plan staff rota for Día de Muertos week",
+                "Issue CFDI invoices for catering customers",
             ],
             b2c=True,
             quotes=30,
-            extra={
-                "rates": {"Takeaway": 7, "Catering delivery": 7},
-                "walk_in": "Restaurant guests (card and cash)",
-                "walk_in_note": "Daily takings",
-            },
+            extra={"walk_in": "Restaurant guests (card and cash)", "walk_in_note": "Daily takings"},
         ),
         Case(
             key="small_hotel",
-            company="Landhotel Tannweiher GmbH",
-            country="DE",
+            company="Klaverdal Country Hotel (Pty) Ltd",
+            country="ZA",
             industry="Hotel",
-            summary="Lakeside country hotel with 34 rooms, seminar rooms and a small spa, Ammersee.",
+            summary="Winelands country hotel with 34 rooms, conference rooms and a small spa, Stellenbosch.",
             customers=[
-                ("Segelschule Tannweiher GmbH", "DE"),
-                ("Reisebüro Gipfelglück GmbH", "DE"),
-                ("Pharmaseminare Vendura GmbH", "DE"),
-                ("Hochzeit Familie Gruber", "DE"),
-                ("TSV Tannweiher Fußball e.V.", "DE"),
-                ("Wanderreisen Gipfelpfad GmbH", "DE"),
-                ("Software Campus Isarlicht GmbH", "DE"),
-                ("Busreisen Hubmann KG", "DE"),
+                ("Bolandrift Cycle Tours (Pty) Ltd", "ZA"),
+                ("Gemsbokvlei Travel (Pty) Ltd", "ZA"),
+                ("Vendura Pharma Seminars (Pty) Ltd", "ZA"),
+                ("Naidoo family wedding", "ZA"),
+                ("Eikestad Wanderers Rugby Club", "ZA"),
+                ("Fynroute Hiking Tours (Pty) Ltd", "ZA"),
+                ("Bytevale Software Campus (Pty) Ltd", "ZA"),
+                ("Karoolyn Coach Tours (Pty) Ltd", "ZA"),
                 ("Lysbro Travel ApS", "DK"),
+                ("Harwick Safari Holidays Ltd", "GB"),
             ],
             suppliers=[
-                ("Gastro-Großhandel Seetal GmbH", "DE", "goods"),
-                ("Brauerei Mönchsquell GmbH", "DE", "goods"),
-                ("Großwäscherei Linnenweiß GmbH", "DE", "services"),
-                ("Grundstücksgesellschaft Tannweiher KG", "DE", "rent"),
+                ("Wynland Hospitality Wholesale (Pty) Ltd", "ZA", "goods"),
+                ("Kloofbrou Craft Brewers (Pty) Ltd", "ZA", "goods"),
+                ("Linnewit Laundry Services (Pty) Ltd", "ZA", "services"),
+                ("Klaverdal Property Holdings (Pty) Ltd", "ZA", "rent"),
             ],
             expenses=[
-                ("Hotel lease", "rent", 9500),
-                ("Salaries", "wages", 34000),
-                ("Linen and laundry", "services", 2400),
-                ("Energy and heating", "other", 3100),
-                ("Property management system and channel manager", "software", 690),
-                ("Booking platform commissions", "marketing", 4800),
+                ("Hotel lease", "rent", 142500),
+                ("Salaries", "wages", 510000),
+                ("Linen and laundry", "services", 36000),
+                ("Electricity and generator diesel", "other", 46500),
+                ("Property management system and channel manager", "software", 10350),
+                ("Booking platform commissions", "marketing", 72000),
             ],
             deals=[
-                "Spring seminar series Pharmaseminare Vendura",
-                "Wedding Familie Gruber",
-                "Group tours 2027 Busreisen Hubmann",
-                "Team offsite Software Campus",
-                "Hiking packages Gipfelpfad",
+                "Spring seminar series Vendura Pharma",
+                "Naidoo family wedding",
+                "Group tours 2027 Karoolyn Coach Tours",
+                "Team offsite Bytevale Software Campus",
+                "Hiking packages Fynroute",
                 "Scandinavian tour series Lysbro Travel",
             ],
             tasks=[
                 "Monthly room inspection checklist",
                 "Service the sauna and steam room",
-                "Update winter rates on booking channels",
-                "Confirm rooming list Busreisen Hubmann",
-                "Order linen replacement for 12 rooms",
+                "Update summer rates on booking channels",
+                "Confirm rooming list Karoolyn Coach Tours",
+                "Test the backup generator before load-shedding",
             ],
             b2c=True,
             quotes=30,
             extra={
-                "rates": {"Accommodation": 7},
                 "walk_in": "Individual guests (card and booking platforms)",
                 "walk_in_note": "Room and restaurant revenue",
             },
@@ -1437,17 +1434,17 @@ ITEMS: dict[str, list[_I]] = {
         ("KM-5000", "Freight and handling, flat", "flat", "Services", "95.00", "0.00", False, 1),
     ],
     "professional_services": [
-        ("SV-PARTNER", "Partner day rate", "day", "Consulting days", "1850.00", "620.00", False, 10),
-        ("SV-SENIOR", "Senior consultant day rate", "day", "Consulting days", "1250.00", "450.00", False, 20),
-        ("SV-CONSULT", "Consultant day rate", "day", "Consulting days", "890.00", "330.00", False, 30),
-        ("SV-ANALYST", "Analyst day rate", "day", "Consulting days", "650.00", "240.00", False, 30),
+        ("SV-PARTNER", "Partner day rate", "day", "Consulting days", "2800.00", "930.00", False, 10),
+        ("SV-SENIOR", "Senior consultant day rate", "day", "Consulting days", "1900.00", "680.00", False, 20),
+        ("SV-CONSULT", "Consultant day rate", "day", "Consulting days", "1350.00", "500.00", False, 30),
+        ("SV-ANALYST", "Analyst day rate", "day", "Consulting days", "980.00", "360.00", False, 30),
         (
             "SV-WORKSHOP",
             "Strategy workshop, half day incl. preparation",
             "session",
             "Workshops",
-            "3200.00",
-            "1100.00",
+            "4800.00",
+            "1650.00",
             False,
             3,
         ),
@@ -1456,16 +1453,25 @@ ITEMS: dict[str, list[_I]] = {
             "Finance training for managers, per participant",
             "participant",
             "Workshops",
-            "690.00",
-            "180.00",
+            "1050.00",
+            "270.00",
             False,
             20,
         ),
-        ("SV-DD", "Financial due diligence package", "flat", "Fixed-fee projects", "14500.00", "5200.00", False, 1),
-        ("SV-BENCH", "Finance function benchmark report", "flat", "Fixed-fee projects", "7800.00", "2600.00", False, 1),
-        ("SV-RET", "Monthly advisory retainer", "month", "Retainers", "4500.00", "1500.00", False, 1),
-        ("SV-INTERIM", "Interim CFO, per week", "week", "Retainers", "6400.00", "2400.00", False, 4),
-        ("SV-EXP", "Travel expenses, flat", "flat", "Expenses", "350.00", "350.00", False, 1),
+        ("SV-DD", "Financial due diligence package", "flat", "Fixed-fee projects", "22000.00", "7800.00", False, 1),
+        (
+            "SV-BENCH",
+            "Finance function benchmark report",
+            "flat",
+            "Fixed-fee projects",
+            "11800.00",
+            "3900.00",
+            False,
+            1,
+        ),
+        ("SV-RET", "Monthly advisory retainer", "month", "Retainers", "6800.00", "2250.00", False, 1),
+        ("SV-INTERIM", "Interim CFO, per week", "week", "Retainers", "9600.00", "3600.00", False, 4),
+        ("SV-EXP", "Travel expenses, flat", "flat", "Expenses", "520.00", "520.00", False, 1),
     ],
     "manufacturing": [
         ("HW-T180", "Oak dining table 180x90", "pcs", "Tables", "1290.00", "470.00", True, 40),
@@ -1482,40 +1488,40 @@ ITEMS: dict[str, list[_I]] = {
         ("HW-DEL", "Delivery and assembly", "flat", "Services", "180.00", "0", False, 1),
     ],
     "retail_ecommerce": [
-        ("LF-BOT", "Glass water bottle 750 ml", "pcs", "Drinkware", "24.90", "10.20", True, 60),
-        ("LF-MUG", "Stoneware mug, hand-glazed", "pcs", "Drinkware", "21.00", "8.60", True, 60),
-        ("LF-CUP", "Reusable coffee cup 350 ml", "pcs", "Drinkware", "16.90", "6.80", True, 60),
-        ("LF-WRAP", "Beeswax food wraps, set of 3", "set", "Kitchen", "18.50", "7.40", True, 80),
-        ("LF-BRUSH", "Bamboo dish brush set", "set", "Kitchen", "12.90", "4.90", True, 80),
-        ("LF-BOARD", "Bamboo cutting board", "pcs", "Kitchen", "29.90", "12.50", True, 40),
-        ("LF-JAR", "Storage jar set, 4 pcs", "set", "Storage", "39.90", "17.20", True, 40),
-        ("LF-BAG", "Organic cotton produce bags, set of 5", "set", "Storage", "14.90", "5.60", True, 80),
-        ("LF-LINEN", "Linen tea towels, set of 2", "set", "Textiles", "26.00", "11.30", True, 40),
-        ("LF-APRON", "Linen apron", "pcs", "Textiles", "34.00", "14.80", True, 30),
-        ("LF-GIFT", "Gift box zero-waste kitchen", "pcs", "Gift sets", "59.00", "27.00", True, 20),
-        ("LF-SHIP", "Shipping", "flat", "Services", "5.90", "0", False, 1),
+        ("LF-BOT", "Glass water bottle, 25 oz", "pcs", "Drinkware", "27.00", "11.20", True, 60),
+        ("LF-MUG", "Stoneware mug, hand-glazed", "pcs", "Drinkware", "23.00", "9.50", True, 60),
+        ("LF-CUP", "Reusable coffee cup, 12 oz", "pcs", "Drinkware", "18.50", "7.50", True, 60),
+        ("LF-WRAP", "Beeswax food wraps, set of 3", "set", "Kitchen", "20.00", "8.10", True, 80),
+        ("LF-BRUSH", "Bamboo dish brush set", "set", "Kitchen", "14.00", "5.40", True, 80),
+        ("LF-BOARD", "Bamboo cutting board", "pcs", "Kitchen", "32.00", "13.80", True, 40),
+        ("LF-JAR", "Storage jar set, 4 pcs", "set", "Storage", "44.00", "18.90", True, 40),
+        ("LF-BAG", "Organic cotton produce bags, set of 5", "set", "Storage", "16.50", "6.20", True, 80),
+        ("LF-LINEN", "Linen tea towels, set of 2", "set", "Textiles", "28.50", "12.40", True, 40),
+        ("LF-APRON", "Linen apron", "pcs", "Textiles", "37.00", "16.30", True, 30),
+        ("LF-GIFT", "Zero-waste kitchen gift box", "pcs", "Gift sets", "65.00", "29.70", True, 20),
+        ("LF-SHIP", "Shipping", "flat", "Services", "6.50", "0", False, 1),
     ],
     "field_service": [
-        ("CP-MAINT-S", "Annual maintenance split AC unit", "unit", "Maintenance", "189.00", "0", False, 40),
-        ("CP-MAINT-C", "Annual maintenance central ventilation unit", "unit", "Maintenance", "640.00", "0", False, 10),
-        ("CP-CONTRACT", "Service contract, quarterly fee per site", "site", "Maintenance", "780.00", "0", False, 6),
-        ("CP-LAB", "Technician labour, per hour", "hour", "Labour", "92.00", "0", False, 80),
-        ("CP-CALL", "Emergency call-out fee", "flat", "Labour", "145.00", "0", False, 1),
-        ("CP-FILT", "Filter set F7 replacement", "set", "Spare parts", "68.00", "31.00", True, 60),
-        ("CP-REFR", "Refrigerant R32 refill, per kg", "kg", "Spare parts", "54.00", "24.00", True, 30),
-        ("CP-VALVE", "Expansion valve, universal", "pcs", "Spare parts", "165.00", "82.00", True, 10),
-        ("CP-FAN", "Condenser fan motor", "pcs", "Spare parts", "285.00", "148.00", True, 6),
-        ("CP-INST", "Installation split AC 3.5 kW incl. unit", "pcs", "Installations", "2490.00", "1290.00", True, 10),
+        ("CP-MAINT-S", "Annual tune-up, furnace and AC", "unit", "Maintenance", "285.00", "0", False, 40),
+        ("CP-MAINT-C", "Annual maintenance rooftop unit", "unit", "Maintenance", "960.00", "0", False, 10),
+        ("CP-CONTRACT", "Service contract, quarterly fee per site", "site", "Maintenance", "1170.00", "0", False, 6),
+        ("CP-LAB", "Technician labour, per hour", "hour", "Labour", "138.00", "0", False, 80),
+        ("CP-CALL", "Emergency call-out fee", "flat", "Labour", "220.00", "0", False, 1),
+        ("CP-FILT", "MERV 13 filter set replacement", "set", "Spare parts", "102.00", "46.50", True, 60),
+        ("CP-REFR", "Refrigerant R-32 refill, per kg", "kg", "Spare parts", "81.00", "36.00", True, 30),
+        ("CP-VALVE", "Expansion valve, universal", "pcs", "Spare parts", "248.00", "123.00", True, 10),
+        ("CP-FAN", "Condenser fan motor", "pcs", "Spare parts", "428.00", "222.00", True, 6),
         (
-            "CP-HP",
-            "Air-to-water heat pump 8 kW incl. installation",
+            "CP-INST",
+            "Ductless mini-split 12,000 BTU incl. installation",
             "pcs",
             "Installations",
-            "11900.00",
-            "7400.00",
+            "3740.00",
+            "1935.00",
             True,
-            2,
+            10,
         ),
+        ("CP-HP", "Cold-climate heat pump incl. installation", "pcs", "Installations", "17850.00", "11100.00", True, 2),
     ],
     "logistics": [
         ("BB-FTL-PL-SE", "Full truckload Gdańsk to Stockholm", "trip", "Road freight", "2150.00", "1640.00", False, 10),
@@ -1549,17 +1555,17 @@ ITEMS: dict[str, list[_I]] = {
         ("BB-INS", "Cargo insurance", "flat", "Insurance", "120.00", "70.00", False, 1),
     ],
     "it_agency": [
-        ("PF-DISC", "Discovery and UX workshop", "flat", "Strategy and UX", "2400.00", "900.00", False, 1),
-        ("PF-UX", "UX research, per day", "day", "Strategy and UX", "720.00", "280.00", False, 10),
-        ("PF-DES", "UI design, per day", "day", "Design", "650.00", "250.00", False, 12),
-        ("PF-BRAND", "Brand identity package", "flat", "Design", "6500.00", "2400.00", False, 1),
-        ("PF-DEV", "Development sprint (2 weeks)", "sprint", "Development", "9800.00", "3900.00", False, 3),
-        ("PF-APP", "Mobile app sprint (2 weeks)", "sprint", "Development", "11800.00", "4700.00", False, 2),
-        ("PF-QA", "QA and accessibility testing, per day", "day", "Development", "560.00", "220.00", False, 10),
-        ("PF-HRS", "Change requests, per hour", "hour", "Development", "95.00", "38.00", False, 60),
-        ("PF-SEO", "SEO and content retainer, monthly", "month", "Marketing", "1800.00", "700.00", False, 1),
-        ("PF-ADS", "Paid social campaign management", "month", "Marketing", "1450.00", "560.00", False, 1),
-        ("PF-HOST", "Managed hosting and support, monthly", "month", "Hosting", "390.00", "120.00", False, 1),
+        ("PF-DISC", "Discovery and UX workshop", "flat", "Strategy and UX", "108000.00", "40500.00", False, 1),
+        ("PF-UX", "UX research, per day", "day", "Strategy and UX", "32000.00", "12500.00", False, 10),
+        ("PF-DES", "UI design, per day", "day", "Design", "29000.00", "11000.00", False, 12),
+        ("PF-BRAND", "Brand identity package", "flat", "Design", "290000.00", "107000.00", False, 1),
+        ("PF-DEV", "Development sprint (2 weeks)", "sprint", "Development", "440000.00", "175000.00", False, 3),
+        ("PF-APP", "Mobile app sprint (2 weeks)", "sprint", "Development", "530000.00", "211000.00", False, 2),
+        ("PF-QA", "QA and accessibility testing, per day", "day", "Development", "25000.00", "9800.00", False, 10),
+        ("PF-HRS", "Change requests, per hour", "hour", "Development", "4200.00", "1700.00", False, 60),
+        ("PF-SEO", "SEO and content retainer, monthly", "month", "Marketing", "80000.00", "31000.00", False, 1),
+        ("PF-ADS", "Paid social campaign management", "month", "Marketing", "65000.00", "25000.00", False, 1),
+        ("PF-HOST", "Managed hosting and support, monthly", "month", "Hosting", "17500.00", "5400.00", False, 1),
     ],
     "nonprofit": [
         ("GC-WS", "School workshop: climate and nature (half day)", "session", "Education", "320.00", "0", False, 12),
@@ -1593,32 +1599,32 @@ ITEMS: dict[str, list[_I]] = {
         ("GC-SEED", "Wildflower seed kit for schools", "kit", "Publications", "9.50", "3.80", True, 300),
     ],
     "craft_trades": [
-        ("HE-MEIST", "Master electrician, per hour", "hour", "Labour", "78.00", "0", False, 40),
-        ("HE-GES", "Electrician, per hour", "hour", "Labour", "64.00", "0", False, 120),
-        ("HE-AZUB", "Apprentice, per hour", "hour", "Labour", "32.00", "0", False, 60),
-        ("HE-ANF", "Call-out and travel, flat", "flat", "Labour", "45.00", "0", False, 1),
-        ("HE-DGUV", "Portable appliance test DGUV V3, per device", "device", "Testing", "6.50", "0", False, 400),
-        ("HE-ANL", "Periodic installation test, per circuit", "circuit", "Testing", "18.00", "0", False, 60),
-        ("HE-NYM", "Installation cable NYM-J 3x1.5, per metre", "m", "Materials", "1.35", "0.62", True, 800),
-        ("HE-SCHUKO", "Flush-mounted socket outlet incl. frame", "pcs", "Materials", "14.80", "6.40", True, 80),
-        ("HE-LED", "LED panel 62x62, 36 W", "pcs", "Materials", "79.00", "38.00", True, 60),
-        ("HE-FI", "Residual current device 40 A 30 mA, 4-pole", "pcs", "Materials", "96.00", "44.00", True, 20),
-        ("HE-VERT", "Distribution board, 3 rows, fitted", "pcs", "Materials", "690.00", "340.00", True, 4),
-        ("HE-WALLB", "Wallbox 11 kW incl. installation", "pcs", "E-mobility", "1890.00", "980.00", True, 6),
-        ("HE-PV", "PV system maintenance visit", "visit", "Maintenance", "240.00", "0", False, 10),
+        ("HE-MEIST", "Supervising electrician, per hour", "hour", "Labour", "133.00", "0", False, 40),
+        ("HE-GES", "Electrician, per hour", "hour", "Labour", "109.00", "0", False, 120),
+        ("HE-AZUB", "Apprentice, per hour", "hour", "Labour", "54.00", "0", False, 60),
+        ("HE-ANF", "Call-out and travel, flat", "flat", "Labour", "79.00", "0", False, 1),
+        ("HE-DGUV", "Test and tag, per appliance", "device", "Testing", "11.00", "0", False, 400),
+        ("HE-ANL", "Periodic installation test, per circuit", "circuit", "Testing", "31.00", "0", False, 60),
+        ("HE-NYM", "TPS cable 2.5 mm² twin and earth, per metre", "m", "Materials", "2.30", "1.05", True, 800),
+        ("HE-SCHUKO", "Double power point incl. plate", "pcs", "Materials", "25.00", "10.90", True, 80),
+        ("HE-LED", "LED panel 600x600, 36 W", "pcs", "Materials", "134.00", "65.00", True, 60),
+        ("HE-FI", "RCBO safety switch 32 A 30 mA", "pcs", "Materials", "163.00", "75.00", True, 20),
+        ("HE-VERT", "Switchboard upgrade, 3 rows, fitted", "pcs", "Materials", "1170.00", "578.00", True, 4),
+        ("HE-WALLB", "EV charger 7 kW incl. installation", "pcs", "E-mobility", "3200.00", "1660.00", True, 6),
+        ("HE-PV", "Solar PV maintenance visit", "visit", "Maintenance", "410.00", "0", False, 10),
     ],
     "food_production": [
-        ("BW-BERG6", "Mountain cheese, 6 months, per kg", "kg", "Hard cheese", "16.90", "6.40", True, 300),
-        ("BW-BERG12", "Mountain cheese, 12 months, per kg", "kg", "Hard cheese", "22.50", "8.60", True, 150),
-        ("BW-EMM", "Allgäu Emmentaler, per kg", "kg", "Hard cheese", "13.80", "5.20", True, 300),
-        ("BW-WEICH", "Soft cheese wheel 200 g", "pcs", "Soft cheese", "4.20", "1.50", True, 400),
-        ("BW-BUTT", "Farmhouse butter 250 g", "pcs", "Dairy", "3.10", "1.20", True, 500),
-        ("BW-JOG", "Natural yoghurt 500 g", "pcs", "Dairy", "2.40", "0.85", True, 500),
-        ("BW-QUARK", "Quark 500 g", "pcs", "Dairy", "2.20", "0.80", True, 400),
-        ("BW-GIFT", "Cheese gift box, four varieties", "box", "Gift boxes", "34.00", "12.50", True, 60),
-        ("BW-PLAT", "Cheese platter for 20 guests", "platter", "Platters", "145.00", "52.00", True, 6),
-        ("BW-TOUR", "Dairy tour and tasting, per group", "group", "Experiences", "180.00", "0", False, 4),
-        ("BW-DEL", "Refrigerated delivery, per drop", "drop", "Logistics", "24.00", "0", False, 1),
+        ("BW-BERG6", "Aged gouda, 6 months, per kg", "kg", "Hard cheese", "30.50", "11.50", True, 300),
+        ("BW-BERG12", "Aged gouda, 12 months, per kg", "kg", "Hard cheese", "40.50", "15.50", True, 150),
+        ("BW-EMM", "Vintage cheddar, per kg", "kg", "Hard cheese", "24.80", "9.40", True, 300),
+        ("BW-WEICH", "Soft cheese wheel 200 g", "pcs", "Soft cheese", "7.60", "2.70", True, 400),
+        ("BW-BUTT", "Farmhouse butter 250 g", "pcs", "Dairy", "5.60", "2.15", True, 500),
+        ("BW-JOG", "Natural yoghurt 500 g", "pcs", "Dairy", "4.30", "1.55", True, 500),
+        ("BW-QUARK", "Cottage cheese 500 g", "pcs", "Dairy", "4.00", "1.45", True, 400),
+        ("BW-GIFT", "Cheese gift box, four varieties", "box", "Gift boxes", "61.00", "22.50", True, 60),
+        ("BW-PLAT", "Cheese platter for 20 guests", "platter", "Platters", "260.00", "93.60", True, 6),
+        ("BW-TOUR", "Dairy tour and tasting, per group", "group", "Experiences", "325.00", "0", False, 4),
+        ("BW-DEL", "Refrigerated delivery, per drop", "drop", "Logistics", "43.00", "0", False, 1),
     ],
     "franchise_multisite": [
         ("BO-ROY", "Franchise royalty, 6 % of monthly net sales", "month", "Franchise fees", "2850.00", "0", False, 1),
@@ -1670,17 +1676,17 @@ ITEMS: dict[str, list[_I]] = {
         ("KP-AUSL", "Postage and telecom, flat", "flat", "Expenses", "20.00", "0", False, 1),
     ],
     "creative_studio": [
-        ("SN-BRAND", "Brand identity: logo, palette, typography", "flat", "Branding", "8900.00", "0", False, 1),
-        ("SN-GUIDE", "Brand guidelines", "flat", "Branding", "3200.00", "0", False, 1),
-        ("SN-CAMP", "Campaign concept and key visual", "flat", "Campaigns", "6500.00", "0", False, 1),
-        ("SN-SOC", "Social media content package, monthly", "month", "Content", "2400.00", "0", False, 1),
-        ("SN-PHOTO", "Product photography, per day", "day", "Photo and video", "1450.00", "0", False, 4),
-        ("SN-FILM", "Brand film, 60 seconds", "flat", "Photo and video", "9800.00", "0", False, 1),
-        ("SN-DES", "Designer, per hour", "hour", "Design hours", "95.00", "0", False, 60),
-        ("SN-AD", "Art director, per hour", "hour", "Design hours", "125.00", "0", False, 30),
-        ("SN-PACK", "Packaging design, per product", "product", "Design hours", "1650.00", "0", False, 6),
-        ("SN-RIGHTS", "Image usage rights, two years national", "licence", "Usage rights", "1200.00", "0", False, 3),
-        ("SN-RET", "Creative retainer, monthly", "month", "Retainers", "4200.00", "0", False, 1),
+        ("SN-BRAND", "Brand identity: logo, palette, typography", "flat", "Branding", "1400000", "0", False, 1),
+        ("SN-GUIDE", "Brand guidelines", "flat", "Branding", "500000", "0", False, 1),
+        ("SN-CAMP", "Campaign concept and key visual", "flat", "Campaigns", "1000000", "0", False, 1),
+        ("SN-SOC", "Social media content package, monthly", "month", "Content", "380000", "0", False, 1),
+        ("SN-PHOTO", "Product photography, per day", "day", "Photo and video", "230000", "0", False, 4),
+        ("SN-FILM", "Brand film, 60 seconds", "flat", "Photo and video", "1550000", "0", False, 1),
+        ("SN-DES", "Designer, per hour", "hour", "Design hours", "15000", "0", False, 60),
+        ("SN-AD", "Art director, per hour", "hour", "Design hours", "20000", "0", False, 30),
+        ("SN-PACK", "Packaging design, per product", "product", "Design hours", "260000", "0", False, 6),
+        ("SN-RIGHTS", "Image usage rights, two years in Japan", "licence", "Usage rights", "190000", "0", False, 3),
+        ("SN-RET", "Creative retainer, monthly", "month", "Retainers", "670000", "0", False, 1),
     ],
     "real_estate": [
         ("KI-SALE", "Sales commission, 3 % of purchase price", "flat", "Brokerage", "10800.00", "0", False, 1),
@@ -1732,43 +1738,52 @@ ITEMS: dict[str, list[_I]] = {
         ("LH-ROLL", "Foam roller", "pcs", "Products", "34.90", "15.80", True, 8),
     ],
     "beauty_salon": [
-        ("MB-CUT-L", "Ladies' cut and blow-dry", "service", "Hair", "68.00", "0", False, 45),
-        ("MB-CUT-M", "Men's cut", "service", "Hair", "38.00", "0", False, 40),
-        ("MB-COL", "Full colour incl. cut", "service", "Colour", "129.00", "0", False, 20),
-        ("MB-BAL", "Balayage incl. toner and styling", "service", "Colour", "219.00", "0", False, 8),
-        ("MB-BRIDE", "Bridal hair and make-up incl. trial", "package", "Bridal", "390.00", "0", False, 3),
-        ("MB-FAC", "Facial treatment, 60 min", "service", "Beauty", "89.00", "0", False, 15),
-        ("MB-LASH", "Lash lift and tint", "service", "Beauty", "65.00", "0", False, 12),
-        ("MB-MANI", "Gel manicure", "service", "Nails", "49.00", "0", False, 30),
-        ("MB-SHAMP", "Professional shampoo 250 ml", "pcs", "Retail products", "24.90", "11.20", True, 25),
-        ("MB-OIL", "Hair oil 100 ml", "pcs", "Retail products", "32.00", "14.50", True, 12),
-        ("MB-CARE", "Skin care set", "set", "Retail products", "59.00", "27.00", True, 6),
+        ("MB-CUT-L", "Ladies' cut and blow-dry", "service", "Hair", "270.00", "0", False, 45),
+        ("MB-CUT-M", "Men's cut", "service", "Hair", "150.00", "0", False, 40),
+        ("MB-COL", "Full colour incl. cut", "service", "Colour", "520.00", "0", False, 20),
+        ("MB-BAL", "Balayage incl. toner and styling", "service", "Colour", "880.00", "0", False, 8),
+        ("MB-BRIDE", "Bridal hair and make-up incl. trial", "package", "Bridal", "1600.00", "0", False, 3),
+        ("MB-FAC", "Facial treatment, 60 min", "service", "Beauty", "360.00", "0", False, 15),
+        ("MB-LASH", "Lash lift and tint", "service", "Beauty", "260.00", "0", False, 12),
+        ("MB-MANI", "Gel manicure", "service", "Nails", "195.00", "0", False, 30),
+        ("MB-SHAMP", "Professional shampoo 250 ml", "pcs", "Retail products", "99.00", "44.80", True, 25),
+        ("MB-OIL", "Hair oil 100 ml", "pcs", "Retail products", "129.00", "58.00", True, 12),
+        ("MB-CARE", "Skin care set", "set", "Retail products", "239.00", "108.00", True, 6),
     ],
     "restaurant_cafe": [
-        ("HL-BRUNCH", "Weekend brunch buffet, per person", "person", "Dine-in food", "29.00", "8.70", True, 180),
-        ("HL-FISH", "Fish of the day with potatoes", "portion", "Dine-in food", "22.50", "7.20", True, 220),
-        ("HL-BOWL", "Seasonal bowl", "portion", "Dine-in food", "15.90", "4.60", True, 260),
-        ("HL-CAKE", "Homemade cake, slice", "slice", "Dine-in food", "4.60", "1.10", True, 500),
-        ("HL-CAPP", "Cappuccino", "cup", "Drinks", "3.90", "0.55", True, 900),
-        ("HL-WINE", "House wine 0.2 l", "glass", "Drinks", "6.50", "1.60", True, 400),
-        ("HL-BEER", "Draught beer 0.4 l", "glass", "Drinks", "4.90", "1.10", True, 500),
-        ("HL-SAND", "Sandwich to go", "pcs", "Takeaway", "6.90", "2.10", True, 400),
-        ("HL-CAKE-TG", "Cake to go, slice", "slice", "Takeaway", "4.20", "1.10", True, 300),
-        ("HL-CATER", "Finger food, per person, delivered", "person", "Catering delivery", "24.00", "8.40", True, 80),
-        ("HL-EVENT", "Private event hire, evening", "evening", "Events", "650.00", "0", False, 1),
+        ("HL-BRUNCH", "Weekend brunch buffet, per person", "person", "Dine-in food", "435.00", "130.50", True, 180),
+        ("HL-FISH", "Fish of the day, Veracruz style", "portion", "Dine-in food", "340.00", "108.00", True, 220),
+        ("HL-BOWL", "Seasonal bowl", "portion", "Dine-in food", "240.00", "69.00", True, 260),
+        ("HL-CAKE", "Tres leches cake, slice", "slice", "Dine-in food", "70.00", "16.50", True, 500),
+        ("HL-CAPP", "Cappuccino", "cup", "Drinks", "60.00", "8.30", True, 900),
+        ("HL-WINE", "Mezcal, 45 ml", "glass", "Drinks", "100.00", "24.00", True, 400),
+        ("HL-BEER", "Craft beer 355 ml", "bottle", "Drinks", "75.00", "16.50", True, 500),
+        ("HL-SAND", "Torta to go", "pcs", "Takeaway", "105.00", "31.50", True, 400),
+        ("HL-CAKE-TG", "Concha sweet bread to go", "pcs", "Takeaway", "65.00", "16.50", True, 300),
+        (
+            "HL-CATER",
+            "Taco bar catering, per person, delivered",
+            "person",
+            "Catering delivery",
+            "360.00",
+            "126.00",
+            True,
+            80,
+        ),
+        ("HL-EVENT", "Private event hire, evening", "evening", "Events", "9800.00", "0", False, 1),
     ],
     "small_hotel": [
-        ("SB-SGL", "Single room, per night", "night", "Accommodation", "89.00", "0", False, 60),
-        ("SB-DBL", "Double room, per night", "night", "Accommodation", "139.00", "0", False, 120),
-        ("SB-SUITE", "Lake-view suite, per night", "night", "Accommodation", "219.00", "0", False, 20),
-        ("SB-BRKF", "Breakfast buffet, per person", "person", "Breakfast", "18.00", "5.20", True, 220),
-        ("SB-HB", "Half board supplement, per person", "person", "Dining", "32.00", "10.50", True, 80),
-        ("SB-BAR", "Bar and minibar", "flat", "Drinks", "26.00", "7.00", True, 60),
-        ("SB-PARK", "Parking, per day", "day", "Extras", "12.00", "0", False, 60),
-        ("SB-SPA", "Spa access, per person", "person", "Extras", "15.00", "0", False, 40),
-        ("SB-BIKE", "E-bike rental, per day", "day", "Extras", "35.00", "0", False, 20),
-        ("SB-DDR", "Day conference package, per person", "person", "Conferences", "59.00", "0", False, 40),
-        ("SB-ROOM", "Seminar room, full day", "day", "Conferences", "390.00", "0", False, 2),
+        ("SB-SGL", "Single room, per night", "night", "Accommodation", "1350.00", "0", False, 60),
+        ("SB-DBL", "Double room, per night", "night", "Accommodation", "2100.00", "0", False, 120),
+        ("SB-SUITE", "Mountain-view suite, per night", "night", "Accommodation", "3300.00", "0", False, 20),
+        ("SB-BRKF", "Breakfast buffet, per person", "person", "Breakfast", "270.00", "78.00", True, 220),
+        ("SB-HB", "Half board supplement, per person", "person", "Dining", "480.00", "157.50", True, 80),
+        ("SB-BAR", "Bar and minibar", "flat", "Drinks", "390.00", "105.00", True, 60),
+        ("SB-PARK", "Guest laundry, per bag", "bag", "Extras", "180.00", "0", False, 60),
+        ("SB-SPA", "Spa access, per person", "person", "Extras", "225.00", "0", False, 40),
+        ("SB-BIKE", "E-bike rental, per day", "day", "Extras", "525.00", "0", False, 20),
+        ("SB-DDR", "Day conference package, per person", "person", "Conferences", "890.00", "0", False, 40),
+        ("SB-ROOM", "Conference room, full day", "day", "Conferences", "5850.00", "0", False, 2),
     ],
     "alpine_inn": [
         ("GM-SGL", "Single room with breakfast, per night", "night", "Accommodation", "135.00", "0", False, 60),
@@ -1878,26 +1893,26 @@ ITEMS: dict[str, list[_I]] = {
 # document (0: sized from the revenue target) and weekly web-shop settlement invoices (B2C).
 PROFILE: dict[str, dict[str, Any]] = {
     "trade_distribution": {"revenue": 180000, "loan": 120000},
-    "professional_services": {"revenue": 95000},
+    "professional_services": {"revenue": 142000},
     "manufacturing": {"revenue": 125000, "loan": 150000},
-    "retail_ecommerce": {"revenue": 38000, "doc_value": 90, "webshop": True},
-    "field_service": {"revenue": 85000},
+    "retail_ecommerce": {"revenue": 42000, "doc_value": 99, "webshop": True},
+    "field_service": {"revenue": 127500},
     "logistics": {"revenue": 128000},
-    "it_agency": {"revenue": 92000},
+    "it_agency": {"revenue": 4140000},
     "nonprofit": {"revenue": 32000},
-    "craft_trades": {"revenue": 78000},
-    "food_production": {"revenue": 88000, "loan": 90000},
+    "craft_trades": {"revenue": 132600},
+    "food_production": {"revenue": 158000, "loan": 162000},
     "franchise_multisite": {"revenue": 95000},
     "law_firm": {"revenue": 140000},
     "tax_advisory": {"revenue": 98000},
-    "creative_studio": {"revenue": 72000},
+    "creative_studio": {"revenue": 11500000},
     "real_estate": {"revenue": 68000},
     "medical_practice": {"revenue": 60000, "loan": 80000},
     "therapy_wellness": {"revenue": 44000, "doc_value": 420, "webshop": True},
-    "beauty_salon": {"revenue": 34000, "doc_value": 180, "webshop": True},
-    "restaurant_cafe": {"revenue": 78000, "doc_value": 900, "webshop": True},
+    "beauty_salon": {"revenue": 136000, "doc_value": 720, "webshop": True},
+    "restaurant_cafe": {"revenue": 1170000, "doc_value": 13500, "webshop": True},
     "alpine_inn": {"revenue": 110000, "doc_value": 1500, "webshop": True},
-    "small_hotel": {"revenue": 82000, "doc_value": 2600, "webshop": True, "loan": 150000},
+    "small_hotel": {"revenue": 1230000, "doc_value": 39000, "webshop": True, "loan": 2250000},
     "fitness_studio": {"revenue": 52000, "doc_value": 900, "webshop": True},
     "education_training": {"revenue": 70000},
 }
@@ -1911,7 +1926,34 @@ INVOICE_CONVERSION = D("0.68")  # calibrated: issued invoice value per quote vs.
 SUPPLIER_TERMS = 30
 
 
-_CASE_CURRENCY = {"GB": "GBP", "PL": "PLN", "CH": "CHF"}
+_CASE_CURRENCY = {
+    "GB": "GBP",
+    "PL": "PLN",
+    "CH": "CHF",
+    "US": "USD",
+    "CA": "CAD",
+    "MX": "MXN",
+    "IN": "INR",
+    "SG": "SGD",
+    "JP": "JPY",
+    "AU": "AUD",
+    "NZ": "NZD",
+    "AE": "AED",
+    "ZA": "ZAR",
+}
+# Rough local amount per euro for the generic sums not written per case (recurring fees, sample bills).
+_GENERIC_SCALE = {"CAD": 1.5, "MXN": 15, "INR": 45, "SGD": 1.5, "JPY": 160, "AUD": 1.7, "NZD": 1.8, "AED": 4, "ZAR": 15}
+
+
+def _cash(value: Any, currency: str) -> Decimal:
+    """Round to the currency's own minor unit (whole yen, cents elsewhere)."""
+    return D(value).quantize(money_quantum(currency), rounding=ROUND_HALF_UP)
+
+
+def _scaled(value: Any, currency: str) -> Decimal:
+    return _cash(D(value) * D(str(_GENERIC_SCALE.get(currency, 1))), currency)
+
+
 DEFAULT_CHART = {"DE": "de_skr03", "AT": "at_ekr", "CH": "ch_kmu"}
 
 
@@ -2070,6 +2112,10 @@ async def install_business_demo(
     country = settings.get("country_code") or case.country
     currency = str(settings.get("base_currency") or base_currency()).upper()
     vat = default_tax_rate(country)
+
+    def cash(v: Any) -> Decimal:
+        return _cash(v, currency)
+
     start = _months_back(today, 5)
     codes = await _ensure_ledger(session, country, start, today + timedelta(days=60), tenant)
     acc = await _gl_ids(session, codes, tenant)
@@ -2136,6 +2182,8 @@ async def install_business_demo(
     def pick_lines(cust_cc: str, target: Decimal, k: int | None = None) -> list[LineData]:
         k = min(k or rng.randint(*case.lines_per_doc), len(items_def))
         disc = D(rng.choice([0, 0, 0, 3, 5])) if not case.b2c else D(0)
+        if not minor_units(currency):
+            disc = D(0)  # a percentage off a whole-yen price would leave fractions of a yen
         order = rng.sample(items_def, k=len(items_def))
         out, left = [], target
         # Lines capped at their usual maximum pass the rest on; extra items join until the value is reached.
@@ -2153,7 +2201,7 @@ async def install_business_demo(
     cogs_month: dict[date, Decimal] = {}
 
     async def book_cogs(inv, lines: list[LineData], day: date) -> None:
-        cost = money(sum((ln.qty * D(by_sku[ln.sku][5]) for ln in lines if by_sku[ln.sku][6]), D(0)))
+        cost = cash(sum((ln.qty * D(by_sku[ln.sku][5]) for ln in lines if by_sku[ln.sku][6]), D(0)))
         if cost <= 0:
             return
         await gl.create_entry(
@@ -2235,7 +2283,7 @@ async def install_business_demo(
             pay_day = ivd + timedelta(days=rng.randint(1, max(1, (latest - ivd).days)))
             pay_day = min(pay_day, today)
             if rng.random() < 0.12:
-                part = money(inv.gross_total * D("0.5"))
+                part = cash(inv.gross_total * D("0.5"))
                 await sales.record_payment(
                     inv.id, amount=part, pay_date=pay_day, reference="Instalment 1", created_by=created_by
                 )
@@ -2286,12 +2334,12 @@ async def install_business_demo(
 
     async def supplier_bill(vendor: tuple[str, str], day: date, net: Decimal, role: str, label: str) -> None:
         name, vcc = vendor
-        net = money(net)
+        net = cash(net)
         if net <= 0 or day > today:
             return
         bills["bills"] += 1
         ref = f"{case_key[:3].upper()}-B{bills['bills']:04d}"
-        tax = money(net * vat / 100) if vcc == country else D(0)  # foreign suppliers: reverse charge
+        tax = cash(net * vat / 100) if vcc == country else D(0)  # foreign suppliers: reverse charge
         lines = [LineInput(acc[role], debit=net if reclaim else net + tax, description=f"{label} {ref}")]
         if tax > 0 and reclaim:
             lines.append(LineInput(acc["input_vat"], debit=tax, description=f"{ref} input VAT"))
@@ -2337,12 +2385,12 @@ async def install_business_demo(
             day = month + timedelta(days=rng.randint(0, 26))
             if day > today:
                 continue
-            net = money(D(monthly) * D(rng.randint(88, 112)) / 100)
+            net = cash(D(monthly) * D(rng.randint(88, 112)) / 100)
             expenses += 1
             if cat == "services" and service_vendor is not None:
                 await supplier_bill(service_vendor, day, net, "services", label)
                 continue
-            tax = D(0) if cat in NO_VAT_CATEGORIES else money(net * vat / 100)
+            tax = D(0) if cat in NO_VAT_CATEGORIES else cash(net * vat / 100)
             lines = [LineInput(acc[cat], debit=net if reclaim else net + tax, description=label)]
             if tax > 0 and reclaim:
                 lines.append(LineInput(acc["input_vat"], debit=tax, description=f"{label} input VAT"))
@@ -2367,7 +2415,7 @@ async def install_business_demo(
         )
         balance, month = loan, _months_back(start, -1)
         while month + timedelta(days=27) <= today:
-            interest, principal = money(balance * D("0.055") / 12), money(loan / 48)
+            interest, principal = cash(balance * D("0.055") / 12), cash(loan / 48)
             await gl.create_entry(
                 entry_date=month + timedelta(days=27),
                 memo=f"Loan instalment {month:%b %Y}",
@@ -2404,7 +2452,7 @@ async def install_business_demo(
         run += v or D(0)
         low = min(low, run)
     cushion = D(sum(e[2] for e in case.expenses))
-    capital = max(D(25000), ((cushion - low) / 10000).to_integral_value(rounding=ROUND_CEILING) * 10000)
+    capital = max(_scaled(25000, currency), ((cushion - low) / 10000).to_integral_value(rounding=ROUND_CEILING) * 10000)
     await gl.create_entry(
         entry_date=start,
         memo=f"Opening balance {case.company}",
@@ -2483,7 +2531,14 @@ async def _seed_recurring(session, case, tenant, today, created_by) -> int:
             for i, (name, line, net, interval, dom) in enumerate(RECURRING_DEMO):
                 cust = accounts[i % len(accounts)]
                 await svc.create(
-                    lines=[{"description": line, "qty": "1", "unit_price": net, "tax_rate": str(vat)}],
+                    lines=[
+                        {
+                            "description": line,
+                            "qty": "1",
+                            "unit_price": str(_scaled(net, currency)),
+                            "tax_rate": str(vat),
+                        }
+                    ],
                     name=f"{name} {cust.name}",
                     customer_id=cust.id,
                     customer_name=cust.name,
@@ -2818,7 +2873,7 @@ async def _seed_deals(session, case, customers, currency, today, rng, owner) -> 
         code = plan[i % len(plan)]
         st = stages[code]
         cust = customers[rng.randrange(len(customers))]
-        value = money(top * D(rng.randint(60, 400)) / 100)
+        value = _cash(top * D(rng.randint(60, 400)) / 100, currency)
         close = (
             today + timedelta(days=rng.randint(10, 120))
             if not st.is_final
@@ -2834,7 +2889,7 @@ async def _seed_deals(session, case, customers, currency, today, rng, owner) -> 
             expected_close_date=close.isoformat(),
             probability_percent=prob,
             stage_id=st.id,
-            weighted_value=money(value * prob / 100),
+            weighted_value=_cash(value * prob / 100, currency),
             source=rng.choice(["inbound", "referral", "outbound", "event"]),
             owner_user_id=owner,
             status="won" if st.is_won else "lost" if st.is_lost else "open",
@@ -2900,10 +2955,10 @@ async def _seed_operations(session, case, owner, currency, vat, today, rng) -> t
             stock = [(r[1], max(2, r[7] // 2), D(r[5])) for r in ITEMS[case.key] if r[6]]
             rows = [stock[(i * 2 + k) % len(stock)] for k in range(2)] if stock else []
         else:
-            rows = [(label, 1, money(D(monthly) / 4)) for label, c, monthly in case.expenses if c == cat][:2]
-        rows = rows or [(vendor, 1, D(1000))]
-        sub = sum((money(q * v) for _, q, v in rows), D(0))
-        tax = money(sub * vat / 100)
+            rows = [(label, 1, _cash(D(monthly) / 4, currency)) for label, c, monthly in case.expenses if c == cat][:2]
+        rows = rows or [(vendor, 1, _scaled(1000, currency))]
+        sub = sum((_cash(q * v, currency) for _, q, v in rows), D(0))
+        tax = _cash(sub * vat / 100, currency)
         po = PurchaseOrder(
             project_id=ws.id,
             po_number=f"PO-{i + 1:04d}",
@@ -2927,8 +2982,8 @@ async def _seed_operations(session, case, owner, currency, vat, today, rng) -> t
                     po_id=po.id,
                     description=label,
                     quantity=str(q),
-                    unit_rate=str(money(v)),
-                    amount=str(money(q * v)),
+                    unit_rate=str(_cash(v, currency)),
+                    amount=str(_cash(q * v, currency)),
                     sort_order=j,
                 )
             )
@@ -2941,7 +2996,7 @@ def bank_account_name(company: str) -> str:
 
 
 # Fictional bank identifiers (not assigned to real institutions) and BBAN lengths per country.
-_IBAN_BANK = {"AT": ("19999", 11), "CH": ("09999", 12)}
+_IBAN_BANK = {"AT": ("19999", 11), "CH": ("09999", 12), "AE": ("999", 16)}
 
 
 def _iban_with_check(country: str, bban: str) -> str:
@@ -2951,12 +3006,48 @@ def _iban_with_check(country: str, bban: str) -> str:
     return " ".join(raw[i : i + 4] for i in range(0, len(raw), 4))
 
 
+def _weighted_check(digits: str, weights: tuple[int, ...]) -> int:
+    return (10 - sum(int(d) * w % 10 for d, w in zip(digits, weights * 6, strict=False)) % 10) % 10
+
+
+def _domestic_account(country: str, num: int) -> str | None:
+    """Domestic account details where IBAN is not used, in the local format (fictional bank codes)."""
+    acct = f"{num:010d}"
+    if country == "US":
+        routing = f"0999{num % 10**4:04d}"  # 09xx prefixes are unassigned ABA ranges
+        return f"ABA {routing}{_weighted_check(routing, (3, 7, 1))} Acct {acct}"
+    if country == "CA":
+        return f"{num % 10**5:05d}-999-{num % 10**7:07d}"  # transit-institution-account
+    if country == "MX":
+        clabe = f"999180{num % 10**11:011d}"
+        return f"CLABE {clabe}{_weighted_check(clabe, (3, 7, 1))}"
+    if country == "IN":
+        return f"IFSC DEMO0{num % 10**6:06d} A/c 50{acct}"
+    if country == "SG":
+        return f"Bank 7999 Br {num % 1000:03d} Acct {acct}"
+    if country == "JP":
+        return f"Bank 9999 Br {num % 1000:03d} Futsu {num % 10**7:07d}"
+    if country == "AU":
+        return f"BSB 999-{num % 1000:03d} Acct {num % 10**9:09d}"
+    if country == "NZ":
+        return f"99-{num % 10**4:04d}-{num % 10**7:07d}-00"
+    if country == "ZA":
+        return f"Branch 999{num % 1000:03d} Acct {acct}"
+    return None
+
+
 def demo_bank_iban(case) -> str:
+    """The demo account's identifier: an IBAN where the country uses one, else the local account format."""
     num = zlib.crc32(case.key.encode())
     if case.country in _IBAN_BANK:
         bank, width = _IBAN_BANK[case.country]
         return _iban_with_check(case.country, bank + f"{num:0{width}d}"[-width:])
-    return f"{case.country}00 0000 0000 {num % 10**8:08d}"
+    return _domestic_account(case.country, num) or f"{case.country}00 0000 0000 {num % 10**8:08d}"
+
+
+def _legacy_account_pattern(case_key: str) -> str:
+    """Placeholder number older builds gave every non-IBAN case, whatever its country then."""
+    return f"__00 0000 0000 {zlib.crc32(case_key.encode()) % 10**8:08d}"
 
 
 async def _seed_bank_account(session, case, tenant, currency, bank_code, bank_acc_id, today) -> None:
@@ -3105,7 +3196,15 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
         supplier_ref=f"INV-{d0:%y%m}-17",
         currency=currency,
         lines=[
-            LineData(pl.description, pl.sku, pl.qty, money(pl.unit_price * D("1.02")), pl.tax_rate, pl.item_id, pl.id)
+            LineData(
+                pl.description,
+                pl.sku,
+                pl.qty,
+                _cash(pl.unit_price * D("1.02"), currency),
+                pl.tax_rate,
+                pl.item_id,
+                pl.id,
+            )
             for pl in po.lines
         ],
     )
@@ -3188,7 +3287,7 @@ async def _seed_purchasing(session, case, tenant, currency, vat, country, today,
     for k, (age, paid) in enumerate(plan):
         vname, vcc = vendors[k % len(vendors)]
         day = today - timedelta(days=age)
-        net = money(D(2800 + 650 * ((k * 3) % 5)))
+        net = _scaled(2800 + 650 * ((k * 3) % 5), currency)
         b = await svc.create_bill(
             "bill",
             doc_date=day,
@@ -3490,6 +3589,7 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
                     or_(
                         BankAccount.name == bank_account_name(CASES[case_key].company),
                         BankAccount.iban == demo_bank_iban(CASES[case_key]),
+                        BankAccount.iban.like(_legacy_account_pattern(case_key)),
                     ),
                 )
             )
@@ -3516,7 +3616,7 @@ async def reset_business_demo(session: AsyncSession, case_key: str, *, tenant_id
         out["accounts"] = await drop(Account, Account.id.in_(acc_ids))
     projects = [
         p.id
-        for p in (await session.execute(select(Project).where(Project.name == f"{case.company} operations"))).scalars()
+        for p in (await session.execute(select(Project).where(Project.name.like("% operations")))).scalars()
         if (p.metadata_ or {}).get("business_demo") == case_key
     ]
     if projects:
