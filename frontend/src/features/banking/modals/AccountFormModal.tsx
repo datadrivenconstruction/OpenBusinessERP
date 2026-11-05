@@ -6,6 +6,7 @@ import { Toggle } from '@/shared/ui/Toggle';
 import { getErrorMessage } from '@/shared/lib/api';
 import { useToastStore } from '@/stores/useToastStore';
 import { bankingApi, type BankAccount } from '../api';
+import { DateField } from '@/shared/ui/DateField';
 
 export const inputCls =
   'h-9 w-full rounded-lg border border-border bg-surface-primary px-3 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue disabled:opacity-60';
@@ -86,6 +87,7 @@ export function AccountFormModal({ existing, onClose }: { existing?: BankAccount
   const set = <K extends keyof AccountForm>(k: K, v: AccountForm[K]) => setForm((f) => ({ ...f, [k]: v }));
   return (
     <WideModal
+onSubmit={() => { if (form.name.trim() && ibanOk && !save.isPending) { setError(null); save.mutate(); } }}
       open
       onClose={onClose}
       busy={save.isPending}
@@ -130,7 +132,7 @@ export function AccountFormModal({ existing, onClose }: { existing?: BankAccount
           <input className={`${inputCls} tabular-nums`} inputMode="decimal" value={form.opening_balance} onChange={(e) => set('opening_balance', e.target.value.replace(',', '.'))} />
         </WideModalField>
         <WideModalField label={t('banking.opening_balance_date', { defaultValue: 'Opening balance date' })}>
-          <input type="date" className={inputCls} value={form.opening_balance_date} onChange={(e) => set('opening_balance_date', e.target.value)} />
+          <DateField className={inputCls} value={form.opening_balance_date} onChange={(e) => set('opening_balance_date', e.target.value)} />
         </WideModalField>
         {existing && (
           <WideModalField label={t('banking.active', { defaultValue: 'Active' })}>

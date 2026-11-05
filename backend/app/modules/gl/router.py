@@ -473,13 +473,14 @@ async def export_file(
     if date_to < date_from:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "date_to before date_from")
     settings = gx.read_export_settings()
+    tpl = await SalesService(session, svc.tenant_id)._chart_template()
+    if tpl in ("de_skr03", "de_skr04"):  # the loaded chart decides the SKR, not a stale setting
+        settings = {**settings, "skr": tpl[-2:]}
     biz = read_business_settings()
     now = datetime.now()
     stamp = f"{date_from:%Y%m%d}_{date_to:%Y%m%d}"
     if fmt == "datev-contacts":
-        contacts = gx.assign_contact_numbers(
-            await gx.collect_contacts(session, svc.tenant_id), settings["sachkontenlaenge"]
-        )
+        contacts = gx.assign_contact_numbers(await gx.collect_contacts(session, svc.tenant_id), settings)
         data = gx.datev_contacts_csv(contacts, settings, fy_start=date(date_from.year, 1, 1), created=now)
         return _attachment(data, f"EXTF_Debitoren_Kreditoren_{stamp}.csv", "text/csv; charset=windows-1252")
     if fmt not in ("datev", "saft"):
@@ -490,6 +491,13 @@ async def export_file(
         data = gx.datev_booking_csv(
             col["entries"], settings, date_from=date_from, date_to=date_to,
             fy_start=col["fy_start"], created=now, currency=currency,
+            partner_accounts={c.id: c.number for c in gx.assign_contact_numbers(
+                await gx.collect_contacts(session, svc.tenant_id), settings)},
+            collective_accounts=(
+                (await SalesService(session, svc.tenant_id).account_mapping()).get("receivable") or "",
+                (await PurchasingService(session, svc.tenant_id).account_mapping()).get("payables") or "",
+            ),
+            home_country=str(biz.get("country_code") or "DE"),
         )  # fmt: skip
         return _attachment(data, f"EXTF_Buchungsstapel_{stamp}.csv", "text/csv; charset=windows-1252")
     contacts = await gx.collect_contacts(session, svc.tenant_id)

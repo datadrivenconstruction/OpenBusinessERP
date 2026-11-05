@@ -36,6 +36,7 @@ export function SupplierCard({ supplierId, supplierName, editable, error, onChan
               if (id) fetchContact(id).then((ct) => onChange(id, name, ct)).catch(() => undefined);
             }}
             showBrowse
+            compact
             browseContactTypes={['supplier', 'subcontractor']}
           />
           {error && <p className="mt-1 text-xs text-semantic-error">{error}</p>}

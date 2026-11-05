@@ -26,6 +26,9 @@ ZERO = Decimal("0.00")
 # Realized exchange-rate difference accounts per chart template (gain, loss).
 FX_ACCOUNTS: dict[str, tuple[str, str]] = {
     "de_skr03": ("2660", "2150"),  # Erträge / Aufwendungen aus Kursdifferenzen
+    "de_skr04": ("4840", "6880"),
+    "at_ekr": ("4800", "7800"),
+    "ch_kmu": ("6950", "6900"),
     "ifrs_generic": ("4300", "5700"),
 }
 

@@ -21,6 +21,7 @@ from app.modules.gl.fx_posting import (
 )
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
+from app.modules.gl.templates import PURCHASE_RATE_ACCOUNTS
 from app.modules.purchasing.models import (
     PurchasingAccountMap,
     PurchasingBill,
@@ -65,6 +66,30 @@ DEFAULT_ACCOUNTS: dict[str, dict[str, str]] = {
         "payables": "1600",
         "bank": "1200",
     },
+    "de_skr04": {
+        "inventory": "1140",
+        "grni": "3500",
+        "expense": "5400",
+        "input_vat": "1406",
+        "payables": "3300",
+        "bank": "1800",
+    },
+    "at_ekr": {
+        "inventory": "1600",
+        "grni": "3700",
+        "expense": "5000",
+        "input_vat": "2500",
+        "payables": "3300",
+        "bank": "2800",
+    },
+    "ch_kmu": {
+        "inventory": "1200",
+        "grni": "2210",
+        "expense": "4200",
+        "input_vat": "1170",
+        "payables": "2000",
+        "bank": "1020",
+    },
     "ifrs_generic": {
         "inventory": "1300",
         "grni": "2550",
@@ -77,7 +102,13 @@ DEFAULT_ACCOUNTS: dict[str, dict[str, str]] = {
 
 
 # Charts seeded before the dedicated GRNI account existed keep posting to the old clearing account.
-GRNI_FALLBACK: dict[str, str] = {"de_skr03": "1700", "ifrs_generic": "2500"}
+GRNI_FALLBACK: dict[str, str] = {
+    "de_skr03": "1700",
+    "de_skr04": "3500",
+    "at_ekr": "3700",
+    "ch_kmu": "2210",
+    "ifrs_generic": "2500",
+}
 
 
 class PurchasingError(Exception):
@@ -705,6 +736,37 @@ class PurchasingService:
         await self.session.delete(bill)
         await self.session.flush()
 
+    async def _rate_split(
+        self, bill: PurchasingBill, acc: dict[str, uuid.UUID]
+    ) -> tuple[dict[uuid.UUID, Decimal], dict[uuid.UUID, Decimal]]:
+        """Net and input VAT per account by the lines' VAT rate (e.g. SKR03 19 % -> 3400/1576, SKR04 19 % -> 5400/1406)."""
+        tpl = await self.session.scalar(
+            select(GLAccount.template)
+            .where(GLAccount.tenant_id == self.tenant_id, GLAccount.template.is_not(None))
+            .limit(1)
+        )
+        rate_map = PURCHASE_RATE_ACCOUNTS.get(tpl or "", {})
+        defaults = DEFAULT_ACCOUNTS.get(tpl or "", {})
+        net: dict[uuid.UUID, Decimal] = {}
+        vat: dict[uuid.UUID, Decimal] = {}
+        for ln in bill.lines:
+            exp_id, vat_id = acc["expense"], acc["input_vat"]
+            pair = rate_map.get(Decimal(ln.tax_rate or 0))
+            # The chart's standard pair stays on the roles, so a mapping override still applies.
+            if pair and pair != (defaults.get("expense"), defaults.get("input_vat")):
+                e = await self.session.scalar(
+                    select(GLAccount.id).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == pair[0])
+                )
+                v = await self.session.scalar(
+                    select(GLAccount.id).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == pair[1])
+                )
+                if e and v:
+                    exp_id, vat_id = e, v
+            net[exp_id] = net.get(exp_id, ZERO) + ln.net
+            if ln.tax:
+                vat[vat_id] = vat.get(vat_id, ZERO) + ln.tax
+        return net, vat
+
     async def post_bill(self, bill_id: uuid.UUID, created_by: str | None = None) -> PurchasingBill:
         """Bill: DR GRNI (received qty at PO price) / expense (rest + price variance), DR input VAT, CR payables.
 
@@ -722,9 +784,9 @@ class PurchasingService:
             lines = [
                 LineInput(acc["payables"], debit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip())
             ]
-            lines.append(LineInput(acc["expense"], credit=bill.net_total, description=num))
-            if bill.tax_total:
-                lines.append(LineInput(acc["input_vat"], credit=bill.tax_total, description=f"{num} VAT"))
+            net_by, vat_by = await self._rate_split(bill, acc)
+            lines += [LineInput(a, credit=v, description=num) for a, v in net_by.items() if v]
+            lines += [LineInput(a, credit=v, description=f"{num} VAT") for a, v in vat_by.items() if v]
             entry = await self._post(
                 bill, lines, f"Supplier credit note {num}", SOURCE_CREDIT, str(bill.id), created_by
             )
@@ -756,13 +818,15 @@ class PurchasingService:
             grni += money(cleared_qty * pl.net_unit_price)
             pl.qty_billed += ln.qty
         expense = bill.net_total - grni  # unreceived lines and price variance
+        net_by, vat_by = await self._rate_split(bill, acc)
         lines = []
         if grni:
             lines.append(LineInput(acc["grni"], debit=grni, description=f"{num} GRNI"))
-        if expense:
-            lines.append(_signed(acc["expense"], expense, num))
-        if bill.tax_total:
-            lines.append(LineInput(acc["input_vat"], debit=bill.tax_total, description=f"{num} VAT"))
+            if expense:
+                lines.append(_signed(acc["expense"], expense, num))
+        else:
+            lines += [_signed(a, v, num) for a, v in net_by.items() if v]
+        lines += [LineInput(a, debit=v, description=f"{num} VAT") for a, v in vat_by.items() if v]
         lines.append(
             LineInput(acc["payables"], credit=bill.gross_total, description=f"{num} {bill.supplier_name}".strip())
         )
@@ -786,13 +850,14 @@ class PurchasingService:
         num, r = bill.number, bill.fx_rate
         grni_b = money(grni * po_rate)
         exp_b = money(expense * r)
-        tax_b = money(bill.tax_total * r)
         payable = money(bill.gross_total * r)
         lines = [LineInput(acc["grni"], debit=grni_b, description=f"{num} GRNI")]
         if exp_b:
             lines.append(_signed(acc["expense"], exp_b, num))
-        if tax_b:
-            lines.append(LineInput(acc["input_vat"], debit=tax_b, description=f"{num} VAT"))
+        _, vat_by = await self._rate_split(bill, acc)
+        vat_b = {a: money(v * r) for a, v in vat_by.items() if v}
+        tax_b = sum(vat_b.values(), ZERO)
+        lines += [LineInput(a, debit=v, description=f"{num} VAT") for a, v in vat_b.items() if v]
         lines.append(LineInput(acc["payables"], credit=payable, description=f"{num} {bill.supplier_name}".strip()))
         loss = payable - grni_b - exp_b - tax_b
         if loss:

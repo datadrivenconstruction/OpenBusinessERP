@@ -73,6 +73,13 @@ const UNRELEASED: ChangelogEntry | null = {
 // carry the long form and are left alone as the record of what shipped.
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '18.5.0',
+    date: '2026-11-02',
+    tag: 'NEW',
+    summary:
+      'First release as OpenBusinessERP. A setup wizard for new workspaces, DIN 5008 PDF templates, a full DATEV Buchungsstapel, Stripe and Mollie payment links with the provider fee booked, foreign currency revaluation, business roles with an audit trail, a Docker image on ghcr.io and a locale-aware date field.',
+  },
+  {
     version: '18.4.0',
     date: '2026-10-04',
     tag: 'NEW',

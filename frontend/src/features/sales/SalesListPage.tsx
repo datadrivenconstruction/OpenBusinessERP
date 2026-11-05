@@ -190,7 +190,7 @@ export function SalesListPage() {
       </DismissibleInfo>
 
       <div className="border-b border-border-light">
-        <nav className="-mb-px flex gap-1" role="tablist" aria-label={t('sales.tabs_aria', { defaultValue: 'Sales sections' })} onKeyDown={onTabKeyDown}>
+        <nav className="-mb-px flex gap-1 overflow-x-auto" role="tablist" aria-label={t('sales.tabs_aria', { defaultValue: 'Sales sections' })} onKeyDown={onTabKeyDown}>
           {SALES_KINDS.map((k) => {
             const Icon = KIND_ICON[k];
             const active = k === kind;
@@ -205,7 +205,7 @@ export function SalesListPage() {
                 tabIndex={active ? 0 : -1}
                 onClick={() => switchTab(k)}
                 className={clsx(
-                  'flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors',
+                  'flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors',
                   active ? 'border-oe-blue text-oe-blue' : 'border-transparent text-content-secondary hover:text-content-primary',
                 )}
               >

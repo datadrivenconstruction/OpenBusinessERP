@@ -18,6 +18,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from sqlalchemy import func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.gl.models import GLAccount
@@ -48,6 +49,9 @@ GL_ADJUST = "inventory_adjustment"
 # Chart defaults; inventory itself follows the purchasing "inventory" role so receipts and issues hit one account.
 DEFAULT_ACCOUNTS: dict[str, dict[str, str]] = {
     "de_skr03": {"cogs": "3400", "diff": "4900"},
+    "de_skr04": {"cogs": "5400", "diff": "6300"},
+    "at_ekr": {"cogs": "5000", "diff": "7800"},
+    "ch_kmu": {"cogs": "4200", "diff": "6700"},
     "ifrs_generic": {"cogs": "5000", "diff": "5500"},
 }
 
@@ -206,8 +210,26 @@ class InventoryService:
                 select(Warehouse).where(Warehouse.tenant_id == self.tenant_id).order_by(Warehouse.created_at).limit(1)
             )
             if wh is None:
-                wh = Warehouse(tenant_id=self.tenant_id, code="MAIN", name="Main warehouse", address="", active=True)
-                self.session.add(wh)
+                # Parallel first requests race to create MAIN; the loser re-reads the winner's row.
+                try:
+                    async with self.session.begin_nested():
+                        wh = Warehouse(
+                            tenant_id=self.tenant_id,
+                            code="MAIN",
+                            name="Main warehouse",
+                            address="",
+                            active=True,
+                            is_default=True,
+                        )
+                        self.session.add(wh)
+                except IntegrityError:
+                    wh = await self.session.scalar(
+                        select(Warehouse)
+                        .where(Warehouse.tenant_id == self.tenant_id, Warehouse.code == "MAIN")
+                        .limit(1)
+                    )
+                    if wh is None:
+                        raise
             wh.is_default = True
             await self.session.flush()
         return wh

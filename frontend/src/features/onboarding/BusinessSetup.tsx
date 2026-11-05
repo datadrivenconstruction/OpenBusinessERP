@@ -19,6 +19,7 @@ import { getCountry, sortedCountries } from '@/shared/lib/countries';
 import { MailSettingsSection } from '@/features/settings/MailSettings';
 import { fetchSalesPdf } from '@/features/sales/api';
 import { fetchBusinessDemoCases, installBusinessDemoCase } from '@/features/business-demo/api';
+import { fmtCurrency, fmtDate } from '@/shared/lib/formatters';
 
 export const SETUP_STEPS = ['company', 'tax', 'bank', 'documents', 'mail', 'invoice'] as const;
 export type SetupStep = (typeof SETUP_STEPS)[number];
@@ -60,8 +61,8 @@ export const fetchSettings = () => apiGet<SettingsData>('/v1/business-settings/'
 /** Country defaults: VAT rates, suggested chart and whether a small-business VAT exemption exists. */
 const COUNTRY_TAX: Record<string, { rates: [string, number][]; chart?: string; smallBusiness?: string }> = {
   DE: { rates: [['Standard', 19], ['Reduced', 7]], chart: 'de_skr03', smallBusiness: '§ 19 UStG' },
-  AT: { rates: [['Standard', 20], ['Reduced', 10]], smallBusiness: '§ 6 Abs. 1 Z 27 UStG' },
-  CH: { rates: [['Standard', 8.1], ['Reduced', 2.6]] },
+  AT: { rates: [['Standard', 20], ['Reduced 13', 13], ['Reduced 10', 10]], chart: 'at_ekr', smallBusiness: '§ 6 Abs. 1 Z 27 UStG' },
+  CH: { rates: [['Standard', 8.1], ['Accommodation', 3.8], ['Reduced', 2.6]], chart: 'ch_kmu', smallBusiness: 'Art. 10 Abs. 2 lit. a MWSTG' },
   FR: { rates: [['Standard', 20], ['Reduced', 5.5]], smallBusiness: 'Art. 293 B CGI' },
   IT: { rates: [['Standard', 22], ['Reduced', 10]] },
   ES: { rates: [['Standard', 21], ['Reduced', 10]] },
@@ -123,6 +124,11 @@ export function BusinessSetup() {
   const [lines, setLines] = useState(EXAMPLE_LINES);
   const [invoice, setInvoice] = useState<{ id: string; number: string | null; status: string } | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const key = SETUP_STEPS[step] ?? 'company';
+    document.title = `${t(`bizsetup.${key}_title`)} | OpenBusinessERP`;
+  }, [step, t]);
 
   useEffect(() => {
     const data = settingsQuery.data;
@@ -377,10 +383,24 @@ export function BusinessSetup() {
                 <select className={textareaCls} value={chart} onChange={(e) => setChart(e.target.value)} data-testid="setup-chart">
                   <option value="ifrs_generic">{t('bizsetup.chart_ifrs', { defaultValue: 'IFRS (international)' })}</option>
                   <option value="de_skr03">{t('bizsetup.chart_skr03', { defaultValue: 'SKR03 (Germany)' })}</option>
+                  {form.country_code === 'DE' && (
+                    <option value="de_skr04">{t('bizsetup.chart_skr04', { defaultValue: 'SKR04 (Germany)' })}</option>
+                  )}
+                  {form.country_code === 'AT' && (
+                    <option value="at_ekr">{t('bizsetup.chart_at_ekr', { defaultValue: 'EKR (Austria)' })}</option>
+                  )}
+                  {form.country_code === 'CH' && (
+                    <option value="ch_kmu">{t('bizsetup.chart_ch_kmu', { defaultValue: 'KMU-Kontenrahmen (Switzerland)' })}</option>
+                  )}
                 </select>
+                {form.country_code === 'DE' && (
+                  <p className="mt-1 text-2xs text-content-tertiary" data-testid="setup-chart-hint">
+                    {t('bizsetup.chart_skr_hint', { defaultValue: 'SKR04 if your tax adviser uses it' })}
+                  </p>
+                )}
               </Field>
               <p className="text-2xs text-content-tertiary">
-                {t('bizsetup.number_format', { defaultValue: 'Numbers and dates: {{sample}}', sample: `${new Intl.NumberFormat(undefined, { style: 'currency', currency: /^[A-Z]{3}$/.test(form.base_currency) ? form.base_currency : 'EUR' }).format(1234.5)} · ${new Date().toLocaleDateString()}` })}
+                {t('bizsetup.number_format', { defaultValue: 'Numbers and dates: {{sample}}', sample: `${fmtCurrency(1234.5, /^[A-Z]{3}$/.test(form.base_currency) ? form.base_currency : 'EUR')} · ${fmtDate(new Date().toISOString().slice(0, 10))}` })}
               </p>
             </div>
           </div>
@@ -467,7 +487,7 @@ export function BusinessSetup() {
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t('bizsetup.customer_name', { defaultValue: 'Customer name' })}>
-                <Input value={customer.name} placeholder="Example Customer Ltd" onChange={(e) => setCustomer({ ...customer, name: e.target.value })} data-testid="setup-customer" />
+                <Input value={customer.name} placeholder={t('bizsetup.customer_name_ph', { defaultValue: 'Example Customer Ltd' })} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} data-testid="setup-customer" />
               </Field>
               <Field label={t('bizsetup.customer_email', { defaultValue: 'Customer email' })}>
                 <Input value={customer.email} onChange={(e) => setCustomer({ ...customer, email: e.target.value })} />
@@ -510,11 +530,11 @@ export function BusinessSetup() {
       </main>
 
       <footer className="border-t border-border-light">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2 px-6 py-4">
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6">
           <Button variant="ghost" disabled={step === 0 || busy} onClick={() => setStep(step - 1)}>
             {t('bizsetup.back', { defaultValue: 'Back' })}
           </Button>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
             <Button variant="ghost" disabled={busy} onClick={() => run(() => saveProgress(key, 'skipped'))} data-testid="setup-skip">
               {t('bizsetup.skip', { defaultValue: 'Skip for now' })}
             </Button>

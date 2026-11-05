@@ -12,11 +12,14 @@ export function CustomerCard({
   set,
   editable,
   error,
+  showBuyerReference = false,
 }: {
   form: SalesForm;
   set: (patch: Partial<SalesForm>) => void;
   editable: boolean;
   error?: string;
+  /** Invoices only: the buyer reference (Leitweg-ID) that the e-invoice export carries. */
+  showBuyerReference?: boolean;
 }) {
   const { t } = useTranslation();
   return (
@@ -31,6 +34,7 @@ export function CustomerCard({
             displayValue={form.customer_name}
             onChange={(id, name) => set({ customer_id: id, customer_name: name })}
             showBrowse
+            compact
           />
           {error && <p className="text-xs text-semantic-error">{error}</p>}
           <label className="block text-xs text-content-tertiary">
@@ -47,6 +51,17 @@ export function CustomerCard({
               <input type="email" className={input} value={form.customer_email} onChange={(e) => set({ customer_email: e.target.value })} />
             </label>
           </div>
+          {showBuyerReference && (
+            <label className="block text-xs text-content-tertiary">
+              {t('sales.buyer_reference', { defaultValue: 'Buyer reference (Leitweg-ID)' })}
+              <input
+                className={input}
+                maxLength={100}
+                value={form.buyer_reference}
+                onChange={(e) => set({ buyer_reference: e.target.value })}
+              />
+            </label>
+          )}
         </div>
       ) : (
         <div className="flex gap-3">
@@ -70,6 +85,11 @@ export function CustomerCard({
                 <Mail size={14} />
                 {form.customer_email}
               </a>
+            )}
+            {showBuyerReference && form.buyer_reference && (
+              <p className="text-xs text-content-tertiary">
+                {t('sales.buyer_reference', { defaultValue: 'Buyer reference (Leitweg-ID)' })}: {form.buyer_reference}
+              </p>
             )}
             {form.payment_terms && (
               <p className="text-xs text-content-tertiary">

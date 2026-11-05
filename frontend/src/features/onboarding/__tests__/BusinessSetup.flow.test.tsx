@@ -64,7 +64,39 @@ beforeEach(() => {
 describe('BusinessSetup', () => {
   it('suggests SKR03 for Germany and IFRS elsewhere', () => {
     expect(suggestedChart('DE')).toBe('de_skr03');
+    expect(suggestedChart('AT')).toBe('at_ekr');
+    expect(suggestedChart('CH')).toBe('ch_kmu');
     expect(suggestedChart('FR')).toBe('ifrs_generic');
+  });
+
+  it('offers SKR04 for Germany only and loads the chosen chart', async () => {
+    renderAt();
+    const chart = await screen.findByTestId('setup-chart');
+    expect(screen.getByTestId('setup-chart-hint')).toHaveTextContent('SKR04 if your tax adviser uses it');
+    fireEvent.change(chart, { target: { value: 'de_skr04' } });
+    fireEvent.click(screen.getByTestId('setup-next'));
+    await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith('/v1/gl/templates/de_skr04/load/', {}));
+    expect(api.apiPost).not.toHaveBeenCalledWith('/v1/gl/templates/de_skr03/load/', {});
+
+    cleanup();
+    stored = { ...base };
+    renderAt();
+    fireEvent.change(await screen.findByTestId('setup-country'), { target: { value: 'FR' } });
+    expect(screen.queryByTestId('setup-chart-hint')).toBeNull();
+    expect(screen.getByTestId('setup-chart').querySelector('option[value="de_skr04"]')).toBeNull();
+  });
+
+  it('offers EKR for Austria and KMU for Switzerland only', async () => {
+    renderAt();
+    const country = await screen.findByTestId('setup-country');
+    const has = (v: string) => screen.getByTestId('setup-chart').querySelector(`option[value="${v}"]`) !== null;
+    expect([has('at_ekr'), has('ch_kmu')]).toEqual([false, false]);
+    fireEvent.change(country, { target: { value: 'AT' } });
+    expect([has('at_ekr'), has('ch_kmu')]).toEqual([true, false]);
+    expect((screen.getByTestId('setup-chart') as HTMLSelectElement).value).toBe('at_ekr');
+    fireEvent.change(country, { target: { value: 'CH' } });
+    expect([has('at_ekr'), has('ch_kmu')]).toEqual([false, true]);
+    expect((screen.getByTestId('setup-chart') as HTMLSelectElement).value).toBe('ch_kmu');
   });
 
   it('walks every step, skipping mail, and issues the first invoice', async () => {

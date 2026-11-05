@@ -10,6 +10,7 @@ import { balanceDue } from '../helpers';
 import { useInvalidatePurchasing } from '../hooks';
 import { inputCls } from '../components/common';
 import { fmtNumberForInput } from '@/shared/lib/formatters';
+import { DateField } from '@/shared/ui/DateField';
 
 export function PaymentDialog({ bill, onClose }: { bill: PurchasingDocSummary | null; onClose: () => void }) {
   const { t } = useTranslation();
@@ -36,6 +37,7 @@ export function PaymentDialog({ bill, onClose }: { bill: PurchasingDocSummary | 
   });
   return (
     <WideModal
+onSubmit={() => { if (!err && !m.isPending) m.mutate(); }}
       open={!!bill}
       onClose={onClose}
       busy={m.isPending}
@@ -62,7 +64,7 @@ export function PaymentDialog({ bill, onClose }: { bill: PurchasingDocSummary | 
         </label>
         <label className="block text-xs text-content-tertiary">
           {t('purchasing.pay_date', { defaultValue: 'Payment date' })}
-          <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
+          <DateField className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
         </label>
         <label className="block text-xs text-content-tertiary">
           {t('purchasing.pay_reference', { defaultValue: 'Reference' })}

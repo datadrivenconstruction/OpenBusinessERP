@@ -46,6 +46,7 @@ export function MatchSettingsModal({ settings, onClose }: { settings: BankSettin
       open
       onClose={onClose}
       busy={save.isPending}
+      onSubmit={() => { setError(null); save.mutate(); }}
       size="md"
       title={t('banking.settings_title', { defaultValue: 'Matching settings' })}
       subtitle={t('banking.settings_sub', { defaultValue: 'How strict suggestions are and how small differences get closed.' })}

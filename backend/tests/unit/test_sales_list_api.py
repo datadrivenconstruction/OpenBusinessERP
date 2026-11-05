@@ -198,6 +198,8 @@ async def test_related_and_activity(svc):
         "payment",
         "credit_note",
     }
+    created = next(e for e in ev if e["type"] == "created")
+    assert created["params"] == {"number": inv.number} and created["actor"] in (None, "u1")
     assert [e["at"] for e in ev] == sorted((e["at"] for e in ev), reverse=True)
     assert ev[-1]["type"] == "created" or any(e["type"] == "created" for e in ev)
     assert next(e for e in ev if e["type"] == "credit_note")["ref_id"] == cn.id

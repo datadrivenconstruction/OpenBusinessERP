@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import clsx from 'clsx';
 import { BellRing, Eye, Handshake } from 'lucide-react';
 import { Badge } from '@/shared/ui/Badge';
@@ -84,7 +85,7 @@ export function DunningTab({ error, setError, creating, currency, onOpenCustomer
           {(levels.data ?? []).map((lv) => (
             <div key={lv.level} className="rounded-lg border border-border-light px-3 py-2">
               <div className="text-xs text-content-tertiary">
-                {lv.level}. {lv.name} · {t('receivables.from_days', { defaultValue: 'from {{count}} days past due', count: lv.days_after_due })}
+                {lv.level}. {levelName(t, lv)} · {t('receivables.from_days', { defaultValue: 'from {{count}} days past due', count: lv.days_after_due })}
               </div>
               <div className="text-lg font-semibold tabular-nums">{byLevel.get(lv.level) ?? 0}</div>
               <div className="text-xs text-content-tertiary">
@@ -233,4 +234,21 @@ export function DunningTab({ error, setError, creating, currency, onOpenCustomer
       </Card>
     </div>
   );
+}
+
+const BUILT_IN_NAMES: Record<string, number> = {
+  Reminder: 1,
+  'First notice': 2,
+  'Second notice': 3,
+  Zahlungserinnerung: 1,
+  '1. Mahnung': 2,
+  '2. Mahnung': 3,
+};
+
+/** The stock level names follow the UI language; names an admin typed stay as typed. */
+function levelName(t: TFunction, lv: { level: number; name: string }): string {
+  if (BUILT_IN_NAMES[lv.name] !== lv.level) return lv.name;
+  if (lv.level === 1) return t('receivables.level_name_1', { defaultValue: 'Reminder' });
+  if (lv.level === 2) return t('receivables.level_name_2', { defaultValue: 'First notice' });
+  return t('receivables.level_name_3', { defaultValue: 'Second notice' });
 }

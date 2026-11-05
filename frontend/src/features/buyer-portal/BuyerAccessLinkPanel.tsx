@@ -169,7 +169,7 @@ export function BuyerAccessLinkPanel({
             >
               <Copy size={10} />
               {copyState === 'copied'
-                ? t('buyer_portal_panel.copied', { defaultValue: 'Copied!' })
+                ? t('buyer_portal_panel.copied', { defaultValue: 'Copied' })
                 : t('buyer_portal_panel.copy', { defaultValue: 'Copy' })}
             </button>
           </div>

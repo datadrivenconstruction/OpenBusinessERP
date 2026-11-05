@@ -11,6 +11,7 @@ import { Hash, Package, Search, Users } from 'lucide-react';
 import { apiGet } from '@/shared/lib/api';
 import { BusinessDocumentsSettings, profileMatches } from './BusinessDocumentsSettings';
 import { MAIL_KEYWORDS, MailSettingsSection } from './MailSettings';
+import { PAYMENT_KEYWORDS, PaymentSettingsSection } from './PaymentSettings';
 import { DESIGN_KEYWORDS, DocumentDesignSettings } from './DocumentDesignSettings';
 
 interface NumberingRow {
@@ -115,9 +116,10 @@ export function BusinessSettingsHub({ canEdit }: { canEdit: boolean }) {
   const showProfile = profileMatches(q);
   const showNumbering = !q || NUMBERING_KEYWORDS.includes(q);
   const showMail = !q || MAIL_KEYWORDS.includes(q);
+  const showPayments = !q || PAYMENT_KEYWORDS.includes(q);
   const showDesign = !q || DESIGN_KEYWORDS.includes(q);
   const links = LINK_SECTIONS.filter((s) => !q || s.keywords.includes(q));
-  const nothing = !showProfile && !showDesign && !showNumbering && !showMail && links.length === 0;
+  const nothing = !showProfile && !showDesign && !showNumbering && !showMail && !showPayments && links.length === 0;
 
   return (
     <div data-testid="business-settings-hub">
@@ -137,6 +139,7 @@ export function BusinessSettingsHub({ canEdit }: { canEdit: boolean }) {
       {showDesign && <DocumentDesignSettings canEdit={canEdit} />}
       {showNumbering && <NumberingSection />}
       {showMail && <MailSettingsSection canEdit={canEdit} />}
+      {showPayments && <PaymentSettingsSection canEdit={canEdit} />}
 
       {links.length > 0 && (
         <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2">

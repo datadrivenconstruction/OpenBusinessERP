@@ -78,7 +78,7 @@ export function ShareDialog({ roomName, isOpen, onClose }: ShareDialogProps) {
             {copied ? (
               <>
                 <Check size={12} />
-                {t('common.copied', { defaultValue: 'Copied!' })}
+                {t('common.copied', { defaultValue: 'Copied' })}
               </>
             ) : (
               <>

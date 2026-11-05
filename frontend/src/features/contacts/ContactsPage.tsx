@@ -81,6 +81,7 @@ import {
   type ImportResult,
   type ContactModuleRows,
 } from './api';
+import { isLeitwegId } from './leitweg';
 import { contactsGuide } from './contactsGuide';
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
@@ -216,6 +217,7 @@ interface ContactFormData {
   company_name: string;
   legal_name: string;
   vat_number: string;
+  leitweg_id: string;
   first_name: string;
   last_name: string;
   contact_type: ContactType;
@@ -235,6 +237,7 @@ const EMPTY_FORM: ContactFormData = {
   company_name: '',
   legal_name: '',
   vat_number: '',
+  leitweg_id: '',
   first_name: '',
   last_name: '',
   contact_type: 'client',
@@ -305,6 +308,7 @@ export function contactFormData(contact?: Contact): ContactFormData {
     company_name: contact.company_name || '',
     legal_name: contact.legal_name || '',
     vat_number: contact.vat_number || '',
+    leitweg_id: contact.leitweg_id || '',
     first_name: contact.first_name || '',
     last_name: contact.last_name || '',
     contact_type: contact.contact_type,
@@ -344,6 +348,7 @@ export function buildContactPatch(
   if (form.company_name !== base.company_name) data.company_name = form.company_name || null;
   if (form.legal_name !== base.legal_name) data.legal_name = form.legal_name || null;
   if (form.vat_number !== base.vat_number) data.vat_number = form.vat_number || null;
+  if (form.leitweg_id !== base.leitweg_id) data.leitweg_id = form.leitweg_id.trim() || null;
   if (form.email !== base.email) data.primary_email = form.email || null;
   if (form.phone !== base.phone) data.primary_phone = form.phone || null;
   if (form.website !== base.website) data.website = form.website || null;
@@ -396,6 +401,9 @@ function AddContactModal({
     }
     if (form.country.trim() && form.country.trim().length !== 2) {
       e.country = t('contacts.country_code_invalid', { defaultValue: 'Country code must be exactly 2 letters (ISO 3166-1 alpha-2, e.g. DE, US, GB)' });
+    }
+    if (!isLeitwegId(form.leitweg_id)) {
+      e.leitweg_id = t('contacts.leitweg_invalid', { defaultValue: 'Expected a format like 991-01234-44' });
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -513,6 +521,18 @@ function AddContactModal({
             onChange={(e) => set('vat_number', e.target.value)}
             className={inputCls}
             placeholder={t('contacts.vat_placeholder', { defaultValue: 'e.g. DE123456789' })}
+          />
+        </WideModalField>
+
+        <WideModalField
+          label={t('contacts.field_leitweg_id', { defaultValue: 'Leitweg-ID (for XRechnung to public-sector buyers)' })}
+          error={errors.leitweg_id}
+        >
+          <input
+            value={form.leitweg_id}
+            onChange={(e) => set('leitweg_id', e.target.value)}
+            className={clsx(inputCls, errors.leitweg_id && 'border-semantic-error focus:ring-red-300 focus:border-semantic-error')}
+            placeholder={t('contacts.leitweg_placeholder', { defaultValue: 'e.g. 991-01234-44' })}
           />
         </WideModalField>
       </WideModalSection>
@@ -1739,6 +1759,7 @@ export function ContactsPage() {
         company_name: formData.company_name || undefined,
         legal_name: formData.legal_name || undefined,
         vat_number: formData.vat_number || undefined,
+        leitweg_id: formData.leitweg_id.trim() || undefined,
         primary_email: formData.email || undefined,
         primary_phone: formData.phone || undefined,
         website: formData.website || undefined,

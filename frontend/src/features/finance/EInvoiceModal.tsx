@@ -34,6 +34,8 @@ export interface EInvoiceModalProps {
   invoiceId: string;
   /** Shown in the title so the user knows which invoice is being issued. */
   invoiceNumber: string;
+  /** Collection the invoice lives under; the finance ledger by default, the sales module otherwise. */
+  basePath?: string;
 }
 
 /** One entry of the profile registry, as the backend publishes it. */
@@ -69,7 +71,15 @@ const selectCls =
   'h-10 w-full appearance-none rounded-lg border border-border bg-surface-primary px-3 text-sm ' +
   'text-content-primary focus:outline-none focus:ring-2 focus:ring-oe-blue';
 
-export function EInvoiceModal({ open, onClose, invoiceId, invoiceNumber }: EInvoiceModalProps) {
+const FINANCE_INVOICES = '/api/v1/finance/invoices';
+
+export function EInvoiceModal({
+  open,
+  onClose,
+  invoiceId,
+  invoiceNumber,
+  basePath = FINANCE_INVOICES,
+}: EInvoiceModalProps) {
   const { t, i18n } = useTranslation();
 
   const [profile, setProfile] = useState('xrechnung');
@@ -87,10 +97,10 @@ export function EInvoiceModal({ open, onClose, invoiceId, invoiceNumber }: EInvo
   });
 
   const dryRunQuery = useQuery({
-    queryKey: ['finance', 'einvoice-dry-run', invoiceId, profile],
+    queryKey: ['finance', 'einvoice-dry-run', basePath, invoiceId, profile],
     queryFn: () =>
       apiGet<EInvoiceDryRun>(
-        `/api/v1/finance/invoices/${encodeURIComponent(invoiceId)}/einvoice?format=${encodeURIComponent(profile)}&dry_run=true`,
+        `${basePath}/${encodeURIComponent(invoiceId)}/einvoice?format=${encodeURIComponent(profile)}&dry_run=true`,
       ),
     enabled: open,
   });
@@ -159,7 +169,7 @@ export function EInvoiceModal({ open, onClose, invoiceId, invoiceNumber }: EInvo
       // the XML inside the hybrid) is locale-independent by the standard.
       const localeParam = embed ? `&locale=${encodeURIComponent(i18n.language)}` : '';
       await downloadWithAuth(
-        `/api/v1/finance/invoices/${encodeURIComponent(invoiceId)}/einvoice?format=${encodeURIComponent(profile)}&embed=${embed ? 'true' : 'false'}${localeParam}`,
+        `${basePath}/${encodeURIComponent(invoiceId)}/einvoice?format=${encodeURIComponent(profile)}&embed=${embed ? 'true' : 'false'}${localeParam}`,
         `einvoice_${invoiceNumber}_${profile}.${kind}`,
       );
     } catch (e: unknown) {

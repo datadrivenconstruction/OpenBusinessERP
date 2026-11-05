@@ -16,6 +16,7 @@ from app.modules.sales.documents import service as docs
 from app.modules.sales.documents.checks import check_invoice
 from app.modules.sales.documents.girocode import GiroCodeError, epc_payload
 from app.modules.sales.documents.i18n import fmt_money
+from app.modules.sales.documents.pdf import render_document, sample_document
 from app.modules.sales.service import LineData, SalesNotFoundError, SalesService
 from tests._pg import transactional_session
 
@@ -62,6 +63,28 @@ async def _doc(session, kind="invoice", tenant="t-a", **extra):
     }
     data.update(extra)
     return await svc.create(kind, lines=lines, doc_date=date(2026, 3, 10), **data)
+
+
+def _two_rate_invoice(n_lines: int):
+    doc = sample_document("invoice", "de", n_lines)
+    ln = doc.lines[1]
+    ln.tax_rate, ln.tax = D(7), (ln.net * 7 / 100).quantize(D("0.01"))
+    doc.tax_total = sum((x.tax for x in doc.lines), D(0))
+    doc.gross_total = doc.net_total + doc.tax_total
+    return doc
+
+
+@pytest.mark.parametrize("n_lines", [3, 8])
+def test_short_invoice_with_payment_block_fits_one_page(n_lines):
+    pdf = render_document(_two_rate_invoice(n_lines), COMPANY)
+    pages = PdfReader(io.BytesIO(pdf)).pages
+    assert len(pages) == 1
+    assert "Zusammenarbeit" in pages[0].extract_text()
+
+
+def test_long_invoice_still_paginates_with_carry():
+    pages = PdfReader(io.BytesIO(render_document(_two_rate_invoice(40), COMPANY))).pages
+    assert len(pages) >= 2 and "Übertrag" in pages[0].extract_text()
 
 
 @pytest.mark.asyncio

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { ArrowLeftRight, Landmark, ListFilter, Plus, Upload } from 'lucide-react';
+import { AlertTriangle, ArrowLeftRight, Landmark, ListFilter, Plus, Upload } from 'lucide-react';
 import { Breadcrumb, Button, DismissibleInfo, EmptyState, ModuleGuideButton, Card } from '@/shared/ui';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { useTabKeyboardNav } from '@/shared/hooks/useTabKeyboardNav';
@@ -114,7 +114,15 @@ export function BankingPage() {
       </div>
 
       <div role="tabpanel" id={`banking-panel-${tab}`} aria-labelledby={`banking-tab-${tab}`}>
-        {noAccounts && tab !== 'accounts' && tab !== 'rules' ? (
+        {accounts.error ? (
+          <Card padding="none">
+            <EmptyState
+              icon={<AlertTriangle size={22} />}
+              title={t('banking.load_error', { defaultValue: "We couldn't load your bank accounts right now." })}
+              action={{ label: t('common.retry', { defaultValue: 'Retry' }), onClick: () => void accounts.refetch() }}
+            />
+          </Card>
+        ) : noAccounts && tab !== 'accounts' && tab !== 'rules' ? (
           <Card padding="none">
             <EmptyState
               icon={<Landmark size={22} />}

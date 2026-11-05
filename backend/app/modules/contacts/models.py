@@ -67,6 +67,8 @@ class Contact(Base):
 
     # Financial
     payment_terms_days: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    # Default BT-10 for XRechnung to a public-sector buyer; prefills sales documents.
+    leitweg_id: Mapped[str | None] = mapped_column(String(46), nullable=True)
     currency_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     # i18n

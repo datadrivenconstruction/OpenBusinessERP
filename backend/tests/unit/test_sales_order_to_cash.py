@@ -183,8 +183,9 @@ async def test_credit_note_posts_proportional_reversal(svc):
     tb = await _closing_by_code(svc)
     assert sum(tb.values()) == 0
     assert tb["1400"] == inv.gross_total - cn.gross_total
-    assert tb["8400"] == -(inv.net_total - cn.net_total)
-    assert tb["1776"] + tb.get("1771", 0) == -(inv.tax_total - cn.tax_total)
+    # Consulting (19 %) is fully credited; the widget (7 %) stays on 8300/1771.
+    assert (tb["8400"], tb["1776"]) == (0, 0)
+    assert (tb["8300"], tb["1771"]) == (D("-49.98"), D("-3.50"))
     assert inv.status == "partially_paid" and inv.gross_total - inv.amount_paid == D("53.48")
     # Remaining open amount can be credited, but not more.
     cn2 = await svc.invoice_to_credit_note(inv.id)
@@ -194,4 +195,92 @@ async def test_credit_note_posts_proportional_reversal(svc):
     await svc.set_status(cn2.id, "issued")
     assert inv.status == "paid"
     tb = await _closing_by_code(svc)
-    assert sum(tb.values()) == 0 and tb["1400"] == 0 and tb["8400"] == 0
+    assert sum(tb.values()) == 0 and tb["1400"] == 0 and tb["8400"] == 0 and tb["8300"] == 0
+
+
+async def test_zero_rate_revenue_follows_the_tax_note(svc):
+    """0 % lines go to 8337 (§ 13b), 8125 (intra-EU), 8195 (§ 19) or 8100 (exempt); never to the 19 % Automatikkonto 8400."""
+    line = LineData("Montage", "M-1", D("1"), D("1000"), D("0"), D("0"))
+    for note, code in (
+        ("Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG)", "8337"),
+        ("Steuerfreie innergemeinschaftliche Lieferung", "8125"),
+        ("VAT exempt (§ 19 UStG)", "8195"),
+        ("Steuerfrei nach § 4 Nr. 8 UStG", "8100"),
+    ):
+        inv = await svc.create("invoice", lines=[line], doc_date=DAY, customer_name="Bau GmbH", tax_note=note)
+        await svc.issue_invoice(inv.id)
+        tb = await _closing_by_code(svc)
+        assert tb[code] == D("-1000.00"), note
+    assert tb.get("8400", 0) == 0 and tb.get("1776", 0) == 0
+
+
+async def test_mixed_rate_invoice_splits_revenue_and_vat(svc):
+    inv = await svc.create("invoice", lines=LINES, doc_date=DAY, customer_name="ACME")
+    await svc.issue_invoice(inv.id)
+    tb = await _closing_by_code(svc)
+    assert (tb["8400"], tb["1776"]) == (D("-90.00"), D("-17.10"))
+    assert (tb["8300"], tb["1771"]) == (D("-49.98"), D("-3.50"))
+    assert tb["1400"] == inv.gross_total
+
+
+@pytest_asyncio.fixture
+async def svc04(session):
+    gl = GLService(session)
+    await gl.load_template("de_skr04")
+    await gl.create_fiscal_year("FY2026", date(2026, 1, 1), date(2026, 12, 31))
+    return SalesService(session)
+
+
+async def test_skr04_mixed_rate_invoice_splits_revenue_and_vat(svc04):
+    inv = await svc04.create("invoice", lines=LINES, doc_date=DAY, customer_name="ACME")
+    await svc04.issue_invoice(inv.id)
+    tb = await _closing_by_code(svc04)
+    assert (tb["4400"], tb["3806"]) == (D("-90.00"), D("-17.10"))
+    assert (tb["4300"], tb["3801"]) == (D("-49.98"), D("-3.50"))
+    assert tb["1200"] == inv.gross_total
+
+
+async def test_skr04_zero_rate_revenue_follows_the_tax_note(svc04):
+    line = LineData("Montage", "M-1", D("1"), D("1000"), D("0"), D("0"))
+    for note, code in (
+        ("Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG)", "4337"),
+        ("Steuerfreie innergemeinschaftliche Lieferung", "4125"),
+        ("VAT exempt (§ 19 UStG)", "4185"),
+        ("Steuerfrei nach § 4 Nr. 8 UStG", "4100"),
+    ):
+        inv = await svc04.create("invoice", lines=[line], doc_date=DAY, customer_name="Bau GmbH", tax_note=note)
+        await svc04.issue_invoice(inv.id)
+        tb = await _closing_by_code(svc04)
+        assert tb[code] == D("-1000.00"), note
+    assert tb.get("4400", 0) == 0 and tb.get("3806", 0) == 0
+
+
+@pytest.mark.parametrize(
+    ("tpl", "rate", "revenue", "vat", "receivable"),
+    [("at_ekr", "20", "4000", "3500", "2000"), ("ch_kmu", "8.1", "3200", "2200", "1100")],
+)
+async def test_at_and_ch_charts_post_invoices_to_their_role_accounts(session, tpl, rate, revenue, vat, receivable):
+    gl = GLService(session)
+    await gl.load_template(tpl)
+    await gl.create_fiscal_year("FY2026", date(2026, 1, 1), date(2026, 12, 31))
+    svc = SalesService(session)
+    line = LineData("Ware", "W-1", D("1"), D("1000"), D("0"), D(rate))
+    inv = await svc.create("invoice", lines=[line], doc_date=DAY, customer_name="ACME")
+    await svc.issue_invoice(inv.id)
+    tb = await _closing_by_code(svc)
+    assert (tb[revenue], tb[vat]) == (D("-1000.00"), -(D(rate) * 10).quantize(D("0.01")))
+    assert tb[receivable] == inv.gross_total
+
+
+async def test_at_ekr_mixed_rates_post_to_the_rate_neutral_accounts(session):
+    gl = GLService(session)
+    await gl.load_template("at_ekr")
+    await gl.create_fiscal_year("FY2026", date(2026, 1, 1), date(2026, 12, 31))
+    svc = SalesService(session)
+    lines = [LineData(f"Ware {r}", f"W-{r}", D("1"), D("100"), D("0"), D(r)) for r in ("20", "13", "10")]
+    inv = await svc.create("invoice", lines=lines, doc_date=DAY, customer_name="ACME")
+    await svc.issue_invoice(inv.id)
+    tb = await _closing_by_code(svc)
+    assert (tb["4000"], tb["3500"], tb["2000"]) == (D("-300.00"), D("-43.00"), D("343.00"))
+    names = {r["code"]: r["name"] for r in (await gl.trial_balance(None, None))["rows"]}
+    assert "%" not in names["4000"] and "%" not in names["3500"]

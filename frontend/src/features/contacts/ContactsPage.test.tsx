@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { buildContactPatch, contactFormData } from './ContactsPage';
 import type { Contact } from './api';
+import { isLeitwegId } from './leitweg';
 
 /**
  * The contact address, which an e-invoice reads as the buyer's postal address.
@@ -91,5 +92,31 @@ describe('buildContactPatch', () => {
     const patch = buildContactPatch({ ...base, postcode: '' }, base);
 
     expect(patch.address).toEqual({ text: 'Werftstrasse 14', city: 'Kiel' });
+  });
+});
+
+describe('Leitweg-ID field', () => {
+  const base = contactFormData({ ...contact(null), leitweg_id: '991-01234-44' } as Contact);
+
+  it('opens with the stored default and an empty one for a new contact', () => {
+    expect(base.leitweg_id).toBe('991-01234-44');
+    expect(contactFormData(contact(null)).leitweg_id).toBe('');
+  });
+
+  it('sends only a changed value, and null when cleared', () => {
+    expect(buildContactPatch({ ...base }, base).leitweg_id).toBeUndefined();
+    expect(buildContactPatch({ ...base, leitweg_id: ' 04011000-1234512345-06 ' }, base).leitweg_id).toBe(
+      '04011000-1234512345-06',
+    );
+    expect(buildContactPatch({ ...base, leitweg_id: '' }, base).leitweg_id).toBeNull();
+  });
+
+  it('accepts real shapes and rejects obvious nonsense', () => {
+    for (const ok of ['', '991-01234-44', '04011000-1234512345-06', '99-44', '991-abc-44']) {
+      expect(isLeitwegId(ok), ok).toBe(true);
+    }
+    for (const bad of ['hello', '991', '991-01234', '1-44', '991-01234-4', 'DE123456789']) {
+      expect(isLeitwegId(bad), bad).toBe(false);
+    }
   });
 });

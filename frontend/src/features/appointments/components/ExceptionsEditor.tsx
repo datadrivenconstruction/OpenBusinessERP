@@ -9,6 +9,7 @@ import { useToastStore } from '@/stores/useToastStore';
 import { getErrorMessage } from '@/shared/lib/api';
 import { appointmentsApi, dayKey, hhmmToMin, minToHHMM } from '../api';
 import { dateRange } from '../scheduling';
+import { DateField } from '@/shared/ui/DateField';
 
 const input = 'h-8 rounded-lg border border-border bg-surface-primary px-2 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
 
@@ -94,11 +95,11 @@ export function ExceptionsEditor({ resourceId }: { resourceId: string }) {
         </select>
         <label className="text-2xs text-content-secondary">
           {t('appointments.from', { defaultValue: 'From' })}
-          <input type="date" className={clsx(input, 'block')} value={from} min={today} onChange={(e) => setFrom(e.target.value)} />
+          <DateField className={clsx(input, 'block')} value={from} min={today} onChange={(e) => setFrom(e.target.value)} />
         </label>
         <label className="text-2xs text-content-secondary">
           {t('appointments.until_optional', { defaultValue: 'Until (optional)' })}
-          <input type="date" className={clsx(input, 'block')} value={to} min={from || today} onChange={(e) => setTo(e.target.value)} />
+          <DateField className={clsx(input, 'block')} value={to} min={from || today} onChange={(e) => setTo(e.target.value)} />
         </label>
         {kind === 'closed' && (
           <label className="flex items-center gap-1 pb-1.5 text-xs">

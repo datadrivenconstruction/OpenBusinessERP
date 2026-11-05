@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { CalendarClock, History, Pause, Pencil, Play, Plus, Repeat, Trash2, Zap } from 'lucide-react';
+import { AlertTriangle, CalendarClock, History, Pause, Pencil, Play, Plus, Repeat, Trash2, Zap } from 'lucide-react';
 import { Badge, Breadcrumb, Button, ConfirmDialog, EmptyState, SkeletonTable, StatCard } from '@/shared/ui';
 import type { BadgeVariant } from '@/shared/ui';
 import { PageHeader } from '@/shared/ui/PageHeader';
@@ -27,6 +27,7 @@ import {
   type RecurringStatus,
   type RecurringTemplate,
 } from './recurringApi';
+import { DateField } from '@/shared/ui/DateField';
 
 const input =
   'w-full rounded-lg border border-border-light bg-surface-primary px-2 py-1.5 text-sm text-content-primary focus:border-oe-blue focus:outline-none';
@@ -140,6 +141,13 @@ export function RecurringInvoicesPage() {
 
       {list.isLoading ? (
         <SkeletonTable rows={4} />
+      ) : list.error ? (
+        <EmptyState
+          icon={<AlertTriangle size={28} />}
+          title={t('recurring.load_error', { defaultValue: "We couldn't load recurring invoices right now." })}
+          description={getErrorMessage(list.error)}
+          action={{ label: t('common.retry', { defaultValue: 'Retry' }), onClick: () => void list.refetch() }}
+        />
       ) : rows.length === 0 ? (
         <EmptyState
           icon={<Repeat size={28} />}
@@ -247,6 +255,8 @@ function RunHistory({ id, name, onOpen }: { id: string; name: string; onOpen: (d
       </h2>
       {runs.isLoading ? (
         <SkeletonTable rows={2} />
+      ) : runs.error ? (
+        <p role="alert" className="text-sm text-semantic-error">{t('recurring.load_error', { defaultValue: "We couldn't load recurring invoices right now." })}</p>
       ) : rows.length === 0 ? (
         <p className="text-sm text-content-tertiary">{t('recurring.history_empty', { defaultValue: 'Nothing generated yet.' })}</p>
       ) : (
@@ -358,7 +368,7 @@ function RecurringForm({
         </label>
         <label className="text-xs text-content-tertiary">
           {t('recurring.start_date', { defaultValue: 'First invoice' })}
-          <input type="date" className={input} value={f.start_date} onChange={(e) => set({ start_date: e.target.value })} />
+          <DateField className={input} value={f.start_date} onChange={(e) => set({ start_date: e.target.value })} />
         </label>
         {usesDay && (
           <label className="text-xs text-content-tertiary">
@@ -391,7 +401,7 @@ function RecurringForm({
         {endMode === 'date' && (
           <label className="text-xs text-content-tertiary">
             {t('recurring.end_date', { defaultValue: 'End date' })}
-            <input type="date" className={input} value={f.end_date ?? ''} onChange={(e) => set({ end_date: e.target.value || null })} />
+            <DateField className={input} value={f.end_date ?? ''} onChange={(e) => set({ end_date: e.target.value || null })} />
           </label>
         )}
         {endMode === 'count' && (

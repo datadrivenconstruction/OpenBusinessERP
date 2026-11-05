@@ -1618,5 +1618,62 @@
     ],
     "key_count_at_seed": 3,
     "note": "Error, spelled the same in all four Spanish locales and borrowed as-is into Filipino: the bare noun (jobs.error = 'Error'), and the singular of a counted label, '{{count}} error', in dashboard.validation_portfolio.errors_count_one and schedule.tabular_import.count_errors_one. Their plural forms (errores, and the unchanged Filipino) are translated."
+  },
+  {
+    "locale_set": [
+      "ro",
+      "tr"
+    ],
+    "key_count_at_seed": 8,
+    "note": "Net is the native word for net amount in ro and tr"
+  },
+  {
+    "locale_set": [
+      "fil",
+      "nl",
+      "sv"
+    ],
+    "key_count_at_seed": 6,
+    "note": "Order is the native noun in nl/sv and the settled loanword in fil; Deadline likewise"
+  },
+  {
+    "locale_set": [
+      "es",
+      "id",
+      "pt",
+      "ro"
+    ],
+    "key_count_at_seed": 5,
+    "note": "Manual and Total are native words in es/id/pt/ro"
+  },
+  {
+    "locale_set": [
+      "el",
+      "fil",
+      "tr",
+      "vi"
+    ],
+    "key_count_at_seed": 4,
+    "note": "Net N payment-term codes kept as the international invoice convention"
+  },
+  {
+    "locale_set": [
+      "es",
+      "fr",
+      "id",
+      "pt",
+      "ro"
+    ],
+    "key_count_at_seed": 3,
+    "note": "Total is the native word in es/fr/id/pt/ro"
+  },
+  {
+    "locale_set": [
+      "fil",
+      "fr",
+      "pt"
+    ],
+    "key_count_at_seed": 3,
+    "note": "Stock is the native/settled word for inventory in fr, pt and fil"
   }
 ]

@@ -651,6 +651,7 @@ function ConnectorModal({
       onClose={onClose}
       size="lg"
       busy={saveMut.isPending}
+      onSubmit={() => { if (canSave) saveMut.mutate(); }}
       title={
         isEdit
           ? t('finance.connectors.edit_title', { defaultValue: 'Edit connector' })

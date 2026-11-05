@@ -21,6 +21,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { HelpCircle, FileWarning, MapPin, AlertTriangle, Landmark } from 'lucide-react';
+import { DateField } from '@/shared/ui/DateField';
 
 import { ApiError } from '@/shared/lib/api';
 import { Badge } from '@/shared/ui/Badge';
@@ -163,8 +164,8 @@ export function TaxRateResolverPanel() {
 
           <label className="flex flex-col gap-1 text-sm">
             {t('tax_rates.field_date', { defaultValue: 'Priced at' })}
-            <input
-              type="date"
+            <DateField
+             
               value={onDate}
               onChange={(e) => setOnDate(e.target.value)}
               className="rounded border border-border-light bg-surface-primary p-2"

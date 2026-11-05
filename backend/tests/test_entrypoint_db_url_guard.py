@@ -33,7 +33,7 @@ def run_entrypoint(tmp_path: Path):
     stub_dir = tmp_path / "bin"
     stub_dir.mkdir()
     stub = stub_dir / "python"
-    stub.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    stub.write_text('#!/bin/sh\necho "python $*"\n', encoding="utf-8")
     stub.chmod(0o755)
 
     def run(**env_overrides: str) -> subprocess.CompletedProcess[str]:

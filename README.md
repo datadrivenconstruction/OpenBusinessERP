@@ -1,212 +1,89 @@
-<p align="center">
-  <img src="docs/images/hero.png" alt="OpenBusinessERP: sales, CRM, stock, purchasing, accounting and banking in one open workspace" width="100%">
-</p>
-
 <h1 align="center">OpenBusinessERP</h1>
 
-<p align="center"><b>An open-source, self-hosted ERP for small and mid-sized businesses, from the first quote to the closed accounting period.</b></p>
+<p align="center">Self-hosted ERP for small businesses in Germany, Austria and Switzerland: quotes, invoices, stock, purchasing, bank reconciliation and double-entry bookkeeping, with a DATEV export for your tax adviser.</p>
 
 <p align="center">
-  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml"><img src="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
-  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/codeql.yml"><img src="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/codeql.yml/badge.svg?branch=main" alt="CodeQL"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
-  <img src="https://img.shields.io/badge/version-18.4.0-2563eb.svg" alt="Version 18.4.0">
-  <img src="https://img.shields.io/badge/python-3.12%2B-3776ab.svg" alt="Python 3.12+">
-  <img src="https://img.shields.io/badge/backend-FastAPI-009688.svg" alt="FastAPI">
-  <img src="https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-61dafb.svg" alt="React + TypeScript">
-  <img src="https://img.shields.io/badge/database-PostgreSQL-336791.svg" alt="PostgreSQL">
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/tags"><img src="https://img.shields.io/github/v/tag/datadrivenconstruction/OpenBusinessERP?label=version" alt="Latest version"></a>
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml"><img src="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
 </p>
 
 <p align="center">
+  <a href="https://openbusinesserp.com">Website</a> ·
+  <a href="https://demo.openbusinesserp.com/">Live demo</a> ·
+  <a href="https://datadrivenconstruction.github.io/OpenBusinessERP/">Documentation</a> ·
   <a href="#quick-start">Quick start</a> ·
-  <a href="#a-tour-of-the-workspace">Feature tour</a> ·
-  <a href="#at-a-glance">At a glance</a> ·
-  <a href="ROADMAP.md">Roadmap</a> ·
-  <a href="#architecture">Architecture</a> ·
-  <a href="#configuration">Configuration</a> ·
-  <a href="#faq">FAQ</a> ·
-  <a href="#contributing">Contributing</a>
+  <a href="#limits">Limits</a> ·
+  <a href="ROADMAP.md">Roadmap</a>
 </p>
 
----
+<p align="center">
+  <img src="docs/images/hero.png" alt="OpenBusinessERP dashboard with cash, receivables, payables and revenue of the demo company" width="100%">
+</p>
 
-OpenBusinessERP is a free, open-source ERP (enterprise resource planning) system for small and mid-sized companies. It covers quotes and invoicing, CRM, products and stock, purchasing, double-entry accounting, bank reconciliation, receivables and appointments in a single web application that you host yourself. It is a modular business suite you can run on your own server, adapt and extend.
+*Auf Deutsch:* Angebote, Rechnungen mit XRechnung/ZUGFeRD, Bankabgleich, Buchhaltung nach SKR03 oder SKR04 und DATEV-Export. Läuft auf Ihrem eigenen Server, Quellcode offen unter AGPL-3.0.
+
+## A month in the software
+
+The demo company, *Kestrelmark Handel GmbH*, is a wholesale trader. A typical month:
+
+1. A customer asks for a price. You write an **Angebot** (quote) and send it as PDF from your own mail server.
+2. The customer accepts. The quote becomes an **Auftrag** (order), then a **Lieferschein** (delivery) that takes the goods out of stock.
+3. The delivery becomes a **Rechnung** (invoice) with a SEPA GiroCode, or a Swiss QR-bill for CH/LI businesses. For a public-sector customer you export it as XRechnung from the invoice page, with the Leitweg-ID on the invoice. Posting the invoice writes the journal entry on SKR03 or SKR04, split by VAT rate.
+4. Stock runs low. A **Bestellung** (purchase order) goes to the supplier; the goods receipt and the supplier's **Eingangsrechnung** (bill) are matched against it.
+5. You import the bank statement (camt.053, MT940 or CSV). The **Bankabgleich** proposes the open invoice or bill behind each line; you confirm.
+6. A customer has not paid. The dunning run proposes a **Mahnung** level and sends the reminder by e-mail.
+7. At month end you check the VAT report, close the period and download the **DATEV Buchungsstapel** for your tax adviser.
 
 <p align="center">
   <img src="docs/images/sales-flow.gif" alt="A quote becomes an order, then an invoice that is issued, posted and paid" width="960">
-  <br><sub>Quote → order → invoice → posted → paid, recorded on the bundled demo company.</sub>
 </p>
 
-## Who it's for
+## Features
 
-- **Trading and wholesale companies** that buy, stock and resell goods and need quotes, orders, invoices, purchase orders and stock in one place.
-- **Service businesses** that sell time or fixed-price services, book appointments and invoice them.
-- **Small teams without an IT department.** One command starts the server with an embedded database and a demo company to explore.
-- **Companies that want their own data.** Everything runs on your hardware or your cloud account; there is no vendor-hosted tenant.
-- **Developers and integrators** who want a FastAPI + React codebase with a documented REST API and a module system to build on.
+**Sales**
+- Quotes, orders, deliveries, invoices and credit notes in one document chain; nothing is typed twice.
+- Recurring invoices (weekly to yearly) that are generated, posted and e-mailed on schedule, with MRR and ARR.
+- Payment links on invoices through Stripe or Mollie; the provider fee is booked when the webhook reports it.
+- Documents in the customer's language, independent of the user's interface language; the interface ships with 45 locale bundles.
 
-It is not a replacement for a certified payroll package or for the statutory filings your accountant submits; see the [disclaimer](#disclaimer).
+**Customers and appointments**
+- CRM pipeline from lead to won deal; a won deal becomes a quote.
+- Calendar for services, staff and rooms, with a public booking page you can embed on your website.
 
-## Why OpenBusinessERP
+**Stock and purchasing**
+- Product and service catalogue with prices, margins, tax rates and minimum stock.
+- Stock per warehouse in a movement ledger, stocktakes, moving-average valuation.
+- Purchase order, goods receipt and supplier bill matched step by step; supplier price catalogues.
 
-Most small companies run on a patchwork: one tool for quotes, another for invoices, a spreadsheet for stock, the bank portal for payments and an accountant who re-types it all. OpenBusinessERP connects these steps in one flow.
+**Bank and receivables**
+- Statement import in camt.053, camt.054, MT940 and CSV; matching rules for recurring lines.
+- Aging buckets and dunning runs with per-customer exclusions.
 
-- **One document chain.** A quote becomes an order, the order becomes an invoice, and the invoice is posted to the general ledger and shows up in receivables. Nothing is typed twice.
-- **Real bookkeeping, not just invoicing.** Double-entry general ledger, journal, trial balance, balance sheet, profit & loss, VAT return and period close.
-- **The bank closes the loop.** Import a statement, let matching rules propose the invoice or bill behind each line, confirm.
-- **Yours to run.** Self-hosted under AGPL-3.0, with an embedded PostgreSQL, so one command gives you a working system. No per-seat licences, and your data stays on your server.
-- **In your language.** The interface ships with 45 locale bundles, and documents can be issued in the customer's language.
+**Accounting**
+- Double-entry general ledger: journal, trial balance, balance sheet, profit and loss with prior-period comparison, VAT report.
+- Posted entries cannot be edited, only reversed. Closed periods accept no postings. Entry numbers are gap-free per fiscal year. Every business-module write is recorded in an audit log with a before/after summary.
+- Multi-currency with ECB reference rates; realised exchange differences are posted.
 
-## A tour of the workspace
+**Getting data in and out**
+- Import wizard for customers, suppliers, products, opening balances and open items from CSV or XLSX, with dry run and undo.
+- REST API under `/api/v1/` with an OpenAPI schema; every screen uses the same API.
+- Optional AI chat over your own data, using your own API key. Everything else works without it.
 
-Every screenshot below shows the real application running the bundled demo company, *Kestrelmark Handel GmbH* (a wholesale trader, EUR).
+## Germany, Austria, Switzerland
 
-### Dashboard
-
-Cash in bank, receivables, payables, revenue and net result at a glance, plus a cash-flow outlook, a revenue-versus-expenses chart, today's agenda and recent activity.
-
-<img src="docs/images/dashboard.png" alt="Dashboard with cash, receivables, payables and revenue" width="100%">
-
-### Sales: quotes, orders, invoices and credit notes
-
-One list covers the whole sales cycle, with status filters, overdue tracking and totals.
-
-<img src="docs/images/sales.png" alt="Sales list with quotes, orders and invoices" width="100%">
-
-Each document shows where it is in the *Quote → Order → Delivered → Invoiced → Paid* chain, along with its line items, payments, related documents and activity log. Documents go out as PDF by email through your own SMTP server (configured under **Settings**), and e-invoices can be produced as CII XML. Invoices in EUR can carry a SEPA payment QR code (EPC "GiroCode"), so the customer's banking app fills in the transfer.
-
-<img src="docs/images/invoice.png" alt="A paid invoice with line items, totals, payments and activity" width="100%">
-
-### Recurring invoices
-
-Subscriptions and service contracts are set up once: customer, lines, interval (weekly, monthly, quarterly or yearly), start and optional end date. Each period an invoice is generated and, if you choose, issued, posted and e-mailed automatically. The overview shows monthly recurring revenue (MRR), annual run rate (ARR) and what falls due in the next seven days.
-
-<img src="docs/images/recurring.png" alt="Recurring invoices with MRR, ARR and next run dates" width="100%">
-
-### CRM
-
-A pipeline board takes deals from lead to won and links them to contacts and companies. A won deal becomes a quote in one click.
-
-<img src="docs/images/crm.png" alt="CRM pipeline board" width="100%">
-
-### Products, services and stock
-
-One catalogue holds everything you sell or buy: SKU, unit, sales price, cost, margin, tax rate and stock on hand, with minimum-stock alerts and CSV export.
-
-<img src="docs/images/products.png" alt="Products and services catalogue with prices, margins and stock" width="100%">
-
-### Inventory
-
-Stock is kept per warehouse in a movement ledger: goods receipts, deliveries, transfers between warehouses and manual adjustments each leave a dated entry. Stocktakes count a warehouse and post the differences. Items are valued at moving-average cost, and items below their minimum stock are flagged.
-
-<img src="docs/images/inventory.png" alt="Inventory: stock per warehouse with minimum levels" width="100%">
-
-### Purchasing
-
-Purchase orders, goods receipts and supplier bills are matched step by step, so you pay only for what was ordered and received. Supplier catalogues keep supplier prices next to your own items.
-
-<img src="docs/images/purchasing.png" alt="Purchase orders list" width="100%">
-
-### Banking and reconciliation
-
-Import bank statements (CSV, MT940, camt) and reconcile them in a two-pane workspace: open statement lines on the left, suggested invoices and bills on the right. Rules categorise recurring lines such as fees or salaries automatically.
-
-<img src="docs/images/banking.png" alt="Bank reconciliation workspace with suggested matches" width="100%">
-
-### Receivables and dunning
-
-Aging buckets show who owes you and how overdue each balance is. A dunning run proposes a reminder level per customer, you can exclude individual customers, and reminders are sent by e-mail.
-
-<img src="docs/images/receivables.png" alt="Receivables aging and dunning" width="100%">
-
-### Accounting
-
-Sales and purchase documents post to the ledger automatically. You can review the journal, add manual entries, maintain the chart of accounts and close periods.
-
-<img src="docs/images/accounting.png" alt="Accounting overview" width="100%">
-
-The reports are trial balance, balance sheet, profit & loss (with comparison to the previous period) and VAT return. All of them export to CSV.
-
-<img src="docs/images/reports.png" alt="Profit and loss report with previous-period comparison" width="100%">
-
-### Multi-currency
-
-Sales and purchase documents can be issued in a foreign currency. Exchange rates can be fetched from the European Central Bank reference rates or entered by hand; when a foreign invoice is paid at a different rate, the realised exchange gain or loss is posted to the ledger.
-
-### Exports for your accountant
-
-**Accounting → Reports → Export** produces a DATEV *Buchungsstapel* (EXTF CSV) plus customer and supplier master data, and an OECD SAF-T 2.0 XML file for a chosen period. These files are not certified; have your tax adviser check them before you import or file them.
-
-<img src="docs/images/export.png" alt="Accounting export panel with DATEV and SAF-T formats" width="100%">
-
-### Appointments and online booking
-
-Plan services, staff and rooms on a calendar, and publish a public booking page (`/book/<slug>`) that customers open directly or that you embed on your website. A completed booking can be invoiced in one click.
-
-<img src="docs/images/appointments.png" alt="Appointments list with services, staff and booking statuses" width="100%">
-
-<img src="docs/images/booking.png" alt="Public online booking page" width="100%">
-
-### Data import
-
-Move in from spreadsheets or another system. A wizard imports customers, suppliers, products, opening balances and open invoices from CSV or XLSX. It maps the columns, validates the rows, runs a dry run first, and lets you undo an import.
-
-<img src="docs/images/import.png" alt="Data import wizard" width="100%">
-
-### Settings and modules
-
-Company and document settings, regional formats, team and roles, e-invoicing, AI providers, integrations and the module switchboard all live in one settings hub. The *Simple* interface mode shows only the essentials; *Advanced* shows every module.
-
-<img src="docs/images/settings.png" alt="Settings hub" width="100%">
-
-### AI chat
-
-Ask about your own data in plain language, for example "which invoices are overdue?" or "what did we buy from this supplier last quarter?". You bring your own API key: Anthropic, OpenAI, Gemini, Mistral, Groq and other providers can be configured in Settings. Without a key, everything else works as usual.
-
-### Projects and service
-
-Projects, service cases and tasks support companies that deliver work as well as goods.
-
-## At a glance
-
-How OpenBusinessERP compares on the points people usually check first. Project policy keeps other products' names out of this repository, so the comparison is left to you; each row below is verifiable in this codebase.
-
-| Criterion | OpenBusinessERP |
+| Topic | What the code does |
 |---|---|
-| License | AGPL-3.0; commercial license on request |
-| Stack | Python 3.12, FastAPI, SQLAlchemy 2, PostgreSQL; React 18 + TypeScript frontend |
-| Database | Embedded PostgreSQL started automatically, or your own PostgreSQL server |
-| Bookkeeping | Double-entry general ledger; SKR03 and an IFRS-style chart included |
-| Accountant export | DATEV Buchungsstapel (EXTF) and SAF-T 2.0 XML |
-| E-invoicing | CII XML export |
-| Interface languages | 45 locale bundles, including right-to-left scripts |
-| Self-hosting | One command: `make quickstart` (Docker) or `openbusinesserp serve --embedded-pg` |
-| API | REST under `/api/v1/` with an OpenAPI schema |
-
-## Architecture
-
-```
-┌──────────────────────────────┐      ┌───────────────────────────────────────────┐
-│  React 18 + TypeScript (SPA) │ HTTP │  FastAPI application (Python 3.12+)       │
-│  Vite · Tailwind · TanStack  │ ───► │  ├─ core: auth, settings, module loader   │
-│  Query · Zustand · i18next   │ JSON │  └─ app/modules/<name>/manifest.py        │
-└──────────────────────────────┘      │      sales · crm · items · purchasing ·   │
-                                      │      gl · banking · receivables · ...     │
-                                      └──────────────────┬────────────────────────┘
-                                                         │ SQLAlchemy 2 (async) + Alembic
-                                                 ┌───────▼────────┐
-                                                 │   PostgreSQL   │  embedded by default,
-                                                 └────────────────┘  or your own server
-```
-
-- **Backend:** FastAPI, SQLAlchemy 2 (async), Pydantic 2 and Alembic migrations.
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, Zustand and i18next. The production build is bundled into the Python wheel and served by the backend.
-- **Modules:** each business area is a Python package under `backend/app/modules/` with a `manifest.py`. The module loader discovers the manifests, resolves dependencies and registers each module's models, routes and event hooks. Modules can be switched on or off per installation.
-- **Database:** PostgreSQL. A fresh install starts an embedded PostgreSQL in the data directory, so you don't need a separate database server. For production, point `DATABASE_URL` at your own server.
+| Charts of accounts | SKR03 and SKR04 (DE), Einheitskontenrahmen EKR (AT), KMU-Kontenrahmen (CH), plus an IFRS-style chart. Pick one in the business setup. |
+| VAT | Sales and purchase VAT post per rate (19 % / 7 % on SKR03 and SKR04). 0 % lines are routed to the reverse-charge (§ 13b), intra-EU, § 19 UStG small-business or exempt revenue account. AT 13 % and CH 3.8 % rates and the Swiss Art. 10 MWSTG exemption are available in the setup. |
+| E-invoicing | XRechnung 3.0 (CII), ZUGFeRD 2.1 / Factur-X hybrid PDF, EN 16931 CII and UBL, Peppol BIS Billing 3.0. Invoices are checked against EN 16931 business rules before export. |
+| DATEV | EXTF Buchungsstapel with all 125 columns, Debitor/Kreditor personal accounts, tax-account folding, Skonto, foreign-currency fields and Beleglink; Debitoren/Kreditoren master data file. SAF-T 2.0 XML as well. |
+| Payment slips | SEPA GiroCode (EPC QR) on EUR invoices; Swiss QR-bill (SIX guidelines v2.3, structured addresses, QR-IBAN with QRR reference) as the A6 payment part for CH/LI businesses. |
+| Bookkeeping rules | Posted entries are immutable and corrected by reversal; closed periods are locked; numbering is gap-free; changes are audit-logged. These are the properties GoBD asks for, not a GoBD certification (see below). |
 
 ## Quick start
 
-### Docker (recommended)
+You need Docker with Compose v2, Git and `make`.
 
 ```bash
 git clone https://github.com/datadrivenconstruction/OpenBusinessERP.git
@@ -216,97 +93,54 @@ echo "JWT_SECRET=$(openssl rand -hex 32)"           >> .env
 make quickstart
 ```
 
-Open **http://localhost:8080**. The first start builds the image, creates the database and loads the demo company. `docker-compose.prod.yml` is the production template. See [docs/getting-started.md](docs/getting-started.md) for details.
+Open <http://localhost:8080>. The first start builds the image, creates the database and loads the demo company; the sign-in page offers one-click demo accounts. If you do not want to build locally, `make quickstart-image` uses the published image.
 
-### Local development
+Before the server is reachable from the internet: set `SEED_DEMO=false`, put a reverse proxy with HTTPS in front of port 8080, and start from `docker-compose.prod.yml`. Details, the desktop app and backups are in the [install guide](docs/manual/install.md).
+
+For development (Python 3.12+, Node.js 22+):
 
 ```bash
-git clone https://github.com/datadrivenconstruction/OpenBusinessERP.git
-cd OpenBusinessERP
 pip install -e "./backend[server]"
-cd frontend && npm install && cd ..
-
-# Terminal 1: API with an embedded PostgreSQL
-cd backend && openbusinesserp serve --embedded-pg --port 8000
-# Terminal 2: frontend with hot reload
-cd frontend && npm run dev
+# terminal 1: API with an embedded PostgreSQL
+cd backend
+openbusinesserp serve --embedded-pg --port 8000
+# terminal 2: UI with hot reload on http://localhost:5173
+cd frontend && npm install && npm run dev
 ```
 
-Open **http://localhost:5173**. You need Python 3.12+ and Node.js 22+.
+See [DEVELOPING.md](DEVELOPING.md) and the [module development quickstart](docs/module-development/quickstart.md).
 
-### pip (from the first PyPI release)
+## Limits
 
-Once the first release is on PyPI, a single command installs the backend together with the pre-built frontend:
+Read these before you rely on the software for your books.
 
-```bash
-pip install --upgrade openbusinesserp
-openbusinesserp            # embedded PostgreSQL, demo company, opens http://localhost:8080
-openbusinesserp doctor     # OK/WARN/ERROR report per check
-```
+- **Nothing is certified.** The DATEV files are not certified by DATEV. The e-invoices are checked against EN 16931 rules, which confirms structure, not acceptance by a receiver or authority. The software is not certified as GoBD-compliant; GoBD compliance also depends on your procedures documentation (Verfahrensdokumentation), retention and operation.
+- **Test the DATEV export with your tax adviser** before the first real import. Adviser and client number, account length and SKR must match their setup. Columns without a data source stay empty. The full list is in [DATEV and SAF-T export](docs/manual/accountant-export.md).
+- **ZUGFeRD PDFs are not strict PDF/A-3b.** The embedded XML is complete; a receiver that demands PDF/A-3b needs a post-processing step.
+- **No payroll, no tax filing.** There is no Lohnabrechnung, no ELSTER submission of the VAT return and no annual financial statement (Jahresabschluss) workflow. Your accountant files.
+- **No GitHub release yet.** Docker from source is the supported path. The desktop installers are not code signed, and the PyPI package is not published.
+- **Bank connection is file-based.** Statements are imported as files; there is no live FinTS/EBICS or PSD2 connection.
 
-### Demo login
+## Architecture
 
-On a local install, the sign-in page offers one-click demo accounts. The administrator account is `demo@openbusinesserp.com`. The `SEED_DEMO` setting controls the demo data and the demo sign-in. **Set `SEED_DEMO=false` on any server that is reachable from the internet.**
+FastAPI, SQLAlchemy 2 (async), Pydantic 2 and Alembic on PostgreSQL; a React 18 + TypeScript single-page app built with Vite and served by the backend. Each business area is a module under `backend/app/modules/<name>/` with a `manifest.py`; the loader resolves dependencies and registers models, routes and event hooks, and modules can be switched off per installation. Without `DATABASE_URL`, an embedded PostgreSQL is started in the data directory. Configuration is read from environment variables; [`backend/.env.example`](backend/.env.example) lists them all.
 
-## Configuration
-
-Settings are read from environment variables or a `.env` file. [`backend/.env.example`](backend/.env.example) has the full annotated list. The most important ones:
-
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection (`postgresql+asyncpg://...`). Leave it unset to use the embedded database. |
-| `JWT_SECRET` | Random string of 32+ characters. Required in production. |
-| `SEED_DEMO` | `true` loads the demo company and the demo sign-in. Set it to `false` in production. |
-| `S3_*` | Optional S3-compatible file storage. Local disk is used otherwise. |
-
-AI providers, e-mail, e-invoicing, company data and number formats are configured in the app under **Settings**.
-
-## Languages and regions
-
-- **Interface:** 45 locale bundles in `frontend/src/app/locales/`. They include right-to-left languages (Arabic, Hebrew, Persian, Urdu) and regional variants such as `en-GB`, `pt-BR` and `es-MX`.
-- **Documents:** quotes and invoices can be issued in a language other than the one the user works in.
-- **Regional formats:** currency, date and number formats and tax rates are set per company.
-
-## FAQ
-
-**Can I self-host it?**
-Yes, self-hosting is the only way to run it. Use Docker Compose (`make quickstart`, with `docker-compose.prod.yml` as the production template) or install the Python package and run `openbusinesserp serve`. Without `DATABASE_URL`, an embedded PostgreSQL is started in the data directory; for production, point it at your own PostgreSQL server.
-
-**What does it cost, and what is the license?**
-The software is free under the AGPL-3.0. There are no per-user fees. If you modify it and offer it to others over a network, you must publish your changes under the same license. A commercial license is available on request.
-
-**Which languages are supported?**
-The interface ships with 45 locale bundles, including right-to-left languages. Quotes and invoices can be issued in the customer's language, independently of the language the user works in.
-
-**Which chart of accounts does it use?**
-Two templates are included: a generic IFRS-style chart and the German SKR03. Accounts can be added, renamed or deactivated afterwards.
-
-**How do I move my data in?**
-The import wizard reads CSV and XLSX files for customers, suppliers, products, opening balances, open invoices and open bills. Export these lists from your current tool or spreadsheet, map the columns, check the dry run, then import. An import can be undone.
-
-**Does it handle e-invoicing?**
-Invoices can be exported as CII XML. Check the generated files against the rules that apply to you; see the [disclaimer](#disclaimer).
-
-**Is there an API?**
-Yes. The backend is a FastAPI application, and every screen in the UI uses the same REST API under `/api/v1/`. Outside production mode the backend also serves the OpenAPI schema (`/api/openapi.json`) with interactive docs.
-
-**Do I need an AI provider?**
-No. The AI chat is optional and uses your own API key. Without a key, every other feature works.
+The interface ships with 45 locale bundles, including right-to-left scripts.
 
 ## Contributing
 
-Bug reports, translations and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first; contributors sign the [CLA](CLA.md) once, via a bot comment on the first pull request. For anything larger than a bug fix, open an issue to discuss the approach before you start.
+Bug reports, translations and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first; contributors sign the [CLA](CLA.md) once, through a bot comment on the first pull request. For anything larger than a bug fix, open a [discussion](https://github.com/datadrivenconstruction/OpenBusinessERP/discussions) about the approach before you start. Report security issues privately as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-OpenBusinessERP is licensed under the [GNU Affero General Public License v3.0](LICENSE). You can use, modify and self-host it freely. If you offer a modified version to users over a network, you must make its source code available to them under the same license. A commercial license is available on request. See also [ROADMAP.md](ROADMAP.md), [NOTICE](NOTICE), [TRADEMARK.md](TRADEMARK.md), [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
+OpenBusinessERP is licensed under the [GNU Affero General Public License v3.0](LICENSE). You can use, modify and self-host it freely. If you offer a modified version to users over a network, you must make its source code available to them under the same license. A commercial license is available on request. See also [NOTICE](NOTICE), [TRADEMARK.md](TRADEMARK.md) and [PRIVACY.md](PRIVACY.md).
 
 ## Disclaimer
 
 OpenBusinessERP is provided **"AS IS", without warranty of any kind**, express or implied, and without liability for damages, to the extent permitted by law (see sections 15 and 16 of the [AGPL-3.0](LICENSE)).
 
 - **Not professional advice.** Nothing in the software or its documentation is tax, legal or accounting advice. Consult a qualified adviser for your situation.
-- **You verify the rules.** Tax rates, VAT and sales-tax logic, e-invoice formats (for example XRechnung, ZUGFeRD, Peppol), statutory reports and retention rules are shipped as a starting point and change over time. You are responsible for checking them against current law and the official specifications before relying on them, and for any filing or invoice you issue.
+- **You verify the rules.** Tax rates, VAT logic, e-invoice formats, statutory reports and retention rules are shipped as a starting point and change over time. You are responsible for checking them against current law and the official specifications before relying on them, and for any filing or invoice you issue.
 - **Schema-validated is not certified.** Where the software validates documents against a published schema, that confirms the structure only. No part of OpenBusinessERP is certified by a tax authority or standards body unless explicitly stated.
 - **Fictional demo data.** All demo companies, people, addresses, bank details and tax numbers are invented. Any resemblance to real organisations or persons is coincidental.
 

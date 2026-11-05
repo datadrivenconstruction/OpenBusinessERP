@@ -57,6 +57,15 @@ export function useSalesRelated(kind: SalesKind, id: string | undefined) {
   });
 }
 
+export function usePaymentLink(id: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['sales', 'invoices', id ?? '', 'payment-link'] as const,
+    queryFn: () => salesApi.paymentLink(id!),
+    enabled: enabled && !!id && id !== 'new',
+    retry: false,
+  });
+}
+
 function useInvalidate() {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: salesKeys.all });

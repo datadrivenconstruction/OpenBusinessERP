@@ -68,6 +68,7 @@ export function RuleFormModal({ existing, initial, onClose }: Props) {
   const valid = form.name.trim() && form.account_code.trim() && form.pattern.trim() && !badPattern;
   return (
     <WideModal
+onSubmit={() => { if (valid && !save.isPending) { setError(null); save.mutate(); } }}
       open
       onClose={onClose}
       busy={save.isPending}

@@ -67,9 +67,9 @@ def test_csp_header_present_and_has_key_directives(client: TestClient) -> None:
     # must allow those schemes (otherwise it falls back to default-src 'self').
     assert "frame-src 'self' blob: data:" in csp
 
-    # Confirm we still allow the analytics hosts the SPA uses.
-    # If anyone tightens CSP they should update this test too.
-    assert "https://www.googletagmanager.com" in csp
+    # The software ships no telemetry, so no analytics host may be allowed.
+    assert "googletagmanager" not in csp
+    assert "google-analytics" not in csp
 
     # The app serves its own typefaces from /assets/vendor/fonts/, so no font
     # host belongs in this policy at all. These used to sit on style-src,

@@ -32,7 +32,7 @@ export function StickyActionBar({ dirty, busy, canSave, primary, onPreview, onSe
     return () => document.removeEventListener('mousedown', close);
   }, [open]);
   return (
-    <div className="sticky bottom-0 z-20 -mx-4 flex flex-wrap items-center gap-2 border-t border-border-light bg-surface-primary/95 px-4 py-3 backdrop-blur">
+    <div className="sticky bottom-0 z-20 -mx-4 flex flex-wrap items-center gap-2 border-t border-border-light bg-surface-primary/95 py-3 pl-4 pr-20 backdrop-blur">
       <span className="text-xs text-content-tertiary">
         {dirty ? t('purchasing.unsaved', { defaultValue: 'Unsaved changes' }) : t('purchasing.saved', { defaultValue: 'All changes saved' })}
       </span>

@@ -73,10 +73,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # self-hosting removed, so they came out with it.
         self._csp = csp or (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: "
-            "https://www.googletagmanager.com https://www.google-analytics.com; "
-            "script-src-elem 'self' 'unsafe-inline' "
-            "https://www.googletagmanager.com https://www.google-analytics.com; "
+            # No analytics host: the software ships no telemetry (PRIVACY.md).
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; "
+            "script-src-elem 'self' 'unsafe-inline'; "
             "worker-src 'self' blob:; "
             "style-src 'self' 'unsafe-inline'; "
             "style-src-elem 'self' 'unsafe-inline'; "
@@ -87,8 +86,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             # regular video host is left off on purpose: it sets cookies on
             # embed, which is why the page does not use it.
             "frame-src 'self' blob: data: https://www.youtube-nocookie.com; "
-            "connect-src 'self' https://www.google-analytics.com "
-            "https://*.google-analytics.com https://*.analytics.google.com "
+            "connect-src 'self' "
             "https://api.github.com "
             "https://tiles.openfreemap.org https://*.openfreemap.org "
             "https://nominatim.openstreetmap.org "

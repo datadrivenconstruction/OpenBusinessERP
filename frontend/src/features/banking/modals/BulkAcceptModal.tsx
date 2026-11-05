@@ -33,6 +33,7 @@ export function BulkAcceptModal({ accountId, onClose }: { accountId?: string; on
       open
       onClose={onClose}
       busy={run.isPending}
+      onSubmit={result ? undefined : () => run.mutate()}
       size="md"
       title={t('banking.bulk_title', { defaultValue: 'Accept confident matches' })}
       subtitle={t('banking.bulk_sub', {
