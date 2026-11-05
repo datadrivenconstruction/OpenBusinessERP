@@ -1014,13 +1014,15 @@ def render_document(
     story += [_p(texts.get("intro") or t(lg, f"intro.{doc.kind}"), st["body"]), Spacer(1, 3 * mm)]
     story += [_line_table(kit, lines), Spacer(1, 3 * mm)]
     grand = t(lg, "credit_total") if doc.kind == "credit_note" else t(lg, "gross_total")
-    story += [_totals(kit, lines, doc.net_total, doc.gross_total, grand), Spacer(1, 2 * mm)]
+    closing_block: list[Any] = [_totals(kit, lines, doc.net_total, doc.gross_total, grand), Spacer(1, 2 * mm)]
     if doc.tax_note:
-        story += [_p(doc.tax_note, st["body"]), Spacer(1, 3 * mm)]
+        closing_block += [_p(doc.tax_note, st["body"]), Spacer(1, 3 * mm)]
     if doc.notes:
-        story += [_p(doc.notes, st["body"]), Spacer(1, 3 * mm)]
-    if doc.kind == "invoice":
-        story += _payment_block(
+        closing_block += [_p(doc.notes, st["body"]), Spacer(1, 3 * mm)]
+    if doc.kind != "invoice":
+        story += closing_block
+    else:
+        payment = _payment_block(
             kit,
             company,
             doc_date=doc.doc_date,
@@ -1030,6 +1032,12 @@ def render_document(
             debtor_name=doc.customer_name,
             debtor_address=doc.customer_address or "",
         )
+        # The amount due stays on the page that says how to pay it; a last page
+        # holding only bank details made the reader turn back for the total.
+        # Nested KeepTogether reports a huge height from wrap() to force a split,
+        # so the inner groups are flattened or the outer one never fits a page.
+        flat = [f for x in [*closing_block, payment[0]] for f in (x._content if isinstance(x, KeepTogether) else [x])]
+        story += [KeepTogether(flat), *payment[1:]]
         if payment_url:
             story += _online_payment_block(kit, payment_url)
     story += [Spacer(1, 2 * mm), _p(texts.get("closing") or t(lg, f"closing.{doc.kind}"), st["body"])]

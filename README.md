@@ -102,7 +102,8 @@ For development (Python 3.12+, Node.js 22+):
 ```bash
 pip install -e "./backend[server]"
 # terminal 1: API with an embedded PostgreSQL
-cd backend && openbusinesserp serve --embedded-pg --port 8000
+cd backend
+openbusinesserp serve --embedded-pg --port 8000
 # terminal 2: UI with hot reload on http://localhost:5173
 cd frontend && npm install && npm run dev
 ```

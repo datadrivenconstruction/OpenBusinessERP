@@ -63,8 +63,11 @@ def test_sixty_lines_break_pages_with_carried_totals(template: str) -> None:
     assert "Übertrag" in pages[1] and "Pos." in pages[1]  # header row repeats
     assert f"Seite 1 von {len(pages)}" in pages[0]
     doc = sample_document("invoice", "de", 60)
-    assert _n(fmt_money(doc.gross_total, "EUR", "de")) in pages[-1]
-    assert "USt. 7 % auf" in "\n".join(pages) and "USt. 19 % auf" in "\n".join(pages)
+    # The total due shares the last page with the payment details.
+    assert _n(fmt_money(doc.gross_total, "EUR", "de")) in pages[-1] and "Zahlungsbedingungen" in pages[-1]
+    # Two rates: the base per rate and the tax per rate each get their own row.
+    text = "\n".join(pages)
+    assert all(label in text for label in ("Netto 7 %", "Netto 19 %", "USt. 7 %", "USt. 19 %"))
 
 
 def test_design_options_render() -> None:
