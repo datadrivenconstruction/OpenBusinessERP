@@ -82,7 +82,7 @@ export function RulesPanel({ onNew, onEdit, currency }: Props) {
             <ul className="mt-2 max-h-40 divide-y divide-border-light overflow-y-auto text-xs">
               {preview.hits.map((h) => (
                 <li key={h.transaction_id} className="flex justify-between py-1">
-                  <span>{h.rule_name} → {h.account_code}</span>
+                  <span>{h.rule_name} <span aria-hidden className="inline-block rtl:rotate-180">→</span> {h.account_code}</span>
                   <MoneyDisplay amount={h.amount} currency={currency} colorize />
                 </li>
               ))}

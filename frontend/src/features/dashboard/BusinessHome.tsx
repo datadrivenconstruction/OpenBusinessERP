@@ -768,7 +768,7 @@ export function BusinessHome() {
             {bankAccounts.isLoading || (hasBank && bsNow.isLoading) ? <Skeleton className="mt-3 h-10 w-48" />
               : bsNow.isError ? <div className="mt-3"><CardError onRetry={() => void bsNow.refetch()} /></div>
                 : cashNow === null ? (
-                  <p className="mt-3 text-sm text-oe-blue">{t('home.biz_kpi_cash_empty', { defaultValue: 'Add a bank account to see your balance' })} →</p>
+                  <p className="mt-3 text-sm text-oe-blue">{t('home.biz_kpi_cash_empty', { defaultValue: 'Add a bank account to see your balance' })} <span aria-hidden className="inline-block rtl:rotate-180">→</span></p>
                 ) : (
                   <>
                     <div className="mt-2 flex flex-wrap items-center gap-3">

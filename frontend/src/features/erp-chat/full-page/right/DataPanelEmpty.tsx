@@ -405,7 +405,7 @@ export default function DataPanelEmpty({ onSuggestion }: DataPanelEmptyProps) {
                       el.style.color = 'var(--chat-text-secondary)';
                     }}
                   >
-                    → {ex}
+                    <span aria-hidden className="inline-block rtl:rotate-180">→</span> {ex}
                   </button>
                 ))}
               </div>

@@ -1369,7 +1369,7 @@ export function ProductTour({ steps, defaultTourId = 'global' }: ProductTourProp
         role="status"
         data-testid="product-tour-prompt"
         data-product-tour="prompt"
-        className="fixed bottom-4 right-4 z-[9100] w-72 rounded-lg border border-border-light bg-surface-elevated p-4 shadow-md animate-scale-in"
+        className="fixed bottom-4 end-4 z-[9100] w-72 rounded-lg border border-border-light bg-surface-elevated p-4 shadow-md animate-scale-in"
       >
         <p className="mb-3 text-sm font-medium text-content-primary">
           {t('tour.biz_prompt', { defaultValue: 'Take a 1-minute tour?' })}

@@ -196,7 +196,7 @@ export function ItemDetailDrawer({ item, onHand, categoryName, onClose, onEdit, 
                 ) : (
                   <Empty>{t('inventory.no_item_moves', { defaultValue: 'No stock movements yet. Goods receipts, deliveries and adjustments appear here.' })}</Empty>
                 )}
-                <Link to="/inventory" className="text-sm text-oe-blue hover:underline">{t('inventory.open_inventory', { defaultValue: 'Open inventory' })} →</Link>
+                <Link to="/inventory" className="text-sm text-oe-blue hover:underline">{t('inventory.open_inventory', { defaultValue: 'Open inventory' })} <span aria-hidden className="inline-block rtl:rotate-180">→</span></Link>
               </>
             ) : (
               <Empty>{stock.isError ? t('inventory.load_error', { defaultValue: 'Stock could not be loaded.' }) : t('common.loading', { defaultValue: 'Loading…' })}</Empty>
@@ -225,7 +225,7 @@ export function ItemDetailDrawer({ item, onHand, categoryName, onClose, onEdit, 
             ) : (
               <Empty>{t('items.no_breaks', { defaultValue: 'This item sells at its standard price — no price list mentions it yet.' })}</Empty>
             )}
-            <Link to="/items/price-lists" className="text-sm text-oe-blue hover:underline">{t('items.manage_price_lists', { defaultValue: 'Manage price lists' })} →</Link>
+            <Link to="/items/price-lists" className="text-sm text-oe-blue hover:underline">{t('items.manage_price_lists', { defaultValue: 'Manage price lists' })} <span aria-hidden className="inline-block rtl:rotate-180">→</span></Link>
           </div>
         )}
 

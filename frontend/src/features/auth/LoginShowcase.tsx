@@ -241,7 +241,7 @@ export function LoginShowcase() {
           {FLOW.map((k, i) => (
             <span key={k} className={i <= step ? 'text-oe-blue' : ''}>
               {t(`login.biz_mod_${k}`, { defaultValue: CELLS.find((c) => c.key === k)!.label })}
-              {i < FLOW.length - 1 && <span className="mx-1 text-slate-400">→</span>}
+              {i < FLOW.length - 1 && <span aria-hidden className="mx-1 inline-block text-slate-400 rtl:rotate-180">→</span>}
             </span>
           ))}
         </span>
