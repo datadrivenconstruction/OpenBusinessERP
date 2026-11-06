@@ -21,6 +21,9 @@ type Tab = 'trial' | 'balance' | 'pnl' | 'vat' | 'export';
 const TABS: Tab[] = ['trial', 'balance', 'pnl', 'vat', 'export'];
 const TAB_LABEL: Record<Tab, string> = { trial: 'Trial balance', balance: 'Balance sheet', pnl: 'Profit and loss', vat: 'VAT return', export: 'Export' };
 
+/** Only these reports have a previous-period column; elsewhere the toggle would do nothing. */
+export const canCompare = (tab: string): boolean => tab === 'pnl' || tab === 'balance';
+
 export interface ReportRow {
   kind: 'head' | 'acc' | 'total';
   label: string;
@@ -74,7 +77,7 @@ export function ReportsPage() {
   const def = useMemo(() => presetRange('year'), []);
   const from = params.get('from') || def.from;
   const to = params.get('to') || def.to;
-  const compare = params.get('compare') !== '0' && tab !== 'trial' && tab !== 'vat' && tab !== 'export';
+  const compare = params.get('compare') !== '0' && canCompare(tab);
   const prev = previousRange(from, to);
   const L = (k: string, d: string) => t(k, { defaultValue: d });
 
@@ -155,7 +158,7 @@ export function ReportsPage() {
       </div>
       <div className="flex flex-wrap items-end gap-4">
         <PeriodPicker from={from} to={to} single={tab === 'balance'} onChange={(r) => update({ from: r.from, to: r.to })} />
-        {tab !== 'trial' && tab !== 'export' && (
+        {canCompare(tab) && (
           <label className="mb-1 flex items-center gap-2 text-sm text-content-primary">
             <input type="checkbox" checked={compare} onChange={(e) => update({ compare: e.target.checked ? null : '0' })} />
             {t('accounting.compare_previous', { defaultValue: 'Compare with previous period' })}
