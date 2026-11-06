@@ -266,6 +266,17 @@ async def test_appointments_seeded_reset_and_stale(session, monkeypatch):
         assert await count(model) == 0
 
 
+def test_every_iban_country_case_gets_a_valid_iban() -> None:
+    for case in CASES.values():
+        if case.country not in business_demo.IBAN_LENGTH:
+            continue
+        iban = business_demo.demo_bank_iban(case).replace(" ", "")
+        assert iban.startswith(case.country) and _iban_ok(iban), (case.key, iban)
+        assert len(iban) == business_demo.IBAN_LENGTH[case.country], (case.key, iban)
+    covered = {c.country for c in CASES.values()} & set(business_demo.IBAN_LENGTH)
+    assert {"DE", "FR", "GB", "IE", "PL"} <= covered
+
+
 def _iban_ok(iban: str) -> bool:
     raw = iban.replace(" ", "")
     return int("".join(str(int(c, 36)) for c in raw[4:] + raw[:4])) % 97 == 1

@@ -2996,7 +2996,19 @@ def bank_account_name(company: str) -> str:
 
 
 # Fictional bank identifiers (not assigned to real institutions) and BBAN lengths per country.
-_IBAN_BANK = {"AT": ("19999", 11), "CH": ("09999", 12), "AE": ("999", 16)}
+# (bank part of the BBAN, account digits); bank codes are fictional.
+_IBAN_BANK = {
+    "AT": ("19999", 11),
+    "CH": ("09999", 12),
+    "AE": ("999", 16),
+    "DE": ("99990000", 10),
+    "NL": ("DEMO", 10),
+    "GB": ("DEMO999999", 8),
+    "IE": ("DEMO999999", 8),
+    "PL": ("99990000", 16),
+}
+# Every IBAN length the demo can produce, by country (ISO 13616 registry).
+IBAN_LENGTH = {"AT": 20, "CH": 21, "AE": 23, "DE": 22, "NL": 18, "GB": 22, "IE": 22, "PL": 28, "FR": 27}
 
 
 def _iban_with_check(country: str, bban: str) -> str:
@@ -3039,6 +3051,10 @@ def _domestic_account(country: str, num: int) -> str | None:
 def demo_bank_iban(case) -> str:
     """The demo account's identifier: an IBAN where the country uses one, else the local account format."""
     num = zlib.crc32(case.key.encode())
+    if case.country == "FR":  # bank, branch, account, then the national RIB key
+        bank, branch, acct = "99999", "00001", f"{num:011d}"[-11:]
+        key = 97 - (89 * int(bank) + 15 * int(branch) + 3 * int(acct)) % 97
+        return _iban_with_check("FR", f"{bank}{branch}{acct}{key:02d}")
     if case.country in _IBAN_BANK:
         bank, width = _IBAN_BANK[case.country]
         return _iban_with_check(case.country, bank + f"{num:0{width}d}"[-width:])
