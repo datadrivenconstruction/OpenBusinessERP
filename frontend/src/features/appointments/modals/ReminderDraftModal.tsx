@@ -69,6 +69,12 @@ export function ReminderDraftModal({ reminderId, onClose }: Props) {
           <h2 id="reminder-draft-title" className="text-base font-semibold">{t('appointments.reminder_draft', { defaultValue: 'Reminder draft' })}</h2>
           <button type="button" onClick={onClose} aria-label={t('common.close', { defaultValue: 'Close' })}><X size={18} /></button>
         </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (open && !mark.isPending) mark.mutate('sent');
+          }}
+        >
         <div className="space-y-3 px-5 py-4">
           <p className="rounded-lg bg-amber-50 p-2.5 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
             {t('appointments.reminder_manual_hint', { defaultValue: 'Nothing is sent automatically. Open the draft in your mail app or copy it, send it yourself, then mark it as sent.' })}
@@ -103,6 +109,7 @@ export function ReminderDraftModal({ reminderId, onClose }: Props) {
                 {t('appointments.open_in_mail', { defaultValue: 'Open in mail app' })}
               </a>
               <Button
+                type="button"
                 size="sm"
                 variant="ghost"
                 icon={<Copy size={14} />}
@@ -116,16 +123,17 @@ export function ReminderDraftModal({ reminderId, onClose }: Props) {
             </div>
             {open && (
               <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={() => mark.mutate('skipped')} disabled={mark.isPending}>
+                <Button type="button" size="sm" variant="ghost" onClick={() => mark.mutate('skipped')} disabled={mark.isPending}>
                   {t('appointments.skip', { defaultValue: 'Skip' })}
                 </Button>
-                <Button size="sm" variant="primary" onClick={() => mark.mutate('sent')} disabled={mark.isPending}>
+                <Button type="submit" size="sm" variant="primary" disabled={mark.isPending}>
                   {t('appointments.mark_sent', { defaultValue: 'Mark as sent' })}
                 </Button>
               </div>
             )}
           </div>
         )}
+        </form>
       </div>
     </div>
   );

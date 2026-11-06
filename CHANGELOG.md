@@ -1,21 +1,35 @@
 # Changelog
 
-All notable changes to OpenConstructionERP are documented here.
+All notable changes to OpenBusinessERP are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-> **Tip:** This file is long. Use your browser's **Find** (Ctrl+F) to jump to a version number, or see the [Releases page](https://github.com/datadrivenconstruction/OpenConstructionERP/releases) for a per-release view with download links.
+> **Tip:** This file is long. Use your browser's **Find** (Ctrl+F) to jump to a version number, or see the [Releases page](https://github.com/datadrivenconstruction/OpenBusinessERP/releases) for a per-release view with download links.
 
 ## [Unreleased]
 
+## [18.5.0] - 2026-11-02
+
+First release under the OpenBusinessERP name.
+
 ### Changed
+
+- Several business dialogs submit with Enter: convert, bank bulk accept, match settings, finance payment, budget, invoice, connector, CRM create, service create and recurring schedule.
 - Renamed to OpenBusinessERP: PyPI package and CLI are now `openbusinesserp` (the `openconstructionerp` command remains as a deprecated alias); repository moved to https://github.com/datadrivenconstruction/OpenBusinessERP.
 
 - Schedule durations and newly generated BOQ plans now use the project's country holiday data wherever available. Regeneration can move dates that previously treated holidays as working days. Generated calendars retain the holiday dates and coverage for every year used by the plan, so the first CPM recalculation agrees with generation; regenerate when extending a plan into an uncovered year. Explicit site calendars remain authoritative. Unknown countries and partial holiday tables expose coverage, and macro-regions no longer supply a neighbouring country's holidays. New ORM-created projects no longer default to DACH.
 
 ### Added
 
+- Onboarding wizard for a new workspace: company profile, country, currency and the modules to switch on.
+- PDF templates for invoices and other sales documents laid out to DIN 5008, with the sender line, address window, reference block and folding marks.
+- DATEV export writes a full Buchungsstapel, including exchange rate, base turnover, cash discount, document link and document field 2.
+- Online payment links for invoices through Stripe and Mollie. The payment card on the invoice shows the link, its status and the amount paid, and the webhook marks the invoice paid. When the provider reports its fee, the fee is booked as an expense.
+- Foreign currency revaluation of open receivables and payables, with the revaluation entries posted to the ledger.
+- Business roles with their own permissions, and an audit trail for changes to sales, finance and inventory records.
+- Official Docker image published to ghcr.io on each version tag, tagged with the version and `latest`.
+- DateField for date input. It follows the locale's date format and shows the field names of that locale in the pattern hint.
 - New eligible outside-SOV progress claims use the retention ladder rate selected by prior SOV work, with existing caps and currency precision. Claims created before this change keep their flat-rate calculation, and issued certificates are not recalculated. Milestone, cost-plus and time-and-materials claims retain their existing rules.
 - Progress claims expose country-independent payment-application figures through `/progress-claims/{id}/payment-application`, using the same calculations and project access checks as the existing regional AIA view. The AIA JSON and PDF endpoints retain their country restrictions.
 - Bills can keep a tax date separately from the date their prices refer to. VAT uses the tax date when one is supplied, and otherwise keeps using the price reference date. Both dates survive copying a bill or creating a revision; impossible calendar dates are refused in the form.

@@ -18,12 +18,14 @@ import { StatusTimeline } from './components/StatusTimeline';
 import { CustomerCard } from './components/CustomerCard';
 import { LineEditor } from './components/LineEditor';
 import { TotalsPanel } from './components/TotalsPanel';
-import { ActivityCard, AttachmentsCard, PaymentsCard, RelatedDocsCard } from './components/DocSidePanels';
+import { ActivityCard, AttachmentsCard, PaymentLinkCard, PaymentsCard, RelatedDocsCard } from './components/DocSidePanels';
 import { StickyActionBar } from './components/StickyActionBar';
+import { EInvoiceCard } from './components/EInvoiceCard';
 import { PdfPreviewPanel } from './components/PdfPreviewPanel';
 import type { ActionMenuItem } from './components/ActionMenu';
 import { ConvertDialog } from './modals/ConvertDialog';
 import { RecordPaymentModal } from './modals/RecordPaymentModal';
+import { DateField } from '@/shared/ui/DateField';
 
 const input =
   'w-full rounded-lg border border-border-light bg-surface-primary px-2 py-1 text-sm text-content-primary focus:border-oe-blue focus:outline-none disabled:bg-surface-secondary aria-[invalid=true]:border-semantic-error';
@@ -209,7 +211,7 @@ export function SalesDocumentPage() {
             {overdue && <Badge variant="error">{t('sales.status_overdue', { defaultValue: 'overdue' })}</Badge>}
           </span>
         }
-        actions={doc && <StatusTimeline kind={doc.kind} status={doc.status} />}
+        actions={doc && doc.kind !== 'credit_note' && <StatusTimeline kind={doc.kind} status={doc.status} />}
       />
       {err && (
         <div role="alert" className="rounded-lg border border-semantic-error/30 bg-semantic-error-bg px-3 py-2 text-sm text-semantic-error">
@@ -222,7 +224,7 @@ export function SalesDocumentPage() {
           <section className={`${card} grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4`}>
             <label className="text-xs text-content-tertiary">
               {t('sales.date', { defaultValue: 'Date' })}
-              <input type="date" className={input} disabled={!editable} aria-invalid={!!visibleErrors.doc_date} value={form.doc_date} onChange={(e) => patch({ doc_date: e.target.value })} />
+              <DateField className={input} disabled={!editable} aria-invalid={!!visibleErrors.doc_date} value={form.doc_date} onChange={(e) => patch({ doc_date: e.target.value })} />
               {visibleErrors.doc_date && <span className="text-semantic-error">{visibleErrors.doc_date}</span>}
             </label>
             <label className="text-xs text-content-tertiary">
@@ -237,8 +239,8 @@ export function SalesDocumentPage() {
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.due_date', { defaultValue: 'Due date' })}
-              <input
-                type="date"
+              <DateField
+               
                 className={input}
                 disabled={!editable}
                 aria-invalid={!!visibleErrors.due_date}
@@ -280,11 +282,11 @@ export function SalesDocumentPage() {
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.delivery_date', { defaultValue: 'Delivery date / period start' })}
-              <input type="date" className={input} disabled={!editable} value={form.delivery_date} onChange={(e) => patch({ delivery_date: e.target.value })} />
+              <DateField className={input} disabled={!editable} value={form.delivery_date} onChange={(e) => patch({ delivery_date: e.target.value })} />
             </label>
             <label className="text-xs text-content-tertiary">
               {t('sales.delivery_end', { defaultValue: 'Period end (optional)' })}
-              <input type="date" className={input} disabled={!editable} value={form.delivery_end} onChange={(e) => patch({ delivery_end: e.target.value })} />
+              <DateField className={input} disabled={!editable} value={form.delivery_end} onChange={(e) => patch({ delivery_end: e.target.value })} />
             </label>
           </section>
 
@@ -316,7 +318,7 @@ export function SalesDocumentPage() {
         </div>
 
         <aside className="space-y-4">
-          <CustomerCard form={form} set={patch} editable={editable} error={visibleErrors.customer} />
+          <CustomerCard form={form} set={patch} editable={editable} error={visibleErrors.customer} showBuyerReference={kind === 'invoices'} />
           <TotalsPanel
             totals={totals}
             currency={cur}
@@ -336,6 +338,8 @@ export function SalesDocumentPage() {
             </p>
           )}
           {doc?.kind === 'invoice' && doc.status !== 'draft' && <PaymentsCard doc={doc} onRecord={canPay ? () => setDialog('pay') : undefined} />}
+          {doc?.kind === 'invoice' && <PaymentLinkCard doc={doc} />}
+          {doc && <EInvoiceCard doc={doc} />}
           <RelatedDocsCard related={related.data} />
           {doc && <ActivityCard entries={activity.data} loading={activity.isLoading} />}
           <AttachmentsCard />

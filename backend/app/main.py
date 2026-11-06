@@ -2566,6 +2566,10 @@ def create_app() -> FastAPI:
 
     app.include_router(business_demo_router, prefix="/api/v1")
 
+    from app.core.business_roles_router import router as business_roles_router
+
+    app.include_router(business_roles_router, prefix="/api/v1")
+
     # The third-party licence texts that ship inside every artefact. Public for
     # the same reason branding's GET is: they are published documents that say
     # nothing about this workspace. They travelled with the product for its

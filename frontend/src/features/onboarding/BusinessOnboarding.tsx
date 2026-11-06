@@ -1056,7 +1056,8 @@ export function BusinessOnboarding() {
           // The workspace is ready; sample data can be loaded later from Settings.
         }
       }
-      navigate('/');
+      // Admins without sample data continue into the business setup (bank, tax, first invoice).
+      navigate(isAdmin && !(sampleCase && loadSample) ? '/setup' : '/');
     } catch {
       setError(t('bizonb.launch_error', { defaultValue: 'Could not save your setup. Check the connection and try again.' }));
     } finally {

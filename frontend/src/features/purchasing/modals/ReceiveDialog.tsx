@@ -40,6 +40,7 @@ export function ReceiveDialog({ orderId, onClose, onDone }: { orderId: string | 
 
   return (
     <WideModal
+onSubmit={() => { if (!hasErr && payload.length > 0 && !m.isPending) m.mutate(); }}
       open={!!orderId}
       onClose={onClose}
       busy={m.isPending}

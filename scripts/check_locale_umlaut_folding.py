@@ -65,6 +65,10 @@ _FOLDS = {"ae": "ä", "oe": "ö", "ue": "ü", "ss": "ß"}
 
 #: Pairs that differ by a fold and are both correct. Keyed by the folded form.
 _ALLOWED_PAIRS = {
+    ("sv.ts", "oe"): (
+        "Swedish ö is the noun 'island' (a canvas node sitting alone like an island); "
+        "oe is the module slug prefix in oe_my_module_*. Two unrelated tokens."
+    ),
     ("fi.ts", "haen"): (
         "Finnish, and the one language here where the pair forms by accident. "
         "haen is the first person singular of hakea, 'I fetch', and han with "

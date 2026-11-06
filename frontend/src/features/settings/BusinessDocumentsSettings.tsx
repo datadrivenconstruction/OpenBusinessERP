@@ -76,10 +76,27 @@ const fillSample = (text: string, company: string) =>
 
 type TextField = Exclude<keyof BusinessDocumentSettings, 'payment_terms_days' | 'giro_code' | 'logo_data_url' | 'document_texts' | 'address'>;
 
+const FIELD_KEYS: Partial<Record<TextField, string>> = {
+  company_name: 'settings.docs_field_company_name',
+  email: 'settings.docs_field_email',
+  phone: 'settings.docs_field_phone',
+  website: 'settings.docs_field_website',
+  vat_id: 'settings.docs_field_vat_id',
+  tax_number: 'settings.docs_field_tax_number',
+  register_court: 'settings.docs_field_register_court',
+  register_number: 'settings.docs_field_register_number',
+  managing_directors: 'settings.docs_field_managing_directors',
+  bank_name: 'settings.docs_field_bank_name',
+  iban: 'settings.docs_field_iban',
+  bic: 'settings.docs_field_bic',
+  payment_terms_text: 'settings.docs_field_payment_terms_text',
+  footer_text: 'settings.docs_field_footer_text',
+};
+
 const GROUPS: { id: string; titleKey: string; title: string; fields: [TextField, string][] }[] = [
   {
     id: 'company',
-    titleKey: 'settings.bizdocs_company',
+    titleKey: 'settings.docs_group_company',
     title: 'Company',
     fields: [
       ['company_name', 'Legal name'],
@@ -90,7 +107,7 @@ const GROUPS: { id: string; titleKey: string; title: string; fields: [TextField,
   },
   {
     id: 'tax',
-    titleKey: 'settings.bizdocs_tax',
+    titleKey: 'settings.docs_group_tax',
     title: 'Tax & register',
     fields: [
       ['vat_id', 'VAT ID'],
@@ -102,7 +119,7 @@ const GROUPS: { id: string; titleKey: string; title: string; fields: [TextField,
   },
   {
     id: 'bank',
-    titleKey: 'settings.bizdocs_bank',
+    titleKey: 'settings.docs_group_bank',
     title: 'Bank account',
     fields: [
       ['bank_name', 'Bank'],
@@ -112,7 +129,7 @@ const GROUPS: { id: string; titleKey: string; title: string; fields: [TextField,
   },
   {
     id: 'finance',
-    titleKey: 'settings.bizdocs_terms',
+    titleKey: 'settings.docs_group_terms',
     title: 'Payment terms & footer',
     fields: [
       ['payment_terms_text', 'Payment terms text (optional, replaces the generated sentence)'],
@@ -237,7 +254,7 @@ export function BusinessDocumentsSettings({ canEdit, query = '' }: { canEdit: bo
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {g.fields.map(([field, label]) => (
               <label key={field} className="text-xs text-content-tertiary">
-                {t(`settings.bizdocs_${field}`, { defaultValue: label })}
+                {t(FIELD_KEYS[field] ?? field, { defaultValue: label })}
                 <input className={input} disabled={!canEdit} value={String(form[field] ?? "")} onChange={(e) => set({ [field]: e.target.value })} />
               </label>
             ))}

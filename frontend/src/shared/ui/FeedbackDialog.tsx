@@ -94,7 +94,7 @@ export function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
       });
       addToast({
         type: 'success',
-        title: t('feedback.success', { defaultValue: 'Thank you! Your feedback has been received.' }),
+        title: t('feedback.success', { defaultValue: 'Thank you. Your feedback has been received.' }),
       });
       onClose();
     } catch {

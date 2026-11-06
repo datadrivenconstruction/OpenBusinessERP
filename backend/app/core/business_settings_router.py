@@ -6,6 +6,8 @@ PUT /api/v1/business-settings/ - admin only. Merge and persist.
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -56,6 +58,9 @@ class BusinessSettings(BaseModel):
     logo_data_url: str = ""
     document_texts: dict[str, dict[str, str]] = Field(default_factory=dict)
     tax_rates: list[TaxRate] = Field(default_factory=list)
+    invoice_prefix: str = ""
+    small_business: bool = False
+    setup: dict[str, Any] = Field(default_factory=dict)
 
 
 class BusinessSettingsUpdate(BaseModel):
@@ -84,6 +89,9 @@ class BusinessSettingsUpdate(BaseModel):
     logo_data_url: str | None = Field(default=None, max_length=700_000)
     document_texts: dict[str, dict[str, str]] | None = None
     tax_rates: list[TaxRate] | None = Field(default=None, max_length=20)
+    invoice_prefix: str | None = Field(default=None, max_length=10)
+    small_business: bool | None = None
+    setup: dict[str, Any] | None = None
 
 
 @router.get(
@@ -117,6 +125,7 @@ async def get_numbering(session: SessionDep, tenant_id: CurrentCompanyTenantId =
     from app.modules.purchasing.service import PREFIX as PURCHASING_PREFIX
     from app.modules.sales.models import SalesSequence
     from app.modules.sales.service import PREFIX as SALES_PREFIX
+    from app.modules.sales.service import prefix_for
 
     rows: list[NumberingRow] = []
     for area, model, prefixes in (
@@ -127,7 +136,8 @@ async def get_numbering(session: SessionDep, tenant_id: CurrentCompanyTenantId =
             seq.kind: seq.last_number
             for seq in (await session.scalars(select(model).where(model.tenant_id == tenant_id))).all()
         }
-        for kind, prefix in prefixes.items():
+        for kind in prefixes:
+            prefix = prefix_for(kind) if area == "sales" else prefixes[kind]
             n = last.get(kind, 0)
             rows.append(
                 NumberingRow(area=area, kind=kind, prefix=prefix, last_number=n, next_number=f"{prefix}-{n + 1:06d}")
@@ -220,3 +230,70 @@ async def send_test_mail(body: MailTestRequest) -> MailTestResult:
         )
     )
     return MailTestResult(ok=result.ok, backend=result.backend, reason=result.reason)
+
+
+class PaymentSettings(BaseModel):
+    provider: str
+    public_base_url: str
+    return_url: str
+    clearing_account_code: str
+    stripe_secret_key_set: bool
+    stripe_webhook_secret_set: bool
+    mollie_api_key_set: bool
+    configured: bool
+    test_mode: bool | None
+
+
+class PaymentSettingsUpdate(BaseModel):
+    provider: str | None = Field(default=None, pattern="^(none|stripe|mollie)$")
+    public_base_url: str | None = Field(default=None, max_length=500)
+    return_url: str | None = Field(default=None, max_length=500)
+    clearing_account_code: str | None = Field(default=None, max_length=32)
+    stripe_secret_key: str | None = Field(default=None, max_length=500)
+    stripe_webhook_secret: str | None = Field(default=None, max_length=500)
+    mollie_api_key: str | None = Field(default=None, max_length=500)
+
+
+class PaymentTestResult(BaseModel):
+    ok: bool
+    provider: str
+    test_mode: bool | None
+    reason: str
+
+
+@router.get(
+    "/business-settings/payments/", response_model=PaymentSettings, dependencies=[Depends(RequireRole("admin"))]
+)
+async def get_payment_settings() -> PaymentSettings:
+    from app.core.payment_settings import read_payment_settings
+
+    return PaymentSettings(**read_payment_settings())
+
+
+@router.put(
+    "/business-settings/payments/", response_model=PaymentSettings, dependencies=[Depends(RequireRole("admin"))]
+)
+async def put_payment_settings(body: PaymentSettingsUpdate) -> PaymentSettings:
+    from app.core.payment_settings import write_payment_settings
+
+    return PaymentSettings(**write_payment_settings(body.model_dump()))
+
+
+@router.post(
+    "/business-settings/payments/test/",
+    response_model=PaymentTestResult,
+    dependencies=[Depends(RequireRole("admin"))],
+)
+async def test_payment_connection() -> PaymentTestResult:
+    from app.core.payment_settings import payment_status
+    from app.modules.sales import online_payments as op
+
+    status_ = payment_status()
+    prov = op.provider()
+    if prov is None:
+        raise HTTPException(status_code=409, detail="No payment provider configured")
+    try:
+        await prov.test()
+    except op.PaymentProviderError as exc:
+        return PaymentTestResult(ok=False, provider=prov.name, test_mode=status_["test_mode"], reason=str(exc))
+    return PaymentTestResult(ok=True, provider=prov.name, test_mode=status_["test_mode"], reason="")

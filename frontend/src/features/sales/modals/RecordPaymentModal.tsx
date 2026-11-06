@@ -6,6 +6,7 @@ import type { SalesDoc, SalesDocSummary } from '../api';
 import { useRecordPayment } from '../hooks';
 import { balanceDue } from '../lib/totals';
 import { fmtNumberForInput } from '@/shared/lib/formatters';
+import { DateField } from '@/shared/ui/DateField';
 
 const input = 'w-full rounded-lg border border-border bg-surface-primary px-3 py-1.5 text-sm focus:border-oe-blue focus:outline-none';
 const METHODS = ['bank_transfer', 'card', 'cash', 'other'] as const;
@@ -32,8 +33,22 @@ export function RecordPaymentModal({
     : n > open + 0.005
       ? t('sales.payment.err_over', { defaultValue: 'Amount is more than the open balance.' })
       : null;
+  const submit = () => {
+    if (error || pay.isPending) return;
+    pay.mutate(
+      { id: doc.id, amount: n.toFixed(2), pay_date: date, reference, method },
+      {
+        onSuccess: (d) => {
+          onDone?.(d);
+          onClose();
+        },
+      },
+    );
+  };
+
   return (
     <WideModal
+onSubmit={submit}
       open
       onClose={onClose}
       size="md"
@@ -52,17 +67,7 @@ export function RecordPaymentModal({
             variant="primary"
             disabled={!!error}
             loading={pay.isPending}
-            onClick={() =>
-              pay.mutate(
-                { id: doc.id, amount: n.toFixed(2), pay_date: date, reference, method },
-                {
-                  onSuccess: (d) => {
-                    onDone?.(d);
-                    onClose();
-                  },
-                },
-              )
-            }
+            onClick={submit}
           >
             {t('sales.payment.save', { defaultValue: 'Record' })}
           </Button>
@@ -77,7 +82,7 @@ export function RecordPaymentModal({
         </label>
         <label className="text-xs text-content-tertiary">
           {t('sales.payment.date', { defaultValue: 'Payment date' })}
-          <input type="date" className={input} value={date} onChange={(e) => setDate(e.target.value)} />
+          <DateField className={input} value={date} onChange={(e) => setDate(e.target.value)} />
         </label>
         <label className="text-xs text-content-tertiary">
           {t('sales.payment.method', { defaultValue: 'Method' })}

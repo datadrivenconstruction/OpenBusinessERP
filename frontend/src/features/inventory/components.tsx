@@ -9,6 +9,7 @@ import { DateDisplay } from '@/shared/ui/DateDisplay';
 import { getErrorMessage } from '@/shared/lib/api';
 import { fmtUpTo } from '@/shared/lib/formatters';
 import { inventoryApi, type Stocktake } from './api';
+import { DateField } from '@/shared/ui/DateField';
 
 export const fieldCls =
   'h-9 w-full rounded-lg border border-border bg-surface-primary px-3 text-sm focus:outline-none focus:ring-2 focus:ring-oe-blue/30 focus:border-oe-blue';
@@ -90,7 +91,7 @@ export function TransferDrawer({ itemId, onClose }: { itemId: string | null; onC
             <input className={fieldCls} type="number" min="0" step="any" value={f.qty} onChange={(e) => setF({ ...f, qty: e.target.value })} required />
           </Field>
           <Field label={t('inventory.col_date', { defaultValue: 'Date' })}>
-            <input className={fieldCls} type="date" value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
+            <DateField className={fieldCls} value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
           </Field>
         </div>
         <Field label={t('inventory.notes', { defaultValue: 'Notes' })}>
@@ -165,7 +166,7 @@ export function AdjustDrawer({ itemId, onClose }: { itemId: string | null; onClo
             </select>
           </Field>
           <Field label={t('inventory.col_date', { defaultValue: 'Date' })}>
-            <input className={fieldCls} type="date" value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
+            <DateField className={fieldCls} value={f.move_date} onChange={(e) => setF({ ...f, move_date: e.target.value })} />
           </Field>
           <Field label={t('inventory.col_qty', { defaultValue: 'Quantity' })}>
             <input className={fieldCls} type="number" step="any" value={f.qty} onChange={(e) => setF({ ...f, qty: e.target.value })} required />
@@ -327,6 +328,13 @@ function StocktakeSheet({ st, warehouseName, onClose }: { st: Stocktake; warehou
               </tr>
             </thead>
             <tbody>
+              {!st.lines.length && (
+                <tr>
+                  <td colSpan={draft ? 4 : 5} className="px-3 py-6 text-center text-content-tertiary">
+                    {t('inventory.no_count_lines', { defaultValue: 'No stocked items in this warehouse to count.' })}
+                  </td>
+                </tr>
+              )}
               {st.lines.map((l) => {
                 const c = counts[l.id] ?? '';
                 const diff = draft ? (c === '' ? null : Number(c) - Number(l.expected_qty)) : l.counted_qty === null ? null : Number(l.diff_qty);
@@ -405,7 +413,7 @@ export function StocktakesTab() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <select className={clsx(fieldCls, 'w-auto')} value={wh} onChange={(e) => setWh(e.target.value)} aria-label={t('inventory.col_warehouse', { defaultValue: 'Warehouse' })}>
+        <select className={clsx(fieldCls, 'max-w-xs')} value={wh} onChange={(e) => setWh(e.target.value)} aria-label={t('inventory.col_warehouse', { defaultValue: 'Warehouse' })}>
           <option value="">{t('inventory.default_warehouse', { defaultValue: 'Default warehouse' })}</option>
           {whs.map((w) => <option key={w.id} value={w.id}>{w.code} · {w.name}</option>)}
         </select>

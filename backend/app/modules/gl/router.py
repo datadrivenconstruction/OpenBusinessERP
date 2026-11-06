@@ -34,6 +34,7 @@ from typing import Any, TypeVar
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
 
 from app.dependencies import CurrentCompanyTenantId, CurrentUserId, RequirePermission, SessionDep
+from app.modules.gl import fx_revaluation
 from app.modules.gl.schemas import (
     AccountCreate,
     AccountResponse,
@@ -43,6 +44,7 @@ from app.modules.gl.schemas import (
     EntryUpdate,
     FiscalYearCreate,
     FiscalYearResponse,
+    FxRevaluationRequest,
     PeriodResponse,
     PeriodStatusRequest,
     ReverseRequest,
@@ -163,6 +165,27 @@ async def set_period_status(
     _perm: None = Depends(RequirePermission("gl.manage")),
 ):
     return await _call(svc.set_period_status(period_id, body.status))
+
+
+# ── Period-end FX revaluation ─────────────────────────────────────────────
+@router.post("/fx-revaluation/preview/")
+async def fx_revaluation_preview(
+    body: FxRevaluationRequest,
+    _user_id: CurrentUserId,
+    svc: GLService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("gl.read")),
+):
+    return await _call(fx_revaluation.preview(svc.session, svc.tenant_id, body.period_end, body.rates))
+
+
+@router.post("/fx-revaluation/")
+async def fx_revaluation_post(
+    body: FxRevaluationRequest,
+    user_id: CurrentUserId,
+    svc: GLService = Depends(_svc),
+    _perm: None = Depends(RequirePermission("gl.manage")),
+):
+    return await _call(fx_revaluation.post(svc.session, svc.tenant_id, body.period_end, body.rates, user_id))
 
 
 # ── Entries ───────────────────────────────────────────────────────────────
@@ -450,13 +473,14 @@ async def export_file(
     if date_to < date_from:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "date_to before date_from")
     settings = gx.read_export_settings()
+    tpl = await SalesService(session, svc.tenant_id)._chart_template()
+    if tpl in ("de_skr03", "de_skr04"):  # the loaded chart decides the SKR, not a stale setting
+        settings = {**settings, "skr": tpl[-2:]}
     biz = read_business_settings()
     now = datetime.now()
     stamp = f"{date_from:%Y%m%d}_{date_to:%Y%m%d}"
     if fmt == "datev-contacts":
-        contacts = gx.assign_contact_numbers(
-            await gx.collect_contacts(session, svc.tenant_id), settings["sachkontenlaenge"]
-        )
+        contacts = gx.assign_contact_numbers(await gx.collect_contacts(session, svc.tenant_id), settings)
         data = gx.datev_contacts_csv(contacts, settings, fy_start=date(date_from.year, 1, 1), created=now)
         return _attachment(data, f"EXTF_Debitoren_Kreditoren_{stamp}.csv", "text/csv; charset=windows-1252")
     if fmt not in ("datev", "saft"):
@@ -467,6 +491,13 @@ async def export_file(
         data = gx.datev_booking_csv(
             col["entries"], settings, date_from=date_from, date_to=date_to,
             fy_start=col["fy_start"], created=now, currency=currency,
+            partner_accounts={c.id: c.number for c in gx.assign_contact_numbers(
+                await gx.collect_contacts(session, svc.tenant_id), settings)},
+            collective_accounts=(
+                (await SalesService(session, svc.tenant_id).account_mapping()).get("receivable") or "",
+                (await PurchasingService(session, svc.tenant_id).account_mapping()).get("payables") or "",
+            ),
+            home_country=str(biz.get("country_code") or "DE"),
         )  # fmt: skip
         return _attachment(data, f"EXTF_Buchungsstapel_{stamp}.csv", "text/csv; charset=windows-1252")
     contacts = await gx.collect_contacts(session, svc.tenant_id)

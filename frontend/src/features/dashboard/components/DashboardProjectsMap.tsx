@@ -96,14 +96,7 @@ function writeCache(q: string, lat: number, lng: number) {
 async function geocodeOne(query: string, signal: AbortSignal): Promise<{ lat: number; lng: number } | null> {
   const cached = readCache(query);
   if (cached) return cached;
-  // Goes to GET /api/v1/geo-hub/geocode/suggest, never to a public
-  // geocoder from the browser. A browser cannot set a User-Agent, so a
-  // direct call is unidentifiable and unthrottled and it fans out over
-  // every user's IP, which the Nominatim usage policy forbids. The
-  // backend tries Photon first, falls back to Nominatim behind a
-  // process-global 1 req/s gate, and sends a contact User-Agent.
-  // ``geocodeSuggest`` throws on a non-2xx and rejects on abort; the
-  // catch below turns both into the same null a miss already produced.
+  // No geocoder backend ships: geocodeSuggest returns no match offline.
   try {
     const res = await geocodeSuggest(query, { limit: 1, signal });
     const first = res.suggestions[0];

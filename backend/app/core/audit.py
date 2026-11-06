@@ -221,3 +221,6 @@ async def count_audit_entries(
         stmt = stmt.where(AuditEntry.created_at <= parsed_to)
     result = await session.execute(stmt)
     return int(result.scalar() or 0)
+
+
+from app.core import business_audit as _business_audit  # noqa: E402,F401  (registers the flush hook)

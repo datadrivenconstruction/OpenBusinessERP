@@ -8,6 +8,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.modules.contacts.leitweg import normalise_leitweg_id
+
 # The roles a contact may hold. Three places read this list: the create schema,
 # the update schema and the CSV import allowlist in router.py. They were three
 # separate copies that happened to agree, which is one condition written three
@@ -100,6 +102,12 @@ class ContactCreate(BaseModel):
 
     payment_terms_days: str | None = Field(default=None, max_length=10)
     currency_code: str | None = Field(default=None, max_length=10)
+    leitweg_id: str | None = Field(default=None, max_length=46, description="Default Leitweg-ID for XRechnung")
+
+    @field_validator("leitweg_id")
+    @classmethod
+    def validate_leitweg_id(cls, v: str | None) -> str | None:
+        return (normalise_leitweg_id(v) or None) if v is not None else None
 
     name_translations: dict[str, Any] | None = None
     notes: str | None = Field(default=None, max_length=5000)
@@ -152,6 +160,12 @@ class ContactUpdate(BaseModel):
 
     payment_terms_days: str | None = Field(default=None, max_length=10)
     currency_code: str | None = Field(default=None, max_length=10)
+    leitweg_id: str | None = Field(default=None, max_length=46, description="Default Leitweg-ID for XRechnung")
+
+    @field_validator("leitweg_id")
+    @classmethod
+    def validate_leitweg_id(cls, v: str | None) -> str | None:
+        return (normalise_leitweg_id(v) or None) if v is not None else None
 
     name_translations: dict[str, Any] | None = None
     notes: str | None = Field(default=None, max_length=5000)
@@ -191,6 +205,7 @@ class ContactResponse(BaseModel):
 
     payment_terms_days: str | None = None
     currency_code: str | None = None
+    leitweg_id: str | None = None
 
     name_translations: dict[str, Any] | None = None
     notes: str | None = None

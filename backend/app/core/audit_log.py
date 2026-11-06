@@ -90,6 +90,7 @@ class AuditContext:
     ip_address: str | None = None
     user_agent: str | None = None
     request_id: str | None = None
+    request_path: str | None = None
 
 
 # Module-level singleton. Default ``None`` so out-of-request callers

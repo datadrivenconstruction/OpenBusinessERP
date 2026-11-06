@@ -36,6 +36,7 @@ class DocumentCreate(BaseModel):
     delivery_end: date | None = None
     tax_note: str = Field("", max_length=300)
     payment_terms: str = Field("", max_length=64)
+    buyer_reference: str = Field("", max_length=100)
     lines: list[LineIn] = Field(default_factory=list)
 
 
@@ -55,6 +56,7 @@ class DocumentUpdate(BaseModel):
     delivery_end: date | None = None
     tax_note: str | None = Field(None, max_length=300)
     payment_terms: str | None = Field(None, max_length=64)
+    buyer_reference: str | None = Field(None, max_length=100)
     lines: list[LineIn] | None = None
 
 
@@ -92,6 +94,7 @@ class PaymentResponse(BaseModel):
     method: str
     reference: str
     gl_entry_id: uuid.UUID | None
+    fx_rate: Decimal | None = None
 
 
 class DocumentSummary(BaseModel):
@@ -128,6 +131,7 @@ class DocumentResponse(DocumentSummary):
     delivery_end: date | None
     tax_note: str
     payment_terms: str
+    buyer_reference: str = ""
     sent_at: datetime | None = None
     sent_to: str = ""
     lines: list[LineResponse]
@@ -215,6 +219,7 @@ class ActivityEvent(BaseModel):
     type: str
     actor: str | None
     message: str
+    params: dict[str, str] = Field(default_factory=dict)
     ref_id: uuid.UUID | None
 
 

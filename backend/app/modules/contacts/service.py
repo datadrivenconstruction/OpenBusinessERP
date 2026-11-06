@@ -145,6 +145,7 @@ class ContactService:
             qualified_until=data.qualified_until,
             payment_terms_days=data.payment_terms_days,
             currency_code=data.currency_code,
+            leitweg_id=data.leitweg_id,
             name_translations=data.name_translations,
             notes=data.notes,
             # ``tenant_id`` is the access gate. For single-tenant installs

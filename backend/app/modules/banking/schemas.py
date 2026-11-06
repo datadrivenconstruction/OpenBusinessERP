@@ -148,6 +148,7 @@ class AccountSummaryOut(BaseModel):
     gl_account_code: str
     gl_balance: Decimal | None
     gl_difference: Decimal | None
+    gl_comparable: bool = True
     line_count: int
     unmatched_count: int
     last_booking_date: date | None

@@ -91,17 +91,34 @@ if [ "$db_from_parts" = 0 ]; then
       # Any postgres-family URL is accepted; the app normalizes the driver.
       ;;
     "")
-      echo "ERROR: DATABASE_URL is not set." >&2
-      echo "" >&2
-      echo "OpenBusinessERP needs a PostgreSQL server. Either:" >&2
-      echo "  - run the full stack from the repo root:" >&2
-      echo "      docker compose -f docker-compose.quickstart.yml up" >&2
-      echo "  - or point this container at your own PostgreSQL:" >&2
-      echo "      docker run -e DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname ..." >&2
-      echo "  - or hand over the parts and let the app assemble them, which is" >&2
-      echo "    the safe route for a password containing '@', ':' or '/':" >&2
-      echo "      docker run -e OE_DB_HOST=... -e OE_DB_PASSWORD=... ..." >&2
-      exit 1
+      case "$(printf '%s' "${OE_USE_EMBEDDED_PG:-1}" | tr '[:upper:]' '[:lower:]')" in
+        0 | false | no | off)
+          echo "ERROR: DATABASE_URL is not set." >&2
+          echo "" >&2
+          echo "OpenBusinessERP needs a PostgreSQL server. Either:" >&2
+          echo "  - run the full stack from the repo root:" >&2
+          echo "      docker compose -f docker-compose.quickstart.yml up" >&2
+          echo "  - or point this container at your own PostgreSQL:" >&2
+          echo "      docker run -e DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname ..." >&2
+          echo "  - or hand over the parts and let the app assemble them, which is" >&2
+          echo "    the safe route for a password containing '@', ':' or '/':" >&2
+          echo "      docker run -e OE_DB_HOST=... -e OE_DB_PASSWORD=... ..." >&2
+          exit 1
+          ;;
+      esac
+      # No external database: run the bundled PostgreSQL inside the data volume.
+      export OE_DATA_DIR="${OE_DATA_DIR:-/data}"
+      if [ -z "${JWT_SECRET:-}${OE_JWT_SECRET:-}" ]; then
+        # Generated once and kept on the volume so sessions survive a restart.
+        _secret_file="$OE_DATA_DIR/.jwt_secret"
+        if [ ! -s "$_secret_file" ]; then
+          (umask 077 && python -c "import secrets;print(secrets.token_urlsafe(48))" > "$_secret_file")
+        fi
+        JWT_SECRET="$(cat "$_secret_file")"
+        export JWT_SECRET
+        unset _secret_file
+      fi
+      exec python -m app.cli serve --host 0.0.0.0 --port 8080 --data-dir "$OE_DATA_DIR"
       ;;
     *)
       # Do not echo the full URL - it may carry credentials.

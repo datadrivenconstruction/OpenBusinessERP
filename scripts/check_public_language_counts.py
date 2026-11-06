@@ -92,7 +92,7 @@ RULES = [
     Rule("headline stat cell", r"<b>(\d+)</b><br/><sub>languages</sub>", "offered", 0),
     Rule("comparison table row", r"<b>UI languages</b>.*?<b>(\d+)</b>", "offered", 0),
     Rule("prose count of languages", r"(?<![\d.,])(\d+) languages\b", "offered", 0),
-    Rule("count of locale bundles", r"(?<![\d.,])(\d+) locale (?:files|bundles)\b", "files", 3),
+    Rule("count of locale bundles", r"(?<![\d.,])(\d+) locale (?:files|bundles)\b", "files", 2),
     Rule(
         "offered in the picker",
         r"(?<![\d.,])(\d+)(?: of them)? offered\b",

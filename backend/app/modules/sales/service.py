@@ -12,9 +12,11 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.business_settings import read_business_settings
-from app.modules.gl.fx_posting import FxRateMissingError, rate_for, settlement, settlement_lines
+from app.modules.contacts.leitweg import contact_leitweg_id
+from app.modules.gl.fx_posting import FxRateMissingError, q_rate, rate_for, settlement, settlement_lines
 from app.modules.gl.models import DEFAULT_TENANT, GLAccount, GLJournalEntry
 from app.modules.gl.service import GLError, GLService, LineInput, base_currency
+from app.modules.gl.templates import SALES_RATE_ACCOUNTS, ZERO_RATE_REVENUE, zero_rate_kind
 from app.modules.sales.models import (
     KINDS,
     SalesAccountMap,
@@ -30,6 +32,17 @@ ZERO = Decimal(0)
 HUNDRED = Decimal(100)
 DERIVES = {"quote": "order", "order": "invoice"}
 PREFIX = {"quote": "QT", "order": "SO", "invoice": "INV", "credit_note": "CN"}
+
+
+def prefix_for(kind: str) -> str:
+    """Number prefix; invoices take the workspace ``invoice_prefix`` when set."""
+    if kind == "invoice":
+        from app.core.business_settings import read_business_settings
+
+        return read_business_settings().get("invoice_prefix") or PREFIX[kind]
+    return PREFIX[kind]
+
+
 SOURCE_INVOICE = "sales_invoice"
 SOURCE_PAYMENT = "sales_payment"
 SOURCE_CREDIT = "sales_credit_note"
@@ -75,12 +88,16 @@ EXTRA_FIELDS = (
     "delivery_end",
     "tax_note",
     "payment_terms",
+    "buyer_reference",
 )
 SYSTEM_STATUSES = {"converted", "invoiced", "partially_paid", "paid"}
 ROLES = ("receivable", "revenue", "vat", "bank")
 # Default account codes per loaded chart template; overridden by oe_sales_account_map.
 DEFAULT_ACCOUNTS: dict[str, dict[str, str]] = {
     "de_skr03": {"receivable": "1400", "revenue": "8400", "vat": "1776", "bank": "1200"},
+    "de_skr04": {"receivable": "1200", "revenue": "4400", "vat": "3806", "bank": "1800"},
+    "at_ekr": {"receivable": "2000", "revenue": "4000", "vat": "3500", "bank": "2800"},
+    "ch_kmu": {"receivable": "1100", "revenue": "3200", "vat": "2200", "bank": "1020"},
     "ifrs_generic": {"receivable": "1400", "revenue": "4000", "vat": "2300", "bank": "1710"},
 }
 
@@ -145,6 +162,9 @@ DEFAULT_TAX_RATES: dict[str, Decimal] = {
         "IN": "18",
         "JP": "10",
         "SG": "9",
+        "MX": "16",
+        "AE": "5",
+        "ZA": "15",
     }.items()
 }
 
@@ -224,7 +244,7 @@ class SalesService:
             self.session.add(seq)
         seq.last_number += 1
         await self.session.flush()
-        return f"{PREFIX[kind]}-{seq.last_number:06d}"
+        return f"{prefix_for(kind)}-{seq.last_number:06d}"
 
     # ── Documents ─────────────────────────────────────────────────────────
     async def get(self, doc_id: uuid.UUID, kind: str | None = None) -> SalesDocument:
@@ -336,6 +356,8 @@ class SalesService:
     ) -> SalesDocument:
         if kind not in KINDS:
             raise SalesValidationError(f"Unknown kind {kind}")
+        if not (data.get("buyer_reference") or "").strip() and data.get("customer_id"):
+            data = {**data, "buyer_reference": await contact_leitweg_id(self.session, data["customer_id"])}
         doc = SalesDocument(
             tenant_id=self.tenant_id,
             kind=kind,
@@ -416,6 +438,7 @@ class SalesService:
                 await self._gl(
                     self.gl.reverse_entry(doc.gl_entry_id, memo=f"Cancel {doc.number}", created_by=created_by)
                 )
+            await self._stock_for_invoice(doc, cancel=True, created_by=created_by)
         if doc.kind == "order" and (target == "delivered" or doc.status == "delivered"):
             await self._stock_for_delivery(doc, cancel=doc.status == "delivered", created_by=created_by)
         doc.status = target
@@ -431,7 +454,51 @@ class SalesService:
             if cancel:
                 await inv.cancel_source(SOURCE_DELIVERY, str(doc.id), created_by=created_by)
             else:
-                await inv.deliver_sales_order(doc, created_by=created_by)
+                await inv.deliver_sales_order(doc, created_by=created_by, already=await self._invoiced_stock(doc, inv))
+        except InventoryError as exc:
+            raise SalesConflictError(str(exc)) from exc
+
+    async def _invoiced_stock(self, order: SalesDocument, inv: Any) -> dict[uuid.UUID, Decimal]:
+        """Item -> qty already issued by invoices of this order that skipped delivery."""
+        from app.modules.inventory.service import SOURCE_INVOICE_ISSUE
+
+        out: dict[uuid.UUID, Decimal] = {}
+        ids = (
+            await self.session.execute(
+                select(SalesDocument.id).where(
+                    SalesDocument.tenant_id == self.tenant_id,
+                    SalesDocument.kind == "invoice",
+                    SalesDocument.source_id == order.id,
+                )
+            )
+        ).scalars()
+        for inv_id in ids:
+            for m in await inv._source_moves(SOURCE_INVOICE_ISSUE, str(inv_id)):
+                out[m.item_id] = out.get(m.item_id, ZERO) - Decimal(m.qty)
+        return out
+
+    async def _stock_for_invoice(self, invoice: SalesDocument, *, cancel: bool, created_by: str | None) -> None:
+        """An invoice of an order that was never delivered issues its stock (and COGS) itself, exactly once."""
+        from app.modules.inventory.service import (
+            SOURCE_DELIVERY,
+            SOURCE_INVOICE_ISSUE,
+            InventoryError,
+            InventoryService,
+        )
+
+        if invoice.source_id is None:
+            return
+        order = await self.session.get(SalesDocument, invoice.source_id)
+        if order is None or order.kind != "order" or order.tenant_id != self.tenant_id:
+            return
+        inv = InventoryService(self.session, self.tenant_id)
+        try:
+            if cancel:
+                await inv.cancel_source(SOURCE_INVOICE_ISSUE, str(invoice.id), created_by=created_by)
+            elif not await inv._source_moves(SOURCE_DELIVERY, str(order.id)):
+                await inv.deliver_sales_order(
+                    invoice, created_by=created_by, on=invoice.doc_date, source_type=SOURCE_INVOICE_ISSUE
+                )
         except InventoryError as exc:
             raise SalesConflictError(str(exc)) from exc
 
@@ -612,6 +679,7 @@ class SalesService:
                 "type": "created",
                 "actor": doc.created_by,
                 "message": f"Created {doc.number}",
+                "params": {"number": doc.number},
                 "ref_id": doc.id,
             }
         ]
@@ -623,6 +691,7 @@ class SalesService:
                     "type": "issued",
                     "actor": None,
                     "message": f"Issued {doc.number} and posted to the general ledger",
+                    "params": {"number": doc.number},
                     "ref_id": doc.gl_entry_id,
                 }
             )
@@ -637,6 +706,7 @@ class SalesService:
                     "type": "sent" if ok else "send_failed",
                     "actor": log.sent_by,
                     "message": f"Sent to {log.to_addr}" if ok else f"Sending to {log.to_addr} failed: {log.detail}",
+                    "params": {"to": log.to_addr, "detail": log.detail or ""},
                     "ref_id": log.id,
                 }
             )
@@ -647,6 +717,7 @@ class SalesService:
                     "type": "payment",
                     "actor": None,
                     "message": f"Payment {pay.amount} {doc.currency} ({pay.method})",
+                    "params": {"amount": str(pay.amount), "currency": doc.currency, "method": pay.method},
                     "ref_id": pay.id,
                 }
             )
@@ -657,11 +728,35 @@ class SalesService:
                     "type": "credit_note" if child.kind == "credit_note" else "derived",
                     "actor": child.created_by,
                     "message": f"{child.kind.replace('_', ' ').capitalize()} {child.number} created",
+                    "params": {"kind": child.kind, "number": child.number},
                     "ref_id": child.id,
                 }
             )
         events.sort(key=lambda e: e["at"], reverse=True)
+        await self._actor_names(events)
         return events
+
+    async def _actor_names(self, events: list[dict[str, Any]]) -> None:
+        """Replace user ids in ``actor`` by the user's name (or e-mail); unknown ids become None."""
+        from app.modules.users.models import User
+
+        ids: set[uuid.UUID] = set()
+        for e in events:
+            if e["actor"]:
+                try:
+                    ids.add(uuid.UUID(str(e["actor"])))
+                except ValueError:
+                    continue
+        names: dict[str, str] = {}
+        if ids:
+            rows = await self.session.execute(select(User.id, User.full_name, User.email).where(User.id.in_(ids)))
+            names = {str(i): (n or em) for i, n, em in rows.all()}
+        for e in events:
+            a = e["actor"]
+            if a and a in names:
+                e["actor"] = names[a]
+            elif a and len(str(a)) == 36 and str(a).count("-") == 4:
+                e["actor"] = None
 
     async def stats(self, today: date | None = None) -> dict[str, Any]:
         today = today or date.today()
@@ -774,6 +869,49 @@ class SalesService:
             out[role] = acc.id
         return out
 
+    async def _chart_template(self) -> str | None:
+        return await self.session.scalar(
+            select(GLAccount.template)
+            .where(GLAccount.tenant_id == self.tenant_id, GLAccount.template.is_not(None))
+            .limit(1)
+        )
+
+    async def _revenue_lines(self, doc: SalesDocument, acc: dict[str, uuid.UUID], *, side: str) -> list[LineInput]:
+        """Revenue and output-VAT lines split by VAT rate, so 7 %, 0 % and mixed invoices reach the right accounts."""
+        tpl = await self._chart_template() or ""
+        defaults = DEFAULT_ACCOUNTS.get(tpl, {})
+        rate_map = SALES_RATE_ACCOUNTS.get(tpl, {})
+        zero_map = ZERO_RATE_REVENUE.get(tpl, {})
+        ids: dict[str, uuid.UUID | None] = {}
+
+        async def by_code(code: str) -> uuid.UUID | None:
+            if code not in ids:
+                ids[code] = await self.session.scalar(
+                    select(GLAccount.id).where(GLAccount.tenant_id == self.tenant_id, GLAccount.code == code)
+                )
+            return ids[code]
+
+        net: dict[uuid.UUID, Decimal] = {}
+        vat: dict[uuid.UUID, Decimal] = {}
+        for ln in doc.lines:
+            rate = Decimal(ln.tax_rate or 0)
+            rev_id, vat_id = acc["revenue"], acc["vat"]
+            pair = rate_map.get(rate)
+            # The chart's standard pair stays on the roles, so a mapping override still applies.
+            if pair and pair != (defaults.get("revenue"), defaults.get("vat")):
+                r, v = await by_code(pair[0]), await by_code(pair[1])
+                if r and v:
+                    rev_id, vat_id = r, v
+            elif rate == 0 and zero_map:
+                rev_id = await by_code(zero_map[zero_rate_kind(doc.tax_note)]) or rev_id
+            net[rev_id] = net.get(rev_id, ZERO) + ln.net
+            if ln.tax:
+                vat[vat_id] = vat.get(vat_id, ZERO) + ln.tax
+        key = "credit" if side == "credit" else "debit"
+        out = [LineInput(a, **{key: amt}, description=doc.number) for a, amt in net.items() if amt]
+        out += [LineInput(a, **{key: amt}, description=f"{doc.number} VAT") for a, amt in vat.items() if amt > 0]
+        return out
+
     async def issue_invoice(self, invoice_id: uuid.UUID, created_by: str | None = None) -> SalesDocument:
         inv = await self.get(invoice_id, "invoice")
         check_transition("invoice", inv.status, "issued")
@@ -787,10 +925,8 @@ class SalesService:
             LineInput(
                 acc["receivable"], debit=inv.gross_total, description=f"{inv.number} {inv.customer_name}".strip()
             ),
-            LineInput(acc["revenue"], credit=inv.net_total, description=inv.number),
+            *await self._revenue_lines(inv, acc, side="credit"),
         ]
-        if inv.tax_total > 0:
-            lines.append(LineInput(acc["vat"], credit=inv.tax_total, description=f"{inv.number} VAT"))
         entry = await self._gl(
             self.gl.create_entry(
                 entry_date=inv.doc_date,
@@ -805,6 +941,7 @@ class SalesService:
             )
         )
         inv.gl_entry_id = entry.id
+        await self._stock_for_invoice(inv, cancel=False, created_by=created_by)
         inv.status = "issued"
         await self.session.flush()
         return inv
@@ -828,9 +965,7 @@ class SalesService:
                     f"Credit exceeds invoice {inv.number}: {inv.gross_total - credited} left to credit"
                 )
         acc = await self._accounts("receivable", "revenue", "vat")
-        lines = [LineInput(acc["revenue"], debit=cn.net_total, description=cn.number)]
-        if cn.tax_total > 0:
-            lines.append(LineInput(acc["vat"], debit=cn.tax_total, description=f"{cn.number} VAT"))
+        lines = await self._revenue_lines(cn, acc, side="debit")
         lines.append(
             LineInput(acc["receivable"], credit=cn.gross_total, description=f"{cn.number} {cn.customer_name}".strip())
         )
@@ -915,6 +1050,7 @@ class SalesService:
                 )
             except FxRateMissingError as exc:
                 raise SalesConflictError(str(exc)) from exc
+            pay.fx_rate = pay_rate if base_amount is None else q_rate(s.base_cash / amount)
             currency, rate = base_currency(), None
             reference = reference or f"{amount} {inv.currency}"
         entry = await self._gl(
@@ -975,7 +1111,9 @@ class SalesService:
                     months[key] -= net * fx
         payables = None
         try:
-            code = "1600" if await self._is_skr03() else "2200"
+            code = {"de_skr03": "1600", "de_skr04": "3300", "at_ekr": "3300", "ch_kmu": "2000"}.get(
+                await self._chart_template(), "2200"
+            )
             tb = await self.gl.trial_balance(None, None)
             row = next((r for r in tb["rows"] if r["code"] == code), None)
             payables = -row["closing"] if row else ZERO
@@ -1050,11 +1188,3 @@ class SalesService:
             ]
 
         return ranked(cust), ranked(items)
-
-    async def _is_skr03(self) -> bool:
-        tpl = await self.session.scalar(
-            select(GLAccount.template)
-            .where(GLAccount.tenant_id == self.tenant_id, GLAccount.template.is_not(None))
-            .limit(1)
-        )
-        return tpl == "de_skr03"

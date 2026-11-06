@@ -348,6 +348,7 @@ function CreateRecurringModal({
       open
       onClose={onClose}
       title={t('service.recurring.new', { defaultValue: 'New Recurring Schedule' })}
+      onSubmit={() => { if (canSubmit && !create.isPending) create.mutate(); }}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>

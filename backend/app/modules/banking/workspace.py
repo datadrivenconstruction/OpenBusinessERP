@@ -24,6 +24,7 @@ from app.modules.banking.service import (
     BankingValidationError,
 )
 from app.modules.gl.models import ENTRY_POSTED, GLAccount, GLJournalEntry, GLJournalLine
+from app.modules.gl.service import base_currency
 
 ZERO = Decimal(0)
 OPEN = ("unmatched", "partially_matched")
@@ -71,6 +72,8 @@ class BankingWorkspace(BankingService):
             opening = Decimal(acc.opening_balance or 0)
             balance = opening + (Decimal(r.balance) if r else ZERO)
             gl_bal = gl.get(acc.gl_account_code) if acc.gl_account_code else None
+            # GL holds the base-currency equivalent; a statement in another currency is not comparable 1:1.
+            foreign = (acc.currency or "").upper() != base_currency()
             accounts.append(
                 {
                     "account_id": acc.id,
@@ -83,7 +86,8 @@ class BankingWorkspace(BankingService):
                     "opening_balance_date": acc.opening_balance_date,
                     "gl_account_code": acc.gl_account_code,
                     "gl_balance": gl_bal,
-                    "gl_difference": None if gl_bal is None else balance - gl_bal,
+                    "gl_difference": None if gl_bal is None or foreign else balance - gl_bal,
+                    "gl_comparable": not foreign,
                     "line_count": r.lines if r else 0,
                     "unmatched_count": r.open_lines if r else 0,
                     "last_booking_date": r.last_booking if r else None,

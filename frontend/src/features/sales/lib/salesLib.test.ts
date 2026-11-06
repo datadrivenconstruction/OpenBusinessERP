@@ -102,3 +102,14 @@ describe('timeline and actions', () => {
     expect(convertBody([{ line_id: 'a', max: 2, qty: '1' }, { line_id: 'b', max: 1, qty: '0' }])).toEqual({ lines: [{ line_id: 'a', qty: '1' }] });
   });
 });
+
+describe('trimDecimals', () => {
+  it('drops storage-scale zeros', async () => {
+    const { trimDecimals } = await import('./form');
+    expect(trimDecimals('55.1000', 2)).toBe('55.10');
+    expect(trimDecimals('0.0000')).toBe('0');
+    expect(trimDecimals('100.00')).toBe('100');
+    expect(trimDecimals('1.2500')).toBe('1.25');
+    expect(trimDecimals('abc')).toBe('abc');
+  });
+});

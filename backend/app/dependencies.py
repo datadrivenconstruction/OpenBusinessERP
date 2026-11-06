@@ -358,7 +358,6 @@ async def get_current_user_payload(
         try:
             from uuid import UUID
 
-            from app.core.permissions import permission_registry
             from app.modules.users.models import User as _UserModel
 
             async with async_session_factory() as session:
@@ -370,7 +369,11 @@ async def get_current_user_payload(
                     )
                 # Overwrite self-asserted claims with canonical DB state.
                 payload["role"] = user.role
-                payload["permissions"] = permission_registry.get_role_permissions(user.role)
+                from app.core.business_roles import effective_permissions, preset_of
+
+                payload["business_role"] = preset_of(user.metadata_)
+                payload["permissions"] = effective_permissions(user.role, payload["business_role"])
+                _bind_audit_actor(payload)
 
                 reject_token_issued_before_password_change(iat, user.password_changed_at)
                 await reject_revoked_session(session, payload.get("sid"), user.id)
@@ -625,6 +628,20 @@ ApiKeyUser = Annotated["User", Depends(get_user_from_api_key)]
 # ── Permission checker ─────────────────────────────────────────────────────
 
 
+def _bind_audit_actor(payload: dict[str, Any]) -> None:
+    """Attribute ORM-level audit entries written later in this request to the caller."""
+    try:
+        import dataclasses as _dc
+
+        from app.core.audit_log import AuditContext, get_audit_context, set_audit_context
+
+        sub = payload.get("sub")
+        if sub:
+            set_audit_context(_dc.replace(get_audit_context() or AuditContext(), actor_id=str(sub)))
+    except Exception:  # pragma: no cover - capture is best-effort
+        logger.debug("audit actor binding failed", exc_info=True)
+
+
 class RequirePermission:
     """Dependency that checks if the current user has a specific permission.
 
@@ -645,6 +662,7 @@ class RequirePermission:
     ) -> None:
         permissions: list[str] = payload.get("permissions", [])
         role: str = payload.get("role", "")
+        _bind_audit_actor(payload)
 
         # Superadmin bypasses all checks.
         #
@@ -669,9 +687,9 @@ class RequirePermission:
             # in. Fall through to the live registry to honour the current
             # role→permission mapping for stale tokens. Admin already
             # short-circuited above; this only widens for non-admins.
-            from app.core.permissions import permission_registry as _reg
+            from app.core.business_roles import role_allows
 
-            if _reg.role_has_permission(role, self.permission):
+            if role_allows(role, payload.get("business_role"), self.permission):
                 logger.debug(
                     "Permission granted via live-registry fallback (stale JWT): permission=%s role=%s",
                     self.permission,
@@ -737,13 +755,23 @@ class RequirePermissionOrApiKey:
         # Interactive caller: a valid bearer token was presented. Attribute the
         # work to the JWT subject, exactly as RequirePermission would gate it.
         if payload is not None:
-            self._authorize(payload.get("role", "") or "", payload.get("permissions", []))
+            self._authorize(
+                payload.get("role", "") or "", payload.get("permissions", []), preset=payload.get("business_role")
+            )
+            _bind_audit_actor(payload)
             return str(payload["sub"])
         # Headless caller: no usable bearer token, so require a valid X-API-Key.
         # Its own 401 (missing / unknown / expired key, or inactive owner)
         # propagates unchanged; a valid key resolves to its owner and scopes.
         principal = await resolve_api_key_principal(request)
-        self._authorize(getattr(principal.user, "role", "") or "", None, principal.scopes)
+        from app.core.business_roles import preset_of
+
+        self._authorize(
+            getattr(principal.user, "role", "") or "",
+            None,
+            principal.scopes,
+            preset=preset_of(getattr(principal.user, "metadata_", None)),
+        )
         return str(principal.user.id)
 
     def _authorize(
@@ -751,6 +779,7 @@ class RequirePermissionOrApiKey:
         role: str,
         permissions: list[str] | None,
         key_scopes: Sequence[str] | None = None,
+        preset: str | None = None,
     ) -> None:
         """Apply the shared role->permission check; raise 403 when it fails.
 
@@ -780,9 +809,9 @@ class RequirePermissionOrApiKey:
             return
         if permissions is not None and self.permission in permissions:
             return
-        from app.core.permissions import permission_registry as _reg
+        from app.core.business_roles import role_allows
 
-        if _reg.role_has_permission(role, self.permission):
+        if role_allows(role, preset, self.permission):
             return
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

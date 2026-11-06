@@ -61,7 +61,7 @@ export function ItemPicker({
         disabled={disabled}
         aria-invalid={invalid}
         value={value}
-        placeholder={t('sales.lines.search_item', { defaultValue: 'Type to search items or describe…' })}
+        placeholder={t('sales.lines.search_item', { defaultValue: 'Search item or describe…' })}
         onFocus={() => setOpen(true)}
         onChange={(e) => {
           onChange(e.target.value);

@@ -33,6 +33,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { BadgeCheck, Calculator, Download, Landmark, ShieldAlert } from 'lucide-react';
+import { DateField } from '@/shared/ui/DateField';
 
 import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
@@ -383,8 +384,8 @@ function PreviewSection({
 
           <label className="flex flex-col gap-1 text-sm sm:col-span-2">
             {t('tax_withholding.field_as_of', { defaultValue: 'Judge the standing as of' })}
-            <input
-              type="date"
+            <DateField
+             
               value={asOf}
               onChange={(e) => setAsOf(e.target.value)}
               className="rounded border border-border-light bg-surface-primary p-2"

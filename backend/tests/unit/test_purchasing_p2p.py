@@ -199,3 +199,44 @@ async def test_grni_default_uses_dedicated_account_with_fallback(svc, session):
     assert (await svc.account_mapping())["grni"] == "1720"
     await session.execute(delete(GLAccount).where(GLAccount.tenant_id == T1, GLAccount.code == "1720"))
     assert (await svc.account_mapping())["grni"] == "1700"
+
+
+async def test_standalone_bill_splits_expense_and_input_vat_by_rate(svc, session):
+    """SKR03: 7 % goes to 3300/1571, 19 % to 3400/1576 (Automatikkonten must match the rate)."""
+    bill = await svc.create_bill(
+        lines=[LineData("Material", "", D(1), D(100), D(19)), LineData("Fachbuch", "", D(1), D(50), D(7))],
+        supplier_name="Händler GmbH",
+        doc_date=DAY,
+    )
+    await svc.post_bill(bill.id)
+    tb = await _tb(svc)
+    assert (_closing(tb, "3400"), _closing(tb, "1576")) == (D("100.00"), D("19.00"))
+    assert (_closing(tb, "3300"), _closing(tb, "1571")) == (D("50.00"), D("3.50"))
+    assert _closing(tb, "1600") == D("-172.50")
+    cn = await svc.create_bill(
+        kind="credit_note",
+        lines=[LineData("Fachbuch", "", D(1), D(50), D(7))],
+        supplier_name="Händler GmbH",
+        doc_date=DAY,
+        source_id=bill.id,
+    )
+    await svc.post_bill(cn.id)
+    tb = await _tb(svc)
+    assert (_closing(tb, "3300"), _closing(tb, "1571")) == (0, 0)
+
+
+async def test_skr04_standalone_bill_splits_expense_and_input_vat_by_rate(session):
+    gl = GLService(session, T1)
+    await gl.load_template("de_skr04")
+    await gl.create_fiscal_year("FY2026", date(2026, 1, 1), date(2026, 12, 31))
+    svc = PurchasingService(session, T1)
+    bill = await svc.create_bill(
+        lines=[LineData("Material", "", D(1), D(100), D(19)), LineData("Fachbuch", "", D(1), D(50), D(7))],
+        supplier_name="Händler GmbH",
+        doc_date=DAY,
+    )
+    await svc.post_bill(bill.id)
+    tb = await _tb(svc)
+    assert (_closing(tb, "5400"), _closing(tb, "1406")) == (D("100.00"), D("19.00"))
+    assert (_closing(tb, "5300"), _closing(tb, "1401")) == (D("50.00"), D("3.50"))
+    assert _closing(tb, "3300") == D("-172.50")

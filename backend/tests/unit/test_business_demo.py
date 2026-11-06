@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import re
 from datetime import date, timedelta
+from decimal import Decimal
+from pathlib import Path
 
 import pytest
 import pytest_asyncio
@@ -34,7 +37,7 @@ GOODS_CASES = {"trade_distribution", "manufacturing", "retail_ecommerce"}
 
 async def _figures(session, key):
     """Month-end bank balances, payables balance, period revenue and expenses (base currency)."""
-    codes = EXPENSE_ACCOUNTS["de_skr03" if CASES[key].country == "DE" else "ifrs_generic"]
+    codes = EXPENSE_ACCOUNTS[business_demo.DEFAULT_CHART.get(CASES[key].country, "ifrs_generic")]
     rows = (
         await session.execute(
             select(
@@ -81,10 +84,35 @@ def test_no_construction_vocabulary():
         assert not words.search(repr(case)), case.key
 
 
+EUROPE = {"AT", "BE", "CH", "DE", "DK", "ES", "FI", "FR", "GB", "IE", "IT", "NL", "NO", "PL", "PT", "SE"}
+EURO_AREA = EUROPE - {"CH", "DK", "GB", "NO", "PL", "SE"}
+
+
+def test_cases_span_the_world_with_tax_preset_and_currency():
+    from app.core.currency_registry import CURRENCIES
+    from app.modules import i18n_foundation
+    from app.modules.sales.service import default_tax_rate
+
+    seed = Path(i18n_foundation.__file__).parent / "seed_data" / "tax_configurations.json"
+    presets = {
+        r["country_code"]: Decimal(r["rate_pct"])
+        for r in json.loads(seed.read_text(encoding="utf-8"))
+        if r["is_default"] and not r["subdivision_code"] and not r["effective_to"]
+    }
+    countries = {c.country for c in CASES.values()}
+    assert len(countries - EUROPE) >= 5, countries
+    for case in CASES.values():
+        cc = case.country
+        assert cc in presets and default_tax_rate(cc) == presets[cc], case.key
+        assert cc in EURO_AREA or cc in business_demo._CASE_CURRENCY, case.key
+        assert business_demo._CASE_CURRENCY.get(cc, "EUR") in CURRENCIES, case.key
+        assert len(business_demo.demo_bank_iban(case)) <= 34, case.key
+
+
 @pytest.mark.parametrize("key", sorted(CASES))
 async def test_case_seeds_balanced_and_idempotent(session, monkeypatch, key):
     case = CASES[key]
-    currency = "GBP" if case.country == "GB" else "PLN" if case.country == "PL" else "EUR"
+    currency = business_demo._CASE_CURRENCY.get(case.country, "EUR")
     monkeypatch.setattr(gl_service, "read_business_settings", _settings(case.country, currency))
     monkeypatch.setattr(business_demo, "read_business_settings", _settings(case.country, currency))
     owner = User(email=f"{key}@example.com", hashed_password="x", full_name="Owner", role="admin")
@@ -103,6 +131,10 @@ async def test_case_seeds_balanced_and_idempotent(session, monkeypatch, key):
 
     tb = await GLService(session).trial_balance(None, None)
     assert tb["balanced"] and tb["total_debit"] > 0
+    if business_demo.minor_units(currency) == 0:
+        gl_rows = (await session.execute(select(GLJournalLine.debit, GLJournalLine.credit))).all()
+        doc_rows = (await session.execute(select(SalesDocument.tax_total, SalesDocument.gross_total))).all()
+        assert all(v == v.to_integral_value() for row in [*gl_rows, *doc_rows] for v in row), "sub-unit amounts"
 
     bank, payables, income, expense = await _figures(session, key)
     assert min(bank) >= 0, bank
@@ -168,6 +200,24 @@ async def test_reinstall_replaces_case(session, monkeypatch):
     assert tb["balanced"]
 
 
+async def test_demo_seeds_on_the_chart_chosen_in_setup(session, monkeypatch):
+    monkeypatch.setattr(gl_service, "read_business_settings", _settings("DE", "EUR"))
+    monkeypatch.setattr(business_demo, "read_business_settings", _settings("DE", "EUR"))
+    await GLService(session).load_template("de_skr04")  # what the setup wizard does for a chosen SKR04
+
+    res = await install_business_demo(session, "trade_distribution", today=TODAY)
+    assert not res["already_installed"]
+    assert set((await session.execute(select(GLAccount.template))).scalars()) == {"de_skr04"}
+    assert (await GLService(session).trial_balance(None, None))["balanced"]
+    posted = await session.scalar(
+        select(func.count())
+        .select_from(GLJournalLine)
+        .join(GLAccount, GLAccount.id == GLJournalLine.account_id)
+        .where(GLAccount.code == EXPENSE_ACCOUNTS["de_skr04"]["bank"])
+    )
+    assert posted
+
+
 async def test_appointments_seeded_reset_and_stale(session, monkeypatch):
     from app.modules.appointments.models import (
         AppointmentBooking,
@@ -214,3 +264,53 @@ async def test_appointments_seeded_reset_and_stale(session, monkeypatch):
     assert removed["appointments"] == res["appointments"]
     for model in (AppointmentBooking, AppointmentService, AppointmentResource, AppointmentSettings):
         assert await count(model) == 0
+
+
+def test_every_iban_country_case_gets_a_valid_iban() -> None:
+    for case in CASES.values():
+        if case.country not in business_demo.IBAN_LENGTH:
+            continue
+        iban = business_demo.demo_bank_iban(case).replace(" ", "")
+        assert iban.startswith(case.country) and _iban_ok(iban), (case.key, iban)
+        assert len(iban) == business_demo.IBAN_LENGTH[case.country], (case.key, iban)
+    covered = {c.country for c in CASES.values()} & set(business_demo.IBAN_LENGTH)
+    assert {"DE", "FR", "GB", "IE", "PL"} <= covered
+
+
+def _iban_ok(iban: str) -> bool:
+    raw = iban.replace(" ", "")
+    return int("".join(str(int(c, 36)) for c in raw[4:] + raw[:4])) % 97 == 1
+
+
+@pytest.mark.parametrize(
+    ("key", "tpl", "currency", "rates", "iban_len"),
+    [
+        ("real_estate", "at_ekr", "EUR", {"20", "10"}, 20),
+        ("alpine_inn", "ch_kmu", "CHF", {"8.1", "3.8", "2.6"}, 21),
+    ],
+)
+async def test_dach_demo_uses_local_chart_vat_and_iban(session, monkeypatch, key, tpl, currency, rates, iban_len):
+    case = CASES[key]
+    monkeypatch.setattr(gl_service, "read_business_settings", _settings(case.country, currency))
+    monkeypatch.setattr(business_demo, "read_business_settings", _settings(case.country, currency))
+
+    res = await install_business_demo(session, key, today=TODAY)
+    assert res["currency"] == currency
+    assert set((await session.execute(select(GLAccount.template))).scalars()) == {tpl}
+    assert (await GLService(session).trial_balance(None, None))["balanced"]
+    posted = await session.scalar(
+        select(func.count())
+        .select_from(GLJournalLine)
+        .join(GLAccount, GLAccount.id == GLJournalLine.account_id)
+        .where(GLAccount.code == EXPENSE_ACCOUNTS[tpl]["bank"])
+    )
+    assert posted
+    from app.modules.sales.models import SalesLine
+
+    used = {
+        format(r, "f").rstrip("0").rstrip(".")
+        for r in (await session.execute(select(SalesLine.tax_rate).distinct())).scalars()
+    }
+    assert used <= rates | {"0"} and used & {"20", "8.1"}
+    iban = business_demo.demo_bank_iban(case)
+    assert iban.replace(" ", "").startswith(case.country) and len(iban.replace(" ", "")) == iban_len and _iban_ok(iban)

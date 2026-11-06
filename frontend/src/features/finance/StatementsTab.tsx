@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
+import { DateField } from '@/shared/ui/DateField';
 import clsx from 'clsx';
 import { Card, Badge, EmptyState, RecoveryCard, SkeletonTable } from '@/shared/ui';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
@@ -734,8 +735,8 @@ export function StatementsTab({ projectId }: { projectId: string }) {
             <span className="text-2xs font-medium uppercase tracking-wider text-content-tertiary">
               {t('finance.stmt_period_from', { defaultValue: 'From' })}
             </span>
-            <input
-              type="date"
+            <DateField
+             
               value={dateFrom}
               max={dateTo || undefined}
               onChange={(e) => setDateFrom(e.target.value)}
@@ -749,8 +750,8 @@ export function StatementsTab({ projectId }: { projectId: string }) {
                 ? t('finance.stmt_as_of', { defaultValue: 'As of' })
                 : t('finance.stmt_period_to', { defaultValue: 'To' })}
             </span>
-            <input
-              type="date"
+            <DateField
+             
               value={dateTo}
               min={dateFrom || undefined}
               onChange={(e) => setDateTo(e.target.value)}

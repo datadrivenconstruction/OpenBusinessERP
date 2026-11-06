@@ -33,6 +33,7 @@ export interface Contact {
   company_name: string | null;
   legal_name: string | null;
   vat_number: string | null;
+  leitweg_id?: string | null;
   primary_email: string | null;
   primary_phone: string | null;
   website: string | null;
@@ -132,6 +133,7 @@ export interface CreateContactPayload {
   company_name?: string;
   legal_name?: string;
   vat_number?: string;
+  leitweg_id?: string;
   primary_email?: string;
   primary_phone?: string;
   website?: string;
@@ -163,6 +165,7 @@ export interface UpdateContactPayload {
   company_name?: string | null;
   legal_name?: string | null;
   vat_number?: string | null;
+  leitweg_id?: string | null;
   primary_email?: string | null;
   primary_phone?: string | null;
   website?: string | null;

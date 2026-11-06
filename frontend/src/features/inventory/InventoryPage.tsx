@@ -11,6 +11,7 @@ import { PageHeader } from '@/shared/ui/PageHeader';
 import { fmtUpTo } from '@/shared/lib/formatters';
 import { MOVE_KINDS, inventoryApi, sourceLink, type Movement } from './api';
 import { AdjustDrawer, StocktakesTab, TransferDrawer, WarehousesTab, fieldCls } from './components';
+import { DateField } from '@/shared/ui/DateField';
 
 type TabId = 'stock' | 'movements' | 'stocktakes' | 'warehouses';
 const PAGE = 50;
@@ -188,8 +189,8 @@ function MovementsTab() {
           <option value="">{t('inventory.all_kinds', { defaultValue: 'All types' })}</option>
           {MOVE_KINDS.map((k) => <option key={k} value={k}>{t(`inventory.kind_${k}`, { defaultValue: k.replace('_', ' ') })}</option>)}
         </select>
-        <input type="date" className={clsx(fieldCls, 'w-auto')} value={f.date_from} onChange={(e) => set('date_from', e.target.value)} aria-label={t('inventory.date_from', { defaultValue: 'From' })} />
-        <input type="date" className={clsx(fieldCls, 'w-auto')} value={f.date_to} onChange={(e) => set('date_to', e.target.value)} aria-label={t('inventory.date_to', { defaultValue: 'To' })} />
+        <DateField className={clsx(fieldCls, 'w-auto')} value={f.date_from} onChange={(e) => set('date_from', e.target.value)} aria-label={t('inventory.date_from', { defaultValue: 'From' })} />
+        <DateField className={clsx(fieldCls, 'w-auto')} value={f.date_to} onChange={(e) => set('date_to', e.target.value)} aria-label={t('inventory.date_to', { defaultValue: 'To' })} />
       </div>
       {moves.data?.items.length ? (
         <div className="rounded-lg border border-border-light">

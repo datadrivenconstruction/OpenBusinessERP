@@ -539,7 +539,7 @@ function FieldEditor({
             disabled={controlDisabled}
             onChange={(e) => onChange(e.target.value)}
             placeholder={t('property_dev.doc_appearance.footer_placeholder', {
-              defaultValue: 'Leave empty to show the company name and date',
+              defaultValue: 'Company name and date',
             })}
             aria-labelledby={labelId}
           />

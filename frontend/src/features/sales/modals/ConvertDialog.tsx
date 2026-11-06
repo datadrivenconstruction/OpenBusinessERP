@@ -72,6 +72,10 @@ export function ConvertDialog({
       onClose={onClose}
       size="lg"
       title={title}
+      onSubmit={() => {
+        if (invalid || nothing || full.isLoading || convert.isPending) return;
+        convert.mutate({ from, id: doc.id, body: convertBody(rows) }, { onSuccess: (d) => onDone(d) });
+      }}
       subtitle={t('sales.convert.subtitle', { defaultValue: 'Take all lines, or lower a quantity to carry over only part of it.' })}
       footer={
         <div className="flex w-full items-center justify-between gap-2">

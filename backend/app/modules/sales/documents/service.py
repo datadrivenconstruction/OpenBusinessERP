@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import logging
 import re
 import uuid
 from datetime import UTC, datetime
@@ -18,10 +19,12 @@ from app.core.email.base import EmailAttachment, EmailMessage
 from app.core.email.service import EmailService
 from app.core.mail_settings import mail_status
 from app.modules.sales.documents.checks import check_invoice
+from app.modules.sales.documents.design import read_design
 from app.modules.sales.documents.i18n import fmt_date, fmt_money, lang, t
 from app.modules.sales.documents.pdf import render_document
 from app.modules.sales.models import SalesDocument, SalesSendLog
 
+logger = logging.getLogger(__name__)
 _EMAIL = re.compile(r"^[^@\s,;<>]+@[^@\s,;<>]+\.[^@\s,;<>]+$")
 
 
@@ -42,6 +45,7 @@ def company_data() -> dict[str, Any]:
     for key in ("email", "phone", "website"):
         if not data.get(key):
             data[key] = profile.get(key, "")
+    data["document_design"] = read_design()
     return data
 
 
@@ -56,8 +60,17 @@ async def _source_number(session: AsyncSession, doc: SalesDocument) -> str | Non
     return src.number if src is not None and src.tenant_id == doc.tenant_id else None
 
 
-async def render_pdf(session: AsyncSession, doc: SalesDocument, company: dict[str, Any] | None = None) -> bytes:
-    return render_document(doc, company or company_data(), source_number=await _source_number(session, doc))
+async def render_pdf(
+    session: AsyncSession, doc: SalesDocument, company: dict[str, Any] | None = None, payment_url: str | None = None
+) -> bytes:
+    if payment_url is None and doc.kind == "invoice":
+        from app.modules.sales.online_payments import open_link
+
+        link = await open_link(session, doc)
+        payment_url = link.url if link is not None else None
+    return render_document(
+        doc, company or company_data(), source_number=await _source_number(session, doc), payment_url=payment_url
+    )
 
 
 def placeholders(doc: SalesDocument, company: dict[str, Any]) -> dict[str, str]:
@@ -135,10 +148,15 @@ async def send_document(
     """Send the PDF to ``to`` (and each ``cc``) and record the outcome. Only called from a user request."""
     recipients = _validate([to, *cc])
     company = company_data()
-    pdf = await render_pdf(session, doc, company)
+    payment_url = await _payment_url(session, doc)
+    pdf = await render_pdf(session, doc, company, payment_url=payment_url)
     values = placeholders(doc, company)
     subject = fill(subject, values)
     html_body = html_paragraphs(fill(body, values))
+    if payment_url:
+        label = html.escape(t(lang(doc.language), "pay_online"))
+        href = html.escape(payment_url, quote=True)
+        html_body += f'<p><a href="{href}">{label}</a><br/>{href}</p>'
     attachment = EmailAttachment(filename=filename(doc), content=pdf)
     result = await email.send(
         EmailMessage(
@@ -170,6 +188,18 @@ async def send_document(
     session.add(log)
     await session.flush()
     return log
+
+
+async def _payment_url(session: AsyncSession, doc: SalesDocument) -> str | None:
+    """Online payment link for the invoice; a provider failure never blocks sending the invoice itself."""
+    from app.modules.sales.online_payments import PaymentProviderError, ensure_link
+
+    try:
+        link = await ensure_link(session, doc)
+    except PaymentProviderError as exc:
+        logger.warning("payment link for %s not created: %s", doc.number, exc)
+        return None
+    return link.url if link is not None else None
 
 
 async def send_history(session: AsyncSession, doc: SalesDocument) -> list[SalesSendLog]:

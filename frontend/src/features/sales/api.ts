@@ -41,6 +41,7 @@ export interface SalesPayment {
   method: string;
   reference: string;
   gl_entry_id: string | null;
+  fx_rate?: string | null;
 }
 
 export interface SalesDocSummary {
@@ -74,6 +75,7 @@ export interface SalesDoc extends SalesDocSummary {
   delivery_end: string | null;
   tax_note: string;
   payment_terms?: string;
+  buyer_reference?: string;
   lines: SalesLine[];
   payments: SalesPayment[];
 }
@@ -95,6 +97,7 @@ export interface SalesDocInput {
   delivery_end?: string | null;
   tax_note?: string;
   payment_terms?: string;
+  buyer_reference?: string;
   lines?: Omit<SalesLine, 'id' | 'line_no' | 'net' | 'tax' | 'gross'>[];
 }
 
@@ -196,7 +199,20 @@ export interface ActivityEntry {
   type: string;
   actor: string | null;
   message: string;
+  params?: Record<string, string>;
   ref_id: string | null;
+}
+
+export interface PaymentLink {
+  provider: string;
+  url: string;
+  amount: string;
+  currency: string;
+  status: string;
+}
+export interface PaymentLinkState {
+  configured: boolean;
+  link: PaymentLink | null;
 }
 
 export interface RelatedDocs {
@@ -261,6 +277,9 @@ export const salesApi = {
   emailDraft: (kind: SalesKind, id: string) => apiGet<EmailDraft>(`${base(kind)}${id}/email-draft/`),
   send: (kind: SalesKind, id: string, body: SendBody) => apiPost<SendLogEntry>(`${base(kind)}${id}/send/`, body),
   sends: (kind: SalesKind, id: string) => apiGet<SendLogEntry[]>(`${base(kind)}${id}/sends/`),
+  paymentLink: (id: string) => apiGet<PaymentLinkState>(`/v1/sales/invoices/${id}/payment-link/`),
+  createPaymentLink: (id: string, regenerate = false) =>
+    apiPost<PaymentLink>(`/v1/sales/invoices/${id}/payment-link/${regenerate ? '?regenerate=true' : ''}`, {}),
   pay: (id: string, body: { amount: string; pay_date?: string; reference?: string; method?: string }) =>
     apiPost<SalesDoc>(`/v1/sales/invoices/${id}/payments/`, body),
 };

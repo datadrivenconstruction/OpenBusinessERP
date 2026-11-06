@@ -18,6 +18,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from sqlalchemy import func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.gl.models import GLAccount
@@ -38,6 +39,7 @@ CENT = Decimal("0.01")
 COST_Q = Decimal("0.000001")
 SOURCE_RECEIPT = "purchasing_receipt"
 SOURCE_DELIVERY = "sales_delivery"
+SOURCE_INVOICE_ISSUE = "sales_invoice_issue"  # invoice issued straight from an undelivered order
 SOURCE_STOCKTAKE = "inventory_stocktake"
 SOURCE_ADJUST = "inventory_adjustment"
 SOURCE_TRANSFER = "inventory_transfer"
@@ -47,6 +49,9 @@ GL_ADJUST = "inventory_adjustment"
 # Chart defaults; inventory itself follows the purchasing "inventory" role so receipts and issues hit one account.
 DEFAULT_ACCOUNTS: dict[str, dict[str, str]] = {
     "de_skr03": {"cogs": "3400", "diff": "4900"},
+    "de_skr04": {"cogs": "5400", "diff": "6300"},
+    "at_ekr": {"cogs": "5000", "diff": "7800"},
+    "ch_kmu": {"cogs": "4200", "diff": "6700"},
     "ifrs_generic": {"cogs": "5000", "diff": "5500"},
 }
 
@@ -205,8 +210,26 @@ class InventoryService:
                 select(Warehouse).where(Warehouse.tenant_id == self.tenant_id).order_by(Warehouse.created_at).limit(1)
             )
             if wh is None:
-                wh = Warehouse(tenant_id=self.tenant_id, code="MAIN", name="Main warehouse", address="", active=True)
-                self.session.add(wh)
+                # Parallel first requests race to create MAIN; the loser re-reads the winner's row.
+                try:
+                    async with self.session.begin_nested():
+                        wh = Warehouse(
+                            tenant_id=self.tenant_id,
+                            code="MAIN",
+                            name="Main warehouse",
+                            address="",
+                            active=True,
+                            is_default=True,
+                        )
+                        self.session.add(wh)
+                except IntegrityError:
+                    wh = await self.session.scalar(
+                        select(Warehouse)
+                        .where(Warehouse.tenant_id == self.tenant_id, Warehouse.code == "MAIN")
+                        .limit(1)
+                    )
+                    if wh is None:
+                        raise
             wh.is_default = True
             await self.session.flush()
         return wh
@@ -482,11 +505,17 @@ class InventoryService:
         warehouse_id: uuid.UUID | None = None,
         on: date | None = None,
         post_gl: bool = True,
+        source_type: str = SOURCE_DELIVERY,
+        already: dict[uuid.UUID, Decimal] | None = None,
     ) -> list[StockMovement]:
-        """Outbound movements for the order's stock-tracked lines plus one COGS entry at average cost."""
+        """Outbound movements for the document's stock-tracked lines plus one COGS entry at average cost.
+
+        Runs once per (source_type, document); ``already`` maps item -> qty issued earlier by other sources.
+        """
         ids = {ln.item_id for ln in order.lines if ln.item_id}
-        if not ids:
+        if not ids or await self._source_moves(source_type, str(order.id)):
             return []
+        skip = dict(already or {})
         tracked = set(
             (
                 await self.session.execute(
@@ -497,15 +526,20 @@ class InventoryService:
         day = on or date.today()
         moves = []
         for ln in order.lines:
-            if ln.item_id in tracked and ln.qty > 0:
+            qty = Decimal(ln.qty)
+            done = min(qty, skip.get(ln.item_id, ZERO))
+            if done > 0:
+                skip[ln.item_id] -= done
+                qty -= done
+            if ln.item_id in tracked and qty > 0:
                 moves.append(
                     await self.move(
                         ln.item_id,
-                        -Decimal(ln.qty),
+                        -qty,
                         "delivery",
                         warehouse_id=warehouse_id,
                         move_date=day,
-                        source_type=SOURCE_DELIVERY,
+                        source_type=source_type,
                         source_id=str(order.id),
                         source_number=order.number,
                         notes=order.customer_name or "",

@@ -13,6 +13,12 @@ export interface ExportSettings {
   mandant_nr: number;
   sachkontenlaenge: number;
   skr: string;
+  debitor_from: number;
+  debitor_to: number;
+  kreditor_from: number;
+  kreditor_to: number;
+  diktatkuerzel: string;
+  festschreibung: boolean;
 }
 
 const FORMAT_LABEL: Record<ExportFormat, string> = {
@@ -54,7 +60,7 @@ export function ExportPanel({ from, to }: { from: string; to: string }) {
     }
   };
 
-  const num = (k: keyof ExportSettings) => (
+  const num = (k: 'berater_nr' | 'mandant_nr' | 'sachkontenlaenge' | 'debitor_from' | 'debitor_to' | 'kreditor_from' | 'kreditor_to') => (
     <input
       type="number"
       className={inputCls}
@@ -99,6 +105,28 @@ export function ExportPanel({ from, to }: { from: string; to: string }) {
             <Field label={t('accounting.datev_berater', { defaultValue: 'Adviser number (Berater-Nr.)' })}>{num('berater_nr')}</Field>
             <Field label={t('accounting.datev_mandant', { defaultValue: 'Client number (Mandanten-Nr.)' })}>{num('mandant_nr')}</Field>
             <Field label={t('accounting.datev_length', { defaultValue: 'G/L account length' })}>{num('sachkontenlaenge')}</Field>
+            <Field label={t('accounting.datev_debitor_range', { defaultValue: 'Customer accounts (Debitoren) from / to' })}>
+              <div className="flex gap-2">{num('debitor_from')}{num('debitor_to')}</div>
+            </Field>
+            <Field label={t('accounting.datev_kreditor_range', { defaultValue: 'Supplier accounts (Kreditoren) from / to' })}>
+              <div className="flex gap-2">{num('kreditor_from')}{num('kreditor_to')}</div>
+            </Field>
+            <Field label={t('accounting.datev_diktat', { defaultValue: 'Initials (Diktatkürzel)' })}>
+              <input
+                className={inputCls}
+                maxLength={2}
+                value={draft.diktatkuerzel ?? ''}
+                onChange={(e) => setDraft({ ...draft, diktatkuerzel: e.target.value })}
+              />
+            </Field>
+            <label className="flex items-center gap-2 text-sm text-content-primary">
+              <input
+                type="checkbox"
+                checked={!!draft.festschreibung}
+                onChange={(e) => setDraft({ ...draft, festschreibung: e.target.checked })}
+              />
+              {t('accounting.datev_festschreibung', { defaultValue: 'Lock bookings on import (Festschreibung)' })}
+            </label>
             <Button size="sm" variant="secondary" icon={<Save size={14} />} disabled={save.isPending} onClick={() => save.mutate(draft)}>
               {t('common.save', { defaultValue: 'Save' })}
             </Button>
@@ -106,7 +134,7 @@ export function ExportPanel({ from, to }: { from: string; to: string }) {
           <p className="mt-2 text-xs text-content-tertiary">
             {t('accounting.datev_limits', {
               defaultValue:
-                'Receivables and payables are exported on the summary accounts (e.g. 1400/1600), not on personal accounts. VAT lines are folded into gross amounts: SKR03 automatic accounts (8400, 8300, 3400, 3300) get no tax key, other accounts get keys 2/3 (output VAT) or 8/9 (input VAT). Only the first 14 Buchungsstapel columns are written.',
+                'Invoices, bills and their payments are booked on personal accounts (Debitoren/Kreditoren) from the ranges above, numbered in creation order; export the master data file with the same settings. Other entries stay on the summary accounts. VAT lines are folded into gross amounts: SKR03 automatic accounts (8400, 8300, 3400, 3300) get no tax key, other accounts get keys 2/3 (output VAT) or 8/9 (input VAT). Amounts are in the base currency.',
             })}
           </p>
         </div>

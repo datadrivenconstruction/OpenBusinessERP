@@ -35,6 +35,7 @@ export interface PurchasingPayment {
   method: string;
   reference: string;
   gl_entry_id: string | null;
+  fx_rate?: string | null;
 }
 
 export interface PurchasingDocSummary {
@@ -89,6 +90,7 @@ export interface PurchasingDocInput {
   supplier_name?: string;
   supplier_ref?: string;
   currency?: string;
+  fx_rate?: string | null;
   doc_date?: string | null;
   due_date?: string | null;
   notes?: string;

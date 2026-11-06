@@ -35,6 +35,7 @@ import {
   type DragStartEvent,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { DateField } from '@/shared/ui/DateField';
 import {
   LayoutGrid,
   List as ListIcon,
@@ -559,7 +560,7 @@ export function CRMPage() {
 
       {/* View switcher + search */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-lg border border-border-light bg-surface-secondary p-0.5">
+        <div className="inline-flex max-w-full overflow-x-auto rounded-lg border border-border-light bg-surface-secondary p-0.5">
           {TABS.map((it) => {
             const Icon = it.icon;
             const active = view === it.id;
@@ -2998,6 +2999,7 @@ function CreateModal({
       title={title}
       size={kind === 'deal' ? 'xl' : 'lg'}
       busy={busy}
+      onSubmit={submit}
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={busy}>
@@ -3149,8 +3151,8 @@ function CreateModal({
               })}
               span={2}
             >
-              <input
-                type="date"
+              <DateField
+               
                 value={dealForm.expected_close_date}
                 onChange={(e) =>
                   setDealForm({
@@ -3322,8 +3324,8 @@ function CreateModal({
             </select>
           </WideModalField>
           <WideModalField label={t('crm.due', { defaultValue: 'Due' })}>
-            <input
-              type="date"
+            <DateField
+             
               value={actForm.due_at}
               onChange={(e) =>
                 setActForm({ ...actForm, due_at: e.target.value })

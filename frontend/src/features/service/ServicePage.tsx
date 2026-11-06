@@ -1807,6 +1807,7 @@ function CreateModal({
       subtitle={subtitleByKind[kind]}
       size={modalSize}
       busy={busy}
+      onSubmit={submit}
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={busy}>
