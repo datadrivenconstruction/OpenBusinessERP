@@ -20,7 +20,7 @@ import sys
 import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 from pathlib import Path
 
 import pytest
@@ -738,7 +738,9 @@ class TestDeadlineSweepAcrossProjects:
                 stmt = stmt.where(Notification.entity_id == record)
             return (await session.execute(stmt)).scalar_one()
 
-        now = datetime.now(UTC)
+        # Noon of the day the records were dated from: the second sweep an hour
+        # later must not cross midnight and move the out-of-window record inside.
+        now = datetime.combine(today, time(12), tzinfo=UTC)
         async with factory() as session:
             await sweep_overdue(session, now=now)
             await session.commit()
