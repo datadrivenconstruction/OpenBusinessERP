@@ -158,7 +158,7 @@ export function ProposalScreen({
                   </span>
                   {field.unit.trim() && <span className="text-content-quaternary">{field.unit}</span>}
                   {field.type === 'link' && field.target && (
-                    <span className="text-content-tertiary"><span aria-hidden className="inline-block rtl:rotate-180">→</span> {say(t, TARGET_NAMES[field.target])}</span>
+                    <span className="text-content-tertiary">→ {say(t, TARGET_NAMES[field.target])}</span>
                   )}
                 </li>
               ))}
