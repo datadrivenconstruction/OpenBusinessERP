@@ -52,6 +52,7 @@ REPORT_PATH = Path(__file__).resolve().parent / "i18n_coverage_report.txt"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_i18n_orphan_keys import base_of  # noqa: E402  (import after sys.path tweak)
+from check_i18n_plural_forms import CATEGORIES  # noqa: E402
 
 MASTER = "en"
 
@@ -224,16 +225,25 @@ def locale_input_digest(paths: list[Path]) -> str:
     return h.hexdigest()[:16]
 
 
-def unanswered_keys(en_keys: set[str], loc_keys: set[str], base_keys: set[str] | None) -> list[str]:
+def unanswered_keys(
+    en_keys: set[str],
+    loc_keys: set[str],
+    base_keys: set[str] | None,
+    plural_categories: tuple[str, ...] | None = None,
+) -> list[str]:
     """Keys whose reader falls past this locale AND its base, into English.
 
     ``base_keys`` is None for a language that is nobody's variant, and that
     case must stay strict: en.ts answering a key is not coverage of anything,
     it is the fallback this whole audit exists to count. A variant is short of
     a key only when its base is short of it too.
+
+    ``plural_categories`` are the CLDR forms the language has. A ``_one`` key in
+    Japanese is not a gap: i18next never asks for it, ``_other`` answers count 1.
     """
     answered = loc_keys if base_keys is None else loc_keys | base_keys
-    return sorted(en_keys - answered)
+    absent = set() if plural_categories is None else {"zero", "one", "two", "few", "many"} - set(plural_categories)
+    return sorted(k for k in en_keys - answered if k.rsplit("_", 1)[-1] not in absent or "_" not in k)
 
 
 def base_locale_data(bases: dict[str, str | None]) -> dict[str, dict[str, str]]:
@@ -300,7 +310,8 @@ def main() -> None:
         inherited = base_data[base] if base else None
         inherited_keys = set(inherited) if inherited is not None else None
 
-        missing = unanswered_keys(en_keys, loc_keys, inherited_keys)
+        plural = CATEGORIES.get(loc) or CATEGORIES.get(loc.split("-")[0])
+        missing = unanswered_keys(en_keys, loc_keys, inherited_keys, plural)
         for k in missing:
             missing_counter[k] += 1
 

@@ -1284,6 +1284,16 @@
     "note": "brand/service name, functional interop reference",
     "reason_category": "product_name"
   },
+  "settings.docs_field_bic": {
+    "en_value": "BIC",
+    "note": "ISO 9362 business identifier code on the document-defaults form, the same bare acronym as settings.einvoice.field.payee_bic in every locale",
+    "reason_category": "acronym"
+  },
+  "settings.docs_field_iban": {
+    "en_value": "IBAN",
+    "note": "ISO 13616 account-number standard on the document-defaults form, the same bare acronym as settings.einvoice.field.payee_iban; its neighbours (Bank, Legal name, Tax number) are translated",
+    "reason_category": "acronym"
+  },
   "settings.einvoice.field.payee_bic": {
     "en_value": "BIC",
     "note": "ISO 9362 business identifier code, used as the bare acronym in all 39 including ru; sits beside the IBAN field for the same reason and the same evidence",
