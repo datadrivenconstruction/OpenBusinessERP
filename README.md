@@ -1,6 +1,6 @@
 <h1 align="center">OpenBusinessERP</h1>
 
-<p align="center">Self-hosted ERP for small businesses in Germany, Austria and Switzerland: quotes, invoices, stock, purchasing, bank reconciliation and double-entry bookkeeping, with a DATEV export for your tax adviser.</p>
+<p align="center">Self-hosted, open-source ERP for businesses in any country: quotes, invoices, stock, purchasing, bank reconciliation and double-entry bookkeeping, in 44 languages.</p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
@@ -21,19 +21,19 @@
   <img src="docs/images/hero.png" alt="OpenBusinessERP dashboard with cash, receivables, payables and revenue of the demo company" width="100%">
 </p>
 
-*Auf Deutsch:* Angebote, Rechnungen mit XRechnung/ZUGFeRD, Bankabgleich, Buchhaltung nach SKR03 oder SKR04 und DATEV-Export. Läuft auf Ihrem eigenen Server, Quellcode offen unter AGPL-3.0.
+The interface is available in 44 languages, four of them written right to left (Arabic, Persian, Urdu, Hebrew). Each document is rendered in the customer's language and currency, whatever language the user works in.
 
 ## A month in the software
 
-The demo company, *Kestrelmark Handel GmbH*, is a wholesale trader. A typical month:
+The demo company is a wholesale trader. A typical month:
 
-1. A customer asks for a price. You write an **Angebot** (quote) and send it as PDF from your own mail server.
-2. The customer accepts. The quote becomes an **Auftrag** (order), then a **Lieferschein** (delivery) that takes the goods out of stock.
-3. The delivery becomes a **Rechnung** (invoice) with a SEPA GiroCode, or a Swiss QR-bill for CH/LI businesses. For a public-sector customer you export it as XRechnung from the invoice page, with the Leitweg-ID on the invoice. Posting the invoice writes the journal entry on SKR03 or SKR04, split by VAT rate.
-4. Stock runs low. A **Bestellung** (purchase order) goes to the supplier; the goods receipt and the supplier's **Eingangsrechnung** (bill) are matched against it.
-5. You import the bank statement (camt.053, MT940 or CSV). The **Bankabgleich** proposes the open invoice or bill behind each line; you confirm.
-6. A customer has not paid. The dunning run proposes a **Mahnung** level and sends the reminder by e-mail.
-7. At month end you check the VAT report, close the period and download the **DATEV Buchungsstapel** for your tax adviser.
+1. A customer asks for a price. You write a **quote** and send it as PDF from your own mail server.
+2. The customer accepts. The quote becomes an **order**, then a **delivery** that takes the goods out of stock.
+3. The delivery becomes an **invoice** in the customer's language and currency, with a payment QR code where one is in use (SEPA GiroCode, Swiss QR-bill). A customer who needs an e-invoice gets EN 16931 XML (UBL or CII), Peppol BIS Billing 3.0, XRechnung or a ZUGFeRD / Factur-X PDF. Posting the invoice writes the journal entry, split by tax rate.
+4. Stock runs low. A **purchase order** goes to the supplier; the goods receipt and the supplier's **bill** are matched against it.
+5. You import the bank statement (camt.053, MT940 or CSV). **Bank reconciliation** proposes the open invoice or bill behind each line; you confirm.
+6. A customer has not paid. The dunning run proposes a **reminder** level and sends it by e-mail.
+7. At month end you check the tax report, close the period and give your accountant a **SAF-T 2.0** file or a **DATEV** batch.
 
 <p align="center">
   <img src="docs/images/sales-flow.gif" alt="A quote becomes an order, then an invoice that is issued, posted and paid" width="960">
@@ -45,7 +45,7 @@ The demo company, *Kestrelmark Handel GmbH*, is a wholesale trader. A typical mo
 - Quotes, orders, deliveries, invoices and credit notes in one document chain; nothing is typed twice.
 - Recurring invoices (weekly to yearly) that are generated, posted and e-mailed on schedule, with MRR and ARR.
 - Payment links on invoices through Stripe or Mollie; the provider fee is booked when the webhook reports it.
-- Documents in the customer's language, independent of the user's interface language; the interface ships with 45 locale bundles.
+- Documents in the customer's language, independent of the user's interface language.
 
 **Customers and appointments**
 - CRM pipeline from lead to won deal; a won deal becomes a quote.
@@ -63,23 +63,26 @@ The demo company, *Kestrelmark Handel GmbH*, is a wholesale trader. A typical mo
 **Accounting**
 - Double-entry general ledger: journal, trial balance, balance sheet, profit and loss with prior-period comparison, VAT report.
 - Posted entries cannot be edited, only reversed. Closed periods accept no postings. Entry numbers are gap-free per fiscal year. Every business-module write is recorded in an audit log with a before/after summary.
-- Multi-currency with ECB reference rates; realised exchange differences are posted.
+- 79 currencies with their own decimal places, ECB reference rates, and realised exchange differences posted.
 
 **Getting data in and out**
 - Import wizard for customers, suppliers, products, opening balances and open items from CSV or XLSX, with dry run and undo.
 - REST API under `/api/v1/` with an OpenAPI schema; every screen uses the same API.
 - Optional AI chat over your own data, using your own API key. Everything else works without it.
 
-## Germany, Austria, Switzerland
+## Countries and standards
 
 | Topic | What the code does |
 |---|---|
-| Charts of accounts | SKR03 and SKR04 (DE), Einheitskontenrahmen EKR (AT), KMU-Kontenrahmen (CH), plus an IFRS-style chart. Pick one in the business setup. |
-| VAT | Sales and purchase VAT post per rate (19 % / 7 % on SKR03 and SKR04). 0 % lines are routed to the reverse-charge (§ 13b), intra-EU, § 19 UStG small-business or exempt revenue account. AT 13 % and CH 3.8 % rates and the Swiss Art. 10 MWSTG exemption are available in the setup. |
-| E-invoicing | XRechnung 3.0 (CII), ZUGFeRD 2.1 / Factur-X hybrid PDF, EN 16931 CII and UBL, Peppol BIS Billing 3.0. Invoices are checked against EN 16931 business rules before export. |
-| DATEV | EXTF Buchungsstapel with all 125 columns, Debitor/Kreditor personal accounts, tax-account folding, Skonto, foreign-currency fields and Beleglink; Debitoren/Kreditoren master data file. SAF-T 2.0 XML as well. |
-| Payment slips | SEPA GiroCode (EPC QR) on EUR invoices; Swiss QR-bill (SIX guidelines v2.3, structured addresses, QR-IBAN with QRR reference) as the A6 payment part for CH/LI businesses. |
-| Bookkeeping rules | Posted entries are immutable and corrected by reversal; closed periods are locked; numbering is gap-free; changes are audit-logged. These are the properties GoBD asks for, not a GoBD certification (see below). |
+| Languages | 44 interface languages, including four right-to-left scripts. Quotes, invoices and reminders are rendered in the customer's language. |
+| Currencies | 79 currencies with 0 to 3 decimal places; ECB reference rates; exchange differences are posted when an invoice is paid. |
+| Tax rates | Rate presets for 44 countries, editable in the setup. Sales and purchase tax post per rate. On the national charts, 0 % lines are routed to reverse-charge, intra-EU, small-business or exempt revenue accounts. |
+| Charts of accounts | A generic IFRS-style chart, plus national templates: SKR03 and SKR04 (Germany), EKR (Austria) and KMU (Switzerland). Pick one in the business setup. |
+| E-invoicing | EN 16931 in CII and UBL, Peppol BIS Billing 3.0, XRechnung 3.0 and ZUGFeRD 2.1 / Factur-X hybrid PDF. Invoices are checked against the EN 16931 business rules before export. |
+| Accountant export | SAF-T 2.0 XML. For Germany, a DATEV EXTF batch with all 125 columns and a debtor/creditor master data file. |
+| Payment slips | SEPA GiroCode (EPC QR) on EUR invoices; Swiss QR-bill (SIX guidelines v2.3) for businesses in Switzerland and Liechtenstein. |
+| Bank statements | camt.053, camt.054, MT940 and CSV, with matching rules for recurring lines. |
+| Bookkeeping rules | Posted entries are immutable and corrected by reversal; closed periods are locked; numbering is gap-free; changes are audit-logged. Audit rules such as the German GoBD ask for these properties; this is not a certification (see below). |
 
 ## Quick start
 
@@ -114,18 +117,19 @@ See [DEVELOPING.md](DEVELOPING.md) and the [module development quickstart](docs/
 
 Read these before you rely on the software for your books.
 
-- **Nothing is certified.** The DATEV files are not certified by DATEV. The e-invoices are checked against EN 16931 rules, which confirms structure, not acceptance by a receiver or authority. The software is not certified as GoBD-compliant; GoBD compliance also depends on your procedures documentation (Verfahrensdokumentation), retention and operation.
-- **Test the DATEV export with your tax adviser** before the first real import. Adviser and client number, account length and SKR must match their setup. Columns without a data source stay empty. The full list is in [DATEV and SAF-T export](docs/manual/accountant-export.md).
+- **Nothing is certified.** No tax authority, e-invoicing network or software vendor has certified any part of it; the DATEV files are not certified by DATEV. The e-invoices are checked against EN 16931 rules, which confirms structure, not acceptance by a receiver or authority. Compliance with national bookkeeping rules (for example GoBD in Germany) also depends on your own procedures, retention and operation.
+- **Depth differs by country.** National charts of accounts, payment slips and the DATEV export exist for Germany, Austria and Switzerland. Elsewhere you work with the generic chart, the tax presets and EN 16931 / Peppol; check your local invoice and filing rules with your accountant.
+- **Test the accountant export** (SAF-T or DATEV) with your accountant before the first real import. Columns without a data source stay empty. The full list is in [DATEV and SAF-T export](docs/manual/accountant-export.md).
 - **ZUGFeRD PDFs are not strict PDF/A-3b.** The embedded XML is complete; a receiver that demands PDF/A-3b needs a post-processing step.
-- **No payroll, no tax filing.** There is no Lohnabrechnung, no ELSTER submission of the VAT return and no annual financial statement (Jahresabschluss) workflow. Your accountant files.
+- **No payroll, no tax filing.** There is no payroll, no electronic submission of tax returns and no year-end financial statement workflow. Your accountant files.
 - **No GitHub release yet.** Docker from source is the supported path. The desktop installers are not code signed, and the PyPI package is not published.
-- **Bank connection is file-based.** Statements are imported as files; there is no live FinTS/EBICS or PSD2 connection.
+- **Bank connection is file-based.** Statements are imported as files; there is no live bank connection (PSD2, EBICS, FinTS or similar).
 
 ## Architecture
 
 FastAPI, SQLAlchemy 2 (async), Pydantic 2 and Alembic on PostgreSQL; a React 18 + TypeScript single-page app built with Vite and served by the backend. Each business area is a module under `backend/app/modules/<name>/` with a `manifest.py`; the loader resolves dependencies and registers models, routes and event hooks, and modules can be switched off per installation. Without `DATABASE_URL`, an embedded PostgreSQL is started in the data directory. Configuration is read from environment variables; [`backend/.env.example`](backend/.env.example) lists them all.
 
-The interface ships with 45 locale bundles, including right-to-left scripts.
+The interface is translated into 44 languages from 45 locale bundles, including right-to-left scripts.
 
 ## Contributing
 
