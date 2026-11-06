@@ -68,6 +68,18 @@ def test_a_language_with_no_base_is_measured_against_english() -> None:
     assert audit.unanswered_keys(en, loc_keys=set(), base_keys=None) == ["boq.title"]
 
 
+def test_a_plural_form_the_language_lacks_is_not_missing() -> None:
+    """Japanese has only "other"; i18next never asks it for ``_one``."""
+    en = {"bim.rows_one", "bim.rows_other", "bim.title"}
+    assert audit.unanswered_keys(en, loc_keys={"bim.rows_other"}, base_keys=None, plural_categories=("other",)) == [
+        "bim.title"
+    ]
+    # Negative control: a language that has "one" is still short of it.
+    assert audit.unanswered_keys(
+        en, loc_keys={"bim.rows_other", "bim.title"}, base_keys=None, plural_categories=("one", "other")
+    ) == ["bim.rows_one"]
+
+
 def test_the_variant_keeps_its_own_words_and_inherits_the_rest() -> None:
     en = {"boq.title", "boq.total"}
     assert audit.unanswered_keys(en, loc_keys={"boq.total"}, base_keys={"boq.title"}) == []
