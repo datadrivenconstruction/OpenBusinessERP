@@ -62,7 +62,7 @@ ARG OE_EXTRAS=server,semantic-clients
 # target must not have a UI at all. A shared install step would have to be right
 # for both, and it cannot be. The extras list is shared instead, through
 # OE_EXTRAS, which is the part that actually drifted.
-FROM python:3.12-slim AS backend-base
+FROM python:3.15-slim AS backend-base
 LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later" \
       org.opencontainers.image.source="https://github.com/datadrivenconstruction/OpenBusinessERP"
 
