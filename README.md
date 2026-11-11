@@ -6,6 +6,8 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
   <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/tags"><img src="https://img.shields.io/github/v/tag/datadrivenconstruction/OpenBusinessERP?label=version" alt="Latest version"></a>
   <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml"><img src="https://github.com/datadrivenconstruction/OpenBusinessERP/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/releases"><img src="https://img.shields.io/github/downloads/datadrivenconstruction/OpenBusinessERP/total?label=downloads&color=brightgreen" alt="Downloads"></a>
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/stargazers"><img src="https://img.shields.io/github/stars/datadrivenconstruction/OpenBusinessERP?style=flat&logo=github&color=f5b301" alt="GitHub stars"></a>
 </p>
 
 <p align="center">
@@ -20,6 +22,33 @@
 <p align="center">
   <img src="docs/images/hero.png" alt="OpenBusinessERP dashboard with cash, receivables, payables and revenue of the demo company" width="100%">
 </p>
+
+<h3 align="center">Download the desktop app</h3>
+
+<p align="center">Embedded database included. No Docker, no server.</p>
+
+<p align="center">
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/releases/latest"><img src="https://img.shields.io/badge/Windows-.exe-0078D6?style=for-the-badge&logo=windows11&logoColor=white" alt="Download for Windows" height="40"></a>&nbsp;
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/releases/latest"><img src="https://img.shields.io/badge/macOS-Apple%20Silicon%20.dmg-111111?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS (Apple Silicon)" height="40"></a>&nbsp;
+  <a href="https://github.com/datadrivenconstruction/OpenBusinessERP/releases/latest"><img src="https://img.shields.io/badge/Linux-.deb%20·%20.rpm%20·%20.AppImage-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Download for Linux" height="40"></a>
+</p>
+
+<p align="center"><sub>The installers are not code-signed yet, so Windows and macOS warn on first launch. Every release ships <code>SHA256SUMS</code> with a Sigstore signature. Server install: <a href="#quick-start">Quick start</a>.</sub></p>
+
+<table align="center"><tr><td align="center">
+
+### ⭐ A star means a lot to us
+
+OpenBusinessERP is free and built by a small team at DataDrivenConstruction.<br>
+Stars are how other companies find out that an open-source project is alive and worth trying.<br>
+**If the project is useful to you, please star it. It takes one click and helps us more than anything else.**
+
+**How:** sign in to GitHub → scroll to the top of this page → click **☆ Star** in the top right.
+
+<a href="https://github.com/datadrivenconstruction/OpenBusinessERP/stargazers"><img src="https://img.shields.io/github/stars/datadrivenconstruction/OpenBusinessERP?style=for-the-badge&logo=github&label=Star%20OpenBusinessERP&color=f5b301" alt="Star OpenBusinessERP on GitHub" height="36"></a>
+
+</td></tr></table>
+
 
 The interface is available in 44 languages, four of them written right to left (Arabic, Persian, Urdu, Hebrew). Each document is rendered in the customer's language and currency, whatever language the user works in.
 
@@ -122,7 +151,7 @@ Read these before you rely on the software for your books.
 - **Test the accountant export** (SAF-T or DATEV) with your accountant before the first real import. Columns without a data source stay empty. The full list is in [DATEV and SAF-T export](docs/manual/accountant-export.md).
 - **ZUGFeRD PDFs are not strict PDF/A-3b.** The embedded XML is complete; a receiver that demands PDF/A-3b needs a post-processing step.
 - **No payroll, no tax filing.** There is no payroll, no electronic submission of tax returns and no year-end financial statement workflow. Your accountant files.
-- **No GitHub release yet.** Docker from source is the supported path. The desktop installers are not code signed, and the PyPI package is not published.
+- **Installers are not code-signed.** Desktop installers for Windows, macOS and Linux are on the [releases page](https://github.com/datadrivenconstruction/OpenBusinessERP/releases/latest); Windows and macOS warn on first launch. The PyPI package is not published.
 - **Bank connection is file-based.** Statements are imported as files; there is no live bank connection (PSD2, EBICS, FinTS or similar).
 
 ## Architecture
@@ -132,6 +161,8 @@ FastAPI, SQLAlchemy 2 (async), Pydantic 2 and Alembic on PostgreSQL; a React 18 
 The interface is translated into 44 languages from 45 locale bundles, including right-to-left scripts.
 
 ## Contributing
+
+The easiest way to help is a ⭐ on GitHub: it is how other companies discover the project.
 
 Bug reports, translations and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first; contributors sign the [CLA](CLA.md) once, through a bot comment on the first pull request. For anything larger than a bug fix, open a [discussion](https://github.com/datadrivenconstruction/OpenBusinessERP/discussions) about the approach before you start. Report security issues privately as described in [SECURITY.md](SECURITY.md).
 
@@ -149,3 +180,7 @@ OpenBusinessERP is provided **"AS IS", without warranty of any kind**, express o
 - **Fictional demo data.** All demo companies, people, addresses, bank details and tax numbers are invented. Any resemblance to real organisations or persons is coincidental.
 
 <p align="center"><sub>Made by <a href="https://datadrivenconstruction.io">Data Driven Construction</a>.</sub></p>
+
+---
+
+<p align="center"><b>Found OpenBusinessERP useful?</b> <a href="https://github.com/datadrivenconstruction/OpenBusinessERP">⭐ Star it on GitHub</a> so more companies can find it. Thank you!</p>
